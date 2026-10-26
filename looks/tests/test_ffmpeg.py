@@ -130,6 +130,8 @@ class TestEveryRegisteredEffectConfigures:
             f"{proc.stderr[-800:]}"
         )
 
+    # The chain is every effect in registry order, not a Look anyone would write.
+    @pytest.mark.filterwarnings("ignore::looks.stages.StageOrderWarning")
     def test_a_whole_chain_of_them_configures(self, cube, env):
         """Composed, not just one at a time — the chain is what ships."""
         _ffmpeg_or_skip()
