@@ -179,6 +179,8 @@ class EffectRegistry:
                 "which code a stored plan resolves to — which is exactly what "
                 "a plan hash exists to prevent. Pick another variant name."
             )
+        if impl.backend == "frame":
+            impl = self._settle_frame_rgb_only(impl)
         if impl.backend == "ffmpeg":
             impl = self._settle_rgb_only(impl)
             if impl.requires_filters:
@@ -233,6 +235,23 @@ class EffectRegistry:
                 f"{KEY_SHAPE}, so a key that says otherwise is a name that "
                 "will be read wrongly by everything downstream."
             )
+
+    @staticmethod
+    def _settle_frame_rgb_only(impl: ImplRef) -> ImplRef:
+        """A frame operation always takes RGB: the pipe converts to it (rule 22).
+
+        The conversion is ffmpeg's, at the pipe's edges, so a frame operation is
+        an RGB-only step whatever it does with the pixels (issue #46).
+        """
+        import dataclasses
+
+        if impl.rgb_only is False:
+            raise RegistryError(
+                f"{impl.impl!r} declares rgb_only=False, but a frame operation "
+                "reads RGB frames off the pipe: ffmpeg converts YUV to RGB for it "
+                "(rule 22). Leave it undeclared, or True."
+            )
+        return dataclasses.replace(impl, rgb_only=True)
 
     @staticmethod
     def _settle_rgb_only(impl: ImplRef) -> ImplRef:

@@ -293,3 +293,141 @@ def test_a_stored_clip_without_color_assumed_loads_as_not_assumed(env):
 def test_an_assumed_flag_with_nothing_assumed_is_incoherent():
     with pytest.raises(SpecError):
         ClipSpec(width=2, height=2, fps=1, color_assumed=True)
+
+
+# --- the pipe's own conversion (issue #46) ----------------------------------
+
+
+@pytest.fixture
+def frame_registry():
+    from looks.ffmpeg import register_defaults
+    from looks.licence import terms_for
+    from looks.registry import EffectRegistry
+    from looks.spec import ImplRef
+
+    reg = register_defaults(EffectRegistry())
+    reg.register(
+        ImplRef(
+            effect="meanshift",
+            impl="meanshift.frame.reference",
+            backend="frame",
+            terms=terms_for("ffmpeg")[0],
+        ),
+        lambda params, **kw: {"op": "meanshift.frame.reference"},
+    )
+    return reg
+
+
+def _matrix_wrap_of(clip):
+    from looks.ffmpeg import matrix_wrap
+
+    return matrix_wrap(clip)
+
+
+def _segment(env, registry, clip, **kwargs):
+    from looks.pipe import pipe_plan
+
+    plan = compile_look(
+        Look(steps=(Effect(name="meanshift"),)),
+        clip=clip,
+        env=env,
+        registry=registry,
+        assume_color_space="bt709" if clip is UNTAGGED else None,
+    )
+    return pipe_plan(plan, source="in.mkv", **kwargs).segments[0]
+
+
+def test_a_frame_op_is_an_rgb_only_step(frame_registry):
+    assert frame_registry.impl("meanshift.frame.reference").rgb_only is True
+
+
+def test_a_frame_op_cannot_declare_itself_yuv(frame_registry):
+    from looks.licence import terms_for
+    from looks.registry import RegistryError
+    from looks.spec import ImplRef
+
+    with pytest.raises(RegistryError, match="rgb_only=False"):
+        frame_registry.register(
+            ImplRef(
+                effect="meanshift",
+                impl="meanshift.frame.other",
+                backend="frame",
+                terms=terms_for("ffmpeg")[0],
+                rgb_only=False,
+            ),
+            lambda params, **kw: {},
+        )
+
+
+def test_a_frame_op_on_an_undeclared_clip_is_refused(env, frame_registry):
+    with pytest.raises(CompileError, match="meanshift"):
+        compile_look(
+            Look(steps=(Effect(name="meanshift"),)),
+            clip=UNTAGGED,
+            env=env,
+            registry=frame_registry,
+        )
+
+
+def test_the_pipe_declares_the_matrix_where_it_converts(env, frame_registry):
+    segment = _segment(env, frame_registry, TAGGED)
+    decode = segment.decode[segment.decode.index("-vf") + 1]
+    encode = segment.encode[segment.encode.index("-vf") + 1]
+    wrap = _matrix_wrap_of(TAGGED)
+    assert decode.count(wrap) == 1 and encode.count(wrap) == 1  # no chain: one `scale`
+    assert decode == encode == _matrix_wrap_of(TAGGED)
+
+
+def test_a_chain_in_the_pipe_is_wrapped_on_both_sides(env, frame_registry):
+    from looks.pipe import pipe_plan
+
+    plan = compile_look(
+        Look(steps=(Effect(name="meanshift"), Effect(name="blur", params={"sigma": 2}))),
+        clip=TAGGED,
+        env=env,
+        registry=frame_registry,
+    )
+    segment = pipe_plan(plan, source="in.mkv").segments[0]
+    encode = segment.encode[segment.encode.index("-vf") + 1]
+    wrap = _matrix_wrap_of(TAGGED)
+    assert encode.startswith(wrap + ",gblur") and encode.endswith("," + wrap)
+
+
+def test_a_grey_pipe_has_no_matrix_to_declare(env, frame_registry):
+    segment = _segment(env, frame_registry, TAGGED, pix_fmt="gray")
+    assert "-vf" not in segment.decode and "-vf" not in segment.encode
+
+
+def test_a_tagged_picture_survives_the_pipe_unshifted(env, frame_registry, tmp_path):
+    """Decode to the pipe format and encode back, the frame op being identity;
+    compared on all three planes (rule 29b), as the `vf` path is."""
+    source = tmp_path / "tagged.mkv"
+    subprocess.run(
+        ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", _source("tv"), "-frames:v", "1",
+         "-c:v", "ffv1", str(source)],
+        check=True,
+    )
+    segment = _segment(env, frame_registry, TAGGED)
+    decode = list(segment.decode)
+    decode[decode.index("in.mkv")] = str(source)
+    frames = subprocess.run(decode, capture_output=True, check=True).stdout
+    assert len(frames) == segment.frame_bytes
+    after = subprocess.run(
+        [*segment.encode, "-pix_fmt", "yuv420p", "-frames:v", "1", "-f", "rawvideo", "-"],
+        input=frames,
+        capture_output=True,
+        check=True,
+    ).stdout
+    drift = _plane_drift(_planes("", _source("tv")), after)
+    assert max(drift) < TOLERANCE, drift
+
+
+def test_a_pipe_over_an_undeclared_clip_is_refused(env, frame_registry):
+    from looks.pipe import PipeError, pipe_plan
+
+    plan = compile_look(
+        Look(steps=(Effect(name="meanshift"),)), clip=TAGGED, env=env, registry=frame_registry
+    )
+    with pytest.raises(PipeError, match="colour space"):
+        pipe_plan(plan, source="in.mkv", clip=UNTAGGED)
+    pipe_plan(plan, source="in.mkv", clip=UNTAGGED, pix_fmt="gray")  # luma has no matrix
