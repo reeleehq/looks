@@ -1,4 +1,4 @@
-> built 2026-10-26 16:15 UTC from 71bbb51 (main) · looks 0.0.24. Details: build_info.json
+> built 2026-10-26 17:09 UTC from 0e31bc2 (main) · looks 0.0.25. Details: build_info.json
 
 # index.html.md
 
@@ -1632,6 +1632,8 @@ keeps the package honest would have nothing left to protect.
 | [`OPTION_LEVEL_SPECIALS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.OPTION_LEVEL_SPECIALS)   | Characters the **option** parser gives meaning to, within one filter's arguments.                                                                                   |
 |--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [`GRAPH_LEVEL_SPECIALS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.GRAPH_LEVEL_SPECIALS)    | Characters the **filtergraph** parser gives meaning to across the graph: `,` chains, `;` separates, `[]` delimit pad labels, `\\` and `'` do that parser's quoting. |
+| [`RGB_DOMAIN_FILTERS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RGB_DOMAIN_FILTERS)      | Filters that only take RGB, so ffmpeg converts YUV to RGB and back around them.                                                                                     |
+| [`RGB_ONLY_IMPL_VERSION`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RGB_ONLY_IMPL_VERSION)   | The version of an implementation that sits in an RGB-only run.                                                                                                      |
 | [`SETSAR_MAX`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.SETSAR_MAX)              | `setsar`'s largest allowed rational term.                                                                                                                           |
 | [`LABEL_NAMESPACE`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.LABEL_NAMESPACE)         | Prefix of the pad labels a branching effect uses internally, so they stay clear of a host's own (`[a]`, `[bg]`: note 05, label rule 2).                             |
 
@@ -1672,6 +1674,18 @@ clear of a host’s own (`[a]`, `[bg]`: note 05, label rule 2).
 Characters the **option** parser gives meaning to, within one filter’s
 arguments. Must lead with `\\`: the backslashes introduced for the later
 characters must not themselves be escaped by the `\\` pass.
+
+### looks.ffmpeg.RGB_DOMAIN_FILTERS *= frozenset({'colorbalance', 'colorchannelmixer', 'colorlevels', 'curves', 'lut3d', 'lutrgb'})*
+
+Filters that only take RGB, so ffmpeg converts YUV to RGB and back around
+them. On ffmpeg 6.1 that auto-inserted conversion ignores the colour tags:
+a flat BT.709 frame lost about 7 luma through any of these, a colour test
+pattern 6.4 mean luma (against 0.16 on ffmpeg 9), issue #29. A YUV-capable
+filter (`lutyuv`, `gblur`) is untouched by it and so is not listed.
+
+### looks.ffmpeg.RGB_ONLY_IMPL_VERSION *= '2'*
+
+The version of an implementation that sits in an RGB-only run.
 
 ### looks.ffmpeg.SETSAR_MAX *= 2147483647*
 
@@ -10768,20 +10782,18 @@ frames...
 
 # About this build
 
-This documentation was built on **2026-10-26 16:15 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/71bbb518723ef9703fe8acc3b45dea9cbdcb9c16"><code>71bbb51</code></a> on branch <code>main</code>, for **looks 0.0.24** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 17:09 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/0e31bc26b453c547be38fddae23fd0a8b9eb799d"><code>0e31bc2</code></a> on branch <code>main</code>, for **looks 0.0.25** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.24) is ahead of the latest release on PyPI (0.0.23): these docs describe unreleased code.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/looks/commit/71bbb518723ef9703fe8acc3b45dea9cbdcb9c16"><code>71bbb518723ef9703fe8acc3b45dea9cbdcb9c16</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/looks/commit/0e31bc26b453c547be38fddae23fd0a8b9eb799d"><code>0e31bc26b453c547be38fddae23fd0a8b9eb799d</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | <code>0.0.24</code>                                                                                                                                   |
+| Tags at this commit | <code>0.0.25</code>                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/looks</code>                                                                                                        |
 
@@ -10790,9 +10802,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/looks</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/40356748299">40356748299</a>       |
+| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/40365295390">40365295390</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>d7d6f0875f001eef7d073edebbed273287cf012b</code> (in the history of the built commit) |
+| Event commit | <code>8a76927d85747f656d7d37edc77394dbfbb59ce9</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -10817,13 +10829,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/looks/0.0.23/">0.0.23</a>, older than the documented version (0.0.24).
+Latest release: <a href="https://pypi.org/project/looks/0.0.25/">0.0.25</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout 71bbb518723ef9703fe8acc3b45dea9cbdcb9c16
+git checkout 0e31bc26b453c547be38fddae23fd0a8b9eb799d
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

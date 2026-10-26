@@ -51,6 +51,8 @@ keeps the package honest would have nothing left to protect.
 | [`OPTION_LEVEL_SPECIALS`](#looks.ffmpeg.OPTION_LEVEL_SPECIALS)   | Characters the **option** parser gives meaning to, within one filter's arguments.                                                                                   |
 |--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [`GRAPH_LEVEL_SPECIALS`](#looks.ffmpeg.GRAPH_LEVEL_SPECIALS)    | Characters the **filtergraph** parser gives meaning to across the graph: `,` chains, `;` separates, `[]` delimit pad labels, `\\` and `'` do that parser's quoting. |
+| [`RGB_DOMAIN_FILTERS`](#looks.ffmpeg.RGB_DOMAIN_FILTERS)      | Filters that only take RGB, so ffmpeg converts YUV to RGB and back around them.                                                                                     |
+| [`RGB_ONLY_IMPL_VERSION`](#looks.ffmpeg.RGB_ONLY_IMPL_VERSION)   | The version of an implementation that sits in an RGB-only run.                                                                                                      |
 | [`SETSAR_MAX`](#looks.ffmpeg.SETSAR_MAX)              | `setsar`'s largest allowed rational term.                                                                                                                           |
 | [`LABEL_NAMESPACE`](#looks.ffmpeg.LABEL_NAMESPACE)         | Prefix of the pad labels a branching effect uses internally, so they stay clear of a host's own (`[a]`, `[bg]`: note 05, label rule 2).                             |
 
@@ -91,6 +93,18 @@ clear of a host’s own (`[a]`, `[bg]`: note 05, label rule 2).
 Characters the **option** parser gives meaning to, within one filter’s
 arguments. Must lead with `\\`: the backslashes introduced for the later
 characters must not themselves be escaped by the `\\` pass.
+
+### looks.ffmpeg.RGB_DOMAIN_FILTERS *= frozenset({'colorbalance', 'colorchannelmixer', 'colorlevels', 'curves', 'lut3d', 'lutrgb'})*
+
+Filters that only take RGB, so ffmpeg converts YUV to RGB and back around
+them. On ffmpeg 6.1 that auto-inserted conversion ignores the colour tags:
+a flat BT.709 frame lost about 7 luma through any of these, a colour test
+pattern 6.4 mean luma (against 0.16 on ffmpeg 9), issue #29. A YUV-capable
+filter (`lutyuv`, `gblur`) is untouched by it and so is not listed.
+
+### looks.ffmpeg.RGB_ONLY_IMPL_VERSION *= '2'*
+
+The version of an implementation that sits in an RGB-only run.
 
 ### looks.ffmpeg.SETSAR_MAX *= 2147483647*
 

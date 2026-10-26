@@ -419,242 +419,244 @@
 </span><span id="line-224">            <span class="p">)</span>
 </span><span id="line-225">
 </span><span id="line-226">
-</span><span id="line-227"><span class="k">def</span><span class="w"> </span><span class="nf">_vf_of</span><span class="p">(</span><span class="n">steps</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Step</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-227"><span class="k">def</span><span class="w"> </span><span class="nf">_vf_of</span><span class="p">(</span><span class="n">steps</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Step</span><span class="p">],</span> <span class="n">clip</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 </span><span id="line-228">    <span class="kn">from</span><span class="w"> </span><span class="nn">looks.ffmpeg</span><span class="w"> </span><span class="kn">import</span> <span class="n">vf</span>
 </span><span id="line-229">
-</span><span id="line-230">    <span class="k">return</span> <span class="n">vf</span><span class="p">(</span><span class="n">LookPlan</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">steps</span><span class="p">)))</span>
-</span><span id="line-231">
-</span><span id="line-232">
+</span><span id="line-230">    <span class="c1"># The clip rides along because `vf` declares its colour matrix around</span>
+</span><span id="line-231">    <span class="c1"># RGB-only steps (issue #29); each segment converts on its own.</span>
+</span><span id="line-232">    <span class="k">return</span> <span class="n">vf</span><span class="p">(</span><span class="n">LookPlan</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">steps</span><span class="p">),</span> <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="p">))</span>
+</span><span id="line-233">
+</span><span id="line-234">
 <div class="viewcode-block" id="piped_size">
 <a class="viewcode-back" href="../../_autosummary/looks.pipe.html#looks.piped_size">[docs]</a>
-</span><span id="line-233"><span class="k">def</span><span class="w"> </span><span class="nf">piped_size</span><span class="p">(</span><span class="n">clip</span><span class="p">:</span> <span class="n">ClipSpec</span><span class="p">,</span> <span class="n">folded</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Step</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-</span><span id="line-234"><span class="w">    </span><span class="sd">"""The frame size the decoder actually emits, after the folded chain.</span>
-</span><span id="line-235">
-</span><span id="line-236"><span class="sd">    An effect that changes the frame's geometry declares ``out_size`` in its</span>
-</span><span id="line-237"><span class="sd">    payload. That is a **contract**, not decoration: rawvideo has no header, so</span>
-</span><span id="line-238"><span class="sd">    the size a consumer reads has to come from the plan, and an implementation</span>
-</span><span id="line-239"><span class="sd">    that resizes without saying so makes the declared stride a lie.</span>
-</span><span id="line-240">
-</span><span id="line-241"><span class="sd">    &gt;&gt;&gt; from looks.spec import ClipSpec</span>
-</span><span id="line-242"><span class="sd">    &gt;&gt;&gt; piped_size(ClipSpec(width=640, height=480, fps=10), [])</span>
-</span><span id="line-243"><span class="sd">    (640, 480)</span>
-</span><span id="line-244"><span class="sd">    """</span>
-</span><span id="line-245">    <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">clip</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">clip</span><span class="o">.</span><span class="n">height</span>
-</span><span id="line-246">    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">folded</span><span class="p">:</span>
-</span><span id="line-247">        <span class="n">declared</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"out_size"</span><span class="p">)</span>
-</span><span id="line-248">        <span class="k">if</span> <span class="n">declared</span><span class="p">:</span>
-</span><span id="line-249">            <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">declared</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">declared</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-</span><span id="line-250">    <span class="k">return</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span></div>
+</span><span id="line-235"><span class="k">def</span><span class="w"> </span><span class="nf">piped_size</span><span class="p">(</span><span class="n">clip</span><span class="p">:</span> <span class="n">ClipSpec</span><span class="p">,</span> <span class="n">folded</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Step</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+</span><span id="line-236"><span class="w">    </span><span class="sd">"""The frame size the decoder actually emits, after the folded chain.</span>
+</span><span id="line-237">
+</span><span id="line-238"><span class="sd">    An effect that changes the frame's geometry declares ``out_size`` in its</span>
+</span><span id="line-239"><span class="sd">    payload. That is a **contract**, not decoration: rawvideo has no header, so</span>
+</span><span id="line-240"><span class="sd">    the size a consumer reads has to come from the plan, and an implementation</span>
+</span><span id="line-241"><span class="sd">    that resizes without saying so makes the declared stride a lie.</span>
+</span><span id="line-242">
+</span><span id="line-243"><span class="sd">    &gt;&gt;&gt; from looks.spec import ClipSpec</span>
+</span><span id="line-244"><span class="sd">    &gt;&gt;&gt; piped_size(ClipSpec(width=640, height=480, fps=10), [])</span>
+</span><span id="line-245"><span class="sd">    (640, 480)</span>
+</span><span id="line-246"><span class="sd">    """</span>
+</span><span id="line-247">    <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">clip</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">clip</span><span class="o">.</span><span class="n">height</span>
+</span><span id="line-248">    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">folded</span><span class="p">:</span>
+</span><span id="line-249">        <span class="n">declared</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"out_size"</span><span class="p">)</span>
+</span><span id="line-250">        <span class="k">if</span> <span class="n">declared</span><span class="p">:</span>
+</span><span id="line-251">            <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">declared</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">declared</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</span><span id="line-252">    <span class="k">return</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span></div>
 
-</span><span id="line-251">
-</span><span id="line-252">
-</span><span id="line-253"><span class="k">def</span><span class="w"> </span><span class="nf">_decoder</span><span class="p">(</span><span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">clip</span><span class="p">:</span> <span class="n">ClipSpec</span><span class="p">,</span> <span class="n">chain</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pix_fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-</span><span id="line-254"><span class="w">    </span><span class="sd">"""ffmpeg reading the source and writing raw frames to stdout."""</span>
-</span><span id="line-255">    <span class="n">argv</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"ffmpeg"</span><span class="p">,</span> <span class="s2">"-v"</span><span class="p">,</span> <span class="s2">"error"</span><span class="p">,</span> <span class="s2">"-i"</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="s2">"-an"</span><span class="p">]</span>
-</span><span id="line-256">    <span class="k">if</span> <span class="n">chain</span><span class="p">:</span>
-</span><span id="line-257">        <span class="n">argv</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">"-vf"</span><span class="p">,</span> <span class="n">chain</span><span class="p">]</span>
-</span><span id="line-258">    <span class="c1"># NO `-s` here. After `-vf` it is an OUTPUT option, so it does not describe</span>
-</span><span id="line-259">    <span class="c1"># the frames — it forces a rescale to that size, undoing any geometry folded</span>
-</span><span id="line-260">    <span class="c1"># into the decode chain. Measured: `fit` to 320x240 folded in, then</span>
-</span><span id="line-261">    <span class="c1"># `-s 640x480` scaled it straight back to the source size, silently. The</span>
-</span><span id="line-262">    <span class="c1"># frame size out of a decoder is whatever its chain produces, and a consumer</span>
-</span><span id="line-263">    <span class="c1"># reads it from the segment's declared width/height instead.</span>
-</span><span id="line-264">    <span class="n">argv</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">"-f"</span><span class="p">,</span> <span class="s2">"rawvideo"</span><span class="p">,</span> <span class="s2">"-pix_fmt"</span><span class="p">,</span> <span class="n">pix_fmt</span><span class="p">,</span> <span class="s2">"-r"</span><span class="p">,</span> <span class="n">_rate</span><span class="p">(</span><span class="n">clip</span><span class="o">.</span><span class="n">fps</span><span class="p">),</span> <span class="s2">"-"</span><span class="p">]</span>
-</span><span id="line-265">    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
-</span><span id="line-266">
-</span><span id="line-267">
-</span><span id="line-268"><span class="k">def</span><span class="w"> </span><span class="nf">_encoder</span><span class="p">(</span><span class="n">clip</span><span class="p">:</span> <span class="n">ClipSpec</span><span class="p">,</span> <span class="n">chain</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pix_fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-</span><span id="line-269"><span class="w">    </span><span class="sd">"""ffmpeg reading raw frames from stdin — input contract and filters only.</span>
-</span><span id="line-270">
-</span><span id="line-271"><span class="sd">    The rate is declared explicitly and derived from the clip, never omitted:</span>
-</span><span id="line-272"><span class="sd">    the rawvideo demuxer defaults to 25, which would rescale every time-based</span>
-</span><span id="line-273"><span class="sd">    expression in the folded chain without saying so.</span>
-</span><span id="line-274"><span class="sd">    """</span>
-</span><span id="line-275">    <span class="n">argv</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-276">        <span class="s2">"ffmpeg"</span><span class="p">,</span>
-</span><span id="line-277">        <span class="s2">"-v"</span><span class="p">,</span>
-</span><span id="line-278">        <span class="s2">"error"</span><span class="p">,</span>
-</span><span id="line-279">        <span class="s2">"-f"</span><span class="p">,</span>
-</span><span id="line-280">        <span class="s2">"rawvideo"</span><span class="p">,</span>
-</span><span id="line-281">        <span class="s2">"-pix_fmt"</span><span class="p">,</span>
-</span><span id="line-282">        <span class="n">pix_fmt</span><span class="p">,</span>
-</span><span id="line-283">        <span class="s2">"-s"</span><span class="p">,</span>
-</span><span id="line-284">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">clip</span><span class="o">.</span><span class="n">width</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">clip</span><span class="o">.</span><span class="n">height</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="line-285">        <span class="s2">"-r"</span><span class="p">,</span>
-</span><span id="line-286">        <span class="n">_rate</span><span class="p">(</span><span class="n">clip</span><span class="o">.</span><span class="n">fps</span><span class="p">),</span>
-</span><span id="line-287">        <span class="s2">"-i"</span><span class="p">,</span>
-</span><span id="line-288">        <span class="s2">"-"</span><span class="p">,</span>
-</span><span id="line-289">    <span class="p">]</span>
-</span><span id="line-290">    <span class="k">if</span> <span class="n">chain</span><span class="p">:</span>
-</span><span id="line-291">        <span class="n">argv</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">"-vf"</span><span class="p">,</span> <span class="n">chain</span><span class="p">]</span>
-</span><span id="line-292">    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
-</span><span id="line-293">
-</span><span id="line-294">
-</span><span id="line-295"><span class="k">def</span><span class="w"> </span><span class="nf">_rate</span><span class="p">(</span><span class="n">fps</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-296">    <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">fps</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">"</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">"0"</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span>
-</span><span id="line-297">    <span class="k">return</span> <span class="n">text</span> <span class="ow">or</span> <span class="s2">"0"</span>
-</span><span id="line-298">
-</span><span id="line-299">
+</span><span id="line-253">
+</span><span id="line-254">
+</span><span id="line-255"><span class="k">def</span><span class="w"> </span><span class="nf">_decoder</span><span class="p">(</span><span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">clip</span><span class="p">:</span> <span class="n">ClipSpec</span><span class="p">,</span> <span class="n">chain</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pix_fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+</span><span id="line-256"><span class="w">    </span><span class="sd">"""ffmpeg reading the source and writing raw frames to stdout."""</span>
+</span><span id="line-257">    <span class="n">argv</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"ffmpeg"</span><span class="p">,</span> <span class="s2">"-v"</span><span class="p">,</span> <span class="s2">"error"</span><span class="p">,</span> <span class="s2">"-i"</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="s2">"-an"</span><span class="p">]</span>
+</span><span id="line-258">    <span class="k">if</span> <span class="n">chain</span><span class="p">:</span>
+</span><span id="line-259">        <span class="n">argv</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">"-vf"</span><span class="p">,</span> <span class="n">chain</span><span class="p">]</span>
+</span><span id="line-260">    <span class="c1"># NO `-s` here. After `-vf` it is an OUTPUT option, so it does not describe</span>
+</span><span id="line-261">    <span class="c1"># the frames — it forces a rescale to that size, undoing any geometry folded</span>
+</span><span id="line-262">    <span class="c1"># into the decode chain. Measured: `fit` to 320x240 folded in, then</span>
+</span><span id="line-263">    <span class="c1"># `-s 640x480` scaled it straight back to the source size, silently. The</span>
+</span><span id="line-264">    <span class="c1"># frame size out of a decoder is whatever its chain produces, and a consumer</span>
+</span><span id="line-265">    <span class="c1"># reads it from the segment's declared width/height instead.</span>
+</span><span id="line-266">    <span class="n">argv</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">"-f"</span><span class="p">,</span> <span class="s2">"rawvideo"</span><span class="p">,</span> <span class="s2">"-pix_fmt"</span><span class="p">,</span> <span class="n">pix_fmt</span><span class="p">,</span> <span class="s2">"-r"</span><span class="p">,</span> <span class="n">_rate</span><span class="p">(</span><span class="n">clip</span><span class="o">.</span><span class="n">fps</span><span class="p">),</span> <span class="s2">"-"</span><span class="p">]</span>
+</span><span id="line-267">    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+</span><span id="line-268">
+</span><span id="line-269">
+</span><span id="line-270"><span class="k">def</span><span class="w"> </span><span class="nf">_encoder</span><span class="p">(</span><span class="n">clip</span><span class="p">:</span> <span class="n">ClipSpec</span><span class="p">,</span> <span class="n">chain</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pix_fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+</span><span id="line-271"><span class="w">    </span><span class="sd">"""ffmpeg reading raw frames from stdin — input contract and filters only.</span>
+</span><span id="line-272">
+</span><span id="line-273"><span class="sd">    The rate is declared explicitly and derived from the clip, never omitted:</span>
+</span><span id="line-274"><span class="sd">    the rawvideo demuxer defaults to 25, which would rescale every time-based</span>
+</span><span id="line-275"><span class="sd">    expression in the folded chain without saying so.</span>
+</span><span id="line-276"><span class="sd">    """</span>
+</span><span id="line-277">    <span class="n">argv</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-278">        <span class="s2">"ffmpeg"</span><span class="p">,</span>
+</span><span id="line-279">        <span class="s2">"-v"</span><span class="p">,</span>
+</span><span id="line-280">        <span class="s2">"error"</span><span class="p">,</span>
+</span><span id="line-281">        <span class="s2">"-f"</span><span class="p">,</span>
+</span><span id="line-282">        <span class="s2">"rawvideo"</span><span class="p">,</span>
+</span><span id="line-283">        <span class="s2">"-pix_fmt"</span><span class="p">,</span>
+</span><span id="line-284">        <span class="n">pix_fmt</span><span class="p">,</span>
+</span><span id="line-285">        <span class="s2">"-s"</span><span class="p">,</span>
+</span><span id="line-286">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">clip</span><span class="o">.</span><span class="n">width</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">clip</span><span class="o">.</span><span class="n">height</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-287">        <span class="s2">"-r"</span><span class="p">,</span>
+</span><span id="line-288">        <span class="n">_rate</span><span class="p">(</span><span class="n">clip</span><span class="o">.</span><span class="n">fps</span><span class="p">),</span>
+</span><span id="line-289">        <span class="s2">"-i"</span><span class="p">,</span>
+</span><span id="line-290">        <span class="s2">"-"</span><span class="p">,</span>
+</span><span id="line-291">    <span class="p">]</span>
+</span><span id="line-292">    <span class="k">if</span> <span class="n">chain</span><span class="p">:</span>
+</span><span id="line-293">        <span class="n">argv</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">"-vf"</span><span class="p">,</span> <span class="n">chain</span><span class="p">]</span>
+</span><span id="line-294">    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+</span><span id="line-295">
+</span><span id="line-296">
+</span><span id="line-297"><span class="k">def</span><span class="w"> </span><span class="nf">_rate</span><span class="p">(</span><span class="n">fps</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-298">    <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">fps</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">"</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">"0"</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span>
+</span><span id="line-299">    <span class="k">return</span> <span class="n">text</span> <span class="ow">or</span> <span class="s2">"0"</span>
+</span><span id="line-300">
+</span><span id="line-301">
 <div class="viewcode-block" id="pipe_plan">
 <a class="viewcode-back" href="../../_autosummary/looks.pipe.html#looks.pipe_plan">[docs]</a>
-</span><span id="line-300"><span class="k">def</span><span class="w"> </span><span class="nf">pipe_plan</span><span class="p">(</span>
-</span><span id="line-301">    <span class="n">plan</span><span class="p">:</span> <span class="n">LookPlan</span><span class="p">,</span>
-</span><span id="line-302">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-303">    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="line-304">    <span class="n">clip</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ClipSpec</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-305">    <span class="n">pix_fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_PIPE_PIX_FMT</span><span class="p">,</span>
-</span><span id="line-306"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PipePlan</span><span class="p">:</span>
-</span><span id="line-307"><span class="w">    </span><span class="sd">"""Arrange a compiled plan as processes — emitted as data, never started.</span>
-</span><span id="line-308">
-</span><span id="line-309"><span class="sd">    Args:</span>
-</span><span id="line-310"><span class="sd">        source: What the first decoder reads. Passed through verbatim; `looks`</span>
-</span><span id="line-311"><span class="sd">            does not open it.</span>
-</span><span id="line-312"><span class="sd">        clip: The clip the plan was compiled against. Defaults to the plan's own.</span>
-</span><span id="line-313">
-</span><span id="line-314"><span class="sd">    Raises:</span>
-</span><span id="line-315"><span class="sd">        PipeError: If the plan needs a raw-frame boundary and cannot be arranged</span>
-</span><span id="line-316"><span class="sd">            safely across it — an undeclared time origin under a gated step, or</span>
-</span><span id="line-317"><span class="sd">            a gate baked into a filter string.</span>
-</span><span id="line-318">
-</span><span id="line-319"><span class="sd">    Examples:</span>
-</span><span id="line-320"><span class="sd">        A plan of pure ffmpeg steps is one segment and costs no boundary. The</span>
-</span><span id="line-321"><span class="sd">        plan is built here by hand rather than compiled, so the example needs no</span>
-</span><span id="line-322"><span class="sd">        ffmpeg — a doctest that needs a binary is a doctest CI does not run.</span>
-</span><span id="line-323">
-</span><span id="line-324"><span class="sd">        &gt;&gt;&gt; from looks.licence import Tier, terms_for</span>
-</span><span id="line-325"><span class="sd">        &gt;&gt;&gt; from looks.spec import ImplRef, LookPlan, Step</span>
-</span><span id="line-326"><span class="sd">        &gt;&gt;&gt; impl = ImplRef(effect='blur', impl='blur.ffmpeg.gblur',</span>
-</span><span id="line-327"><span class="sd">        ...                backend='ffmpeg', terms=terms_for('ffmpeg')[0])</span>
-</span><span id="line-328"><span class="sd">        &gt;&gt;&gt; plan = LookPlan(steps=(Step(effect='blur', impl=impl,</span>
-</span><span id="line-329"><span class="sd">        ...     tier=Tier.COPYLEFT_TOOL, payload={'filter': 'gblur=sigma=2'}),))</span>
-</span><span id="line-330"><span class="sd">        &gt;&gt;&gt; arranged = pipe_plan(plan, source='in.mp4')</span>
-</span><span id="line-331"><span class="sd">        &gt;&gt;&gt; len(arranged), arranged.boundaries</span>
-</span><span id="line-332"><span class="sd">        (1, 0)</span>
-</span><span id="line-333"><span class="sd">    """</span>
-</span><span id="line-334">    <span class="k">if</span> <span class="n">pix_fmt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">PIPE_BYTES_PER_PIXEL</span><span class="p">:</span>
-</span><span id="line-335">        <span class="k">raise</span> <span class="n">PipeError</span><span class="p">(</span>
-</span><span id="line-336">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">pix_fmt</span><span class="si">!r}</span><span class="s2"> has no single bytes-per-pixel this module can declare "</span>
-</span><span id="line-337">            <span class="sa">f</span><span class="s2">"(known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">PIPE_BYTES_PER_PIXEL</span><span class="p">)</span><span class="si">}</span><span class="s2">). rawvideo carries no "</span>
-</span><span id="line-338">            <span class="s2">"header, so a consumer reads the stride from the plan — and a "</span>
-</span><span id="line-339">            <span class="s2">"planar or higher-depth format would make that number a guess."</span>
-</span><span id="line-340">        <span class="p">)</span>
-</span><span id="line-341">    <span class="n">clip</span> <span class="o">=</span> <span class="n">plan</span><span class="o">.</span><span class="n">clip</span> <span class="k">if</span> <span class="n">clip</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">clip</span>
-</span><span id="line-342">    <span class="n">grouped</span> <span class="o">=</span> <span class="n">runs</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
-</span><span id="line-343">    <span class="k">if</span> <span class="ow">not</span> <span class="n">grouped</span><span class="p">:</span>
-</span><span id="line-344">        <span class="k">return</span> <span class="n">PipePlan</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="p">(),</span> <span class="n">boundaries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">)</span>
-</span><span id="line-345">
-</span><span id="line-346">    <span class="n">frame_runs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">grouped</span><span class="p">)</span> <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">"frame"</span><span class="p">]</span>
-</span><span id="line-347">    <span class="k">if</span> <span class="ow">not</span> <span class="n">frame_runs</span><span class="p">:</span>
-</span><span id="line-348">        <span class="k">return</span> <span class="n">PipePlan</span><span class="p">(</span>
-</span><span id="line-349">            <span class="n">segments</span><span class="o">=</span><span class="p">(</span><span class="n">FilterSegment</span><span class="p">(</span><span class="n">vf</span><span class="o">=</span><span class="n">_vf_of</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">steps</span><span class="p">)),),</span>
-</span><span id="line-350">            <span class="n">boundaries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="line-351">            <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
-</span><span id="line-352">        <span class="p">)</span>
-</span><span id="line-353">    <span class="k">if</span> <span class="n">clip</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-354">        <span class="k">raise</span> <span class="n">PipeError</span><span class="p">(</span>
-</span><span id="line-355">            <span class="s2">"a pipe needs a ClipSpec: the raw frames on it have no header, so "</span>
-</span><span id="line-356">            <span class="s2">"their size and rate have to be declared or the reader guesses."</span>
-</span><span id="line-357">        <span class="p">)</span>
-</span><span id="line-358">
-</span><span id="line-359">    <span class="n">segments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-360">    <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="line-361">    <span class="k">for</span> <span class="n">position</span><span class="p">,</span> <span class="n">run_index</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">frame_runs</span><span class="p">):</span>
-</span><span id="line-362">        <span class="n">backend</span><span class="p">,</span> <span class="n">frame_steps</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="n">run_index</span><span class="p">]</span>
-</span><span id="line-363">        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame_steps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="line-364">            <span class="k">raise</span> <span class="n">PipeError</span><span class="p">(</span>
-</span><span id="line-365">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">frame_steps</span><span class="p">)</span><span class="si">}</span><span class="s2"> frame operations run back to back "</span>
-</span><span id="line-366">                <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">effect</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">frame_steps</span><span class="p">]</span><span class="si">}</span><span class="s2">). Each is a separate "</span>
-</span><span id="line-367">                <span class="s2">"process on this pipe; compose them into one registered "</span>
-</span><span id="line-368">                <span class="s2">"operation instead, or the frames cross Python twice for "</span>
-</span><span id="line-369">                <span class="s2">"nothing."</span>
-</span><span id="line-370">            <span class="p">)</span>
-</span><span id="line-371">        <span class="n">before</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">steps</span> <span class="ow">in</span> <span class="n">grouped</span><span class="p">[</span><span class="n">index</span><span class="p">:</span><span class="n">run_index</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">]</span>
-</span><span id="line-372">        <span class="n">after_index</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-373">            <span class="n">frame_runs</span><span class="p">[</span><span class="n">position</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">position</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame_runs</span><span class="p">)</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">grouped</span><span class="p">)</span>
-</span><span id="line-374">        <span class="p">)</span>
-</span><span id="line-375">        <span class="n">after</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">steps</span> <span class="ow">in</span> <span class="n">grouped</span><span class="p">[</span><span class="n">run_index</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">after_index</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">]</span>
-</span><span id="line-376">
-</span><span id="line-377">        <span class="c1"># Folding into the DECODER is always safe — it reads a container and</span>
-</span><span id="line-378">        <span class="c1"># keeps the host's timeline. Nothing to rebase, nothing to refuse.</span>
-</span><span id="line-379">        <span class="n">decode_chain</span> <span class="o">=</span> <span class="n">_vf_of</span><span class="p">(</span><span class="n">before</span><span class="p">)</span> <span class="k">if</span> <span class="n">before</span> <span class="k">else</span> <span class="s2">""</span>
-</span><span id="line-380">
-</span><span id="line-381">        <span class="c1"># Folding into the ENCODER crosses the raw-frame boundary, where the</span>
-</span><span id="line-382">        <span class="c1"># timeline restarts at 0. This is rule 27.</span>
-</span><span id="line-383">        <span class="k">if</span> <span class="n">after</span><span class="p">:</span>
-</span><span id="line-384">            <span class="c1"># UNCONDITIONAL. An author who bakes a gate into a filter string is</span>
-</span><span id="line-385">            <span class="c1"># by construction NOT using `Effect.at`, so `at is None` is the</span>
-</span><span id="line-386">            <span class="c1"># NORMAL case for exactly the population this refuses. Running it</span>
-</span><span id="line-387">            <span class="c1"># only when some unrelated sibling happened to carry a span made the</span>
-</span><span id="line-388">            <span class="c1"># guard fire on a coincidence rather than on the hazard — measured:</span>
-</span><span id="line-389">            <span class="c1"># the foreign gate folded through un-rebased and moved a look by 20</span>
-</span><span id="line-390">            <span class="c1"># frames at exit 0.</span>
-</span><span id="line-391">            <span class="n">_refuse_foreign_gate</span><span class="p">(</span><span class="n">after</span><span class="p">,</span> <span class="s2">"folding into the encoder half"</span><span class="p">)</span>
-</span><span id="line-392">            <span class="c1"># A Span open at BOTH ends bounds nothing — `gated()` emits no</span>
-</span><span id="line-393">            <span class="c1"># `enable=` for it and `_rebased` cannot move it — so it must not</span>
-</span><span id="line-394">            <span class="c1"># demand an origin it provably cannot use.</span>
-</span><span id="line-395">            <span class="n">gated</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-396">                <span class="n">s</span>
-</span><span id="line-397">                <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">after</span>
-</span><span id="line-398">                <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">at</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">at</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">s</span><span class="o">.</span><span class="n">at</span><span class="o">.</span><span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-399">            <span class="p">]</span>
-</span><span id="line-400">            <span class="k">if</span> <span class="n">gated</span><span class="p">:</span>
-</span><span id="line-401">                <span class="k">if</span> <span class="n">clip</span><span class="o">.</span><span class="n">origin_s</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-402">                    <span class="k">raise</span> <span class="n">PipeError</span><span class="p">(</span>
-</span><span id="line-403">                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">gated</span><span class="p">)</span><span class="si">}</span><span class="s2"> step(s) after the frame operation carry a "</span>
-</span><span id="line-404">                        <span class="s2">"span, and folding them into the encoder half rebases "</span>
-</span><span id="line-405">                        <span class="s2">"their time origin — the encoder reads rawvideo, which "</span>
-</span><span id="line-406">                        <span class="s2">"has no timestamps, so its timeline restarts at 0. "</span>
-</span><span id="line-407">                        <span class="s2">"Declare ClipSpec.origin_s (the source time of this "</span>
-</span><span id="line-408">                        <span class="s2">"part's frame 0 as the host's decoder sees it). It is "</span>
-</span><span id="line-409">                        <span class="s2">"not assumed to be 0: that is right for an input-side "</span>
-</span><span id="line-410">                        <span class="s2">"seek and wrong for an output-side one, and the "</span>
-</span><span id="line-411">                        <span class="s2">"difference is a look on the wrong frames with no error."</span>
-</span><span id="line-412">                    <span class="p">)</span>
-</span><span id="line-413">            <span class="n">after</span> <span class="o">=</span> <span class="p">[</span><span class="n">_rebased</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">clip</span><span class="o">.</span><span class="n">origin_s</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">after</span><span class="p">]</span>
-</span><span id="line-414">        <span class="n">encode_chain</span> <span class="o">=</span> <span class="n">_vf_of</span><span class="p">(</span><span class="n">after</span><span class="p">)</span> <span class="k">if</span> <span class="n">after</span> <span class="k">else</span> <span class="s2">""</span>
-</span><span id="line-415">
-</span><span id="line-416">        <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">piped_size</span><span class="p">(</span><span class="n">clip</span><span class="p">,</span> <span class="n">before</span><span class="p">)</span>
-</span><span id="line-417">        <span class="n">piped</span> <span class="o">=</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">clip</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
-</span><span id="line-418">        <span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-419">            <span class="n">FrameSegment</span><span class="p">(</span>
-</span><span id="line-420">                <span class="n">op</span><span class="o">=</span><span class="n">frame_steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"op"</span><span class="p">,</span> <span class="n">frame_steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="p">),</span>
-</span><span id="line-421">                <span class="n">decode</span><span class="o">=</span><span class="n">_decoder</span><span class="p">(</span>
-</span><span id="line-422">                    <span class="n">source</span> <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">"-"</span><span class="p">,</span> <span class="n">clip</span><span class="p">,</span> <span class="n">decode_chain</span><span class="p">,</span> <span class="n">pix_fmt</span>
-</span><span id="line-423">                <span class="p">),</span>
-</span><span id="line-424">                <span class="n">encode</span><span class="o">=</span><span class="n">_encoder</span><span class="p">(</span><span class="n">piped</span><span class="p">,</span> <span class="n">encode_chain</span><span class="p">,</span> <span class="n">pix_fmt</span><span class="p">),</span>
-</span><span id="line-425">                <span class="n">pix_fmt</span><span class="o">=</span><span class="n">pix_fmt</span><span class="p">,</span>
-</span><span id="line-426">                <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
-</span><span id="line-427">                <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
-</span><span id="line-428">                <span class="n">rate</span><span class="o">=</span><span class="n">clip</span><span class="o">.</span><span class="n">fps</span><span class="p">,</span>
-</span><span id="line-429">                <span class="n">params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">frame_steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="p">),</span>
-</span><span id="line-430">            <span class="p">)</span>
-</span><span id="line-431">        <span class="p">)</span>
-</span><span id="line-432">        <span class="n">index</span> <span class="o">=</span> <span class="n">after_index</span>
-</span><span id="line-433">    <span class="k">return</span> <span class="n">PipePlan</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">segments</span><span class="p">),</span> <span class="n">boundaries</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">segments</span><span class="p">),</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">)</span></div>
+</span><span id="line-302"><span class="k">def</span><span class="w"> </span><span class="nf">pipe_plan</span><span class="p">(</span>
+</span><span id="line-303">    <span class="n">plan</span><span class="p">:</span> <span class="n">LookPlan</span><span class="p">,</span>
+</span><span id="line-304">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-305">    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="line-306">    <span class="n">clip</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ClipSpec</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-307">    <span class="n">pix_fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_PIPE_PIX_FMT</span><span class="p">,</span>
+</span><span id="line-308"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PipePlan</span><span class="p">:</span>
+</span><span id="line-309"><span class="w">    </span><span class="sd">"""Arrange a compiled plan as processes — emitted as data, never started.</span>
+</span><span id="line-310">
+</span><span id="line-311"><span class="sd">    Args:</span>
+</span><span id="line-312"><span class="sd">        source: What the first decoder reads. Passed through verbatim; `looks`</span>
+</span><span id="line-313"><span class="sd">            does not open it.</span>
+</span><span id="line-314"><span class="sd">        clip: The clip the plan was compiled against. Defaults to the plan's own.</span>
+</span><span id="line-315">
+</span><span id="line-316"><span class="sd">    Raises:</span>
+</span><span id="line-317"><span class="sd">        PipeError: If the plan needs a raw-frame boundary and cannot be arranged</span>
+</span><span id="line-318"><span class="sd">            safely across it — an undeclared time origin under a gated step, or</span>
+</span><span id="line-319"><span class="sd">            a gate baked into a filter string.</span>
+</span><span id="line-320">
+</span><span id="line-321"><span class="sd">    Examples:</span>
+</span><span id="line-322"><span class="sd">        A plan of pure ffmpeg steps is one segment and costs no boundary. The</span>
+</span><span id="line-323"><span class="sd">        plan is built here by hand rather than compiled, so the example needs no</span>
+</span><span id="line-324"><span class="sd">        ffmpeg — a doctest that needs a binary is a doctest CI does not run.</span>
+</span><span id="line-325">
+</span><span id="line-326"><span class="sd">        &gt;&gt;&gt; from looks.licence import Tier, terms_for</span>
+</span><span id="line-327"><span class="sd">        &gt;&gt;&gt; from looks.spec import ImplRef, LookPlan, Step</span>
+</span><span id="line-328"><span class="sd">        &gt;&gt;&gt; impl = ImplRef(effect='blur', impl='blur.ffmpeg.gblur',</span>
+</span><span id="line-329"><span class="sd">        ...                backend='ffmpeg', terms=terms_for('ffmpeg')[0])</span>
+</span><span id="line-330"><span class="sd">        &gt;&gt;&gt; plan = LookPlan(steps=(Step(effect='blur', impl=impl,</span>
+</span><span id="line-331"><span class="sd">        ...     tier=Tier.COPYLEFT_TOOL, payload={'filter': 'gblur=sigma=2'}),))</span>
+</span><span id="line-332"><span class="sd">        &gt;&gt;&gt; arranged = pipe_plan(plan, source='in.mp4')</span>
+</span><span id="line-333"><span class="sd">        &gt;&gt;&gt; len(arranged), arranged.boundaries</span>
+</span><span id="line-334"><span class="sd">        (1, 0)</span>
+</span><span id="line-335"><span class="sd">    """</span>
+</span><span id="line-336">    <span class="k">if</span> <span class="n">pix_fmt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">PIPE_BYTES_PER_PIXEL</span><span class="p">:</span>
+</span><span id="line-337">        <span class="k">raise</span> <span class="n">PipeError</span><span class="p">(</span>
+</span><span id="line-338">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">pix_fmt</span><span class="si">!r}</span><span class="s2"> has no single bytes-per-pixel this module can declare "</span>
+</span><span id="line-339">            <span class="sa">f</span><span class="s2">"(known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">PIPE_BYTES_PER_PIXEL</span><span class="p">)</span><span class="si">}</span><span class="s2">). rawvideo carries no "</span>
+</span><span id="line-340">            <span class="s2">"header, so a consumer reads the stride from the plan — and a "</span>
+</span><span id="line-341">            <span class="s2">"planar or higher-depth format would make that number a guess."</span>
+</span><span id="line-342">        <span class="p">)</span>
+</span><span id="line-343">    <span class="n">clip</span> <span class="o">=</span> <span class="n">plan</span><span class="o">.</span><span class="n">clip</span> <span class="k">if</span> <span class="n">clip</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">clip</span>
+</span><span id="line-344">    <span class="n">grouped</span> <span class="o">=</span> <span class="n">runs</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
+</span><span id="line-345">    <span class="k">if</span> <span class="ow">not</span> <span class="n">grouped</span><span class="p">:</span>
+</span><span id="line-346">        <span class="k">return</span> <span class="n">PipePlan</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="p">(),</span> <span class="n">boundaries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">)</span>
+</span><span id="line-347">
+</span><span id="line-348">    <span class="n">frame_runs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">grouped</span><span class="p">)</span> <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">"frame"</span><span class="p">]</span>
+</span><span id="line-349">    <span class="k">if</span> <span class="ow">not</span> <span class="n">frame_runs</span><span class="p">:</span>
+</span><span id="line-350">        <span class="k">return</span> <span class="n">PipePlan</span><span class="p">(</span>
+</span><span id="line-351">            <span class="n">segments</span><span class="o">=</span><span class="p">(</span><span class="n">FilterSegment</span><span class="p">(</span><span class="n">vf</span><span class="o">=</span><span class="n">_vf_of</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">steps</span><span class="p">,</span> <span class="n">clip</span><span class="p">)),),</span>
+</span><span id="line-352">            <span class="n">boundaries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="line-353">            <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+</span><span id="line-354">        <span class="p">)</span>
+</span><span id="line-355">    <span class="k">if</span> <span class="n">clip</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-356">        <span class="k">raise</span> <span class="n">PipeError</span><span class="p">(</span>
+</span><span id="line-357">            <span class="s2">"a pipe needs a ClipSpec: the raw frames on it have no header, so "</span>
+</span><span id="line-358">            <span class="s2">"their size and rate have to be declared or the reader guesses."</span>
+</span><span id="line-359">        <span class="p">)</span>
+</span><span id="line-360">
+</span><span id="line-361">    <span class="n">segments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-362">    <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="line-363">    <span class="k">for</span> <span class="n">position</span><span class="p">,</span> <span class="n">run_index</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">frame_runs</span><span class="p">):</span>
+</span><span id="line-364">        <span class="n">backend</span><span class="p">,</span> <span class="n">frame_steps</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="n">run_index</span><span class="p">]</span>
+</span><span id="line-365">        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame_steps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+</span><span id="line-366">            <span class="k">raise</span> <span class="n">PipeError</span><span class="p">(</span>
+</span><span id="line-367">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">frame_steps</span><span class="p">)</span><span class="si">}</span><span class="s2"> frame operations run back to back "</span>
+</span><span id="line-368">                <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">effect</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">frame_steps</span><span class="p">]</span><span class="si">}</span><span class="s2">). Each is a separate "</span>
+</span><span id="line-369">                <span class="s2">"process on this pipe; compose them into one registered "</span>
+</span><span id="line-370">                <span class="s2">"operation instead, or the frames cross Python twice for "</span>
+</span><span id="line-371">                <span class="s2">"nothing."</span>
+</span><span id="line-372">            <span class="p">)</span>
+</span><span id="line-373">        <span class="n">before</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">steps</span> <span class="ow">in</span> <span class="n">grouped</span><span class="p">[</span><span class="n">index</span><span class="p">:</span><span class="n">run_index</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">]</span>
+</span><span id="line-374">        <span class="n">after_index</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-375">            <span class="n">frame_runs</span><span class="p">[</span><span class="n">position</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">position</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame_runs</span><span class="p">)</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">grouped</span><span class="p">)</span>
+</span><span id="line-376">        <span class="p">)</span>
+</span><span id="line-377">        <span class="n">after</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">steps</span> <span class="ow">in</span> <span class="n">grouped</span><span class="p">[</span><span class="n">run_index</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">after_index</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">]</span>
+</span><span id="line-378">
+</span><span id="line-379">        <span class="c1"># Folding into the DECODER is always safe — it reads a container and</span>
+</span><span id="line-380">        <span class="c1"># keeps the host's timeline. Nothing to rebase, nothing to refuse.</span>
+</span><span id="line-381">        <span class="n">decode_chain</span> <span class="o">=</span> <span class="n">_vf_of</span><span class="p">(</span><span class="n">before</span><span class="p">,</span> <span class="n">clip</span><span class="p">)</span> <span class="k">if</span> <span class="n">before</span> <span class="k">else</span> <span class="s2">""</span>
+</span><span id="line-382">
+</span><span id="line-383">        <span class="c1"># Folding into the ENCODER crosses the raw-frame boundary, where the</span>
+</span><span id="line-384">        <span class="c1"># timeline restarts at 0. This is rule 27.</span>
+</span><span id="line-385">        <span class="k">if</span> <span class="n">after</span><span class="p">:</span>
+</span><span id="line-386">            <span class="c1"># UNCONDITIONAL. An author who bakes a gate into a filter string is</span>
+</span><span id="line-387">            <span class="c1"># by construction NOT using `Effect.at`, so `at is None` is the</span>
+</span><span id="line-388">            <span class="c1"># NORMAL case for exactly the population this refuses. Running it</span>
+</span><span id="line-389">            <span class="c1"># only when some unrelated sibling happened to carry a span made the</span>
+</span><span id="line-390">            <span class="c1"># guard fire on a coincidence rather than on the hazard — measured:</span>
+</span><span id="line-391">            <span class="c1"># the foreign gate folded through un-rebased and moved a look by 20</span>
+</span><span id="line-392">            <span class="c1"># frames at exit 0.</span>
+</span><span id="line-393">            <span class="n">_refuse_foreign_gate</span><span class="p">(</span><span class="n">after</span><span class="p">,</span> <span class="s2">"folding into the encoder half"</span><span class="p">)</span>
+</span><span id="line-394">            <span class="c1"># A Span open at BOTH ends bounds nothing — `gated()` emits no</span>
+</span><span id="line-395">            <span class="c1"># `enable=` for it and `_rebased` cannot move it — so it must not</span>
+</span><span id="line-396">            <span class="c1"># demand an origin it provably cannot use.</span>
+</span><span id="line-397">            <span class="n">gated</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-398">                <span class="n">s</span>
+</span><span id="line-399">                <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">after</span>
+</span><span id="line-400">                <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">at</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">at</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">s</span><span class="o">.</span><span class="n">at</span><span class="o">.</span><span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-401">            <span class="p">]</span>
+</span><span id="line-402">            <span class="k">if</span> <span class="n">gated</span><span class="p">:</span>
+</span><span id="line-403">                <span class="k">if</span> <span class="n">clip</span><span class="o">.</span><span class="n">origin_s</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-404">                    <span class="k">raise</span> <span class="n">PipeError</span><span class="p">(</span>
+</span><span id="line-405">                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">gated</span><span class="p">)</span><span class="si">}</span><span class="s2"> step(s) after the frame operation carry a "</span>
+</span><span id="line-406">                        <span class="s2">"span, and folding them into the encoder half rebases "</span>
+</span><span id="line-407">                        <span class="s2">"their time origin — the encoder reads rawvideo, which "</span>
+</span><span id="line-408">                        <span class="s2">"has no timestamps, so its timeline restarts at 0. "</span>
+</span><span id="line-409">                        <span class="s2">"Declare ClipSpec.origin_s (the source time of this "</span>
+</span><span id="line-410">                        <span class="s2">"part's frame 0 as the host's decoder sees it). It is "</span>
+</span><span id="line-411">                        <span class="s2">"not assumed to be 0: that is right for an input-side "</span>
+</span><span id="line-412">                        <span class="s2">"seek and wrong for an output-side one, and the "</span>
+</span><span id="line-413">                        <span class="s2">"difference is a look on the wrong frames with no error."</span>
+</span><span id="line-414">                    <span class="p">)</span>
+</span><span id="line-415">            <span class="n">after</span> <span class="o">=</span> <span class="p">[</span><span class="n">_rebased</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">clip</span><span class="o">.</span><span class="n">origin_s</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">after</span><span class="p">]</span>
+</span><span id="line-416">        <span class="n">encode_chain</span> <span class="o">=</span> <span class="n">_vf_of</span><span class="p">(</span><span class="n">after</span><span class="p">,</span> <span class="n">clip</span><span class="p">)</span> <span class="k">if</span> <span class="n">after</span> <span class="k">else</span> <span class="s2">""</span>
+</span><span id="line-417">
+</span><span id="line-418">        <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">piped_size</span><span class="p">(</span><span class="n">clip</span><span class="p">,</span> <span class="n">before</span><span class="p">)</span>
+</span><span id="line-419">        <span class="n">piped</span> <span class="o">=</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">clip</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+</span><span id="line-420">        <span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-421">            <span class="n">FrameSegment</span><span class="p">(</span>
+</span><span id="line-422">                <span class="n">op</span><span class="o">=</span><span class="n">frame_steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"op"</span><span class="p">,</span> <span class="n">frame_steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="p">),</span>
+</span><span id="line-423">                <span class="n">decode</span><span class="o">=</span><span class="n">_decoder</span><span class="p">(</span>
+</span><span id="line-424">                    <span class="n">source</span> <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">"-"</span><span class="p">,</span> <span class="n">clip</span><span class="p">,</span> <span class="n">decode_chain</span><span class="p">,</span> <span class="n">pix_fmt</span>
+</span><span id="line-425">                <span class="p">),</span>
+</span><span id="line-426">                <span class="n">encode</span><span class="o">=</span><span class="n">_encoder</span><span class="p">(</span><span class="n">piped</span><span class="p">,</span> <span class="n">encode_chain</span><span class="p">,</span> <span class="n">pix_fmt</span><span class="p">),</span>
+</span><span id="line-427">                <span class="n">pix_fmt</span><span class="o">=</span><span class="n">pix_fmt</span><span class="p">,</span>
+</span><span id="line-428">                <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+</span><span id="line-429">                <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+</span><span id="line-430">                <span class="n">rate</span><span class="o">=</span><span class="n">clip</span><span class="o">.</span><span class="n">fps</span><span class="p">,</span>
+</span><span id="line-431">                <span class="n">params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">frame_steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="p">),</span>
+</span><span id="line-432">            <span class="p">)</span>
+</span><span id="line-433">        <span class="p">)</span>
+</span><span id="line-434">        <span class="n">index</span> <span class="o">=</span> <span class="n">after_index</span>
+</span><span id="line-435">    <span class="k">return</span> <span class="n">PipePlan</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">segments</span><span class="p">),</span> <span class="n">boundaries</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">segments</span><span class="p">),</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">)</span></div>
 
-</span><span id="line-434">
-</span><span id="line-435">
+</span><span id="line-436">
+</span><span id="line-437">
 <div class="viewcode-block" id="describe">
 <a class="viewcode-back" href="../../_autosummary/looks.pipe.html#looks.describe">[docs]</a>
-</span><span id="line-436"><span class="k">def</span><span class="w"> </span><span class="nf">describe</span><span class="p">(</span><span class="n">arranged</span><span class="p">:</span> <span class="n">PipePlan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-437"><span class="w">    </span><span class="sd">"""The arrangement as a few lines — what will run, and what it costs."""</span>
-</span><span id="line-438">    <span class="k">if</span> <span class="ow">not</span> <span class="n">arranged</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
-</span><span id="line-439">        <span class="k">return</span> <span class="s2">"(empty pipe)"</span>
-</span><span id="line-440">    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-441">    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">segment</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">arranged</span><span class="o">.</span><span class="n">segments</span><span class="p">):</span>
-</span><span id="line-442">        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">segment</span><span class="p">,</span> <span class="n">FilterSegment</span><span class="p">):</span>
-</span><span id="line-443">            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. one ffmpeg process: -vf </span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">vf</span><span class="p">[:</span><span class="mi">70</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-444">        <span class="k">else</span><span class="p">:</span>
-</span><span id="line-445">            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-446">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. decode -&gt; </span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">op</span><span class="si">}</span><span class="s2"> -&gt; encode "</span>
-</span><span id="line-447">                <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">width</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">height</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">pix_fmt</span><span class="si">}</span><span class="s2"> "</span>
-</span><span id="line-448">                <span class="sa">f</span><span class="s2">"@</span><span class="si">{</span><span class="n">_rate</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">rate</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">frame_bytes</span><span class="si">}</span><span class="s2"> B/frame)"</span>
-</span><span id="line-449">            <span class="p">)</span>
-</span><span id="line-450">    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-451">        <span class="sa">f</span><span class="s2">"raw-frame boundaries: </span><span class="si">{</span><span class="n">arranged</span><span class="o">.</span><span class="n">boundaries</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-452">        <span class="o">+</span> <span class="p">(</span><span class="s2">" (none: one process)"</span> <span class="k">if</span> <span class="n">arranged</span><span class="o">.</span><span class="n">boundaries</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">""</span><span class="p">)</span>
-</span><span id="line-453">    <span class="p">)</span>
-</span><span id="line-454">    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+</span><span id="line-438"><span class="k">def</span><span class="w"> </span><span class="nf">describe</span><span class="p">(</span><span class="n">arranged</span><span class="p">:</span> <span class="n">PipePlan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-439"><span class="w">    </span><span class="sd">"""The arrangement as a few lines — what will run, and what it costs."""</span>
+</span><span id="line-440">    <span class="k">if</span> <span class="ow">not</span> <span class="n">arranged</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+</span><span id="line-441">        <span class="k">return</span> <span class="s2">"(empty pipe)"</span>
+</span><span id="line-442">    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-443">    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">segment</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">arranged</span><span class="o">.</span><span class="n">segments</span><span class="p">):</span>
+</span><span id="line-444">        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">segment</span><span class="p">,</span> <span class="n">FilterSegment</span><span class="p">):</span>
+</span><span id="line-445">            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. one ffmpeg process: -vf </span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">vf</span><span class="p">[:</span><span class="mi">70</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-446">        <span class="k">else</span><span class="p">:</span>
+</span><span id="line-447">            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-448">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. decode -&gt; </span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">op</span><span class="si">}</span><span class="s2"> -&gt; encode "</span>
+</span><span id="line-449">                <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">width</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">height</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">pix_fmt</span><span class="si">}</span><span class="s2"> "</span>
+</span><span id="line-450">                <span class="sa">f</span><span class="s2">"@</span><span class="si">{</span><span class="n">_rate</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">rate</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">frame_bytes</span><span class="si">}</span><span class="s2"> B/frame)"</span>
+</span><span id="line-451">            <span class="p">)</span>
+</span><span id="line-452">    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-453">        <span class="sa">f</span><span class="s2">"raw-frame boundaries: </span><span class="si">{</span><span class="n">arranged</span><span class="o">.</span><span class="n">boundaries</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-454">        <span class="o">+</span> <span class="p">(</span><span class="s2">" (none: one process)"</span> <span class="k">if</span> <span class="n">arranged</span><span class="o">.</span><span class="n">boundaries</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">""</span><span class="p">)</span>
+</span><span id="line-455">    <span class="p">)</span>
+</span><span id="line-456">    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -669,7 +671,7 @@
 </footer>
     </div>
     
-    <script src="../../_static/documentation_options.js?v=f91d8841"></script>
+    <script src="../../_static/documentation_options.js?v=5d650c58"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
