@@ -80,7 +80,10 @@ def test_interpolating_after_posterize_is_reported(later):
 
 
 def _compile(*names):
-    return compile_look(Look(steps=_names(*names)), clip=CLIP, env=probe())
+    env = probe()
+    if not env.available:
+        pytest.skip("ffmpeg not usable")
+    return compile_look(Look(steps=_names(*names)), clip=CLIP, env=env)
 
 
 def test_compile_look_warns_and_does_not_reorder():
