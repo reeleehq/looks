@@ -651,3 +651,20 @@ class TestAStoredPlanKeepsItsCeiling:
         del document["policy"]
         impls = {s.impl.impl: s.impl for s in plan.steps}
         assert plan_from_dict(document, impls=impls).policy is not None
+
+
+def test_a_user_impl_declares_rgb_only_and_compile_reads_the_flag(registry, env):
+    """Rule 22 reads `ImplRef.rgb_only`, not any backend's filter list."""
+    from dataclasses import replace
+
+    from looks.compile import CompileError
+
+    key = "tint.custom.rgb"
+    ref = replace(impl_ref(key, filters=("gblur",), backend="custom"), rgb_only=True)
+    registry.register(ref, a_filter("gblur"))
+    with pytest.raises(CompileError, match="tint"):
+        compile_look(Look(steps=(Effect(name="tint"),)), clip=CLIP, env=env, registry=registry)
+    quiet = replace(ref, impl="tint.custom.quiet", rgb_only=None)
+    reg2 = EffectRegistry()
+    reg2.register(quiet, a_filter("gblur"))
+    compile_look(Look(steps=(Effect(name="tint"),)), clip=CLIP, env=env, registry=reg2)

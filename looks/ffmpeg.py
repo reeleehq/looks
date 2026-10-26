@@ -249,7 +249,7 @@ def vf(plan: LookPlan, *, gate: bool = True) -> str:
                     "silently applies everywhere."
                 )
             fragment = gated(fragment, step.at)
-        rgb = is_rgb_domain(step.impl)
+        rgb = step.impl.rgb_only is True
         if rgb and not wrap:
             raise FfmpegBackendError(
                 f"step {index} ({step.effect!r}) only takes RGB and the plan's "
@@ -293,16 +293,18 @@ RGB_DOMAIN_FILTERS = frozenset(
 )
 
 
-def is_rgb_domain(impl) -> bool:
-    """Whether an implementation has a step that only takes RGB.
+def is_rgb_domain(filters) -> bool:
+    """Whether any of these ffmpeg filters only takes RGB.
 
-    >>> from types import SimpleNamespace as Impl
-    >>> is_rgb_domain(Impl(requires_filters=("curves",)))
+    This is what derives :attr:`ImplRef.rgb_only` for the built-ins; the
+    compiler and :func:`vf` read the flag, never this list.
+
+    >>> is_rgb_domain(("curves",))
     True
-    >>> is_rgb_domain(Impl(requires_filters=("gblur",)))
+    >>> is_rgb_domain(("gblur",))
     False
     """
-    return bool(RGB_DOMAIN_FILTERS & set(impl.requires_filters))
+    return bool(RGB_DOMAIN_FILTERS & set(filters))
 
 
 #: The version of an implementation that sits in an RGB-only run.
@@ -576,6 +578,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         # registration to say which is how this module avoids shipping a
         # silent `False` for something nobody checked.
         effect, backend, _variant = key.split(".")
+        rgb_only = is_rgb_domain(filters)
         reg.register(
             ImplRef(
                 effect=effect,
@@ -583,15 +586,14 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
                 # `vf` now declares the colour matrix around an RGB-only step
                 # (issue #29), which changes its pixels: version 2, so a plan
                 # stored with the old behaviour is refused rather than trusted.
-                impl_version=RGB_ONLY_IMPL_VERSION
-                if RGB_DOMAIN_FILTERS & set(filters)
-                else "1",
+                impl_version=RGB_ONLY_IMPL_VERSION if rgb_only else "1",
                 backend=backend,
                 terms=terms,
                 requires_filters=filters,
                 preference=preference,
                 timeline=timeline,
                 time_varying=time_varying,
+                rgb_only=rgb_only,
             ),
             compiler,
             tags=tags,

@@ -755,6 +755,15 @@ class ImplRef:
             false permission that would let muvid#73's ramp restart ship
             unwarned. :func:`looks.ffmpeg.register_defaults` requires every
             built-in implementation to declare it explicitly for this reason.
+        rgb_only: Whether the implementation has a step that only takes RGB,
+            so the backend converts the picture to RGB and back around it
+            (rule 22: on such a step the clip's colour space must be declared
+            or assumed, because the converter's own guess shifts luma on
+            ffmpeg 6.1). Declared on the implementation so the backend-agnostic
+            compiler asks one flag instead of knowing any backend's filter
+            list; :func:`looks.ffmpeg.register_defaults` derives it from
+            ``requires_filters``. **Tri-state:** ``None`` is undeclared and
+            is *not asserted* to be RGB-only; only ``True`` triggers rule 22.
         preference: Explicit tiebreak within one tier; lower wins.
 
     Examples:
@@ -768,6 +777,8 @@ class ImplRef:
         True
         >>> impl.time_varying is None      # undeclared is unknown, not False
         True
+        >>> impl.rgb_only is None
+        True
     """
 
     effect: str
@@ -778,6 +789,7 @@ class ImplRef:
     impl_version: str = "1"
     timeline: bool = True
     time_varying: Optional[bool] = None
+    rgb_only: Optional[bool] = None
     preference: int = 0
 
     def __post_init__(self) -> None:
