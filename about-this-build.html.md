@@ -2,20 +2,20 @@
 
 # About this build
 
-This documentation was built on **2026-10-26 19:44 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/44b3eede5327f089b75f4134c7b638078288b809"><code>44b3eed</code></a> on branch <code>main</code>, for **looks 0.0.27** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 20:43 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/7d53d2f63af079cb75307e4c41b363ab6cc468c4"><code>7d53d2f</code></a> on branch <code>main</code>, for **looks 0.0.28** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.27) is ahead of the latest release on PyPI (0.0.26): these docs describe unreleased code.
+- The documented version (0.0.28) is ahead of the latest release on PyPI (0.0.27): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/looks/commit/44b3eede5327f089b75f4134c7b638078288b809"><code>44b3eede5327f089b75f4134c7b638078288b809</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/looks/commit/7d53d2f63af079cb75307e4c41b363ab6cc468c4"><code>7d53d2f63af079cb75307e4c41b363ab6cc468c4</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | <code>0.0.27</code>                                                                                                                                   |
+| Tags at this commit | <code>0.0.28</code>                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/looks</code>                                                                                                        |
 
@@ -24,9 +24,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/looks</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/40388881974">40388881974</a>       |
+| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/40397596875">40397596875</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>c97875c1cda27d0539cf255fbe00ce4e9d382d49</code> (in the history of the built commit) |
+| Event commit | <code>ec56780a0e749f76cea55bfb6fd14378997eb580</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -51,13 +51,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/looks/0.0.26/">0.0.26</a>, older than the documented version (0.0.27).
+Latest release: <a href="https://pypi.org/project/looks/0.0.27/">0.0.27</a>, older than the documented version (0.0.28).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout 44b3eede5327f089b75f4134c7b638078288b809
+git checkout 7d53d2f63af079cb75307e4c41b363ab6cc468c4
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

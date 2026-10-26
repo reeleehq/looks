@@ -96,7 +96,7 @@ Characters the **option** parser gives meaning to, within one filter’s
 arguments. Must lead with `\\`: the backslashes introduced for the later
 characters must not themselves be escaped by the `\\` pass.
 
-### looks.ffmpeg.RGB_DOMAIN_FILTERS *= frozenset({'colorbalance', 'colorchannelmixer', 'colorcontrast', 'colorlevels', 'colortemperature', 'curves', 'exposure', 'huesaturation', 'lut1d', 'lut3d', 'lutrgb', 'selectivecolor', 'vibrance'})*
+### looks.ffmpeg.RGB_DOMAIN_FILTERS *= frozenset({'ciescope', 'colorbalance', 'colorchannelmixer', 'colorcontrast', 'colorhold', 'colorkey', 'colorlevels', 'colortemperature', 'curves', 'dctdnoiz', 'despill', 'elbg', 'epx', 'exposure', 'grayworld', 'greyedge', 'histeq', 'hqx', 'huesaturation', 'lut1d', 'lut3d', 'lutrgb', 'normalize', 'palettegen', 'photosensitivity', 'rgbashift', 'selectivecolor', 'stereo3d', 'super2xsai', 'tonemap', 'vibrance', 'xbr'})*
 
 Filters that only take RGB, so ffmpeg converts YUV to RGB and back around
 them. On ffmpeg 6.1 that auto-inserted conversion ignores the colour tags:
