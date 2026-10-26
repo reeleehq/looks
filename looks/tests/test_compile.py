@@ -405,7 +405,7 @@ class TestCompilingSeveral:
             registry=registry,
         )
         assert len(good) == 2
-        with pytest.raises(CompileError):
+        with pytest.raises(CompileError, match="nonesuch"):
             compile_all(
                 [look, Look(steps=(Effect(name="nonesuch"),))],
                 clip=CLIP,

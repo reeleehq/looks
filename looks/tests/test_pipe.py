@@ -216,7 +216,7 @@ class TestWhatIsEmitted:
             ],
             registry=registry,
             env=env,
-            clip=ClipSpec(width=640, height=480, fps=10),
+            clip=ClipSpec(width=640, height=480, fps=10, color_space="bt709"),
         )
         segment = pipe_plan(plan, source="in.mp4").segments[0]
         assert (segment.width, segment.height) == (320, 240)
@@ -285,7 +285,9 @@ class TestTheRebase:
             ],
             registry=registry,
             env=env,
-            clip=ClipSpec(width=64, height=48, fps=10, origin_s=0.0),
+            clip=ClipSpec(
+                width=64, height=48, fps=10, origin_s=0.0, color_space="bt709"
+            ),
         )
         encode = " ".join(pipe_plan(plan, source="in.mp4").segments[0].encode)
         assert "between(t,4,5)" in encode
