@@ -47,11 +47,11 @@ RGB_EFFECTS = {
 }
 
 
-def _planes(fragment, source):
+def _planes(fragment, source, *, pix_fmt="yuv420p"):
     chain = f"{fragment}," if fragment else ""
     return subprocess.run(
         ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", source, "-vf",
-         f"{chain}format=yuv420p", "-frames:v", "1", "-f", "rawvideo", "-"],
+         f"{chain}format={pix_fmt}", "-frames:v", "1", "-f", "rawvideo", "-"],
         capture_output=True, check=True,
     ).stdout
 
@@ -132,8 +132,9 @@ def test_an_undeclared_colour_space_is_left_to_ffmpeg(env):
 #: 10-bit identity RGB step must be lossless; `smptehdbars` is not one of them
 #: (issue #37): its edges are resampled by 4:2:0 <-> RGB and its PLUGE patches
 #: are out of gamut, which no bit depth or matrix declaration recovers.
+#: A gradient, not a flat colour: a flat 8-bit colour survives an 8-bit trip, so
+#: only a ramp can see a narrowed intermediate.
 SMOOTH_10BIT = {
-    "flat": "color=c=0x3070b0:s=64x48:r=1",
     "gradient": (
         "gradients=s=64x48:r=1:speed=0.01:seed=3:c0=0x103060:c1=0xc08040"
         ":x0=0:y0=0:x1=64:y1=48:nb_colors=2"
@@ -141,14 +142,8 @@ SMOOTH_10BIT = {
 }
 
 
-def _planes_10bit(fragment, source):
-    chain = f"{fragment}," if fragment else ""
-    out = subprocess.run(
-        ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", source, "-vf",
-         f"{chain}format=yuv420p10le", "-frames:v", "1", "-f", "rawvideo", "-"],
-        capture_output=True, check=True,
-    ).stdout
-    return [int.from_bytes(out[i : i + 2], "little") for i in range(0, len(out), 2)]
+def _samples_10bit(raw):
+    return [int.from_bytes(raw[i : i + 2], "little") for i in range(0, len(raw), 2)]
 
 
 @pytest.mark.parametrize("space", ["bt709", "bt2020nc"])
@@ -164,5 +159,6 @@ def test_an_identity_rgb_step_is_lossless_on_smooth_10_bit(env, effect, kind, sp
         width=SIZE[0], height=SIZE[1], fps=1, color_space=space, color_range="tv"
     )
     fragment = _fragment(env, clip, (effect, RGB_EFFECTS[effect]))
-    before, after = _planes_10bit("", source), _planes_10bit(fragment, source)
-    assert max(abs(a - b) for a, b in zip(before, after)) <= 2, (effect, kind, space)
+    before = _samples_10bit(_planes("", source, pix_fmt="yuv420p10le"))
+    after = _samples_10bit(_planes(fragment, source, pix_fmt="yuv420p10le"))
+    assert max(abs(a - b) for a, b in zip(before, after)) <= 1, (effect, kind, space)
