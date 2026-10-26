@@ -217,6 +217,8 @@ def vf(plan: LookPlan, *, gate: bool = True) -> str:
             accepted by the string and ignored by the binary.
     """
     fragments = []
+    in_rgb_run = False
+    wrap = _matrix_wrap(plan.clip)
     for index, step in enumerate(plan.steps):
         if step.impl.backend != "ffmpeg":
             raise FfmpegBackendError(
@@ -247,8 +249,73 @@ def vf(plan: LookPlan, *, gate: bool = True) -> str:
                     "silently applies everywhere."
                 )
             fragment = gated(fragment, step.at)
+        if wrap:
+            rgb = bool(RGB_DOMAIN_FILTERS & set(step.impl.requires_filters))
+            if rgb != in_rgb_run:
+                fragments.append(wrap)
+                in_rgb_run = rgb
         fragments.append(fragment)
+    if in_rgb_run:
+        fragments.append(wrap)
     return ",".join(fragments)
+
+
+#: Filters that only take RGB, so ffmpeg converts YUV to RGB and back around
+#: them. On ffmpeg 6.1 that auto-inserted conversion ignores the colour tags:
+#: a flat BT.709 frame lost about 7 luma through any of these, a colour test
+#: pattern 6.4 mean luma (against 0.16 on ffmpeg 9), issue #29. A YUV-capable
+#: filter (`lutyuv`, `gblur`) is untouched by it and so is not listed.
+RGB_DOMAIN_FILTERS = frozenset(
+    {"lutrgb", "colorchannelmixer", "colorbalance", "colorlevels", "curves", "lut3d"}
+)
+
+#: ClipSpec.color_space (the tag's name) -> scale's matrix name, where they differ.
+_SCALE_MATRICES = {
+    "bt709": "bt709",
+    "bt601": "bt601",
+    "smpte170m": "smpte170m",
+    "bt470bg": "bt470",
+    "bt2020nc": "bt2020",
+    "smpte240m": "smpte240m",
+    "fcc": "fcc",
+}
+_SCALE_RANGES = {
+    "tv": "limited",
+    "limited": "limited",
+    "mpeg": "limited",
+    "pc": "full",
+    "full": "full",
+    "jpeg": "full",
+}
+
+
+def _matrix_wrap(clip) -> Optional[str]:
+    """The ``scale`` that makes a YUV<->RGB conversion use the clip's own matrix.
+
+    Rule 24's mechanism: declare the matrix instead of trusting ffmpeg to read
+    the tag. Placed on either side of each run of RGB-only steps, it is where
+    that conversion happens (ffmpeg's negotiation moves it into the ``scale``),
+    and costs nothing where the two sides already agree. **Absent** when the
+    clip does not say its colour space: the conversion is then left to ffmpeg,
+    which is what it always was. Rule 22 would refuse there, and refusing is
+    not built yet.
+
+    >>> from looks.spec import ClipSpec
+    >>> _matrix_wrap(ClipSpec(width=2, height=2, fps=1, color_space="bt709"))
+    'scale=in_color_matrix=bt709:out_color_matrix=bt709'
+    >>> _matrix_wrap(ClipSpec(width=2, height=2, fps=1, color_space="bt709", color_range="pc"))
+    'scale=in_color_matrix=bt709:out_color_matrix=bt709:in_range=full:out_range=full'
+    >>> _matrix_wrap(ClipSpec(width=2, height=2, fps=1)) is None
+    True
+    """
+    if clip is None or clip.color_space not in _SCALE_MATRICES:
+        return None
+    matrix = _SCALE_MATRICES[clip.color_space]
+    options = {"in_color_matrix": matrix, "out_color_matrix": matrix}
+    if clip.color_range in _SCALE_RANGES:
+        range_ = _SCALE_RANGES[clip.color_range]
+        options |= {"in_range": range_, "out_range": range_}
+    return filter_string("scale", options)
 
 
 # ---------------------------------------------------------------- the effects
