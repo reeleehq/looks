@@ -92,7 +92,7 @@ False
 | [`SpecError`](#looks.spec.SpecError)           | A Look or a plan that cannot mean what it says.                                                            |
 | [`UnresolvedParameter`](#looks.spec.UnresolvedParameter) | A [`Ref`](#looks.spec.Ref) the probe did not answer, and which has no default. |
 
-### *class* looks.spec.ClipSpec(, width, height, fps, duration_s=None, pix_fmt=None, color_range=None, color_space=None, sar=None, origin_s=None)
+### *class* looks.spec.ClipSpec(, width, height, fps, duration_s=None, pix_fmt=None, color_range=None, color_space=None, sar=None, origin_s=None, color_assumed=False)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -131,6 +131,12 @@ looks.spec.SpecError: a ClipSpec needs positive dimensions, got 0x1080
 #### *property* aspect *: [float](https://docs.python.org/3/builtins/functions.html#float)*
 
 Display aspect, honouring `sar` when it is declared.
+
+#### color_assumed *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+`color_space` was **assumed** by the caller (rule 22’s escape), not
+read from the file. It is part of the plan’s identity: a plan built on a
+guess must not hash like one built on a probe.
 
 #### *property* colour_is_declared *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 
@@ -218,7 +224,7 @@ A copy with every [`Ref`](#looks.spec.Ref) replaced, or raise.
 * **Return type:**
   [`Effect`](#looks.spec.Effect)
 
-### *class* looks.spec.ImplRef(, effect, impl, backend, terms, requires_filters=(), impl_version='1', timeline=True, time_varying=None, preference=0)
+### *class* looks.spec.ImplRef(, effect, impl, backend, terms, requires_filters=(), impl_version='1', timeline=True, time_varying=None, rgb_only=None, preference=0)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -308,6 +314,24 @@ built-in implementation to declare it explicitly for this reason.
 * **Type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
 
+#### rgb_only
+
+Whether the implementation has a step that only takes RGB,
+so the backend converts the picture to RGB and back around it
+(rule 22: on such a step the clip’s colour space must be declared
+or assumed, because the converter’s own guess shifts luma on
+ffmpeg 6.1). Declared on the implementation so the backend-agnostic
+compiler asks one flag instead of knowing any backend’s filter
+list. **Tri-state:** `None` is undeclared. For an
+`ffmpeg` implementation `EffectRegistry.register()` settles
+it from `requires_filters` (and refuses `False` on an RGB-only
+filter), so rule 22 never sees `None` there; for another backend
+`None` is not asserted, and only `True` triggers rule 22.
+Changing it changes the backend’s pixels: bump `impl_version`.
+
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
+
 #### preference
 
 Explicit tiebreak within one tier; lower wins.
@@ -327,6 +351,8 @@ Explicit tiebreak within one tier; lower wins.
 >>> impl.timeline
 True
 >>> impl.time_varying is None      # undeclared is unknown, not False
+True
+>>> impl.rgb_only is None
 True
 ```
 

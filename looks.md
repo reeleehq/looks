@@ -1,4 +1,4 @@
-> built 2026-10-26 17:09 UTC from 0e31bc2 (main) · looks 0.0.25. Details: build_info.json
+> built 2026-10-26 19:32 UTC from 96fac3d (main) · looks 0.0.26. Details: build_info.json
 
 # index.html.md
 
@@ -927,7 +927,7 @@ exists to prevent.
 * **Return type:**
   [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`LookPlan`](_autosummary/looks.spec.html.md#looks.spec.LookPlan), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
 
-### looks.compile.compile_look(look, , clip=None, env=None, policy=None, probe={}, registry=None)
+### looks.compile.compile_look(look, , clip=None, env=None, policy=None, probe={}, registry=None, assume_color_space=None)
 
 Compile a Look into a plan. No process is started and no file is written.
 
@@ -944,6 +944,11 @@ Compile a Look into a plan. No process is started and no file is written.
     against.
   * **registry** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`EffectRegistry`](_autosummary/looks.registry.html.md#looks.registry.EffectRegistry)]) – Which implementations exist. Defaults to
     [`looks.registry.REGISTRY`](_autosummary/looks.registry.html.md#looks.registry.REGISTRY).
+  * **assume_color_space** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]) – Rule 22’s escape. The colour space (a
+    `ClipSpec.color_space` name such as `"bt709"`) to declare when
+    the clip does not say; it is recorded on the plan’s clip
+    (`color_assumed`) and so moves `plan_hash`. Ignored when the
+    clip declares its own.
 * **Warns:**
   **looks.stages.StageOrderWarning** – If the Look departs from the canonical
   stage order. It is never reordered, and never a refusal unless the
@@ -954,6 +959,9 @@ Compile a Look into a plan. No process is started and no file is written.
   A [`LookPlan`](_autosummary/looks.spec.html.md#looks.spec.LookPlan) holding no live callables — the runner
   resolves each step’s code from the registry by key.
 * **Raises:**
+  * [**CompileError**](_autosummary/looks.compile.html.md#looks.compile.CompileError) – If a step only takes RGB and the clip’s colour space is
+        undeclared (rule 22) and not assumed. ffmpeg would pick a matrix
+        for it, and on some builds picks wrongly.
   * [**CompileError**](_autosummary/looks.compile.html.md#looks.compile.CompileError) – If an effect has no admissible implementation. The
         message says which constraint emptied the pool, because “no
         implementation available” alone is the least useful refusal in the
@@ -1643,6 +1651,8 @@ keeps the package honest would have nothing left to protect.
 |---------------------------------------------------------------------------------|---------------------------------------------------------------------|
 | [`filter_string`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.filter_string)(name[, options]) | One filter, with its options escaped.                               |
 | [`gated`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.gated)(fragment, at)            | Restrict a fragment to a span, using ffmpeg's own timeline support. |
+| [`has_scale_matrix`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.has_scale_matrix)(color_space)  | Whether a declared colour space names a matrix `scale` knows.       |
+| [`is_rgb_domain`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.is_rgb_domain)(filters)         | Whether any of these ffmpeg filters only takes RGB.                 |
 | [`register_defaults`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.register_defaults)([registry])  | Register the built-in ffmpeg effects.                               |
 | [`split_filters`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.split_filters)(fragment)        | A chain into its filters, splitting on UNESCAPED commas only.       |
 | [`vf`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.vf)(plan, \*[, gate])           | A whole plan as one `-vf` fragment: input-index-free, splice-ready. |
@@ -1675,7 +1685,7 @@ Characters the **option** parser gives meaning to, within one filter’s
 arguments. Must lead with `\\`: the backslashes introduced for the later
 characters must not themselves be escaped by the `\\` pass.
 
-### looks.ffmpeg.RGB_DOMAIN_FILTERS *= frozenset({'colorbalance', 'colorchannelmixer', 'colorlevels', 'curves', 'lut3d', 'lutrgb'})*
+### looks.ffmpeg.RGB_DOMAIN_FILTERS *= frozenset({'colorbalance', 'colorchannelmixer', 'colorcontrast', 'colorlevels', 'colortemperature', 'curves', 'exposure', 'huesaturation', 'lut1d', 'lut3d', 'lutrgb', 'selectivecolor', 'vibrance'})*
 
 Filters that only take RGB, so ffmpeg converts YUV to RGB and back around
 them. On ffmpeg 6.1 that auto-inserted conversion ignores the colour tags:
@@ -1763,6 +1773,43 @@ gate only the last one, silently:
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### looks.ffmpeg.has_scale_matrix(color_space)
+
+Whether a declared colour space names a matrix `scale` knows.
+
+The one predicate behind both the compile-time refusal (rule 22) and
+`_matrix_wrap()`: `"unknown"` (what ffprobe prints for an untagged
+stream) and any other unmapped name is *not* a declaration.
+
+```pycon
+>>> has_scale_matrix("bt709")
+True
+>>> has_scale_matrix("unknown")
+False
+>>> has_scale_matrix(None)
+False
+```
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+### looks.ffmpeg.is_rgb_domain(filters)
+
+Whether any of these ffmpeg filters only takes RGB.
+
+This is what derives `ImplRef.rgb_only` for the built-ins; the
+compiler and [`vf()`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.vf) read the flag, never this list.
+
+```pycon
+>>> is_rgb_domain(("curves",))
+True
+>>> is_rgb_domain(("gblur",))
+False
+```
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 ### looks.ffmpeg.register_defaults(registry=None)
 
@@ -2941,7 +2988,7 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 The value one clip was given, and the measurement that justifies it.
 
-### *class* looks.ClipSpec(, width, height, fps, duration_s=None, pix_fmt=None, color_range=None, color_space=None, sar=None, origin_s=None)
+### *class* looks.ClipSpec(, width, height, fps, duration_s=None, pix_fmt=None, color_range=None, color_space=None, sar=None, origin_s=None, color_assumed=False)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -2980,6 +3027,12 @@ looks.spec.SpecError: a ClipSpec needs positive dimensions, got 0x1080
 #### *property* aspect *: [float](https://docs.python.org/3/builtins/functions.html#float)*
 
 Display aspect, honouring `sar` when it is declared.
+
+#### color_assumed *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+`color_space` was **assumed** by the caller (rule 22’s escape), not
+read from the file. It is part of the plan’s identity: a plan built on a
+guess must not hash like one built on a probe.
 
 #### *property* colour_is_declared *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 
@@ -3338,7 +3391,7 @@ consumer can compose several. The module-level functions below delegate to
 >>> reg = EffectRegistry()
 >>> impl = ImplRef(effect="lut3d", impl="lut3d.ffmpeg.default",
 ...                backend="ffmpeg", terms=terms_for("ffmpeg")[0],
-...                requires_filters=("lut3d",))
+...                requires_filters=("lut3d",), rgb_only=True)
 >>> _ = reg.register(impl, lambda params, **kw: {"filter": "lut3d"})
 >>> reg.effects()
 ('lut3d',)
@@ -3453,9 +3506,16 @@ Record an implementation. Returns it, so this reads well inline.
 * **Raises:**
   * [**ImplConflict**](_autosummary/looks.html.md#looks.ImplConflict) – If the key is taken.
   * [**RegistryError**](_autosummary/looks.html.md#looks.RegistryError) – If the key is not `<effect>.<backend>.<variant>`,
-        or an ffmpeg implementation names a filter that does not exist.
+        an ffmpeg implementation names a filter that does not exist,
+        or it declares `rgb_only=False` while naming an RGB-only
+        filter.
 * **Return type:**
   [`ImplRef`](_autosummary/looks.spec.html.md#looks.spec.ImplRef)
+
+An ffmpeg implementation’s undeclared `rgb_only` is settled here
+from its `requires_filters`, so rule 22 never reads `None` for
+one: leaving it out is not a way past the refusal. (Changing a
+declared `rgb_only` changes `vf`’s pixels; bump `impl_version`.)
 
 #### with_defaults(effect, params)
 
@@ -3687,7 +3747,7 @@ Bases: [`RegistryError`](_autosummary/looks.registry.html.md#looks.registry.Regi
 
 That key is taken. Last-write-wins would change what a stored plan runs.
 
-### *class* looks.ImplRef(, effect, impl, backend, terms, requires_filters=(), impl_version='1', timeline=True, time_varying=None, preference=0)
+### *class* looks.ImplRef(, effect, impl, backend, terms, requires_filters=(), impl_version='1', timeline=True, time_varying=None, rgb_only=None, preference=0)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -3777,6 +3837,24 @@ built-in implementation to declare it explicitly for this reason.
 * **Type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
 
+#### rgb_only
+
+Whether the implementation has a step that only takes RGB,
+so the backend converts the picture to RGB and back around it
+(rule 22: on such a step the clip’s colour space must be declared
+or assumed, because the converter’s own guess shifts luma on
+ffmpeg 6.1). Declared on the implementation so the backend-agnostic
+compiler asks one flag instead of knowing any backend’s filter
+list. **Tri-state:** `None` is undeclared. For an
+`ffmpeg` implementation [`EffectRegistry.register()`](_autosummary/looks.html.md#looks.EffectRegistry.register) settles
+it from `requires_filters` (and refuses `False` on an RGB-only
+filter), so rule 22 never sees `None` there; for another backend
+`None` is not asserted, and only `True` triggers rule 22.
+Changing it changes the backend’s pixels: bump `impl_version`.
+
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
+
 #### preference
 
 Explicit tiebreak within one tier; lower wins.
@@ -3796,6 +3874,8 @@ Explicit tiebreak within one tier; lower wins.
 >>> impl.timeline
 True
 >>> impl.time_varying is None      # undeclared is unknown, not False
+True
+>>> impl.rgb_only is None
 True
 ```
 
@@ -5107,7 +5187,7 @@ looks.measure.Incomparable: ...luma_space 'coded_y' vs 'bgr2gray'...
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
-### looks.compile_look(look, , clip=None, env=None, policy=None, probe={}, registry=None)
+### looks.compile_look(look, , clip=None, env=None, policy=None, probe={}, registry=None, assume_color_space=None)
 
 Compile a Look into a plan. No process is started and no file is written.
 
@@ -5124,6 +5204,11 @@ Compile a Look into a plan. No process is started and no file is written.
     against.
   * **registry** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`EffectRegistry`](_autosummary/looks.registry.html.md#looks.registry.EffectRegistry)]) – Which implementations exist. Defaults to
     [`looks.registry.REGISTRY`](_autosummary/looks.registry.html.md#looks.registry.REGISTRY).
+  * **assume_color_space** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]) – Rule 22’s escape. The colour space (a
+    `ClipSpec.color_space` name such as `"bt709"`) to declare when
+    the clip does not say; it is recorded on the plan’s clip
+    (`color_assumed`) and so moves `plan_hash`. Ignored when the
+    clip declares its own.
 * **Warns:**
   **looks.stages.StageOrderWarning** – If the Look departs from the canonical
   stage order. It is never reordered, and never a refusal unless the
@@ -5134,6 +5219,9 @@ Compile a Look into a plan. No process is started and no file is written.
   A [`LookPlan`](_autosummary/looks.spec.html.md#looks.spec.LookPlan) holding no live callables — the runner
   resolves each step’s code from the registry by key.
 * **Raises:**
+  * [**CompileError**](_autosummary/looks.html.md#looks.CompileError) – If a step only takes RGB and the clip’s colour space is
+        undeclared (rule 22) and not assumed. ffmpeg would pick a matrix
+        for it, and on some builds picks wrongly.
   * [**CompileError**](_autosummary/looks.html.md#looks.CompileError) – If an effect has no admissible implementation. The
         message says which constraint emptied the pool, because “no
         implementation available” alone is the least useful refusal in the
@@ -9223,7 +9311,7 @@ consumer can compose several. The module-level functions below delegate to
 >>> reg = EffectRegistry()
 >>> impl = ImplRef(effect="lut3d", impl="lut3d.ffmpeg.default",
 ...                backend="ffmpeg", terms=terms_for("ffmpeg")[0],
-...                requires_filters=("lut3d",))
+...                requires_filters=("lut3d",), rgb_only=True)
 >>> _ = reg.register(impl, lambda params, **kw: {"filter": "lut3d"})
 >>> reg.effects()
 ('lut3d',)
@@ -9338,9 +9426,16 @@ Record an implementation. Returns it, so this reads well inline.
 * **Raises:**
   * [**ImplConflict**](_autosummary/looks.registry.html.md#looks.registry.ImplConflict) – If the key is taken.
   * [**RegistryError**](_autosummary/looks.registry.html.md#looks.registry.RegistryError) – If the key is not `<effect>.<backend>.<variant>`,
-        or an ffmpeg implementation names a filter that does not exist.
+        an ffmpeg implementation names a filter that does not exist,
+        or it declares `rgb_only=False` while naming an RGB-only
+        filter.
 * **Return type:**
   [`ImplRef`](_autosummary/looks.spec.html.md#looks.spec.ImplRef)
+
+An ffmpeg implementation’s undeclared `rgb_only` is settled here
+from its `requires_filters`, so rule 22 never reads `None` for
+one: leaving it out is not a way past the refusal. (Changing a
+declared `rgb_only` changes `vf`’s pixels; bump `impl_version`.)
 
 #### with_defaults(effect, params)
 
@@ -9507,7 +9602,7 @@ False
 | [`SpecError`](_autosummary/looks.spec.html.md#looks.spec.SpecError)           | A Look or a plan that cannot mean what it says.                                                            |
 | [`UnresolvedParameter`](_autosummary/looks.spec.html.md#looks.spec.UnresolvedParameter) | A [`Ref`](_autosummary/looks.spec.html.md#looks.spec.Ref) the probe did not answer, and which has no default. |
 
-### *class* looks.spec.ClipSpec(, width, height, fps, duration_s=None, pix_fmt=None, color_range=None, color_space=None, sar=None, origin_s=None)
+### *class* looks.spec.ClipSpec(, width, height, fps, duration_s=None, pix_fmt=None, color_range=None, color_space=None, sar=None, origin_s=None, color_assumed=False)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -9546,6 +9641,12 @@ looks.spec.SpecError: a ClipSpec needs positive dimensions, got 0x1080
 #### *property* aspect *: [float](https://docs.python.org/3/builtins/functions.html#float)*
 
 Display aspect, honouring `sar` when it is declared.
+
+#### color_assumed *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+`color_space` was **assumed** by the caller (rule 22’s escape), not
+read from the file. It is part of the plan’s identity: a plan built on a
+guess must not hash like one built on a probe.
 
 #### *property* colour_is_declared *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 
@@ -9633,7 +9734,7 @@ A copy with every [`Ref`](_autosummary/looks.spec.html.md#looks.spec.Ref) replac
 * **Return type:**
   [`Effect`](_autosummary/looks.spec.html.md#looks.spec.Effect)
 
-### *class* looks.spec.ImplRef(, effect, impl, backend, terms, requires_filters=(), impl_version='1', timeline=True, time_varying=None, preference=0)
+### *class* looks.spec.ImplRef(, effect, impl, backend, terms, requires_filters=(), impl_version='1', timeline=True, time_varying=None, rgb_only=None, preference=0)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -9723,6 +9824,24 @@ built-in implementation to declare it explicitly for this reason.
 * **Type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
 
+#### rgb_only
+
+Whether the implementation has a step that only takes RGB,
+so the backend converts the picture to RGB and back around it
+(rule 22: on such a step the clip’s colour space must be declared
+or assumed, because the converter’s own guess shifts luma on
+ffmpeg 6.1). Declared on the implementation so the backend-agnostic
+compiler asks one flag instead of knowing any backend’s filter
+list. **Tri-state:** `None` is undeclared. For an
+`ffmpeg` implementation `EffectRegistry.register()` settles
+it from `requires_filters` (and refuses `False` on an RGB-only
+filter), so rule 22 never sees `None` there; for another backend
+`None` is not asserted, and only `True` triggers rule 22.
+Changing it changes the backend’s pixels: bump `impl_version`.
+
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
+
 #### preference
 
 Explicit tiebreak within one tier; lower wins.
@@ -9742,6 +9861,8 @@ Explicit tiebreak within one tier; lower wins.
 >>> impl.timeline
 True
 >>> impl.time_varying is None      # undeclared is unknown, not False
+True
+>>> impl.rgb_only is None
 True
 ```
 
@@ -10782,18 +10903,20 @@ frames...
 
 # About this build
 
-This documentation was built on **2026-10-26 17:09 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/0e31bc26b453c547be38fddae23fd0a8b9eb799d"><code>0e31bc2</code></a> on branch <code>main</code>, for **looks 0.0.25** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 19:32 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/96fac3dea7d1654e36ed857afe79e9b6708fb214"><code>96fac3d</code></a> on branch <code>main</code>, for **looks 0.0.26** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.26) is ahead of the latest release on PyPI (0.0.25): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/looks/commit/0e31bc26b453c547be38fddae23fd0a8b9eb799d"><code>0e31bc26b453c547be38fddae23fd0a8b9eb799d</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/looks/commit/96fac3dea7d1654e36ed857afe79e9b6708fb214"><code>96fac3dea7d1654e36ed857afe79e9b6708fb214</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | <code>0.0.25</code>                                                                                                                                   |
+| Tags at this commit | <code>0.0.26</code>                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/looks</code>                                                                                                        |
 
@@ -10802,9 +10925,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/looks</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/40365295390">40365295390</a>       |
+| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/40387152243">40387152243</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>8a76927d85747f656d7d37edc77394dbfbb59ce9</code> (in the history of the built commit) |
+| Event commit | <code>82c8fe675890ee3358950ec249bb7b7611389656</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -10829,13 +10952,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/looks/0.0.25/">0.0.25</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/looks/0.0.25/">0.0.25</a>, older than the documented version (0.0.26).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout 0e31bc26b453c547be38fddae23fd0a8b9eb799d
+git checkout 96fac3dea7d1654e36ed857afe79e9b6708fb214
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -255,7 +255,7 @@ consumer can compose several. The module-level functions below delegate to
 </span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">reg</span> <span class="o">=</span> <span class="n">EffectRegistry</span><span class="p">()</span>
 </span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">impl</span> <span class="o">=</span> <span class="n">ImplRef</span><span class="p">(</span><span class="n">effect</span><span class="o">=</span><span class="s2">"lut3d"</span><span class="p">,</span> <span class="n">impl</span><span class="o">=</span><span class="s2">"lut3d.ffmpeg.default"</span><span class="p">,</span>
 </span><span id="line-4"><span class="gp">... </span>               <span class="n">backend</span><span class="o">=</span><span class="s2">"ffmpeg"</span><span class="p">,</span> <span class="n">terms</span><span class="o">=</span><span class="n">terms_for</span><span class="p">(</span><span class="s2">"ffmpeg"</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
-</span><span id="line-5"><span class="gp">... </span>               <span class="n">requires_filters</span><span class="o">=</span><span class="p">(</span><span class="s2">"lut3d"</span><span class="p">,))</span>
+</span><span id="line-5"><span class="gp">... </span>               <span class="n">requires_filters</span><span class="o">=</span><span class="p">(</span><span class="s2">"lut3d"</span><span class="p">,),</span> <span class="n">rgb_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span id="line-6"><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">impl</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">params</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="p">{</span><span class="s2">"filter"</span><span class="p">:</span> <span class="s2">"lut3d"</span><span class="p">})</span>
 </span><span id="line-7"><span class="gp">&gt;&gt;&gt; </span><span class="n">reg</span><span class="o">.</span><span class="n">effects</span><span class="p">()</span>
 </span><span id="line-8"><span class="go">('lut3d',)</span>
@@ -397,13 +397,19 @@ validate against that instead.</p></li>
 <dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="#looks.registry.ImplConflict" title="looks.registry.ImplConflict"><strong>ImplConflict</strong></a> – If the key is taken.</p></li>
 <li><p><a class="reference internal" href="#looks.registry.RegistryError" title="looks.registry.RegistryError"><strong>RegistryError</strong></a> – If the key is not <code class="docutils literal notranslate"><span class="pre">&lt;effect&gt;.&lt;backend&gt;.&lt;variant&gt;</span></code>,
-    or an ffmpeg implementation names a filter that does not exist.</p></li>
+    an ffmpeg implementation names a filter that does not exist,
+    or it declares <code class="docutils literal notranslate"><span class="pre">rgb_only=False</span></code> while naming an RGB-only
+    filter.</p></li>
 </ul>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="looks.spec.html#looks.spec.ImplRef" title="looks.spec.ImplRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImplRef</span></code></a></span></p>
 </dd>
 </dl>
+<p>An ffmpeg implementation’s undeclared <code class="docutils literal notranslate"><span class="pre">rgb_only</span></code> is settled here
+from its <code class="docutils literal notranslate"><span class="pre">requires_filters</span></code>, so rule 22 never reads <code class="docutils literal notranslate"><span class="pre">None</span></code> for
+one: leaving it out is not a way past the refusal. (Changing a
+declared <code class="docutils literal notranslate"><span class="pre">rgb_only</span></code> changes <code class="docutils literal notranslate"><span class="pre">vf</span></code>’s pixels; bump <code class="docutils literal notranslate"><span class="pre">impl_version</span></code>.)</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="looks.registry.EffectRegistry.with_defaults">
@@ -536,7 +542,7 @@ validate against that instead.</p></li>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=5d650c58"></script>
+<script src="../_static/documentation_options.js?v=6a9d8632"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

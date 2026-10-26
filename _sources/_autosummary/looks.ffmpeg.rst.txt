@@ -22,6 +22,8 @@ looks.ffmpeg
       escape_filter_value
       filter_string
       gated
+      has_scale_matrix
+      is_rgb_domain
       register_defaults
       split_filters
       vf

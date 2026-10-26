@@ -5,19 +5,21 @@ orphan: true
 
 # About this build
 
-This documentation was built on **2026-10-26 17:09 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/0e31bc26b453c547be38fddae23fd0a8b9eb799d"><code>0e31bc2</code></a> on branch <code>main</code>, for **looks 0.0.25** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 19:32 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/96fac3dea7d1654e36ed857afe79e9b6708fb214"><code>96fac3d</code></a> on branch <code>main</code>, for **looks 0.0.26** (from <code>pyproject.toml</code>).
 
-:::{note}
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+:::{warning}
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.26) is ahead of the latest release on PyPI (0.0.25): these docs describe unreleased code.
 :::
 
 ## Source
 
 | | |
 |---|---|
-| Commit | <a href="https://github.com/reeleehq/looks/commit/0e31bc26b453c547be38fddae23fd0a8b9eb799d"><code>0e31bc26b453c547be38fddae23fd0a8b9eb799d</code></a> |
+| Commit | <a href="https://github.com/reeleehq/looks/commit/96fac3dea7d1654e36ed857afe79e9b6708fb214"><code>96fac3dea7d1654e36ed857afe79e9b6708fb214</code></a> |
 | Branch | <code>main</code> |
-| Tags at this commit | <code>0.0.25</code> |
+| Tags at this commit | <code>0.0.26</code> |
 | Working tree | clean |
 | Remote | <code>https://github.com/reeleehq/looks</code> |
 
@@ -26,9 +28,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 | | |
 |---|---|
 | Repository | <code>reeleehq/looks</code> |
-| Run | <a href="https://github.com/reeleehq/looks/actions/runs/40365295390">40365295390</a> |
+| Run | <a href="https://github.com/reeleehq/looks/actions/runs/40387152243">40387152243</a> |
 | Ref | <code>refs/heads/main</code> |
-| Event commit | <code>8a76927d85747f656d7d37edc77394dbfbb59ce9</code> (in the history of the built commit) |
+| Event commit | <code>82c8fe675890ee3358950ec249bb7b7611389656</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -53,13 +55,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/looks/0.0.25/">0.0.25</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/looks/0.0.25/">0.0.25</a>, older than the documented version (0.0.26).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout 0e31bc26b453c547be38fddae23fd0a8b9eb799d
+git checkout 96fac3dea7d1654e36ed857afe79e9b6708fb214
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

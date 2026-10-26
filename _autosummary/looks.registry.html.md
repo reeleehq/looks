@@ -104,7 +104,7 @@ consumer can compose several. The module-level functions below delegate to
 >>> reg = EffectRegistry()
 >>> impl = ImplRef(effect="lut3d", impl="lut3d.ffmpeg.default",
 ...                backend="ffmpeg", terms=terms_for("ffmpeg")[0],
-...                requires_filters=("lut3d",))
+...                requires_filters=("lut3d",), rgb_only=True)
 >>> _ = reg.register(impl, lambda params, **kw: {"filter": "lut3d"})
 >>> reg.effects()
 ('lut3d',)
@@ -219,9 +219,16 @@ Record an implementation. Returns it, so this reads well inline.
 * **Raises:**
   * [**ImplConflict**](#looks.registry.ImplConflict) – If the key is taken.
   * [**RegistryError**](#looks.registry.RegistryError) – If the key is not `<effect>.<backend>.<variant>`,
-        or an ffmpeg implementation names a filter that does not exist.
+        an ffmpeg implementation names a filter that does not exist,
+        or it declares `rgb_only=False` while naming an RGB-only
+        filter.
 * **Return type:**
   [`ImplRef`](looks.spec.html.md#looks.spec.ImplRef)
+
+An ffmpeg implementation’s undeclared `rgb_only` is settled here
+from its `requires_filters`, so rule 22 never reads `None` for
+one: leaving it out is not a way past the refusal. (Changing a
+declared `rgb_only` changes `vf`’s pixels; bump `impl_version`.)
 
 #### with_defaults(effect, params)
 

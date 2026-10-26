@@ -138,7 +138,7 @@ exists to prevent.
 * **Return type:**
   [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`LookPlan`](looks.spec.html.md#looks.spec.LookPlan), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
 
-### looks.compile.compile_look(look, , clip=None, env=None, policy=None, probe={}, registry=None)
+### looks.compile.compile_look(look, , clip=None, env=None, policy=None, probe={}, registry=None, assume_color_space=None)
 
 Compile a Look into a plan. No process is started and no file is written.
 
@@ -155,6 +155,11 @@ Compile a Look into a plan. No process is started and no file is written.
     against.
   * **registry** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`EffectRegistry`](looks.registry.html.md#looks.registry.EffectRegistry)]) – Which implementations exist. Defaults to
     [`looks.registry.REGISTRY`](looks.registry.html.md#looks.registry.REGISTRY).
+  * **assume_color_space** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]) – Rule 22’s escape. The colour space (a
+    `ClipSpec.color_space` name such as `"bt709"`) to declare when
+    the clip does not say; it is recorded on the plan’s clip
+    (`color_assumed`) and so moves `plan_hash`. Ignored when the
+    clip declares its own.
 * **Warns:**
   **looks.stages.StageOrderWarning** – If the Look departs from the canonical
   stage order. It is never reordered, and never a refusal unless the
@@ -165,6 +170,9 @@ Compile a Look into a plan. No process is started and no file is written.
   A [`LookPlan`](looks.spec.html.md#looks.spec.LookPlan) holding no live callables — the runner
   resolves each step’s code from the registry by key.
 * **Raises:**
+  * [**CompileError**](#looks.compile.CompileError) – If a step only takes RGB and the clip’s colour space is
+        undeclared (rule 22) and not assumed. ffmpeg would pick a matrix
+        for it, and on some builds picks wrongly.
   * [**CompileError**](#looks.compile.CompileError) – If an effect has no admissible implementation. The
         message says which constraint emptied the pool, because “no
         implementation available” alone is the least useful refusal in the

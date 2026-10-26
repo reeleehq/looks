@@ -202,6 +202,12 @@ keeps the package honest would have nothing left to protect.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.gated" title="looks.ffmpeg.gated"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gated</span></code></a>(fragment, at)</p></td>
 <td><p>Restrict a fragment to a span, using ffmpeg's own timeline support.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.has_scale_matrix" title="looks.ffmpeg.has_scale_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_scale_matrix</span></code></a>(color_space)</p></td>
+<td><p>Whether a declared colour space names a matrix <code class="docutils literal notranslate"><span class="pre">scale</span></code> knows.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.is_rgb_domain" title="looks.ffmpeg.is_rgb_domain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_rgb_domain</span></code></a>(filters)</p></td>
+<td><p>Whether any of these ffmpeg filters only takes RGB.</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.register_defaults" title="looks.ffmpeg.register_defaults"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_defaults</span></code></a>([registry])</p></td>
 <td><p>Register the built-in ffmpeg effects.</p></td>
 </tr>
@@ -249,7 +255,7 @@ characters must not themselves be escaped by the <code class="docutils literal n
 </dd></dl>
 <dl class="py data">
 <dt class="sig sig-object py" id="looks.ffmpeg.RGB_DOMAIN_FILTERS">
-<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">RGB_DOMAIN_FILTERS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'colorbalance',</span> <span class="pre">'colorchannelmixer',</span> <span class="pre">'colorlevels',</span> <span class="pre">'curves',</span> <span class="pre">'lut3d',</span> <span class="pre">'lutrgb'})</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.RGB_DOMAIN_FILTERS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.RGB_DOMAIN_FILTERS'">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">RGB_DOMAIN_FILTERS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'colorbalance',</span> <span class="pre">'colorchannelmixer',</span> <span class="pre">'colorcontrast',</span> <span class="pre">'colorlevels',</span> <span class="pre">'colortemperature',</span> <span class="pre">'curves',</span> <span class="pre">'exposure',</span> <span class="pre">'huesaturation',</span> <span class="pre">'lut1d',</span> <span class="pre">'lut3d',</span> <span class="pre">'lutrgb',</span> <span class="pre">'selectivecolor',</span> <span class="pre">'vibrance'})</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.RGB_DOMAIN_FILTERS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.RGB_DOMAIN_FILTERS'">¶</a></dt>
 <dd><p>Filters that only take RGB, so ffmpeg converts YUV to RGB and back around
 them. On ffmpeg 6.1 that auto-inserted conversion ignores the colour tags:
 a flat BT.709 frame lost about 7 luma through any of these, a colour test
@@ -338,6 +344,45 @@ gate only the last one, silently:</p>
 </dl>
 </dd></dl>
 <dl class="py function">
+<dt class="sig sig-object py" id="looks.ffmpeg.has_scale_matrix">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">has_scale_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_space</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/ffmpeg.html#has_scale_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.has_scale_matrix" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.has_scale_matrix'">¶</a></dt>
+<dd><p>Whether a declared colour space names a matrix <code class="docutils literal notranslate"><span class="pre">scale</span></code> knows.</p>
+<p>The one predicate behind both the compile-time refusal (rule 22) and
+<code class="xref py py-func docutils literal notranslate"><span class="pre">_matrix_wrap()</span></code>: <code class="docutils literal notranslate"><span class="pre">"unknown"</span></code> (what ffprobe prints for an untagged
+stream) and any other unmapped name is <em>not</em> a declaration.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">has_scale_matrix</span><span class="p">(</span><span class="s2">"bt709"</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">True</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">has_scale_matrix</span><span class="p">(</span><span class="s2">"unknown"</span><span class="p">)</span>
+</span><span id="line-4"><span class="go">False</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="n">has_scale_matrix</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+</span><span id="line-6"><span class="go">False</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.ffmpeg.is_rgb_domain">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">is_rgb_domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/ffmpeg.html#is_rgb_domain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.is_rgb_domain" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.is_rgb_domain'">¶</a></dt>
+<dd><p>Whether any of these ffmpeg filters only takes RGB.</p>
+<p>This is what derives <code class="xref py py-attr docutils literal notranslate"><span class="pre">ImplRef.rgb_only</span></code> for the built-ins; the
+compiler and <a class="reference internal" href="#looks.ffmpeg.vf" title="looks.ffmpeg.vf"><code class="xref py py-func docutils literal notranslate"><span class="pre">vf()</span></code></a> read the flag, never this list.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">is_rgb_domain</span><span class="p">((</span><span class="s2">"curves"</span><span class="p">,))</span>
+</span><span id="line-2"><span class="go">True</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">is_rgb_domain</span><span class="p">((</span><span class="s2">"gblur"</span><span class="p">,))</span>
+</span><span id="line-4"><span class="go">False</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
 <dt class="sig sig-object py" id="looks.ffmpeg.register_defaults">
 <span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">register_defaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">registry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/ffmpeg.html#register_defaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.register_defaults" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.register_defaults'">¶</a></dt>
 <dd><p>Register the built-in ffmpeg effects. Idempotent per registry.</p>
@@ -421,6 +466,8 @@ nothing here names a stream.</p>
 <li><a :data-current="activeSection === '#looks.ffmpeg.escape_filter_value'" class="reference internal" href="#looks.ffmpeg.escape_filter_value"><code class="docutils literal notranslate"><span class="pre">escape_filter_value()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.filter_string'" class="reference internal" href="#looks.ffmpeg.filter_string"><code class="docutils literal notranslate"><span class="pre">filter_string()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.gated'" class="reference internal" href="#looks.ffmpeg.gated"><code class="docutils literal notranslate"><span class="pre">gated()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.has_scale_matrix'" class="reference internal" href="#looks.ffmpeg.has_scale_matrix"><code class="docutils literal notranslate"><span class="pre">has_scale_matrix()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.is_rgb_domain'" class="reference internal" href="#looks.ffmpeg.is_rgb_domain"><code class="docutils literal notranslate"><span class="pre">is_rgb_domain()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.register_defaults'" class="reference internal" href="#looks.ffmpeg.register_defaults"><code class="docutils literal notranslate"><span class="pre">register_defaults()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.split_filters'" class="reference internal" href="#looks.ffmpeg.split_filters"><code class="docutils literal notranslate"><span class="pre">split_filters()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.vf'" class="reference internal" href="#looks.ffmpeg.vf"><code class="docutils literal notranslate"><span class="pre">vf()</span></code></a></li>
@@ -437,7 +484,7 @@ nothing here names a stream.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=5d650c58"></script>
+<script src="../_static/documentation_options.js?v=6a9d8632"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

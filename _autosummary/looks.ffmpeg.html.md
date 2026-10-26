@@ -62,6 +62,8 @@ keeps the package honest would have nothing left to protect.
 |---------------------------------------------------------------------------------|---------------------------------------------------------------------|
 | [`filter_string`](#looks.ffmpeg.filter_string)(name[, options]) | One filter, with its options escaped.                               |
 | [`gated`](#looks.ffmpeg.gated)(fragment, at)            | Restrict a fragment to a span, using ffmpeg's own timeline support. |
+| [`has_scale_matrix`](#looks.ffmpeg.has_scale_matrix)(color_space)  | Whether a declared colour space names a matrix `scale` knows.       |
+| [`is_rgb_domain`](#looks.ffmpeg.is_rgb_domain)(filters)         | Whether any of these ffmpeg filters only takes RGB.                 |
 | [`register_defaults`](#looks.ffmpeg.register_defaults)([registry])  | Register the built-in ffmpeg effects.                               |
 | [`split_filters`](#looks.ffmpeg.split_filters)(fragment)        | A chain into its filters, splitting on UNESCAPED commas only.       |
 | [`vf`](#looks.ffmpeg.vf)(plan, \*[, gate])           | A whole plan as one `-vf` fragment: input-index-free, splice-ready. |
@@ -94,7 +96,7 @@ Characters the **option** parser gives meaning to, within one filter’s
 arguments. Must lead with `\\`: the backslashes introduced for the later
 characters must not themselves be escaped by the `\\` pass.
 
-### looks.ffmpeg.RGB_DOMAIN_FILTERS *= frozenset({'colorbalance', 'colorchannelmixer', 'colorlevels', 'curves', 'lut3d', 'lutrgb'})*
+### looks.ffmpeg.RGB_DOMAIN_FILTERS *= frozenset({'colorbalance', 'colorchannelmixer', 'colorcontrast', 'colorlevels', 'colortemperature', 'curves', 'exposure', 'huesaturation', 'lut1d', 'lut3d', 'lutrgb', 'selectivecolor', 'vibrance'})*
 
 Filters that only take RGB, so ffmpeg converts YUV to RGB and back around
 them. On ffmpeg 6.1 that auto-inserted conversion ignores the colour tags:
@@ -182,6 +184,43 @@ gate only the last one, silently:
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### looks.ffmpeg.has_scale_matrix(color_space)
+
+Whether a declared colour space names a matrix `scale` knows.
+
+The one predicate behind both the compile-time refusal (rule 22) and
+`_matrix_wrap()`: `"unknown"` (what ffprobe prints for an untagged
+stream) and any other unmapped name is *not* a declaration.
+
+```pycon
+>>> has_scale_matrix("bt709")
+True
+>>> has_scale_matrix("unknown")
+False
+>>> has_scale_matrix(None)
+False
+```
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+### looks.ffmpeg.is_rgb_domain(filters)
+
+Whether any of these ffmpeg filters only takes RGB.
+
+This is what derives `ImplRef.rgb_only` for the built-ins; the
+compiler and [`vf()`](#looks.ffmpeg.vf) read the flag, never this list.
+
+```pycon
+>>> is_rgb_domain(("curves",))
+True
+>>> is_rgb_domain(("gblur",))
+False
+```
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 ### looks.ffmpeg.register_defaults(registry=None)
 

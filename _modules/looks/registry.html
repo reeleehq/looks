@@ -296,7 +296,7 @@
 </span><span id="line-105"><span class="sd">        &gt;&gt;&gt; reg = EffectRegistry()</span>
 </span><span id="line-106"><span class="sd">        &gt;&gt;&gt; impl = ImplRef(effect="lut3d", impl="lut3d.ffmpeg.default",</span>
 </span><span id="line-107"><span class="sd">        ...                backend="ffmpeg", terms=terms_for("ffmpeg")[0],</span>
-</span><span id="line-108"><span class="sd">        ...                requires_filters=("lut3d",))</span>
+</span><span id="line-108"><span class="sd">        ...                requires_filters=("lut3d",), rgb_only=True)</span>
 </span><span id="line-109"><span class="sd">        &gt;&gt;&gt; _ = reg.register(impl, lambda params, **kw: {"filter": "lut3d"})</span>
 </span><span id="line-110"><span class="sd">        &gt;&gt;&gt; reg.effects()</span>
 </span><span id="line-111"><span class="sd">        ('lut3d',)</span>
@@ -354,231 +354,257 @@
 </span><span id="line-161"><span class="sd">        Raises:</span>
 </span><span id="line-162"><span class="sd">            ImplConflict: If the key is taken.</span>
 </span><span id="line-163"><span class="sd">            RegistryError: If the key is not ``&lt;effect&gt;.&lt;backend&gt;.&lt;variant&gt;``,</span>
-</span><span id="line-164"><span class="sd">                or an ffmpeg implementation names a filter that does not exist.</span>
-</span><span id="line-165"><span class="sd">        """</span>
-</span><span id="line-166">        <span class="bp">self</span><span class="o">.</span><span class="n">_check_key</span><span class="p">(</span><span class="n">impl</span><span class="p">)</span>
-</span><span id="line-167">        <span class="k">if</span> <span class="n">impl</span><span class="o">.</span><span class="n">impl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">:</span>
-</span><span id="line-168">            <span class="n">existing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">[</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="p">]</span><span class="o">.</span><span class="n">impl</span>
-</span><span id="line-169">            <span class="k">raise</span> <span class="n">ImplConflict</span><span class="p">(</span>
-</span><span id="line-170">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> is already registered, for effect "</span>
-</span><span id="line-171">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">existing</span><span class="o">.</span><span class="n">effect</span><span class="si">!r}</span><span class="s2">. Overwriting it would silently change "</span>
-</span><span id="line-172">                <span class="s2">"which code a stored plan resolves to — which is exactly what "</span>
-</span><span id="line-173">                <span class="s2">"a plan hash exists to prevent. Pick another variant name."</span>
-</span><span id="line-174">            <span class="p">)</span>
-</span><span id="line-175">        <span class="k">if</span> <span class="n">impl</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">"ffmpeg"</span> <span class="ow">and</span> <span class="n">impl</span><span class="o">.</span><span class="n">requires_filters</span><span class="p">:</span>
-</span><span id="line-176">            <span class="bp">self</span><span class="o">.</span><span class="n">_check_filters</span><span class="p">(</span><span class="n">impl</span><span class="p">,</span> <span class="n">known_filters</span><span class="p">)</span>
-</span><span id="line-177">        <span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">[</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Entry</span><span class="p">(</span><span class="n">impl</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">tags</span><span class="p">))</span>
-</span><span id="line-178">        <span class="bp">self</span><span class="o">.</span><span class="n">_by_effect</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">impl</span><span class="o">.</span><span class="n">effect</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
-</span><span id="line-179">        <span class="k">return</span> <span class="n">impl</span></div>
+</span><span id="line-164"><span class="sd">                an ffmpeg implementation names a filter that does not exist,</span>
+</span><span id="line-165"><span class="sd">                or it declares ``rgb_only=False`` while naming an RGB-only</span>
+</span><span id="line-166"><span class="sd">                filter.</span>
+</span><span id="line-167">
+</span><span id="line-168"><span class="sd">        An ffmpeg implementation's undeclared ``rgb_only`` is settled here</span>
+</span><span id="line-169"><span class="sd">        from its ``requires_filters``, so rule 22 never reads ``None`` for</span>
+</span><span id="line-170"><span class="sd">        one: leaving it out is not a way past the refusal. (Changing a</span>
+</span><span id="line-171"><span class="sd">        declared ``rgb_only`` changes ``vf``'s pixels; bump ``impl_version``.)</span>
+</span><span id="line-172"><span class="sd">        """</span>
+</span><span id="line-173">        <span class="bp">self</span><span class="o">.</span><span class="n">_check_key</span><span class="p">(</span><span class="n">impl</span><span class="p">)</span>
+</span><span id="line-174">        <span class="k">if</span> <span class="n">impl</span><span class="o">.</span><span class="n">impl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">:</span>
+</span><span id="line-175">            <span class="n">existing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">[</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="p">]</span><span class="o">.</span><span class="n">impl</span>
+</span><span id="line-176">            <span class="k">raise</span> <span class="n">ImplConflict</span><span class="p">(</span>
+</span><span id="line-177">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> is already registered, for effect "</span>
+</span><span id="line-178">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">existing</span><span class="o">.</span><span class="n">effect</span><span class="si">!r}</span><span class="s2">. Overwriting it would silently change "</span>
+</span><span id="line-179">                <span class="s2">"which code a stored plan resolves to — which is exactly what "</span>
+</span><span id="line-180">                <span class="s2">"a plan hash exists to prevent. Pick another variant name."</span>
+</span><span id="line-181">            <span class="p">)</span>
+</span><span id="line-182">        <span class="k">if</span> <span class="n">impl</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">"ffmpeg"</span><span class="p">:</span>
+</span><span id="line-183">            <span class="n">impl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settle_rgb_only</span><span class="p">(</span><span class="n">impl</span><span class="p">)</span>
+</span><span id="line-184">            <span class="k">if</span> <span class="n">impl</span><span class="o">.</span><span class="n">requires_filters</span><span class="p">:</span>
+</span><span id="line-185">                <span class="bp">self</span><span class="o">.</span><span class="n">_check_filters</span><span class="p">(</span><span class="n">impl</span><span class="p">,</span> <span class="n">known_filters</span><span class="p">)</span>
+</span><span id="line-186">        <span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">[</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Entry</span><span class="p">(</span><span class="n">impl</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">tags</span><span class="p">))</span>
+</span><span id="line-187">        <span class="bp">self</span><span class="o">.</span><span class="n">_by_effect</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">impl</span><span class="o">.</span><span class="n">effect</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
+</span><span id="line-188">        <span class="k">return</span> <span class="n">impl</span></div>
 
-</span><span id="line-180">
+</span><span id="line-189">
 <div class="viewcode-block" id="EffectRegistry.declare_params">
 <a class="viewcode-back" href="../../_autosummary/looks.registry.html#looks.EffectRegistry.declare_params">[docs]</a>
-</span><span id="line-181">    <span class="k">def</span><span class="w"> </span><span class="nf">declare_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Param</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-182"><span class="w">        </span><span class="sd">"""Declare an effect's parameters, once: see :mod:`looks.params`.</span>
-</span><span id="line-183">
-</span><span id="line-184"><span class="sd">        The schema belongs to the registry, not to the package, so a registry</span>
-</span><span id="line-185"><span class="sd">        with its own implementation of an effect (a different ``flatten``, say)</span>
-</span><span id="line-186"><span class="sd">        declares that implementation's keys and is not bound to ours. An effect</span>
-</span><span id="line-187"><span class="sd">        with no declaration is not checked.</span>
-</span><span id="line-188">
-</span><span id="line-189"><span class="sd">        Raises:</span>
-</span><span id="line-190"><span class="sd">            RegistryError: If the effect already has a different schema.</span>
-</span><span id="line-191"><span class="sd">        """</span>
-</span><span id="line-192">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">schema</span><span class="p">:</span>
-</span><span id="line-193">            <span class="k">raise</span> <span class="n">RegistryError</span><span class="p">(</span>
-</span><span id="line-194">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">effect</span><span class="si">!r}</span><span class="s2"> already has a parameter schema. A second would "</span>
-</span><span id="line-195">                <span class="s2">"change what a stored Look means."</span>
-</span><span id="line-196">            <span class="p">)</span>
-</span><span id="line-197">        <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="n">effect</span><span class="p">]</span> <span class="o">=</span> <span class="n">schema</span></div>
+</span><span id="line-190">    <span class="k">def</span><span class="w"> </span><span class="nf">declare_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Param</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-191"><span class="w">        </span><span class="sd">"""Declare an effect's parameters, once: see :mod:`looks.params`.</span>
+</span><span id="line-192">
+</span><span id="line-193"><span class="sd">        The schema belongs to the registry, not to the package, so a registry</span>
+</span><span id="line-194"><span class="sd">        with its own implementation of an effect (a different ``flatten``, say)</span>
+</span><span id="line-195"><span class="sd">        declares that implementation's keys and is not bound to ours. An effect</span>
+</span><span id="line-196"><span class="sd">        with no declaration is not checked.</span>
+</span><span id="line-197">
+</span><span id="line-198"><span class="sd">        Raises:</span>
+</span><span id="line-199"><span class="sd">            RegistryError: If the effect already has a different schema.</span>
+</span><span id="line-200"><span class="sd">        """</span>
+</span><span id="line-201">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">schema</span><span class="p">:</span>
+</span><span id="line-202">            <span class="k">raise</span> <span class="n">RegistryError</span><span class="p">(</span>
+</span><span id="line-203">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">effect</span><span class="si">!r}</span><span class="s2"> already has a parameter schema. A second would "</span>
+</span><span id="line-204">                <span class="s2">"change what a stored Look means."</span>
+</span><span id="line-205">            <span class="p">)</span>
+</span><span id="line-206">        <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="n">effect</span><span class="p">]</span> <span class="o">=</span> <span class="n">schema</span></div>
 
-</span><span id="line-198">
+</span><span id="line-207">
 <div class="viewcode-block" id="EffectRegistry.has_params">
 <a class="viewcode-back" href="../../_autosummary/looks.registry.html#looks.EffectRegistry.has_params">[docs]</a>
-</span><span id="line-199">    <span class="k">def</span><span class="w"> </span><span class="nf">has_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="line-200"><span class="w">        </span><span class="sd">"""Has this registry declared a schema for ``effect``?"""</span>
-</span><span id="line-201">        <span class="k">return</span> <span class="n">effect</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span></div>
+</span><span id="line-208">    <span class="k">def</span><span class="w"> </span><span class="nf">has_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-209"><span class="w">        </span><span class="sd">"""Has this registry declared a schema for ``effect``?"""</span>
+</span><span id="line-210">        <span class="k">return</span> <span class="n">effect</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span></div>
 
-</span><span id="line-202">
+</span><span id="line-211">
 <div class="viewcode-block" id="EffectRegistry.check_params">
 <a class="viewcode-back" href="../../_autosummary/looks.registry.html#looks.EffectRegistry.check_params">[docs]</a>
-</span><span id="line-203">    <span class="k">def</span><span class="w"> </span><span class="nf">check_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-204"><span class="w">        </span><span class="sd">"""Refuse parameters this registry's schema for ``effect`` rejects."""</span>
-</span><span id="line-205">        <span class="n">check_params</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">schemas</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">)</span></div>
+</span><span id="line-212">    <span class="k">def</span><span class="w"> </span><span class="nf">check_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-213"><span class="w">        </span><span class="sd">"""Refuse parameters this registry's schema for ``effect`` rejects."""</span>
+</span><span id="line-214">        <span class="n">check_params</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">schemas</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">)</span></div>
 
-</span><span id="line-206">
+</span><span id="line-215">
 <div class="viewcode-block" id="EffectRegistry.with_defaults">
 <a class="viewcode-back" href="../../_autosummary/looks.registry.html#looks.EffectRegistry.with_defaults">[docs]</a>
-</span><span id="line-207">    <span class="k">def</span><span class="w"> </span><span class="nf">with_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-</span><span id="line-208"><span class="w">        </span><span class="sd">"""``params`` with this registry's declared defaults filled in."""</span>
-</span><span id="line-209">        <span class="k">return</span> <span class="n">with_defaults</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">schemas</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">)</span></div>
+</span><span id="line-216">    <span class="k">def</span><span class="w"> </span><span class="nf">with_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+</span><span id="line-217"><span class="w">        </span><span class="sd">"""``params`` with this registry's declared defaults filled in."""</span>
+</span><span id="line-218">        <span class="k">return</span> <span class="n">with_defaults</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">schemas</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">)</span></div>
 
-</span><span id="line-210">
-</span><span id="line-211">    <span class="nd">@staticmethod</span>
-</span><span id="line-212">    <span class="k">def</span><span class="w"> </span><span class="nf">_check_key</span><span class="p">(</span><span class="n">impl</span><span class="p">:</span> <span class="n">ImplRef</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-213">        <span class="n">parts</span> <span class="o">=</span> <span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span>
-</span><span id="line-214">        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
-</span><span id="line-215">            <span class="k">raise</span> <span class="n">RegistryError</span><span class="p">(</span>
-</span><span id="line-216">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> is not of the form </span><span class="si">{</span><span class="n">KEY_SHAPE</span><span class="si">}</span><span class="s2"> — a key with "</span>
-</span><span id="line-217">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span><span class="si">}</span><span class="s2"> segments cannot be read back into its parts."</span>
-</span><span id="line-218">            <span class="p">)</span>
-</span><span id="line-219">        <span class="n">effect</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">_variant</span> <span class="o">=</span> <span class="n">parts</span>
-</span><span id="line-220">        <span class="k">if</span> <span class="n">effect</span> <span class="o">!=</span> <span class="n">impl</span><span class="o">.</span><span class="n">effect</span> <span class="ow">or</span> <span class="n">backend</span> <span class="o">!=</span> <span class="n">impl</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
-</span><span id="line-221">            <span class="k">raise</span> <span class="n">RegistryError</span><span class="p">(</span>
-</span><span id="line-222">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> disagrees with what it declares: effect "</span>
-</span><span id="line-223">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">effect</span><span class="si">!r}</span><span class="s2">, backend </span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">backend</span><span class="si">!r}</span><span class="s2">. The key is "</span>
-</span><span id="line-224">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">KEY_SHAPE</span><span class="si">}</span><span class="s2">, so a key that says otherwise is a name that "</span>
-</span><span id="line-225">                <span class="s2">"will be read wrongly by everything downstream."</span>
-</span><span id="line-226">            <span class="p">)</span>
-</span><span id="line-227">
-</span><span id="line-228">    <span class="nd">@staticmethod</span>
-</span><span id="line-229">    <span class="k">def</span><span class="w"> </span><span class="nf">_check_filters</span><span class="p">(</span><span class="n">impl</span><span class="p">:</span> <span class="n">ImplRef</span><span class="p">,</span> <span class="n">known</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">frozenset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-230">        <span class="kn">from</span><span class="w"> </span><span class="nn">looks.environment</span><span class="w"> </span><span class="kn">import</span> <span class="n">known_filters</span> <span class="k">as</span> <span class="n">_known</span>
-</span><span id="line-231">
-</span><span id="line-232">        <span class="n">universe</span> <span class="o">=</span> <span class="n">_known</span><span class="p">()</span> <span class="k">if</span> <span class="n">known</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">known</span>
-</span><span id="line-233">        <span class="n">unknown</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">impl</span><span class="o">.</span><span class="n">requires_filters</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">universe</span><span class="p">))</span>
-</span><span id="line-234">        <span class="k">if</span> <span class="n">unknown</span><span class="p">:</span>
-</span><span id="line-235">            <span class="k">raise</span> <span class="n">RegistryError</span><span class="p">(</span>
-</span><span id="line-236">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> requires </span><span class="si">{</span><span class="n">unknown</span><span class="si">}</span><span class="s2">, which are not ffmpeg "</span>
-</span><span id="line-237">                <span class="sa">f</span><span class="s2">"filters (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">universe</span><span class="p">)</span><span class="si">}</span><span class="s2"> known). Left in, a typo makes "</span>
-</span><span id="line-238">                <span class="s2">"selection drop this candidate on a set-inclusion test and "</span>
-</span><span id="line-239">                <span class="s2">"report 'no implementation available' — a refusal pointing "</span>
-</span><span id="line-240">                <span class="s2">"nowhere near the cause. Case matters to ffmpeg."</span>
-</span><span id="line-241">            <span class="p">)</span>
+</span><span id="line-219">
+</span><span id="line-220">    <span class="nd">@staticmethod</span>
+</span><span id="line-221">    <span class="k">def</span><span class="w"> </span><span class="nf">_check_key</span><span class="p">(</span><span class="n">impl</span><span class="p">:</span> <span class="n">ImplRef</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-222">        <span class="n">parts</span> <span class="o">=</span> <span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span>
+</span><span id="line-223">        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+</span><span id="line-224">            <span class="k">raise</span> <span class="n">RegistryError</span><span class="p">(</span>
+</span><span id="line-225">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> is not of the form </span><span class="si">{</span><span class="n">KEY_SHAPE</span><span class="si">}</span><span class="s2"> — a key with "</span>
+</span><span id="line-226">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span><span class="si">}</span><span class="s2"> segments cannot be read back into its parts."</span>
+</span><span id="line-227">            <span class="p">)</span>
+</span><span id="line-228">        <span class="n">effect</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">_variant</span> <span class="o">=</span> <span class="n">parts</span>
+</span><span id="line-229">        <span class="k">if</span> <span class="n">effect</span> <span class="o">!=</span> <span class="n">impl</span><span class="o">.</span><span class="n">effect</span> <span class="ow">or</span> <span class="n">backend</span> <span class="o">!=</span> <span class="n">impl</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
+</span><span id="line-230">            <span class="k">raise</span> <span class="n">RegistryError</span><span class="p">(</span>
+</span><span id="line-231">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> disagrees with what it declares: effect "</span>
+</span><span id="line-232">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">effect</span><span class="si">!r}</span><span class="s2">, backend </span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">backend</span><span class="si">!r}</span><span class="s2">. The key is "</span>
+</span><span id="line-233">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">KEY_SHAPE</span><span class="si">}</span><span class="s2">, so a key that says otherwise is a name that "</span>
+</span><span id="line-234">                <span class="s2">"will be read wrongly by everything downstream."</span>
+</span><span id="line-235">            <span class="p">)</span>
+</span><span id="line-236">
+</span><span id="line-237">    <span class="nd">@staticmethod</span>
+</span><span id="line-238">    <span class="k">def</span><span class="w"> </span><span class="nf">_settle_rgb_only</span><span class="p">(</span><span class="n">impl</span><span class="p">:</span> <span class="n">ImplRef</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImplRef</span><span class="p">:</span>
+</span><span id="line-239">        <span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
+</span><span id="line-240">
+</span><span id="line-241">        <span class="kn">from</span><span class="w"> </span><span class="nn">looks.ffmpeg</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_rgb_domain</span>
 </span><span id="line-242">
+</span><span id="line-243">        <span class="n">derived</span> <span class="o">=</span> <span class="n">is_rgb_domain</span><span class="p">(</span><span class="n">impl</span><span class="o">.</span><span class="n">requires_filters</span><span class="p">)</span>
+</span><span id="line-244">        <span class="k">if</span> <span class="n">impl</span><span class="o">.</span><span class="n">rgb_only</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-245">            <span class="k">return</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">impl</span><span class="p">,</span> <span class="n">rgb_only</span><span class="o">=</span><span class="n">derived</span><span class="p">)</span>
+</span><span id="line-246">        <span class="k">if</span> <span class="n">derived</span> <span class="ow">and</span> <span class="n">impl</span><span class="o">.</span><span class="n">rgb_only</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+</span><span id="line-247">            <span class="k">raise</span> <span class="n">RegistryError</span><span class="p">(</span>
+</span><span id="line-248">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> declares rgb_only=False but names an RGB-only "</span>
+</span><span id="line-249">                <span class="sa">f</span><span class="s2">"filter in </span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">requires_filters</span><span class="si">!r}</span><span class="s2">: ffmpeg would convert "</span>
+</span><span id="line-250">                <span class="s2">"around it with the colour tags ignored (rule 22)"</span>
+</span><span id="line-251">            <span class="p">)</span>
+</span><span id="line-252">        <span class="k">return</span> <span class="n">impl</span>
+</span><span id="line-253">
+</span><span id="line-254">    <span class="nd">@staticmethod</span>
+</span><span id="line-255">    <span class="k">def</span><span class="w"> </span><span class="nf">_check_filters</span><span class="p">(</span><span class="n">impl</span><span class="p">:</span> <span class="n">ImplRef</span><span class="p">,</span> <span class="n">known</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">frozenset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-256">        <span class="kn">from</span><span class="w"> </span><span class="nn">looks.environment</span><span class="w"> </span><span class="kn">import</span> <span class="n">known_filters</span> <span class="k">as</span> <span class="n">_known</span>
+</span><span id="line-257">
+</span><span id="line-258">        <span class="n">universe</span> <span class="o">=</span> <span class="n">_known</span><span class="p">()</span> <span class="k">if</span> <span class="n">known</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">known</span>
+</span><span id="line-259">        <span class="n">unknown</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">impl</span><span class="o">.</span><span class="n">requires_filters</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">universe</span><span class="p">))</span>
+</span><span id="line-260">        <span class="k">if</span> <span class="n">unknown</span><span class="p">:</span>
+</span><span id="line-261">            <span class="k">raise</span> <span class="n">RegistryError</span><span class="p">(</span>
+</span><span id="line-262">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> requires </span><span class="si">{</span><span class="n">unknown</span><span class="si">}</span><span class="s2">, which are not ffmpeg "</span>
+</span><span id="line-263">                <span class="sa">f</span><span class="s2">"filters (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">universe</span><span class="p">)</span><span class="si">}</span><span class="s2"> known). Left in, a typo makes "</span>
+</span><span id="line-264">                <span class="s2">"selection drop this candidate on a set-inclusion test and "</span>
+</span><span id="line-265">                <span class="s2">"report 'no implementation available' — a refusal pointing "</span>
+</span><span id="line-266">                <span class="s2">"nowhere near the cause. Case matters to ffmpeg."</span>
+</span><span id="line-267">            <span class="p">)</span>
+</span><span id="line-268">
 <div class="viewcode-block" id="EffectRegistry.implementations">
 <a class="viewcode-back" href="../../_autosummary/looks.registry.html#looks.EffectRegistry.implementations">[docs]</a>
-</span><span id="line-243">    <span class="k">def</span><span class="w"> </span><span class="nf">implementations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ImplRef</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-</span><span id="line-244"><span class="w">        </span><span class="sd">"""Everything registered for an effect, registration order preserved."""</span>
-</span><span id="line-245">        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">impl</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_by_effect</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="p">()))</span></div>
+</span><span id="line-269">    <span class="k">def</span><span class="w"> </span><span class="nf">implementations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ImplRef</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+</span><span id="line-270"><span class="w">        </span><span class="sd">"""Everything registered for an effect, registration order preserved."""</span>
+</span><span id="line-271">        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">impl</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_by_effect</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="p">()))</span></div>
 
-</span><span id="line-246">
+</span><span id="line-272">
 <div class="viewcode-block" id="EffectRegistry.effects">
 <a class="viewcode-back" href="../../_autosummary/looks.registry.html#looks.EffectRegistry.effects">[docs]</a>
-</span><span id="line-247">    <span class="k">def</span><span class="w"> </span><span class="nf">effects</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-</span><span id="line-248"><span class="w">        </span><span class="sd">"""Every effect with at least one implementation, sorted."""</span>
-</span><span id="line-249">        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_effect</span><span class="p">))</span></div>
+</span><span id="line-273">    <span class="k">def</span><span class="w"> </span><span class="nf">effects</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+</span><span id="line-274"><span class="w">        </span><span class="sd">"""Every effect with at least one implementation, sorted."""</span>
+</span><span id="line-275">        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_effect</span><span class="p">))</span></div>
 
-</span><span id="line-250">
+</span><span id="line-276">
 <div class="viewcode-block" id="EffectRegistry.impl">
 <a class="viewcode-back" href="../../_autosummary/looks.registry.html#looks.EffectRegistry.impl">[docs]</a>
-</span><span id="line-251">    <span class="k">def</span><span class="w"> </span><span class="nf">impl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImplRef</span><span class="p">:</span>
-</span><span id="line-252"><span class="w">        </span><span class="sd">"""The declaration behind a key.</span>
-</span><span id="line-253">
-</span><span id="line-254"><span class="sd">        Raises:</span>
-</span><span id="line-255"><span class="sd">            UnknownImpl: Naming what is available, because the usual cause is a</span>
-</span><span id="line-256"><span class="sd">                plan compiled where a different set was registered.</span>
-</span><span id="line-257"><span class="sd">        """</span>
-</span><span id="line-258">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">impl</span></div>
+</span><span id="line-277">    <span class="k">def</span><span class="w"> </span><span class="nf">impl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImplRef</span><span class="p">:</span>
+</span><span id="line-278"><span class="w">        </span><span class="sd">"""The declaration behind a key.</span>
+</span><span id="line-279">
+</span><span id="line-280"><span class="sd">        Raises:</span>
+</span><span id="line-281"><span class="sd">            UnknownImpl: Naming what is available, because the usual cause is a</span>
+</span><span id="line-282"><span class="sd">                plan compiled where a different set was registered.</span>
+</span><span id="line-283"><span class="sd">        """</span>
+</span><span id="line-284">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">impl</span></div>
 
-</span><span id="line-259">
+</span><span id="line-285">
 <div class="viewcode-block" id="EffectRegistry.compiler">
 <a class="viewcode-back" href="../../_autosummary/looks.registry.html#looks.EffectRegistry.compiler">[docs]</a>
-</span><span id="line-260">    <span class="k">def</span><span class="w"> </span><span class="nf">compiler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Compiler</span><span class="p">:</span>
-</span><span id="line-261"><span class="w">        </span><span class="sd">"""The code behind a key — how a stored plan becomes runnable work.</span>
-</span><span id="line-262">
-</span><span id="line-263"><span class="sd">        Defaults are filled in before the code runs, so the params a plan</span>
-</span><span id="line-264"><span class="sd">        stores (as asked, defaults absent) are all it needs.</span>
-</span><span id="line-265"><span class="sd">        """</span>
-</span><span id="line-266">        <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-</span><span id="line-267">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaulting</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">effect</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">compiler</span><span class="p">)</span></div>
+</span><span id="line-286">    <span class="k">def</span><span class="w"> </span><span class="nf">compiler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Compiler</span><span class="p">:</span>
+</span><span id="line-287"><span class="w">        </span><span class="sd">"""The code behind a key — how a stored plan becomes runnable work.</span>
+</span><span id="line-288">
+</span><span id="line-289"><span class="sd">        Defaults are filled in before the code runs, so the params a plan</span>
+</span><span id="line-290"><span class="sd">        stores (as asked, defaults absent) are all it needs.</span>
+</span><span id="line-291"><span class="sd">        """</span>
+</span><span id="line-292">        <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="line-293">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaulting</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">effect</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">compiler</span><span class="p">)</span></div>
 
-</span><span id="line-268">
+</span><span id="line-294">
 <div class="viewcode-block" id="EffectRegistry.cost">
 <a class="viewcode-back" href="../../_autosummary/looks.registry.html#looks.EffectRegistry.cost">[docs]</a>
-</span><span id="line-269">    <span class="k">def</span><span class="w"> </span><span class="nf">cost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CostFn</span><span class="p">]:</span>
-</span><span id="line-270"><span class="w">        </span><span class="sd">"""The cost estimator, or ``None`` when none was declared."""</span>
-</span><span id="line-271">        <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-</span><span id="line-272">        <span class="k">return</span> <span class="p">(</span>
-</span><span id="line-273">            <span class="kc">None</span>
-</span><span id="line-274">            <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">cost</span> <span class="ow">is</span> <span class="kc">None</span>
-</span><span id="line-275">            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaulting</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">effect</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">cost</span><span class="p">)</span>
-</span><span id="line-276">        <span class="p">)</span></div>
+</span><span id="line-295">    <span class="k">def</span><span class="w"> </span><span class="nf">cost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CostFn</span><span class="p">]:</span>
+</span><span id="line-296"><span class="w">        </span><span class="sd">"""The cost estimator, or ``None`` when none was declared."""</span>
+</span><span id="line-297">        <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="line-298">        <span class="k">return</span> <span class="p">(</span>
+</span><span id="line-299">            <span class="kc">None</span>
+</span><span id="line-300">            <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">cost</span> <span class="ow">is</span> <span class="kc">None</span>
+</span><span id="line-301">            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaulting</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">effect</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">cost</span><span class="p">)</span>
+</span><span id="line-302">        <span class="p">)</span></div>
 
-</span><span id="line-277">
-</span><span id="line-278">    <span class="k">def</span><span class="w"> </span><span class="nf">_defaulting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">function</span><span class="p">):</span>
-</span><span id="line-279">        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
-</span><span id="line-280">        <span class="k">def</span><span class="w"> </span><span class="nf">with_defaults_applied</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="line-281">            <span class="c1"># A stored plan may have been edited or come from elsewhere: the</span>
-</span><span id="line-282">            <span class="c1"># compiler is a chokepoint, so it is checked here too.</span>
-</span><span id="line-283">            <span class="bp">self</span><span class="o">.</span><span class="n">check_params</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
-</span><span id="line-284">            <span class="k">return</span> <span class="n">function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">with_defaults</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="n">params</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</span><span id="line-285">
-</span><span id="line-286">        <span class="k">return</span> <span class="n">with_defaults_applied</span>
-</span><span id="line-287">
-</span><span id="line-288">    <span class="k">def</span><span class="w"> </span><span class="nf">tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">frozenset</span><span class="p">:</span>
-</span><span id="line-289">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">tags</span>
-</span><span id="line-290">
-</span><span id="line-291">    <span class="k">def</span><span class="w"> </span><span class="nf">_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Entry</span><span class="p">:</span>
-</span><span id="line-292">        <span class="k">try</span><span class="p">:</span>
-</span><span id="line-293">            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-</span><span id="line-294">        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-</span><span id="line-295">            <span class="k">raise</span> <span class="n">UnknownImpl</span><span class="p">(</span>
-</span><span id="line-296">                <span class="sa">f</span><span class="s2">"nothing is registered as </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2">. This process has "</span>
-</span><span id="line-297">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">)</span><span class="si">}</span><span class="s2"> implementations across "</span>
-</span><span id="line-298">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_effect</span><span class="p">)</span><span class="si">}</span><span class="s2"> effects. A plan naming an absent "</span>
-</span><span id="line-299">                <span class="s2">"implementation was compiled somewhere else — which is a "</span>
-</span><span id="line-300">                <span class="s2">"refusal, not a reason to guess a substitute."</span>
-</span><span id="line-301">            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
-</span><span id="line-302">
-</span><span id="line-303">    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="line-304">        <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span>
-</span><span id="line-305">
-</span><span id="line-306">    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-</span><span id="line-307">        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">)</span>
-</span><span id="line-308">
-</span><span id="line-309">    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-310">        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">)</span>
+</span><span id="line-303">
+</span><span id="line-304">    <span class="k">def</span><span class="w"> </span><span class="nf">_defaulting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">function</span><span class="p">):</span>
+</span><span id="line-305">        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+</span><span id="line-306">        <span class="k">def</span><span class="w"> </span><span class="nf">with_defaults_applied</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="line-307">            <span class="c1"># A stored plan may have been edited or come from elsewhere: the</span>
+</span><span id="line-308">            <span class="c1"># compiler is a chokepoint, so it is checked here too.</span>
+</span><span id="line-309">            <span class="bp">self</span><span class="o">.</span><span class="n">check_params</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+</span><span id="line-310">            <span class="k">return</span> <span class="n">function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">with_defaults</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="n">params</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </span><span id="line-311">
-</span><span id="line-312">    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="line-313">        <span class="k">return</span> <span class="p">(</span>
-</span><span id="line-314">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(name=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">, "</span>
-</span><span id="line-315">            <span class="sa">f</span><span class="s2">"effects=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_effect</span><span class="p">)</span><span class="si">}</span><span class="s2">, implementations=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span>
-</span><span id="line-316">        <span class="p">)</span></div>
+</span><span id="line-312">        <span class="k">return</span> <span class="n">with_defaults_applied</span>
+</span><span id="line-313">
+</span><span id="line-314">    <span class="k">def</span><span class="w"> </span><span class="nf">tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">frozenset</span><span class="p">:</span>
+</span><span id="line-315">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">tags</span>
+</span><span id="line-316">
+</span><span id="line-317">    <span class="k">def</span><span class="w"> </span><span class="nf">_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Entry</span><span class="p">:</span>
+</span><span id="line-318">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-319">            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+</span><span id="line-320">        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+</span><span id="line-321">            <span class="k">raise</span> <span class="n">UnknownImpl</span><span class="p">(</span>
+</span><span id="line-322">                <span class="sa">f</span><span class="s2">"nothing is registered as </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2">. This process has "</span>
+</span><span id="line-323">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">)</span><span class="si">}</span><span class="s2"> implementations across "</span>
+</span><span id="line-324">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_effect</span><span class="p">)</span><span class="si">}</span><span class="s2"> effects. A plan naming an absent "</span>
+</span><span id="line-325">                <span class="s2">"implementation was compiled somewhere else — which is a "</span>
+</span><span id="line-326">                <span class="s2">"refusal, not a reason to guess a substitute."</span>
+</span><span id="line-327">            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+</span><span id="line-328">
+</span><span id="line-329">    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-330">        <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span>
+</span><span id="line-331">
+</span><span id="line-332">    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="line-333">        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">)</span>
+</span><span id="line-334">
+</span><span id="line-335">    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-336">        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">)</span>
+</span><span id="line-337">
+</span><span id="line-338">    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-339">        <span class="k">return</span> <span class="p">(</span>
+</span><span id="line-340">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(name=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">, "</span>
+</span><span id="line-341">            <span class="sa">f</span><span class="s2">"effects=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_effect</span><span class="p">)</span><span class="si">}</span><span class="s2">, implementations=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_by_key</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span>
+</span><span id="line-342">        <span class="p">)</span></div>
 
-</span><span id="line-317">
-</span><span id="line-318">
-</span><span id="line-319"><span class="c1">#: The registry the compiler uses when not given another.</span>
-</span><span id="line-320"><span class="n">REGISTRY</span> <span class="o">=</span> <span class="n">EffectRegistry</span><span class="p">()</span>
-</span><span id="line-321">
-</span><span id="line-322">
+</span><span id="line-343">
+</span><span id="line-344">
+</span><span id="line-345"><span class="c1">#: The registry the compiler uses when not given another.</span>
+</span><span id="line-346"><span class="n">REGISTRY</span> <span class="o">=</span> <span class="n">EffectRegistry</span><span class="p">()</span>
+</span><span id="line-347">
+</span><span id="line-348">
 <div class="viewcode-block" id="register_effect">
 <a class="viewcode-back" href="../../_autosummary/looks.registry.html#looks.register_effect">[docs]</a>
-</span><span id="line-323"><span class="k">def</span><span class="w"> </span><span class="nf">register_effect</span><span class="p">(</span><span class="n">impl</span><span class="p">:</span> <span class="n">ImplRef</span><span class="p">,</span> <span class="n">compiler</span><span class="p">:</span> <span class="n">Compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImplRef</span><span class="p">:</span>
-</span><span id="line-324"><span class="w">    </span><span class="sd">"""Register into :data:`REGISTRY`. See :meth:`EffectRegistry.register`."""</span>
-</span><span id="line-325">    <span class="k">return</span> <span class="n">REGISTRY</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">impl</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</span><span id="line-349"><span class="k">def</span><span class="w"> </span><span class="nf">register_effect</span><span class="p">(</span><span class="n">impl</span><span class="p">:</span> <span class="n">ImplRef</span><span class="p">,</span> <span class="n">compiler</span><span class="p">:</span> <span class="n">Compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImplRef</span><span class="p">:</span>
+</span><span id="line-350"><span class="w">    </span><span class="sd">"""Register into :data:`REGISTRY`. See :meth:`EffectRegistry.register`."""</span>
+</span><span id="line-351">    <span class="k">return</span> <span class="n">REGISTRY</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">impl</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-</span><span id="line-326">
-</span><span id="line-327">
+</span><span id="line-352">
+</span><span id="line-353">
 <div class="viewcode-block" id="implementations">
 <a class="viewcode-back" href="../../_autosummary/looks.registry.html#looks.implementations">[docs]</a>
-</span><span id="line-328"><span class="k">def</span><span class="w"> </span><span class="nf">implementations</span><span class="p">(</span><span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ImplRef</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-</span><span id="line-329"><span class="w">    </span><span class="sd">"""What :data:`REGISTRY` has for an effect."""</span>
-</span><span id="line-330">    <span class="k">return</span> <span class="n">REGISTRY</span><span class="o">.</span><span class="n">implementations</span><span class="p">(</span><span class="n">effect</span><span class="p">)</span></div>
+</span><span id="line-354"><span class="k">def</span><span class="w"> </span><span class="nf">implementations</span><span class="p">(</span><span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ImplRef</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+</span><span id="line-355"><span class="w">    </span><span class="sd">"""What :data:`REGISTRY` has for an effect."""</span>
+</span><span id="line-356">    <span class="k">return</span> <span class="n">REGISTRY</span><span class="o">.</span><span class="n">implementations</span><span class="p">(</span><span class="n">effect</span><span class="p">)</span></div>
 
-</span><span id="line-331">
-</span><span id="line-332">
+</span><span id="line-357">
+</span><span id="line-358">
 <div class="viewcode-block" id="effects">
 <a class="viewcode-back" href="../../_autosummary/looks.registry.html#looks.effects">[docs]</a>
-</span><span id="line-333"><span class="k">def</span><span class="w"> </span><span class="nf">effects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-</span><span id="line-334"><span class="w">    </span><span class="sd">"""Every effect :data:`REGISTRY` can serve."""</span>
-</span><span id="line-335">    <span class="k">return</span> <span class="n">REGISTRY</span><span class="o">.</span><span class="n">effects</span><span class="p">()</span></div>
+</span><span id="line-359"><span class="k">def</span><span class="w"> </span><span class="nf">effects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+</span><span id="line-360"><span class="w">    </span><span class="sd">"""Every effect :data:`REGISTRY` can serve."""</span>
+</span><span id="line-361">    <span class="k">return</span> <span class="n">REGISTRY</span><span class="o">.</span><span class="n">effects</span><span class="p">()</span></div>
 
-</span><span id="line-336">
-</span><span id="line-337">
+</span><span id="line-362">
+</span><span id="line-363">
 <div class="viewcode-block" id="get_impl">
 <a class="viewcode-back" href="../../_autosummary/looks.registry.html#looks.get_impl">[docs]</a>
-</span><span id="line-338"><span class="k">def</span><span class="w"> </span><span class="nf">get_impl</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImplRef</span><span class="p">:</span>
-</span><span id="line-339"><span class="w">    </span><span class="sd">"""The declaration behind a key, from :data:`REGISTRY`."""</span>
-</span><span id="line-340">    <span class="k">return</span> <span class="n">REGISTRY</span><span class="o">.</span><span class="n">impl</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+</span><span id="line-364"><span class="k">def</span><span class="w"> </span><span class="nf">get_impl</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImplRef</span><span class="p">:</span>
+</span><span id="line-365"><span class="w">    </span><span class="sd">"""The declaration behind a key, from :data:`REGISTRY`."""</span>
+</span><span id="line-366">    <span class="k">return</span> <span class="n">REGISTRY</span><span class="o">.</span><span class="n">impl</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
 
-</span><span id="line-341">
-</span><span id="line-342">
+</span><span id="line-367">
+</span><span id="line-368">
 <div class="viewcode-block" id="get_compiler">
 <a class="viewcode-back" href="../../_autosummary/looks.registry.html#looks.get_compiler">[docs]</a>
-</span><span id="line-343"><span class="k">def</span><span class="w"> </span><span class="nf">get_compiler</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Compiler</span><span class="p">:</span>
-</span><span id="line-344"><span class="w">    </span><span class="sd">"""The code behind a key, from :data:`REGISTRY`."""</span>
-</span><span id="line-345">    <span class="k">return</span> <span class="n">REGISTRY</span><span class="o">.</span><span class="n">compiler</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+</span><span id="line-369"><span class="k">def</span><span class="w"> </span><span class="nf">get_compiler</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Compiler</span><span class="p">:</span>
+</span><span id="line-370"><span class="w">    </span><span class="sd">"""The code behind a key, from :data:`REGISTRY`."""</span>
+</span><span id="line-371">    <span class="k">return</span> <span class="n">REGISTRY</span><span class="o">.</span><span class="n">compiler</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -593,7 +619,7 @@
 </footer>
     </div>
     
-    <script src="../../_static/documentation_options.js?v=5d650c58"></script>
+    <script src="../../_static/documentation_options.js?v=6a9d8632"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

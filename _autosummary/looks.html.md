@@ -357,7 +357,7 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 The value one clip was given, and the measurement that justifies it.
 
-### *class* looks.ClipSpec(, width, height, fps, duration_s=None, pix_fmt=None, color_range=None, color_space=None, sar=None, origin_s=None)
+### *class* looks.ClipSpec(, width, height, fps, duration_s=None, pix_fmt=None, color_range=None, color_space=None, sar=None, origin_s=None, color_assumed=False)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -396,6 +396,12 @@ looks.spec.SpecError: a ClipSpec needs positive dimensions, got 0x1080
 #### *property* aspect *: [float](https://docs.python.org/3/builtins/functions.html#float)*
 
 Display aspect, honouring `sar` when it is declared.
+
+#### color_assumed *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+`color_space` was **assumed** by the caller (rule 22’s escape), not
+read from the file. It is part of the plan’s identity: a plan built on a
+guess must not hash like one built on a probe.
 
 #### *property* colour_is_declared *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 
@@ -754,7 +760,7 @@ consumer can compose several. The module-level functions below delegate to
 >>> reg = EffectRegistry()
 >>> impl = ImplRef(effect="lut3d", impl="lut3d.ffmpeg.default",
 ...                backend="ffmpeg", terms=terms_for("ffmpeg")[0],
-...                requires_filters=("lut3d",))
+...                requires_filters=("lut3d",), rgb_only=True)
 >>> _ = reg.register(impl, lambda params, **kw: {"filter": "lut3d"})
 >>> reg.effects()
 ('lut3d',)
@@ -869,9 +875,16 @@ Record an implementation. Returns it, so this reads well inline.
 * **Raises:**
   * [**ImplConflict**](#looks.ImplConflict) – If the key is taken.
   * [**RegistryError**](#looks.RegistryError) – If the key is not `<effect>.<backend>.<variant>`,
-        or an ffmpeg implementation names a filter that does not exist.
+        an ffmpeg implementation names a filter that does not exist,
+        or it declares `rgb_only=False` while naming an RGB-only
+        filter.
 * **Return type:**
   [`ImplRef`](looks.spec.html.md#looks.spec.ImplRef)
+
+An ffmpeg implementation’s undeclared `rgb_only` is settled here
+from its `requires_filters`, so rule 22 never reads `None` for
+one: leaving it out is not a way past the refusal. (Changing a
+declared `rgb_only` changes `vf`’s pixels; bump `impl_version`.)
 
 #### with_defaults(effect, params)
 
@@ -1103,7 +1116,7 @@ Bases: [`RegistryError`](looks.registry.html.md#looks.registry.RegistryError)
 
 That key is taken. Last-write-wins would change what a stored plan runs.
 
-### *class* looks.ImplRef(, effect, impl, backend, terms, requires_filters=(), impl_version='1', timeline=True, time_varying=None, preference=0)
+### *class* looks.ImplRef(, effect, impl, backend, terms, requires_filters=(), impl_version='1', timeline=True, time_varying=None, rgb_only=None, preference=0)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -1193,6 +1206,24 @@ built-in implementation to declare it explicitly for this reason.
 * **Type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
 
+#### rgb_only
+
+Whether the implementation has a step that only takes RGB,
+so the backend converts the picture to RGB and back around it
+(rule 22: on such a step the clip’s colour space must be declared
+or assumed, because the converter’s own guess shifts luma on
+ffmpeg 6.1). Declared on the implementation so the backend-agnostic
+compiler asks one flag instead of knowing any backend’s filter
+list. **Tri-state:** `None` is undeclared. For an
+`ffmpeg` implementation [`EffectRegistry.register()`](#looks.EffectRegistry.register) settles
+it from `requires_filters` (and refuses `False` on an RGB-only
+filter), so rule 22 never sees `None` there; for another backend
+`None` is not asserted, and only `True` triggers rule 22.
+Changing it changes the backend’s pixels: bump `impl_version`.
+
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
+
 #### preference
 
 Explicit tiebreak within one tier; lower wins.
@@ -1212,6 +1243,8 @@ Explicit tiebreak within one tier; lower wins.
 >>> impl.timeline
 True
 >>> impl.time_varying is None      # undeclared is unknown, not False
+True
+>>> impl.rgb_only is None
 True
 ```
 
@@ -2523,7 +2556,7 @@ looks.measure.Incomparable: ...luma_space 'coded_y' vs 'bgr2gray'...
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
-### looks.compile_look(look, , clip=None, env=None, policy=None, probe={}, registry=None)
+### looks.compile_look(look, , clip=None, env=None, policy=None, probe={}, registry=None, assume_color_space=None)
 
 Compile a Look into a plan. No process is started and no file is written.
 
@@ -2540,6 +2573,11 @@ Compile a Look into a plan. No process is started and no file is written.
     against.
   * **registry** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`EffectRegistry`](looks.registry.html.md#looks.registry.EffectRegistry)]) – Which implementations exist. Defaults to
     [`looks.registry.REGISTRY`](looks.registry.html.md#looks.registry.REGISTRY).
+  * **assume_color_space** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]) – Rule 22’s escape. The colour space (a
+    `ClipSpec.color_space` name such as `"bt709"`) to declare when
+    the clip does not say; it is recorded on the plan’s clip
+    (`color_assumed`) and so moves `plan_hash`. Ignored when the
+    clip declares its own.
 * **Warns:**
   **looks.stages.StageOrderWarning** – If the Look departs from the canonical
   stage order. It is never reordered, and never a refusal unless the
@@ -2550,6 +2588,9 @@ Compile a Look into a plan. No process is started and no file is written.
   A [`LookPlan`](looks.spec.html.md#looks.spec.LookPlan) holding no live callables — the runner
   resolves each step’s code from the registry by key.
 * **Raises:**
+  * [**CompileError**](#looks.CompileError) – If a step only takes RGB and the clip’s colour space is
+        undeclared (rule 22) and not assumed. ffmpeg would pick a matrix
+        for it, and on some builds picks wrongly.
   * [**CompileError**](#looks.CompileError) – If an effect has no admissible implementation. The
         message says which constraint emptied the pool, because “no
         implementation available” alone is the least useful refusal in the
