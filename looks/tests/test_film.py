@@ -22,11 +22,16 @@ from looks.ffmpeg import vf
 from looks.spec import ClipSpec, Effect, Look, Span, SpanUnsupported
 
 SIZE = (64, 48)
-CLIP = ClipSpec(width=SIZE[0], height=SIZE[1], fps=10)
-COLOUR = f"testsrc2=size={SIZE[0]}x{SIZE[1]}:rate=10"
+#: Rule 22 refuses an RGB-only step on a clip that does not declare its colour
+#: space, so the clip says bt709 and the sources below are tagged to match.
+TAG = "format=yuv420p,setparams=colorspace=bt709:range=tv"
+CLIP = ClipSpec(
+    width=SIZE[0], height=SIZE[1], fps=10, color_space="bt709", color_range="tv"
+)
+COLOUR = f"testsrc2=size={SIZE[0]}x{SIZE[1]}:rate=10,{TAG}"
 #: A colour bar pattern carries both shadows and highlights; testsrc2 alone is
 #: mostly mid-tones and saturated primaries.
-BARS = f"smptehdbars=size={SIZE[0]}x{SIZE[1]}:rate=10"
+BARS = f"smptehdbars=size={SIZE[0]}x{SIZE[1]}:rate=10,{TAG}"
 #: The baseline for a step that works in RGB: the same conversion halation
 #: makes, so a comparison measures the effect and not the conversion (an 8-bit
 #: `gbrp` path differs from the 16-bit one by up to 117/255 on testsrc2).
@@ -53,15 +58,30 @@ def _vf(env, *effects, **vf_kw):
 def frames(fragment, *, source=COLOUR, count=1):
     """``count`` decoded rgb24 frames, each a bytes object."""
     proc = subprocess.run(
-        ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", source,
-         "-vf", f"{fragment},format=rgb24", "-frames:v", str(count),
-         "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+        [
+            "ffmpeg",
+            "-v",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            source,
+            "-vf",
+            f"{fragment},format=rgb24",
+            "-frames:v",
+            str(count),
+            "-f",
+            "rawvideo",
+            "-pix_fmt",
+            "rgb24",
+            "-",
+        ],
         capture_output=True,
     )
     assert proc.returncode == 0, proc.stderr.decode("utf-8", "replace")[-600:]
     size = SIZE[0] * SIZE[1] * 3
     assert len(proc.stdout) == size * count, (len(proc.stdout), size * count)
-    return [proc.stdout[i * size:(i + 1) * size] for i in range(count)]
+    return [proc.stdout[i * size : (i + 1) * size] for i in range(count)]
 
 
 def channel_means(frame):
@@ -71,7 +91,7 @@ def channel_means(frame):
 
 def pixel(frame, x, y):
     i = (y * SIZE[0] + x) * 3
-    return tuple(frame[i:i + 3])
+    return tuple(frame[i : i + 3])
 
 
 class TestHalation:
@@ -95,9 +115,7 @@ class TestHalation:
     def test_a_threshold_above_every_pixel_changes_nothing(self, env):
         _ffmpeg_or_skip()
         (before,) = frames(RGB)
-        (after,) = frames(
-            _vf(env, Effect(name="halation", params={"threshold": 1.0}))
-        )
+        (after,) = frames(_vf(env, Effect(name="halation", params={"threshold": 1.0})))
         assert max(abs(a - b) for a, b in zip(after, before)) <= 1
 
     def test_it_cannot_be_gated_to_a_span(self, env):
@@ -166,7 +184,7 @@ class TestCurvesAndColorbalance:
 
     def test_curves_is_always_pchip(self, env):
         fragment = _vf(env, Effect(name="curves", params={"red": [(0, 0), (1, 1)]}))
-        assert fragment.endswith(":interp=pchip")
+        assert ",curves=red=0/0 1/1:interp=pchip," in fragment
 
     def test_a_shadow_shift_moves_shadows_more_than_highlights(self, env):
         _ffmpeg_or_skip()
@@ -175,20 +193,23 @@ class TestCurvesAndColorbalance:
             _vf(env, Effect(name="colorbalance", params={"shadows": (0, 0, 0.5)})),
             source=BARS,
         )
-        dark = [i for i in range(0, len(before), 3) if sum(before[i:i + 3]) < 150]
-        bright = [i for i in range(0, len(before), 3) if sum(before[i:i + 3]) > 600]
+        dark = [i for i in range(0, len(before), 3) if sum(before[i : i + 3]) < 150]
+        bright = [i for i in range(0, len(before), 3) if sum(before[i : i + 3]) > 600]
         assert dark and bright
         lift = lambda idx: sum(after[i + 2] - before[i + 2] for i in idx) / len(idx)  # noqa: E731
         assert lift(dark) > lift(bright) + 5, (lift(dark), lift(bright))
-
 
     def test_preserve_lightness_changes_the_picture(self, env):
         _ffmpeg_or_skip()
         shift = {"midtones": (0.4, 0, -0.4)}
         plain = frames(_vf(env, Effect(name="colorbalance", params=shift)), source=BARS)
         kept = frames(
-            _vf(env, Effect(name="colorbalance",
-                            params={**shift, "preserve_lightness": True})),
+            _vf(
+                env,
+                Effect(
+                    name="colorbalance", params={**shift, "preserve_lightness": True}
+                ),
+            ),
             source=BARS,
         )
         assert plain != kept
@@ -282,10 +303,24 @@ class TestGateWeave:
 
         def shown(fragment):
             proc = subprocess.run(
-                ["ffmpeg", "-v", "info", "-f", "lavfi", "-i", source,
-                 "-vf", f"{fragment},showinfo", "-frames:v", "3",
-                 "-f", "null", "-"],
-                capture_output=True, text=True,
+                [
+                    "ffmpeg",
+                    "-v",
+                    "info",
+                    "-f",
+                    "lavfi",
+                    "-i",
+                    source,
+                    "-vf",
+                    f"{fragment},showinfo",
+                    "-frames:v",
+                    "3",
+                    "-f",
+                    "null",
+                    "-",
+                ],
+                capture_output=True,
+                text=True,
             )
             assert proc.returncode == 0, proc.stderr[-600:]
             return [line for line in proc.stderr.splitlines() if " n:" in line]
@@ -330,7 +365,9 @@ class TestGammaDirection:
         opposite and wrote it into a plan (issue #25)."""
         _ffmpeg_or_skip()
         grey = "color=c=0x808080:size=64x48:rate=10"
-        (after,) = frames(_vf(env, Effect(name="gamma", params={"gamma": 1.5})), source=grey)
+        (after,) = frames(
+            _vf(env, Effect(name="gamma", params={"gamma": 1.5})), source=grey
+        )
         assert all(c > 0x80 + 20 for c in pixel(after, 0, 0))
 
 
@@ -410,10 +447,18 @@ def test_the_sigma_bound_is_gblurs(env):
 #: that crashed on every input would be wrapped into a CompileError and still
 #: satisfy the refusal tests above; this is the test it would fail.
 EVERY_PARAM = {
-    "curves": {"all": [(0, 0.03), (1, 0.95)], "red": [(0, 0), (1, 1)],
-               "green": [(0, 0), (1, 1)], "blue": [(0, 0), (1, 1)]},
-    "colorbalance": {"shadows": (-0.03, 0, 0.04), "midtones": (0, 0, 0),
-                     "highlights": (0.04, 0, -0.04), "preserve_lightness": True},
+    "curves": {
+        "all": [(0, 0.03), (1, 0.95)],
+        "red": [(0, 0), (1, 1)],
+        "green": [(0, 0), (1, 1)],
+        "blue": [(0, 0), (1, 1)],
+    },
+    "colorbalance": {
+        "shadows": (-0.03, 0, 0.04),
+        "midtones": (0, 0, 0),
+        "highlights": (0.04, 0, -0.04),
+        "preserve_lightness": True,
+    },
     "vignette": {"angle": 0.7},
     "halation": {"threshold": 0.7, "sigma": 8, "amount": 0.4, "tint": (1, 0.3, 0.2)},
     "grain": {"strength": 7, "seed": 7},
@@ -433,15 +478,31 @@ def test_halation_keeps_ten_bits(env):
     _ffmpeg_or_skip()
     identity = _vf(env, Effect(name="halation", params={"threshold": 1.0}))
     proc = subprocess.run(
-        ["ffmpeg", "-v", "error", "-f", "lavfi",
-         "-i", "nullsrc=size=1024x2:rate=10,format=yuv444p10le,geq=lum=X:cb=512:cr=512",
-         "-vf", f"{identity},format=gbrp16le", "-frames:v", "1",
-         "-f", "rawvideo", "-pix_fmt", "gbrp16le", "-"],
+        [
+            "ffmpeg",
+            "-v",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            "nullsrc=size=1024x2:rate=10,format=yuv444p10le,geq=lum=X:cb=512:cr=512",
+            "-vf",
+            f"{identity},format=gbrp16le",
+            "-frames:v",
+            "1",
+            "-f",
+            "rawvideo",
+            "-pix_fmt",
+            "gbrp16le",
+            "-",
+        ],
         capture_output=True,
     )
     assert proc.returncode == 0, proc.stderr[-600:]
     plane = proc.stdout[: 1024 * 2 * 2]
-    codes = {int.from_bytes(plane[i:i + 2], "little") for i in range(0, len(plane), 2)}
+    codes = {
+        int.from_bytes(plane[i : i + 2], "little") for i in range(0, len(plane), 2)
+    }
     assert len(codes) > 512, len(codes)
 
 

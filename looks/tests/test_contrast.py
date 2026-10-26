@@ -65,7 +65,12 @@ COLOUR_SOURCE = "testsrc2=size=64x64:rate=5:d=1"
 #: of the six emits `curves` today — they emit `scale`/`pad`/`lut3d`/`crop` —
 #: which is why the sweep is still worth having over the eight it does reach.
 UNREACHABLE_BY_THIS_SWEEP = [
-    "fill", "fit", "gradient_map", "lut3d", "motion", "stretch",
+    "fill",
+    "fit",
+    "gradient_map",
+    "lut3d",
+    "motion",
+    "stretch",
 ]
 
 #: The same pattern carried through a limited-range conversion. A luma pivot at
@@ -85,9 +90,24 @@ def transfer(filter_fragment, *, must=True):
     So `must=True` is the default and it says what ffmpeg said.
     """
     proc = subprocess.run(
-        ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", RAMP_SOURCE,
-         "-vf", f"format=gray,geq=lum='X',format=rgb24,{filter_fragment}",
-         "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+        [
+            "ffmpeg",
+            "-v",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            RAMP_SOURCE,
+            "-vf",
+            f"format=gray,geq=lum='X',format=rgb24,{filter_fragment}",
+            "-frames:v",
+            "1",
+            "-f",
+            "rawvideo",
+            "-pix_fmt",
+            "rgb24",
+            "-",
+        ],
         capture_output=True,
     )
     if proc.returncode != 0 or len(proc.stdout) < 256 * 3:
@@ -113,9 +133,24 @@ def rendered(filter_fragment, source=COLOUR_SOURCE, *, must=True):
     a per-channel implementation passed 51 tests while changing saturation.
     """
     proc = subprocess.run(
-        ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", source,
-         "-vf", filter_fragment, "-frames:v", "1",
-         "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+        [
+            "ffmpeg",
+            "-v",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            source,
+            "-vf",
+            filter_fragment,
+            "-frames:v",
+            "1",
+            "-f",
+            "rawvideo",
+            "-pix_fmt",
+            "rgb24",
+            "-",
+        ],
         capture_output=True,
     )
     if proc.returncode != 0 or not proc.stdout:
@@ -131,10 +166,14 @@ def rendered(filter_fragment, source=COLOUR_SOURCE, *, must=True):
 
 def ours(amount, env):
     """What the package emits for this amount, as a bare -vf fragment."""
-    return vf(compile_look(
-        Look(steps=(Effect(name="contrast", params={"amount": amount}),)),
-        clip=CLIP, env=env,
-    ))
+    return vf(
+        compile_look(
+            Look(steps=(Effect(name="contrast", params={"amount": amount}),)),
+            clip=CLIP,
+            env=env,
+            assume_color_space="bt709",
+        )
+    )
 
 
 def slope(levels, base):
@@ -201,9 +240,14 @@ class TestTheTwoImplementationsAreOneEffect:
         other test passes an explicit amount, so a wrong DEFAULT was invisible
         to all of them."""
         _ffmpeg_or_skip()
-        fragment = vf(compile_look(
-            Look(steps=(Effect(name="contrast"),)), clip=CLIP, env=env,
-        ))
+        fragment = vf(
+            compile_look(
+                Look(steps=(Effect(name="contrast"),)),
+                clip=CLIP,
+                env=env,
+                assume_color_space="bt709",
+            )
+        )
         mine = transfer(fragment)
         assert mine is not None
         assert max(abs(a - b) for a, b in zip(mine, base)) <= 1
@@ -300,7 +344,11 @@ class TestItRendersAtEveryAmount:
         """
         step = Effect(name="contrast", params={"amount": -1.0}, impl=impl)
         with pytest.raises(SpecError, match="must not be negative"):
-            vf(compile_look(Look(steps=(step,)), clip=CLIP, env=env))
+            vf(
+                compile_look(
+                    Look(steps=(step,)), clip=CLIP, env=env, assume_color_space="bt709"
+                )
+            )
 
 
 class TestTheTransferIsMonotone:
@@ -386,10 +434,15 @@ class TestRule26HoldsForAnythingThatEmitsCurves:
         for name in registry.effects():
             for params in param_sets:
                 try:
-                    fragment = vf(compile_look(
-                        Look(steps=(Effect(name=name, params=params),)),
-                        clip=CLIP, env=env, registry=registry,
-                    ))
+                    fragment = vf(
+                        compile_look(
+                            Look(steps=(Effect(name=name, params=params),)),
+                            clip=CLIP,
+                            env=env,
+                            registry=registry,
+                            assume_color_space="bt709",
+                        )
+                    )
                 except Exception:
                     continue
                 reached.add(name)

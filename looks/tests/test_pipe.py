@@ -83,7 +83,13 @@ def registry():
 
 
 def plan_of(steps, *, registry, env, clip=CLIP):
-    return compile_look(Look(steps=tuple(steps)), clip=clip, env=env, registry=registry)
+    return compile_look(
+        Look(steps=tuple(steps)),
+        clip=clip,
+        env=env,
+        registry=registry,
+        assume_color_space="bt709",
+    )
 
 
 class TestRunsAndFolding:
@@ -94,13 +100,16 @@ class TestRunsAndFolding:
     def test_pure_ffmpeg_is_one_process_and_no_boundary(self, env, registry):
         plan = plan_of(
             [Effect(name="blur", params={"sigma": 2}), Effect(name="sharpen")],
-            registry=registry, env=env,
+            registry=registry,
+            env=env,
         )
         assert len(runs(plan)) == 1
         arranged = pipe_plan(plan, source="in.mp4")
         assert arranged.boundaries == 0
         assert isinstance(arranged.segments[0], FilterSegment)
-        assert "gblur" in arranged.segments[0].vf and "unsharp" in arranged.segments[0].vf
+        assert (
+            "gblur" in arranged.segments[0].vf and "unsharp" in arranged.segments[0].vf
+        )
 
     def test_ffmpeg_either_side_of_a_frame_op_is_ONE_boundary(self, env, registry):
         """The fold. Three runs become one process pair, not three processes —
@@ -111,7 +120,8 @@ class TestRunsAndFolding:
                 Effect(name="meanshift"),
                 Effect(name="posterize", params={"levels": 6}),
             ],
-            registry=registry, env=env,
+            registry=registry,
+            env=env,
         )
         assert len(runs(plan)) == 3, "three runs before folding"
         arranged = pipe_plan(plan, source="in.mp4")
@@ -123,8 +133,12 @@ class TestRunsAndFolding:
 
     def test_two_frame_ops_back_to_back_are_refused(self, env, registry):
         registry.register(
-            ImplRef(effect="other", impl="other.frame.reference", backend="frame",
-                    terms=terms_for("ffmpeg")[0]),
+            ImplRef(
+                effect="other",
+                impl="other.frame.reference",
+                backend="frame",
+                terms=terms_for("ffmpeg")[0],
+            ),
             lambda params, **kw: {"op": "other.frame.reference"},
         )
         plan = plan_of(
@@ -139,7 +153,8 @@ class TestWhatIsEmitted:
     def segment(self, env, registry):
         plan = plan_of(
             [Effect(name="blur", params={"sigma": 2}), Effect(name="meanshift")],
-            registry=registry, env=env,
+            registry=registry,
+            env=env,
         )
         return pipe_plan(plan, source="in.mp4").segments[0]
 
@@ -151,8 +166,10 @@ class TestWhatIsEmitted:
             assert tell not in text, tell
 
     def test_the_encoder_stops_at_its_filter_chain(self, segment):
-        assert segment.encode[-2] == "-vf" or segment.encode[-1] == "-i" or (
-            "-i" in segment.encode
+        assert (
+            segment.encode[-2] == "-vf"
+            or segment.encode[-1] == "-i"
+            or ("-i" in segment.encode)
         )
         assert not any(str(a).endswith(".mp4") for a in segment.encode)
 
@@ -194,8 +211,12 @@ class TestWhatIsEmitted:
 
     def test_folded_geometry_moves_the_declared_size(self, env, registry):
         plan = plan_of(
-            [Effect(name="fit", params={"target": "320x240"}), Effect(name="meanshift")],
-            registry=registry, env=env,
+            [
+                Effect(name="fit", params={"target": "320x240"}),
+                Effect(name="meanshift"),
+            ],
+            registry=registry,
+            env=env,
             clip=ClipSpec(width=640, height=480, fps=10),
         )
         segment = pipe_plan(plan, source="in.mp4").segments[0]
@@ -233,7 +254,9 @@ class TestTheRebase:
                 Effect(name="meanshift"),
                 Effect(name="blur", params={"sigma": 2}, at=Span(4.0, 5.0)),
             ],
-            registry=registry, env=env, clip=SEEKED,
+            registry=registry,
+            env=env,
+            clip=SEEKED,
         )
         encode = " ".join(pipe_plan(plan, source="in.mp4").segments[0].encode)
         assert "between(t,1,2)" in encode, encode
@@ -246,7 +269,9 @@ class TestTheRebase:
                 Effect(name="blur", params={"sigma": 2}, at=Span(4.0, 5.0)),
                 Effect(name="meanshift"),
             ],
-            registry=registry, env=env, clip=SEEKED,
+            registry=registry,
+            env=env,
+            clip=SEEKED,
         )
         decode = " ".join(pipe_plan(plan, source="in.mp4").segments[0].decode)
         assert "between(t,4,5)" in decode, decode
@@ -259,7 +284,8 @@ class TestTheRebase:
                 Effect(name="meanshift"),
                 Effect(name="blur", params={"sigma": 2}, at=Span(4.0, 5.0)),
             ],
-            registry=registry, env=env,
+            registry=registry,
+            env=env,
             clip=ClipSpec(width=64, height=48, fps=10, origin_s=0.0),
         )
         encode = " ".join(pipe_plan(plan, source="in.mp4").segments[0].encode)
@@ -274,7 +300,9 @@ class TestTheRebase:
                 Effect(name="meanshift"),
                 Effect(name="blur", params={"sigma": 2}, at=Span(4.0, 5.0)),
             ],
-            registry=registry, env=env, clip=CLIP,
+            registry=registry,
+            env=env,
+            clip=CLIP,
         )
         with pytest.raises(PipeError, match="origin_s"):
             pipe_plan(plan, source="in.mp4")
@@ -284,7 +312,9 @@ class TestTheRebase:
         gated needs no origin and must not be asked for one."""
         plan = plan_of(
             [Effect(name="meanshift"), Effect(name="blur", params={"sigma": 2})],
-            registry=registry, env=env, clip=CLIP,
+            registry=registry,
+            env=env,
+            clip=CLIP,
         )
         assert pipe_plan(plan, source="in.mp4").boundaries == 1
 
@@ -295,7 +325,9 @@ class TestTheRebase:
 
         plan = plan_of(
             [Effect(name="meanshift"), Effect(name="blur", params={"sigma": 2})],
-            registry=registry, env=env, clip=SEEKED,
+            registry=registry,
+            env=env,
+            clip=SEEKED,
         )
         smuggled = dataclasses.replace(
             plan.steps[1],
@@ -320,10 +352,25 @@ class TestRule27IsReal:
     def _source(self, tmp_path):
         path = tmp_path / "flat.mp4"
         subprocess.run(
-            ["ffmpeg", "-v", "error", "-y", "-f", "lavfi",
-             "-i", "color=c=gray:s=64x48:r=10:d=8",
-             "-c:v", "libx264", "-crf", "20", "-pix_fmt", "yuv420p", str(path)],
-            check=True, capture_output=True,
+            [
+                "ffmpeg",
+                "-v",
+                "error",
+                "-y",
+                "-f",
+                "lavfi",
+                "-i",
+                "color=c=gray:s=64x48:r=10:d=8",
+                "-c:v",
+                "libx264",
+                "-crf",
+                "20",
+                "-pix_fmt",
+                "yuv420p",
+                str(path),
+            ],
+            check=True,
+            capture_output=True,
         )
         return path
 
@@ -339,15 +386,30 @@ class TestRule27IsReal:
         gate = self.GATE.format(a=4, b=5)
 
         truth = subprocess.run(
-            ["ffmpeg", "-v", "error", "-i", str(source), "-ss", "3",
-             "-vf", gate, "-f", "rawvideo", "-pix_fmt", "gray", "-"],
+            [
+                "ffmpeg",
+                "-v",
+                "error",
+                "-i",
+                str(source),
+                "-ss",
+                "3",
+                "-vf",
+                gate,
+                "-f",
+                "rawvideo",
+                "-pix_fmt",
+                "gray",
+                "-",
+            ],
             capture_output=True,
         ).stdout
         piped = subprocess.run(
             f'ffmpeg -v error -i "{source}" -ss 3 -an -f rawvideo -pix_fmt bgr24 '
-            f'-s 64x48 -r 10 - | ffmpeg -v error -f rawvideo -pix_fmt bgr24 '
+            f"-s 64x48 -r 10 - | ffmpeg -v error -f rawvideo -pix_fmt bgr24 "
             f'-s 64x48 -r 10 -i - -vf "{gate}" -f rawvideo -pix_fmt gray -',
-            shell=True, capture_output=True,
+            shell=True,
+            capture_output=True,
         ).stdout
 
         assert self._bright(truth), "the unfolded gate must fire at all"
@@ -364,17 +426,31 @@ class TestRule27IsReal:
         _ffmpeg_or_skip()
         source = self._source(tmp_path)
         truth = subprocess.run(
-            ["ffmpeg", "-v", "error", "-i", str(source), "-ss", "3",
-             "-vf", self.GATE.format(a=4, b=5),
-             "-f", "rawvideo", "-pix_fmt", "gray", "-"],
+            [
+                "ffmpeg",
+                "-v",
+                "error",
+                "-i",
+                str(source),
+                "-ss",
+                "3",
+                "-vf",
+                self.GATE.format(a=4, b=5),
+                "-f",
+                "rawvideo",
+                "-pix_fmt",
+                "gray",
+                "-",
+            ],
             capture_output=True,
         ).stdout
         rebased = subprocess.run(
             f'ffmpeg -v error -i "{source}" -ss 3 -an -f rawvideo -pix_fmt bgr24 '
-            f'-s 64x48 -r 10 - | ffmpeg -v error -f rawvideo -pix_fmt bgr24 '
+            f"-s 64x48 -r 10 - | ffmpeg -v error -f rawvideo -pix_fmt bgr24 "
             f'-s 64x48 -r 10 -i - -vf "{self.GATE.format(a=1, b=2)}" '
-            f'-f rawvideo -pix_fmt gray -',
-            shell=True, capture_output=True,
+            f"-f rawvideo -pix_fmt gray -",
+            shell=True,
+            capture_output=True,
         ).stdout
         assert self._bright(truth), (
             "the unfolded gate must fire at all — without this the assertion "
@@ -396,10 +472,22 @@ class TestTheLgplFlatten:
 
         fragment = vf(plan_of([Effect(name="flatten")], registry=registry, env=env))
         proc = subprocess.run(
-            ["ffmpeg", "-v", "error", "-f", "lavfi",
-             "-i", "testsrc2=size=64x48:rate=5:duration=0.2",
-             "-vf", fragment, "-f", "null", "-"],
-            capture_output=True, text=True,
+            [
+                "ffmpeg",
+                "-v",
+                "error",
+                "-f",
+                "lavfi",
+                "-i",
+                "testsrc2=size=64x48:rate=5:duration=0.2",
+                "-vf",
+                fragment,
+                "-f",
+                "null",
+                "-",
+            ],
+            capture_output=True,
+            text=True,
         )
         assert proc.returncode == 0, proc.stderr[-400:]
 
@@ -410,10 +498,24 @@ class TestTheLgplFlatten:
 
         def energy(chain):
             data = subprocess.run(
-                ["ffmpeg", "-v", "error", "-f", "lavfi",
-                 "-i", "testsrc2=size=320x240:rate=10:duration=0.2",
-                 "-vf", chain, "-frames:v", "1",
-                 "-f", "rawvideo", "-pix_fmt", "gray", "-"],
+                [
+                    "ffmpeg",
+                    "-v",
+                    "error",
+                    "-f",
+                    "lavfi",
+                    "-i",
+                    "testsrc2=size=320x240:rate=10:duration=0.2",
+                    "-vf",
+                    chain,
+                    "-frames:v",
+                    "1",
+                    "-f",
+                    "rawvideo",
+                    "-pix_fmt",
+                    "gray",
+                    "-",
+                ],
                 capture_output=True,
             ).stdout
             rows = [data[y * 320 : (y + 1) * 320] for y in range(240)]
@@ -437,14 +539,16 @@ class TestDescribe:
     def test_it_says_how_many_boundaries(self, env, registry):
         plan = plan_of(
             [Effect(name="blur", params={"sigma": 2}), Effect(name="meanshift")],
-            registry=registry, env=env,
+            registry=registry,
+            env=env,
         )
         text = describe(pipe_plan(plan, source="in.mp4"))
         assert "raw-frame boundaries: 1" in text
 
     def test_a_single_process_says_so(self, env, registry):
-        plan = plan_of([Effect(name="blur", params={"sigma": 2})],
-                       registry=registry, env=env)
+        plan = plan_of(
+            [Effect(name="blur", params={"sigma": 2})], registry=registry, env=env
+        )
         assert "none: one process" in describe(pipe_plan(plan, source="in.mp4"))
 
     def test_an_empty_pipe(self):
@@ -473,8 +577,11 @@ class TestTheForeignGateIsRefusedOnTheHAZARDNotACoincidence:
         """A third-party impl that bakes its own gate — via the public API."""
         registry.register(
             ImplRef(
-                effect="late", impl="late.ffmpeg.baked", backend="ffmpeg",
-                terms=terms_for("ffmpeg")[0], requires_filters=("lutyuv",),
+                effect="late",
+                impl="late.ffmpeg.baked",
+                backend="ffmpeg",
+                terms=terms_for("ffmpeg")[0],
+                requires_filters=("lutyuv",),
             ),
             lambda params, **kw: {
                 "filter": "lutyuv=y='clip(val+80,0,255)':enable='between(t,5,6)'"
@@ -487,7 +594,9 @@ class TestTheForeignGateIsRefusedOnTheHAZARDNotACoincidence:
         returns, through `compile_look`."""
         plan = plan_of(
             [Effect(name="meanshift"), Effect(name="late")],
-            registry=baked, env=env, clip=SEEKED,
+            registry=baked,
+            env=env,
+            clip=SEEKED,
         )
         assert plan.steps[1].at is None
         assert "enable=" in plan.steps[1].payload["filter"]
@@ -495,7 +604,9 @@ class TestTheForeignGateIsRefusedOnTheHAZARDNotACoincidence:
     def test_it_is_refused_with_a_declared_origin(self, baked, env):
         plan = plan_of(
             [Effect(name="meanshift"), Effect(name="late")],
-            registry=baked, env=env, clip=SEEKED,
+            registry=baked,
+            env=env,
+            clip=SEEKED,
         )
         with pytest.raises(PipeError, match="carries an `enable=`"):
             pipe_plan(plan, source="in.mp4")
@@ -505,7 +616,9 @@ class TestTheForeignGateIsRefusedOnTheHAZARDNotACoincidence:
         undeclared — the assumption `ClipSpec.origin_s` exists to prevent."""
         plan = plan_of(
             [Effect(name="meanshift"), Effect(name="late")],
-            registry=baked, env=env, clip=CLIP,
+            registry=baked,
+            env=env,
+            clip=CLIP,
         )
         with pytest.raises(PipeError, match="carries an `enable=`"):
             pipe_plan(plan, source="in.mp4")
@@ -516,6 +629,8 @@ class TestTheForeignGateIsRefusedOnTheHAZARDNotACoincidence:
         boundary, not about the string."""
         plan = plan_of(
             [Effect(name="late"), Effect(name="meanshift")],
-            registry=baked, env=env, clip=CLIP,
+            registry=baked,
+            env=env,
+            clip=CLIP,
         )
         assert pipe_plan(plan, source="in.mp4").boundaries == 1

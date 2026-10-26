@@ -249,8 +249,15 @@ def vf(plan: LookPlan, *, gate: bool = True) -> str:
                     "silently applies everywhere."
                 )
             fragment = gated(fragment, step.at)
+        rgb = is_rgb_domain(step.impl)
+        if rgb and not wrap:
+            raise FfmpegBackendError(
+                f"step {index} ({step.effect!r}) only takes RGB and the plan's "
+                "clip declares no colour space `scale` knows, so ffmpeg would "
+                "pick the matrix (rule 22). Compile with a ClipSpec that "
+                "declares color_space, or assume_color_space=."
+            )
         if wrap:
-            rgb = bool(RGB_DOMAIN_FILTERS & set(step.impl.requires_filters))
             if rgb != in_rgb_run:
                 fragments.append(wrap)
                 in_rgb_run = rgb
@@ -266,8 +273,37 @@ def vf(plan: LookPlan, *, gate: bool = True) -> str:
 #: pattern 6.4 mean luma (against 0.16 on ffmpeg 9), issue #29. A YUV-capable
 #: filter (`lutyuv`, `gblur`) is untouched by it and so is not listed.
 RGB_DOMAIN_FILTERS = frozenset(
-    {"lutrgb", "colorchannelmixer", "colorbalance", "colorlevels", "curves", "lut3d"}
+    {
+        "lutrgb",
+        "colorchannelmixer",
+        "colorbalance",
+        "colorlevels",
+        "curves",
+        "lut3d",
+        # Found by the review of #35 from ffmpeg's `auto_scale` debug lines:
+        # each of these also converts YUV to RGB around itself.
+        "exposure",
+        "huesaturation",
+        "vibrance",
+        "colortemperature",
+        "colorcontrast",
+        "selectivecolor",
+        "lut1d",
+    }
 )
+
+
+def is_rgb_domain(impl) -> bool:
+    """Whether an implementation has a step that only takes RGB.
+
+    >>> from types import SimpleNamespace as Impl
+    >>> is_rgb_domain(Impl(requires_filters=("curves",)))
+    True
+    >>> is_rgb_domain(Impl(requires_filters=("gblur",)))
+    False
+    """
+    return bool(RGB_DOMAIN_FILTERS & set(impl.requires_filters))
+
 
 #: The version of an implementation that sits in an RGB-only run.
 RGB_ONLY_IMPL_VERSION = "2"
@@ -292,6 +328,23 @@ _SCALE_RANGES = {
 }
 
 
+def has_scale_matrix(color_space) -> bool:
+    """Whether a declared colour space names a matrix ``scale`` knows.
+
+    The one predicate behind both the compile-time refusal (rule 22) and
+    :func:`_matrix_wrap`: ``"unknown"`` (what ffprobe prints for an untagged
+    stream) and any other unmapped name is *not* a declaration.
+
+    >>> has_scale_matrix("bt709")
+    True
+    >>> has_scale_matrix("unknown")
+    False
+    >>> has_scale_matrix(None)
+    False
+    """
+    return color_space in _SCALE_MATRICES
+
+
 def _matrix_wrap(clip) -> Optional[str]:
     """The ``scale`` that makes a YUV<->RGB conversion use the clip's own matrix.
 
@@ -300,8 +353,8 @@ def _matrix_wrap(clip) -> Optional[str]:
     that conversion happens (ffmpeg's negotiation moves it into the ``scale``),
     and costs nothing where the two sides already agree. **Absent** when the
     clip does not say its colour space: the conversion is then left to ffmpeg,
-    which is what it always was. Rule 22 would refuse there, and refusing is
-    not built yet.
+    which is what it always was. :func:`looks.compile.compile_look` refuses
+    before this is reached (rule 22), unless the colour was explicitly assumed.
 
     >>> from looks.spec import ClipSpec
     >>> _matrix_wrap(ClipSpec(width=2, height=2, fps=1, color_space="bt709"))
@@ -311,7 +364,7 @@ def _matrix_wrap(clip) -> Optional[str]:
     >>> _matrix_wrap(ClipSpec(width=2, height=2, fps=1)) is None
     True
     """
-    if clip is None or clip.color_space not in _SCALE_MATRICES:
+    if clip is None or not has_scale_matrix(clip.color_space):
         return None
     matrix = _SCALE_MATRICES[clip.color_space]
     options = {"in_color_matrix": matrix, "out_color_matrix": matrix}

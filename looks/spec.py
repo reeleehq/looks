@@ -362,7 +362,14 @@ class ClipSpec:
     #: exactly why it must be said rather than defaulted.
     origin_s: Optional[float] = None
 
+    #: ``color_space`` was **assumed** by the caller (rule 22's escape), not
+    #: read from the file. It is part of the plan's identity: a plan built on a
+    #: guess must not hash like one built on a probe.
+    color_assumed: bool = False
+
     def __post_init__(self) -> None:
+        if self.color_assumed and self.color_space is None:
+            raise SpecError("color_assumed=True with no color_space to have assumed")
         if self.width <= 0 or self.height <= 0:
             raise SpecError(
                 f"a ClipSpec needs positive dimensions, got {self.width}x{self.height}"
@@ -1328,6 +1335,7 @@ def plan_from_dict(d: Mapping[str, Any], *, impls: Mapping[str, ImplRef]) -> Loo
             color_space=clip_raw.get("color_space"),
             sar=tuple(clip_raw["sar"]) if clip_raw.get("sar") else None,
             origin_s=clip_raw.get("origin_s"),
+            color_assumed=clip_raw.get("color_assumed", False),
         )
     )
     env_raw = d.get("env")
@@ -1422,6 +1430,7 @@ def plan_to_dict(plan: LookPlan) -> dict:
             "color_space": plan.clip.color_space,
             "sar": list(plan.clip.sar) if plan.clip.sar else None,
             "origin_s": plan.clip.origin_s,
+            "color_assumed": plan.clip.color_assumed,
         },
         # The CEILING the plan was compiled under. Without it a stored plan
         # rehydrates at the shipped default, so `audit()` — whose documented

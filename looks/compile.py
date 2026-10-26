@@ -94,6 +94,7 @@ def compile_look(
     policy: Optional[Policy] = None,
     probe: Mapping[str, Any] = EMPTY,
     registry: Optional[EffectRegistry] = None,
+    assume_color_space: Optional[str] = None,
 ) -> LookPlan:
     """Compile a Look into a plan. No process is started and no file is written.
 
@@ -110,6 +111,11 @@ def compile_look(
             against.
         registry: Which implementations exist. Defaults to
             :data:`looks.registry.REGISTRY`.
+        assume_color_space: Rule 22's escape. The colour space (a
+            ``ClipSpec.color_space`` name such as ``"bt709"``) to declare when
+            the clip does not say; it is recorded on the plan's clip
+            (``color_assumed``) and so moves ``plan_hash``. Ignored when the
+            clip declares its own.
 
     Warns:
         looks.stages.StageOrderWarning: If the Look departs from the canonical
@@ -121,6 +127,9 @@ def compile_look(
         resolves each step's code from the registry by key.
 
     Raises:
+        CompileError: If a step only takes RGB and the clip's colour space is
+            undeclared (rule 22) and not assumed. ffmpeg would pick a matrix
+            for it, and on some builds picks wrongly.
         CompileError: If an effect has no admissible implementation. The
             message says which constraint emptied the pool, because "no
             implementation available" alone is the least useful refusal in the
@@ -132,6 +141,7 @@ def compile_look(
     reg = REGISTRY if registry is None else registry
     ceiling = look.policy if policy is None else policy
     concrete = resolve(look, probe or EMPTY)
+    clip = _with_assumed_colour(clip, assume_color_space)
     available = None if env is None or not env.available else env.filters
 
     for message in check_stage_order(concrete.steps):
@@ -153,6 +163,7 @@ def compile_look(
                 metadata=effect.metadata,
             )
         )
+    _require_declared_colour(steps, clip)
     return LookPlan(
         steps=tuple(steps),
         clip=clip,
@@ -161,6 +172,46 @@ def compile_look(
         policy=ceiling,
         probe=probe,
     )
+
+
+def _with_assumed_colour(clip, assumed: Optional[str]):
+    """The clip with ``assumed`` declared on it, when it declares nothing usable."""
+    from looks.ffmpeg import has_scale_matrix
+
+    if assumed is None:
+        return clip
+    if not has_scale_matrix(assumed):
+        raise CompileError(
+            f"assume_color_space={assumed!r} is not a colour space `scale` knows "
+            "(bt709, bt601, smpte170m, bt470bg, bt2020nc, smpte240m, fcc)"
+        )
+    if clip is None:
+        raise CompileError(
+            "assume_color_space needs a clip to declare it on; pass clip=ClipSpec(...)"
+        )
+    if has_scale_matrix(clip.color_space):
+        return clip
+    return dataclasses.replace(clip, color_space=assumed, color_assumed=True)
+
+
+def _require_declared_colour(steps, clip) -> None:
+    """Rule 22: an RGB-only step on a clip of unknown colour space is a refusal."""
+    from looks.ffmpeg import has_scale_matrix, is_rgb_domain
+
+    if clip is not None and has_scale_matrix(clip.color_space):
+        return
+    rgb = [
+        s.effect for s in steps if s.impl.backend == "ffmpeg" and is_rgb_domain(s.impl)
+    ]
+    if rgb:
+        raise CompileError(
+            f"{sorted(set(rgb))} convert the picture to RGB and back, and the "
+            "clip does not declare a colour space `scale` knows (note: a YUV-only "
+            "alternative may have been excluded by the licence policy), so the matrix would be "
+            "whatever the ffmpeg build guesses (a visible luma shift on 6.1). "
+            "Declare it on the ClipSpec (color_space, from a probe of the file), "
+            "or pass assume_color_space='bt709' to record a guess on the plan."
+        )
 
 
 def check_effect_params(effect: Effect, registry: EffectRegistry = REGISTRY) -> None:
