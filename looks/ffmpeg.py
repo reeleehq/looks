@@ -853,6 +853,13 @@ def _halation_compiler(params, **_kw):
     The mask is Rec.709 luma, thresholded per channel — the channels are equal
     after the grey matrix, so that is a luma threshold — and scaled by the tint
     in the same lookup, since a blur commutes with a per-channel gain.
+
+    ``amount`` is folded into that gain, not passed as ``all_opacity``:
+    ``screen(A, k*B)`` *is* ``A + k*(screen(A, B) - A)`` (within 1/65535,
+    measured), so the blend runs at opacity 1. The opacity path was wrong on
+    CI's ffmpeg 6.1.1 at 16 bits — an identity halation moved pixels by 129/255,
+    and ``amount=0.5`` glowed more than ``amount=1`` — while 6.1.6 and 9.0 were
+    exact.
     """
     threshold = float(params.get("threshold", DFLT_HALATION_THRESHOLD))
     sigma = float(params.get("sigma", DFLT_HALATION_SIGMA))
@@ -860,7 +867,7 @@ def _halation_compiler(params, **_kw):
     tint = params.get("tint", DFLT_HALATION_TINT)
     a, b, h = (f"[{LABEL_NAMESPACE}{name}]" for name in "abh")
     mask = {
-        channel: f"if(gt(val,{_num(threshold)}*maxval),val*{_num(float(gain))},0)"
+        channel: f"if(gt(val,{_num(threshold)}*maxval),val*{_num(amount * float(gain))},0)"
         for channel, gain in zip("rgb", tint)
     }
     branch = ",".join(
@@ -870,7 +877,7 @@ def _halation_compiler(params, **_kw):
             filter_string("gblur", {"sigma": _num(sigma)}),
         )
     )
-    screen = filter_string("blend", {"all_mode": "screen", "all_opacity": _num(amount)})
+    screen = filter_string("blend", {"all_mode": "screen"})
     return {"filter": f"format=gbrp16le,split{a}{b};{b}{branch}{h};{a}{h}{screen}"}
 
 
