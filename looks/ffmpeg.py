@@ -218,7 +218,7 @@ def vf(plan: LookPlan, *, gate: bool = True) -> str:
     """
     fragments = []
     in_rgb_run = False
-    wrap = _matrix_wrap(plan.clip)
+    wrap = matrix_wrap(plan.clip)
     for index, step in enumerate(plan.steps):
         if step.impl.backend != "ffmpeg":
             raise FfmpegBackendError(
@@ -375,7 +375,7 @@ def has_scale_matrix(color_space) -> bool:
     """Whether a declared colour space names a matrix ``scale`` knows.
 
     The one predicate behind both the compile-time refusal (rule 22) and
-    :func:`_matrix_wrap`: ``"unknown"`` (what ffprobe prints for an untagged
+    :func:`matrix_wrap`: ``"unknown"`` (what ffprobe prints for an untagged
     stream) and any other unmapped name is *not* a declaration.
 
     >>> has_scale_matrix("bt709")
@@ -388,7 +388,7 @@ def has_scale_matrix(color_space) -> bool:
     return color_space in _SCALE_MATRICES
 
 
-def _matrix_wrap(clip) -> Optional[str]:
+def matrix_wrap(clip) -> Optional[str]:
     """The ``scale`` that makes a YUV<->RGB conversion use the clip's own matrix.
 
     Rule 24's mechanism: declare the matrix instead of trusting ffmpeg to read
@@ -400,11 +400,11 @@ def _matrix_wrap(clip) -> Optional[str]:
     before this is reached (rule 22), unless the colour was explicitly assumed.
 
     >>> from looks.spec import ClipSpec
-    >>> _matrix_wrap(ClipSpec(width=2, height=2, fps=1, color_space="bt709"))
+    >>> matrix_wrap(ClipSpec(width=2, height=2, fps=1, color_space="bt709"))
     'scale=in_color_matrix=bt709:out_color_matrix=bt709'
-    >>> _matrix_wrap(ClipSpec(width=2, height=2, fps=1, color_space="bt709", color_range="pc"))
+    >>> matrix_wrap(ClipSpec(width=2, height=2, fps=1, color_space="bt709", color_range="pc"))
     'scale=in_color_matrix=bt709:out_color_matrix=bt709:in_range=full:out_range=full'
-    >>> _matrix_wrap(ClipSpec(width=2, height=2, fps=1)) is None
+    >>> matrix_wrap(ClipSpec(width=2, height=2, fps=1)) is None
     True
     """
     if clip is None or not has_scale_matrix(clip.color_space):

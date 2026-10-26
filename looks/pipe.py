@@ -81,6 +81,11 @@ PIPE_BYTES_PER_PIXEL = {
 }
 
 
+#: Raw formats that carry RGB, so the pipe's edge conversion to or from YUV has a
+#: matrix to get wrong. ``gray`` is luma alone and has none.
+_RGB_PIX_FMTS = frozenset({"bgr24", "rgb24", "bgra", "rgba", "argb", "abgr"})
+
+
 class PipeError(SpecError):
     """A plan that cannot be arranged as a pipe, or not safely."""
 
@@ -232,6 +237,28 @@ def _vf_of(steps: Sequence[Step], clip) -> str:
     return vf(LookPlan(steps=tuple(steps), clip=clip))
 
 
+def _with_edge_matrix(chain: str, clip, pix_fmt: str, *, leading: bool) -> str:
+    """``chain`` with the clip's colour matrix declared where the pipe converts.
+
+    The pipe's YUV<->RGB conversion is ffmpeg's own, at the decoder's output and
+    the encoder's input, and it guesses the matrix like any other (issue #46,
+    the same build-dependent luma shift as #29). A ``scale`` that declares it
+    goes last in the decoder's chain, so the conversion to the pipe format is its
+    own, and in the encoder's it goes first and last, so a conversion from RGB
+    into a YUV filter and the final one into the encoder are both declared. It
+    is a no-op where the picture is already in the format. Absent when the clip
+    declares no matrix (rule 22 refuses RGB-only steps there) or the pipe is not RGB.
+    """
+    from looks.ffmpeg import matrix_wrap
+
+    wrap = matrix_wrap(clip) if pix_fmt in _RGB_PIX_FMTS else None
+    if not wrap:
+        return chain
+    if not chain:
+        return wrap  # one `scale` is both the first and the last
+    return ",".join(([wrap] if leading else []) + [chain, wrap])
+
+
 def piped_size(clip: ClipSpec, folded: Sequence[Step]) -> tuple[int, int]:
     """The frame size the decoder actually emits, after the folded chain.
 
@@ -378,7 +405,9 @@ def pipe_plan(
 
         # Folding into the DECODER is always safe — it reads a container and
         # keeps the host's timeline. Nothing to rebase, nothing to refuse.
-        decode_chain = _vf_of(before, clip) if before else ""
+        decode_chain = _with_edge_matrix(
+            _vf_of(before, clip) if before else "", clip, pix_fmt, leading=False
+        )
 
         # Folding into the ENCODER crosses the raw-frame boundary, where the
         # timeline restarts at 0. This is rule 27.
@@ -413,7 +442,9 @@ def pipe_plan(
                         "difference is a look on the wrong frames with no error."
                     )
             after = [_rebased(s, clip.origin_s or 0.0) for s in after]
-        encode_chain = _vf_of(after, clip) if after else ""
+        encode_chain = _with_edge_matrix(
+            _vf_of(after, clip) if after else "", clip, pix_fmt, leading=True
+        )
 
         width, height = piped_size(clip, before)
         piped = dataclasses.replace(clip, width=width, height=height)
