@@ -289,6 +289,14 @@ RGB_DOMAIN_FILTERS = frozenset(
         "colorcontrast",
         "selectivecolor",
         "lut1d",
+        # Found while pinning the list against the binary (#42), by sweeping
+        # filters with default arguments. None is emitted by a built-in.
+        # `geq` is deliberately absent: it takes RGB only when given r=/g=/b=
+        # expressions, and its default (luma) form stays in YUV.
+        "histeq",
+        "normalize",
+        "tonemap",
+        "dctdnoiz",
     }
 )
 
