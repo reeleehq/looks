@@ -61,16 +61,8 @@ import numbers
 import warnings
 
 from looks.environment import FfmpegEnv
-from looks.ffmpeg import (
-    COLORBALANCE_ZONES,
-    CURVES_CHANNELS,
-    MAX_GRAIN_SEED,
-    MAX_GRAIN_STRENGTH,
-    MAX_HALATION_SIGMA,
-    MAX_VIGNETTE_ANGLE,
-    as_emitted,
-)
 from looks.licence import Policy, classify, check, ffmpeg_terms
+from looks.params import ParamError, check_params, with_defaults
 from looks.registry import REGISTRY, EffectRegistry, UnknownImpl
 from looks.stages import StageOrderWarning, check_stage_order
 from looks.spec import (
@@ -171,219 +163,22 @@ def compile_look(
     )
 
 
-def _check_contrast(params) -> None:
-    amount = float(params.get("amount", 1.0))
-    if amount < 0:
-        raise CompileError(
-            f"contrast amount must not be negative; got {amount!r}. A negative "
-            "amount would invert the picture, which is a different effect than "
-            "the one being asked for."
-        )
-
-
-def _require(ok: bool, effect: str, message: str) -> None:
-    if not ok:
-        raise CompileError(f"{effect}: {message}")
-
-
-def _check_present(effect: str, params, rules: Mapping[str, tuple]) -> None:
-    """Check each rule's parameter only if it is PRESENT.
-
-    An absent parameter takes its compiler's default, so a check that supplied
-    one of its own would be a second copy of it, free to disagree (the first
-    copies did: halation sigma 1 against 24, grain strength 0 against 8).
-    """
-    for key, (ok, requirement) in rules.items():
-        if key in params:
-            value = params[key]
-            _require(ok(value), effect, f"{key} {requirement}; got {value!r}")
-
-
-def _in_range(value, low: float, high: float) -> bool:
-    return low <= float(value) <= high
-
-
-def _is_sequence(value, length: Optional[int] = None) -> bool:
-    """A tuple-like value. A string is a sequence too, and ``"12"`` is not ``(1, 2)``."""
-    return (
-        isinstance(value, Sequence)
-        and not isinstance(value, (str, bytes))
-        and (length is None or len(value) == length)
-    )
-
-
-def _is_whole(value) -> bool:
-    """A number ffmpeg can take as an integer option without it being changed.
-
-    ``8.0`` is accepted, deliberately: it is emitted as ``8``, the picture asked
-    for. ``7.9`` (emitted ``7``), ``True`` (emitted ``1``) and ``"8"`` are not.
-    """
-    if isinstance(value, bool) or not isinstance(value, numbers.Real):
-        return False
-    return isinstance(value, numbers.Integral) or float(value).is_integer()
-
-
-def _whole_in(value, low: int, high: int) -> bool:
-    return _is_whole(value) and low <= value <= high
-
-
-def _check_curves(params) -> None:
-    def is_curve(points) -> bool:
-        # Checked as emitted: x-points closer than the six decimals the
-        # compiler writes become one point, and `curves` refuses the curve.
-        if not (_is_sequence(points) and len(points) >= 2):
-            return False
-        if not all(_is_sequence(point, 2) for point in points):
-            return False
-        emitted = [tuple(as_emitted(v) for v in point) for point in points]
-        xs = [x for x, _y in emitted]
-        return all(0 <= v <= 1 for point in emitted for v in point) and all(
-            a < b for a, b in zip(xs, xs[1:])
-        )
-
-    for channel in CURVES_CHANNELS:
-        points = params.get(channel)
-        if not points:  # the compiler skips an empty channel too
-            continue
-        _require(
-            is_curve(points),
-            "curves",
-            f"{channel!r} must be at least two (x, y) points in 0..1 with x "
-            f"strictly increasing at six decimals; got {points!r}",
-        )
-
-
-def _check_colorbalance(params) -> None:
-    _check_present(
-        "colorbalance",
-        params,
-        {
-            zone: (
-                lambda v: _is_sequence(v, 3) and all(_in_range(c, -1, 1) for c in v),
-                "must be an (r, g, b) shift, each in -1..1",
-            )
-            for zone in COLORBALANCE_ZONES
-        }
-        | {
-            # A bool, not truthiness: "false" would otherwise compile to pl=1.
-            "preserve_lightness": (
-                lambda v: isinstance(v, bool),
-                "must be True or False",
-            ),
-        },
-    )
-
-
-def _check_vignette(params) -> None:
-    _check_present(
-        "vignette",
-        params,
-        {
-            "angle": (
-                lambda v: 0 < as_emitted(v) <= MAX_VIGNETTE_ANGLE,
-                "must be in (0, pi/2] radians, as written to six decimals",
-            ),
-        },
-    )
-
-
-def _check_halation(params) -> None:
-    _check_present(
-        "halation",
-        params,
-        {
-            "threshold": (
-                lambda v: _in_range(v, 0, 1),
-                "is a fraction of full scale, 0..1",
-            ),
-            "sigma": (
-                lambda v: 0 < as_emitted(v) <= MAX_HALATION_SIGMA,
-                f"must be in (0, {MAX_HALATION_SIGMA}], gblur's range",
-            ),
-            "amount": (lambda v: _in_range(v, 0, 1), "is a blend opacity, 0..1"),
-            "tint": (
-                lambda v: _is_sequence(v, 3) and all(float(g) >= 0 for g in v),
-                "must be three non-negative gains (r, g, b)",
-            ),
-        },
-    )
-
-
-def _check_grain(params) -> None:
-    _require(
-        "temporal" not in params,
-        "grain",
-        "there is no 'temporal' switch: grain is always re-drawn per frame, "
-        "because static noise reads as dirt on the lens, not as grain",
-    )
-    _check_present(
-        "grain",
-        params,
-        {
-            "strength": (
-                lambda v: _whole_in(v, 0, MAX_GRAIN_STRENGTH),
-                f"must be a whole number in 0..{MAX_GRAIN_STRENGTH}",
-            ),
-            "seed": (
-                lambda v: _whole_in(v, 0, MAX_GRAIN_SEED),
-                f"must be a whole number in 0..{MAX_GRAIN_SEED}",
-            ),
-        },
-    )
-
-
-def _check_gate_weave(params) -> None:
-    _check_present(
-        "gate_weave",
-        params,
-        {
-            "amplitude": (
-                lambda v: _is_whole(v) and v >= 0,
-                "must be a whole number of pixels, >= 0",
-            ),
-            "frequency": (
-                lambda v: _is_sequence(v, 2) and all(float(f) >= 0 for f in v),
-                "must be two non-negative values, Hz",
-            ),
-        },
-    )
-
-
-#: What an effect's parameters must satisfy, keyed by EFFECT — never by
-#: implementation. A check that lives inside one compiler is a check the
-#: licence tier can switch off: `contrast` with `amount=-1` was refused on the
-#: LGPL path and emitted `eq=contrast=-1.0` on the GPL one, so the same Look was
-#: valid or invalid depending on how the binary was built. Rule 29b says the
-#: tier must not decide what the viewer sees; it must not decide whether the
-#: document is accepted either.
-EFFECT_PARAM_CHECKS = {
-    "contrast": _check_contrast,
-    "curves": _check_curves,
-    "colorbalance": _check_colorbalance,
-    "vignette": _check_vignette,
-    "halation": _check_halation,
-    "grain": _check_grain,
-    "gate_weave": _check_gate_weave,
-}
-
-
 def check_effect_params(effect: Effect) -> None:
     """Refuse parameters no implementation of this effect could honour.
 
     Called before an implementation is chosen, so every implementation of an
-    effect accepts exactly the same documents.
+    effect accepts exactly the same documents. The schema is
+    :data:`looks.params.EFFECT_PARAMS`, keyed by EFFECT, never by
+    implementation: a check that lives inside one compiler is a check the
+    licence tier can switch off (`contrast` with `amount=-1` was refused on the
+    LGPL path and emitted `eq=contrast=-1.0` on the GPL one). Rule 29b says the
+    tier must not decide what the viewer sees; it must not decide whether the
+    document is accepted either.
     """
-    check = EFFECT_PARAM_CHECKS.get(effect.name)
-    if check is None:
-        return
     try:
-        check(effect.params)
-    except (TypeError, ValueError) as error:
-        # A parameter of the wrong type (`float(None)`, `len(3)`) is a refusal
-        # of the document, said once here rather than guarded in every check.
-        raise CompileError(
-            f"{effect.name}: malformed parameters {dict(effect.params)!r} ({error})"
-        ) from error
+        check_params(effect.name, effect.params)
+    except ParamError as error:
+        raise CompileError(str(error)) from error
 
 
 def _select(
@@ -446,7 +241,9 @@ def _tier(impl) -> Any:
 def _payload(
     registry: EffectRegistry, impl, effect: Effect, *, clip, env
 ) -> Mapping[str, Any]:
-    payload = registry.compiler(impl.impl)(effect.params, clip=clip, env=env)
+    payload = registry.compiler(impl.impl)(
+        with_defaults(effect.name, effect.params), clip=clip, env=env
+    )
     if not isinstance(payload, Mapping):
         raise CompileError(
             f"{impl.impl!r} returned {type(payload).__name__}, not a mapping. "
@@ -461,7 +258,7 @@ def _cost(registry: EffectRegistry, impl, effect: Effect, *, clip, env):
     estimator = registry.cost(impl.impl)
     if estimator is None:
         return None
-    return estimator(effect.params, clip=clip, env=env)
+    return estimator(with_defaults(effect.name, effect.params), clip=clip, env=env)
 
 
 def audit(

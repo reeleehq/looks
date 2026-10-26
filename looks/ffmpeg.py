@@ -52,6 +52,12 @@ from typing import Any, Mapping, Optional, Sequence
 
 from looks.geometry import Size, ffmpeg_chain, placement, social_size
 from looks.licence import Terms, terms_for
+from looks.params import (
+    COLORBALANCE_ZONES,
+    CURVES_CHANNELS,
+    as_emitted,
+    with_defaults,
+)
 from looks.registry import REGISTRY, EffectRegistry
 from looks.spec import ImplRef, LookPlan, Span, SpecError
 
@@ -197,21 +203,6 @@ def _num(value: float) -> str:
     return text or "0"
 
 
-def as_emitted(value: float) -> float:
-    """A number as the compilers write it into a filter string, read back.
-
-    A parameter check compares this, not the value asked for: six decimals are
-    kept, so two curve x-points ``1e-7`` apart are written as one point, which
-    ``curves`` refuses, and a vignette ``angle`` of ``1e-9`` is written ``0``.
-
-    >>> as_emitted(1e-9)
-    0.0
-    >>> as_emitted(0.1234567)
-    0.123457
-    """
-    return float(_num(float(value)))
-
-
 def vf(plan: LookPlan, *, gate: bool = True) -> str:
     """A whole plan as one ``-vf`` fragment: input-index-free, splice-ready.
 
@@ -324,9 +315,7 @@ def _gamma_expression(params) -> Mapping[str, Any]:
     gamma curve keeps the endpoints. ``eq=gamma=`` would say this in one option
     and is GPL-only, so the LGPL form composes the same curve as a lookup.
     """
-    gamma = float(params.get("gamma", 1.0))
-    if gamma <= 0:
-        raise FfmpegBackendError(f"gamma must be positive, got {gamma}")
+    gamma = float(params["gamma"])
     curve = f"maxval*pow(val/maxval,{1 / gamma:.6f})"
     return {"r": curve, "g": curve, "b": curve}
 
@@ -338,9 +327,7 @@ def _posterize_expression(params) -> Mapping[str, Any]:
     while building the flicker classifier, two runs of one command disagreed by
     70-86/255. A look that differs from itself between renders is not a look.
     """
-    levels = int(params.get("levels", 8))
-    if levels < 2:
-        raise FfmpegBackendError(f"posterize needs at least 2 levels, got {levels}")
+    levels = int(params["levels"])
     step = f"round(val*{levels - 1}/maxval)*maxval/{levels - 1}"
     return {"r": step, "g": step, "b": step}
 
@@ -364,25 +351,24 @@ def _gradient_map_compiler(params, **_kw):
             "the ramp the look maps luminance onto"
         )
     size = int(params.get("size", DFLT_CUBE_SIZE))
-    title = str(params.get("title", DFLT_CUBE_TITLE))
+    title = params.get("title", DFLT_CUBE_TITLE)
     spec = gradient_map(
         Ramp.from_hex([tuple(s) for s in stops]),
-        contrast=float(params.get("contrast", 1.0)),
-        lift=float(params.get("lift", 0.0)),
+        contrast=float(params["contrast"]),
+        lift=float(params["lift"]),
     )
     request = {
         "stops": [list(s) for s in stops],
         "size": size,
         "title": title,
-        "contrast": float(params.get("contrast", 1.0)),
-        "lift": float(params.get("lift", 0.0)),
+        "contrast": float(params["contrast"]),
+        "lift": float(params["lift"]),
         "key": cube_key(spec, size=size, title=title),
         # The template rather than the filter, because the path is not known
         # until the artifact exists. `{file}` is filled in by materialize with
         # an ESCAPED path — the flagship effect takes a caller-supplied
         # directory, and a comma in it would otherwise end the filter.
-        "filter_template": "lut3d=file={file}:interp="
-        + str(params.get("interp", "tetrahedral")),
+        "filter_template": "lut3d=file={file}:interp=" + params["interp"],
     }
     return {PENDING: request}
 
@@ -452,7 +438,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         ("lut3d",),
         _simple(
             "lut3d",
-            lambda p: {"file": p["cube"], "interp": p.get("interp", "tetrahedral")},
+            lambda p: {"file": p["cube"], "interp": p["interp"]},
         ),
         time_varying=False,
     )
@@ -465,7 +451,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
     add(
         "saturation.ffmpeg.eq",
         ("eq",),
-        _simple("eq", lambda p: {"saturation": p.get("amount", 1.0)}),
+        _simple("eq", lambda p: {"saturation": p["amount"]}),
         preference=1,
         tags=("gpl-gated",),
         time_varying=False,
@@ -479,7 +465,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
     add(
         "contrast.ffmpeg.eq",
         ("eq",),
-        _simple("eq", lambda p: {"contrast": p.get("amount", 1.0)}),
+        _simple("eq", lambda p: {"contrast": p["amount"]}),
         preference=1,
         tags=("gpl-gated",),
         time_varying=False,
@@ -496,12 +482,12 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         _simple(
             "colorlevels",
             lambda p: {
-                "rimin": p.get("black", 0),
-                "gimin": p.get("black", 0),
-                "bimin": p.get("black", 0),
-                "rimax": p.get("white", 1),
-                "gimax": p.get("white", 1),
-                "bimax": p.get("white", 1),
+                "rimin": p["black"],
+                "gimin": p["black"],
+                "bimin": p["black"],
+                "rimax": p["white"],
+                "gimax": p["white"],
+                "bimax": p["white"],
             },
         ),
         time_varying=False,
@@ -518,12 +504,12 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         _simple(
             "bilateral",
             lambda p: {
-                "sigmaS": p.get("spatial", 60),
-                "sigmaR": p.get("range", 0.05),
+                "sigmaS": p["spatial"],
+                "sigmaR": p["range"],
                 # All three planes. bilateral's default is 1 — luma only — which
                 # smooths the detail and leaves behind the chroma noise the
                 # flatten was for.
-                "planes": p.get("planes", 7),
+                "planes": p["planes"],
             },
         ),
         time_varying=False,
@@ -533,13 +519,13 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
     add(
         "blur.ffmpeg.gblur",
         ("gblur",),
-        _simple("gblur", lambda p: {"sigma": p.get("sigma", 2)}),
+        _simple("gblur", lambda p: {"sigma": p["sigma"]}),
         time_varying=False,
     )
     add(
         "blur.ffmpeg.boxblur",
         ("boxblur",),
-        _simple("boxblur", lambda p: {"luma_radius": p.get("radius", 2)}),
+        _simple("boxblur", lambda p: {"luma_radius": p["radius"]}),
         preference=1,
         tags=("gpl-gated",),
         time_varying=False,
@@ -552,7 +538,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
             # `luma_amount`, not `amount`: unsharp has no such option and
             # ffmpeg answers "Option not found" at configure time. Caught by
             # the registry sweep, which is what that sweep is for.
-            lambda p: {"luma_amount": p.get("amount", 1.0)},
+            lambda p: {"luma_amount": p["amount"]},
         ),
         time_varying=False,
     )
@@ -602,7 +588,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         ("vignette",),
         _simple(
             "vignette",
-            lambda p: {"angle": _num(float(p.get("angle", DFLT_VIGNETTE_ANGLE)))},
+            lambda p: {"angle": _num(float(p["angle"]))},
         ),
         time_varying=False,
     )
@@ -643,7 +629,7 @@ def _saturation_matrix(params) -> Mapping[str, Any]:
     Note the recorded trap from `muvid`: ``colorchannelmixer`` is a silent
     no-op on YUV, so a caller wanting it on YUV input must convert first.
     """
-    amount = float(params.get("amount", 1.0))
+    amount = float(params["amount"])
     lr, lg, lb = 0.2126, 0.7152, 0.0722
     cell = lambda base, weight: f"{weight + amount * (base - weight):.6f}"  # noqa: E731
     return {
@@ -700,9 +686,9 @@ def _contrast_luma(params) -> Mapping[str, Any]:
     'clip(128+1.5*(val-128),0,255)'
     """
     # The non-negativity of `amount` is an EFFECT-level constraint and lives in
-    # `looks.compile.EFFECT_PARAM_CHECKS`, not here: a check inside one compiler
+    # `looks.params.EFFECT_PARAMS`, not here: a check inside one compiler
     # is a check the licence tier can switch off.
-    amount = float(params.get("amount", 1.0))
+    amount = float(params["amount"])
     # `%g` so 1.0 stays "1" and 1.5 stays "1.5": the expression reaches the
     # plan hash, and an amount that round-trips through a float repr would make
     # two identical Looks hash differently.
@@ -746,49 +732,13 @@ def _motion_compiler(params, *, clip=None, env=None, **_kw):
 # halation tint and the gate weave are the 2026-10-16 production's (issue #25),
 # where they read as 16 mm at 720p.
 
-#: Vignette half-angle, radians.
-DFLT_VIGNETTE_ANGLE = math.pi / 5
-#: ``vignette`` clips its angle to [0, PI/2] instead of refusing, so a larger
-#: one would compile to a picture nobody asked for.
-MAX_VIGNETTE_ANGLE = math.pi / 2
-
-DFLT_HALATION_THRESHOLD = 0.78
-DFLT_HALATION_SIGMA = 24.0
-#: ``gblur`` refuses a larger sigma ("Result too large"; 9.0 and 6.1).
-MAX_HALATION_SIGMA = 1024
-DFLT_HALATION_AMOUNT = 0.5
-#: Red-orange: film halation is the red layer scattering back off the base.
-DFLT_HALATION_TINT = (1.0, 0.35, 0.2)
-
-DFLT_GRAIN_STRENGTH = 8
-#: ``noise``'s ``alls`` range is 0..100.
-MAX_GRAIN_STRENGTH = 100
-#: Pinned rather than ffmpeg's own default, for portability across builds.
-#: Note ``0`` is a different picture from an unseeded ``noise``.
-DFLT_GRAIN_SEED = 0
-#: ``noise``'s ``all_seed`` tops out at INT_MAX; its ``-1`` (a random seed) is
-#: below the range on purpose, since a seed is what makes grain reproducible.
-MAX_GRAIN_SEED = 2**31 - 1
-
 #: `setsar`'s largest allowed rational term. Its default of 100 rewrites any
 #: SAR with a bigger term (118/81 -> 67/46, 1001/1000 -> 1/1).
 SETSAR_MAX = 2**31 - 1
 
-#: Gate-weave wander, in pixels either side of centre.
-DFLT_WEAVE_AMPLITUDE = 2
-#: Horizontal and vertical wander, Hz. Incommensurate so the path never loops
-#: visibly: the production's ``n*0.9`` and ``n*0.61`` rad/frame, at 24 fps.
-DFLT_WEAVE_FREQUENCY = (3.44, 2.33)
-
 #: Prefix of the pad labels a branching effect uses internally, so they stay
 #: clear of a host's own (``[a]``, ``[bg]``: note 05, label rule 2).
 LABEL_NAMESPACE = "lk_"
-
-#: `looks` channel names to ffmpeg `curves` option names.
-CURVES_CHANNELS = ("all", "red", "green", "blue")
-
-#: `colorbalance` tonal zones, keyed to the letter its options end in.
-COLORBALANCE_ZONES = {"shadows": "s", "midtones": "m", "highlights": "h"}
 
 
 def _curve_points(points) -> str:
@@ -822,14 +772,14 @@ def _curves_compiler(params, **_kw):
 def _colorbalance_compiler(params, **_kw):
     """Shadow / midtone / highlight RGB shifts, each in -1..1.
 
-    >>> _colorbalance_compiler({"shadows": (-0.03, 0, 0.04)})["filter"]
+    >>> _colorbalance_compiler(with_defaults("colorbalance", {"shadows": (-0.03, 0, 0.04)}))["filter"]
     'colorbalance=rs=-0.03:gs=0:bs=0.04:rm=0:gm=0:bm=0:rh=0:gh=0:bh=0:pl=0'
     """
     options = {}
     for zone, letter in COLORBALANCE_ZONES.items():
-        for channel, shift in zip("rgb", params.get(zone, (0, 0, 0))):
+        for channel, shift in zip("rgb", params[zone]):
             options[f"{channel}{letter}"] = _num(float(shift))
-    options["pl"] = int(bool(params.get("preserve_lightness", False)))
+    options["pl"] = int(params["preserve_lightness"])
     return {"filter": filter_string("colorbalance", options)}
 
 
@@ -861,10 +811,10 @@ def _halation_compiler(params, **_kw):
     and ``amount=0.5`` glowed more than ``amount=1`` — while 6.1.6 and 9.0 were
     exact.
     """
-    threshold = float(params.get("threshold", DFLT_HALATION_THRESHOLD))
-    sigma = float(params.get("sigma", DFLT_HALATION_SIGMA))
-    amount = float(params.get("amount", DFLT_HALATION_AMOUNT))
-    tint = params.get("tint", DFLT_HALATION_TINT)
+    threshold = float(params["threshold"])
+    sigma = float(params["sigma"])
+    amount = float(params["amount"])
+    tint = params["tint"]
     a, b, h = (f"[{LABEL_NAMESPACE}{name}]" for name in "abh")
     mask = {
         channel: f"if(gt(val,{_num(threshold)}*maxval),val*{_num(amount * float(gain))},0)"
@@ -889,16 +839,16 @@ def _grain_compiler(params, **_kw):
     one would make ``time_varying`` a function of the params, which an
     :class:`~looks.spec.ImplRef` declaration cannot express.
 
-    >>> _grain_compiler({})["filter"]
+    >>> _grain_compiler(with_defaults("grain", {}))["filter"]
     'noise=alls=8:allf=t+u:all_seed=0'
     """
     return {
         "filter": filter_string(
             "noise",
             {
-                "alls": int(params.get("strength", DFLT_GRAIN_STRENGTH)),
+                "alls": int(params["strength"]),
                 "allf": "t+u",
-                "all_seed": int(params.get("seed", DFLT_GRAIN_SEED)),
+                "all_seed": int(params["seed"]),
             },
         )
     }
@@ -925,7 +875,7 @@ def _gate_weave_compiler(params, *, clip=None, **_kw):
     >>> _gate_weave_compiler({"amplitude": 2, "frequency": (3, 2)})["filter"]
     'setsar=sar=sar:max=2147483647,crop=w=iw-4:h=ih-4:x=2+2*sin(2*PI*3*t):y=2+2*cos(2*PI*2*t):exact=1,scale=w=iw+4:h=ih+4,setsar=sar=sar*w*(h-4)/(h*(w-4)):max=2147483647'
     """
-    amplitude = int(params.get("amplitude", DFLT_WEAVE_AMPLITUDE))
+    amplitude = int(params["amplitude"])
     margin = 2 * amplitude
     if clip is not None and margin >= min(clip.width, clip.height):
         raise FfmpegBackendError(
@@ -933,7 +883,7 @@ def _gate_weave_compiler(params, *, clip=None, **_kw):
             f"{clip.width}x{clip.height} frame: 2 * amplitude must be below its "
             "smaller side"
         )
-    fx, fy = (_num(float(f)) for f in params.get("frequency", DFLT_WEAVE_FREQUENCY))
+    fx, fy = (_num(float(f)) for f in params["frequency"])
     crop = filter_string(
         "crop",
         {
