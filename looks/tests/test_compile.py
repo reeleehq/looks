@@ -56,7 +56,7 @@ def impl_ref(key, *, filters=(), preference=0, version="1", backend="ffmpeg"):
 
 def a_filter(name):
     def compiler(params, **_kw):
-        return {"filter": f"{name}={params.get('arg', '')}"}
+        return {"filter": f"{name}={params.get('cube', '')}"}
 
     return compiler
 
@@ -89,7 +89,7 @@ def env():
 @pytest.fixture
 def look():
     return Look(
-        steps=(Effect(name="lut3d", params={"arg": "a.cube"}), Effect(name="grade")),
+        steps=(Effect(name="lut3d", params={"cube": "a.cube"}), Effect(name="grade")),
         name="que-calor",
     )
 
@@ -432,7 +432,7 @@ class TestTheRegistryIsAPlainDictOnPurpose:
 
     def test_the_compiler_behind_a_key_is_reachable(self, registry):
         """How a stored plan becomes runnable work again."""
-        assert registry.compiler("lut3d.ffmpeg.default")({"arg": "x.cube"}) == {
+        assert registry.compiler("lut3d.ffmpeg.default")({"cube": "x.cube"}) == {
             "filter": "lut3d=x.cube"
         }
 

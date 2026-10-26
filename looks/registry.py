@@ -43,8 +43,10 @@ mean a caller with a GPL ceiling could not use one either.
 
 from __future__ import annotations
 
+import functools
 from typing import Any, Callable, Iterator, Mapping, Optional, Sequence
 
+from looks.params import Param, check_params, with_defaults
 from looks.spec import ImplRef, SpecError
 
 #: What a compiler is handed and what it must return. The payload is
@@ -129,6 +131,7 @@ class EffectRegistry:
         self.name = name
         self._by_key: dict[str, _Entry] = {}
         self._by_effect: dict[str, list[str]] = {}
+        self._params: dict[str, Mapping[str, Param]] = {}
 
     def register(
         self,
@@ -174,6 +177,36 @@ class EffectRegistry:
         self._by_key[impl.impl] = _Entry(impl, compiler, cost, frozenset(tags))
         self._by_effect.setdefault(impl.effect, []).append(impl.impl)
         return impl
+
+    def declare_params(self, effect: str, schema: Mapping[str, Param]) -> None:
+        """Declare an effect's parameters, once: see :mod:`looks.params`.
+
+        The schema belongs to the registry, not to the package, so a registry
+        with its own implementation of an effect (a different ``flatten``, say)
+        declares that implementation's keys and is not bound to ours. An effect
+        with no declaration is not checked.
+
+        Raises:
+            RegistryError: If the effect already has a different schema.
+        """
+        if self._params.get(effect, schema) is not schema:
+            raise RegistryError(
+                f"{effect!r} already has a parameter schema. A second would "
+                "change what a stored Look means."
+            )
+        self._params[effect] = schema
+
+    def has_params(self, effect: str) -> bool:
+        """Has this registry declared a schema for ``effect``?"""
+        return effect in self._params
+
+    def check_params(self, effect: str, params: Mapping[str, Any]) -> None:
+        """Refuse parameters this registry's schema for ``effect`` rejects."""
+        check_params(effect, params, schemas=self._params)
+
+    def with_defaults(self, effect: str, params: Mapping[str, Any]) -> dict:
+        """``params`` with this registry's declared defaults filled in."""
+        return with_defaults(effect, params, schemas=self._params)
 
     @staticmethod
     def _check_key(impl: ImplRef) -> None:
@@ -225,12 +258,32 @@ class EffectRegistry:
         return self._entry(key).impl
 
     def compiler(self, key: str) -> Compiler:
-        """The code behind a key — how a stored plan becomes runnable work."""
-        return self._entry(key).compiler
+        """The code behind a key — how a stored plan becomes runnable work.
+
+        Defaults are filled in before the code runs, so the params a plan
+        stores (as asked, defaults absent) are all it needs.
+        """
+        entry = self._entry(key)
+        return self._defaulting(entry.impl.effect, entry.compiler)
 
     def cost(self, key: str) -> Optional[CostFn]:
         """The cost estimator, or ``None`` when none was declared."""
-        return self._entry(key).cost
+        entry = self._entry(key)
+        return (
+            None
+            if entry.cost is None
+            else self._defaulting(entry.impl.effect, entry.cost)
+        )
+
+    def _defaulting(self, effect: str, function):
+        @functools.wraps(function)
+        def with_defaults_applied(params, **kwargs):
+            # A stored plan may have been edited or come from elsewhere: the
+            # compiler is a chokepoint, so it is checked here too.
+            self.check_params(effect, params)
+            return function(self.with_defaults(effect, params), **kwargs)
+
+        return with_defaults_applied
 
     def tags(self, key: str) -> frozenset:
         return self._entry(key).tags
