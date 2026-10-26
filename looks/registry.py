@@ -105,7 +105,7 @@ class EffectRegistry:
         >>> reg = EffectRegistry()
         >>> impl = ImplRef(effect="lut3d", impl="lut3d.ffmpeg.default",
         ...                backend="ffmpeg", terms=terms_for("ffmpeg")[0],
-        ...                requires_filters=("lut3d",))
+        ...                requires_filters=("lut3d",), rgb_only=True)
         >>> _ = reg.register(impl, lambda params, **kw: {"filter": "lut3d"})
         >>> reg.effects()
         ('lut3d',)
@@ -161,7 +161,14 @@ class EffectRegistry:
         Raises:
             ImplConflict: If the key is taken.
             RegistryError: If the key is not ``<effect>.<backend>.<variant>``,
-                or an ffmpeg implementation names a filter that does not exist.
+                an ffmpeg implementation names a filter that does not exist,
+                or it declares ``rgb_only=False`` while naming an RGB-only
+                filter.
+
+        An ffmpeg implementation's undeclared ``rgb_only`` is settled here
+        from its ``requires_filters``, so rule 22 never reads ``None`` for
+        one: leaving it out is not a way past the refusal. (Changing a
+        declared ``rgb_only`` changes ``vf``'s pixels; bump ``impl_version``.)
         """
         self._check_key(impl)
         if impl.impl in self._by_key:
@@ -172,8 +179,10 @@ class EffectRegistry:
                 "which code a stored plan resolves to — which is exactly what "
                 "a plan hash exists to prevent. Pick another variant name."
             )
-        if impl.backend == "ffmpeg" and impl.requires_filters:
-            self._check_filters(impl, known_filters)
+        if impl.backend == "ffmpeg":
+            impl = self._settle_rgb_only(impl)
+            if impl.requires_filters:
+                self._check_filters(impl, known_filters)
         self._by_key[impl.impl] = _Entry(impl, compiler, cost, frozenset(tags))
         self._by_effect.setdefault(impl.effect, []).append(impl.impl)
         return impl
@@ -224,6 +233,23 @@ class EffectRegistry:
                 f"{KEY_SHAPE}, so a key that says otherwise is a name that "
                 "will be read wrongly by everything downstream."
             )
+
+    @staticmethod
+    def _settle_rgb_only(impl: ImplRef) -> ImplRef:
+        import dataclasses
+
+        from looks.ffmpeg import is_rgb_domain
+
+        derived = is_rgb_domain(impl.requires_filters)
+        if impl.rgb_only is None:
+            return dataclasses.replace(impl, rgb_only=derived)
+        if derived and impl.rgb_only is False:
+            raise RegistryError(
+                f"{impl.impl!r} declares rgb_only=False but names an RGB-only "
+                f"filter in {impl.requires_filters!r}: ffmpeg would convert "
+                "around it with the colour tags ignored (rule 22)"
+            )
+        return impl
 
     @staticmethod
     def _check_filters(impl: ImplRef, known: Optional[frozenset]) -> None:

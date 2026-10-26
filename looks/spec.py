@@ -761,9 +761,12 @@ class ImplRef:
             or assumed, because the converter's own guess shifts luma on
             ffmpeg 6.1). Declared on the implementation so the backend-agnostic
             compiler asks one flag instead of knowing any backend's filter
-            list; :func:`looks.ffmpeg.register_defaults` derives it from
-            ``requires_filters``. **Tri-state:** ``None`` is undeclared and
-            is *not asserted* to be RGB-only; only ``True`` triggers rule 22.
+            list. **Tri-state:** ``None`` is undeclared. For an
+            ``ffmpeg`` implementation :meth:`EffectRegistry.register` settles
+            it from ``requires_filters`` (and refuses ``False`` on an RGB-only
+            filter), so rule 22 never sees ``None`` there; for another backend
+            ``None`` is not asserted, and only ``True`` triggers rule 22.
+            Changing it changes the backend's pixels: bump ``impl_version``.
         preference: Explicit tiebreak within one tier; lower wins.
 
     Examples:
