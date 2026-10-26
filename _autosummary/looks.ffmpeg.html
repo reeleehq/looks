@@ -208,13 +208,16 @@ keeps the package honest would have nothing left to protect.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.is_rgb_domain" title="looks.ffmpeg.is_rgb_domain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_rgb_domain</span></code></a>(filters)</p></td>
 <td><p>Whether any of these ffmpeg filters only takes RGB.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.register_defaults" title="looks.ffmpeg.register_defaults"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_defaults</span></code></a>([registry])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.matrix_wrap" title="looks.ffmpeg.matrix_wrap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matrix_wrap</span></code></a>(clip)</p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">scale</span></code> that makes a YUV&lt;-&gt;RGB conversion use the clip's own matrix.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.register_defaults" title="looks.ffmpeg.register_defaults"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_defaults</span></code></a>([registry])</p></td>
 <td><p>Register the built-in ffmpeg effects.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.split_filters" title="looks.ffmpeg.split_filters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_filters</span></code></a>(fragment)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.split_filters" title="looks.ffmpeg.split_filters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_filters</span></code></a>(fragment)</p></td>
 <td><p>A chain into its filters, splitting on UNESCAPED commas only.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.vf" title="looks.ffmpeg.vf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vf</span></code></a>(plan, *[, gate])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.vf" title="looks.ffmpeg.vf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vf</span></code></a>(plan, *[, gate])</p></td>
 <td><p>A whole plan as one <code class="docutils literal notranslate"><span class="pre">-vf</span></code> fragment: input-index-free, splice-ready.</p></td>
 </tr>
 </tbody>
@@ -348,7 +351,7 @@ gate only the last one, silently:</p>
 <span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">has_scale_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_space</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/ffmpeg.html#has_scale_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.has_scale_matrix" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.has_scale_matrix'">¶</a></dt>
 <dd><p>Whether a declared colour space names a matrix <code class="docutils literal notranslate"><span class="pre">scale</span></code> knows.</p>
 <p>The one predicate behind both the compile-time refusal (rule 22) and
-<code class="xref py py-func docutils literal notranslate"><span class="pre">_matrix_wrap()</span></code>: <code class="docutils literal notranslate"><span class="pre">"unknown"</span></code> (what ffprobe prints for an untagged
+<a class="reference internal" href="#looks.ffmpeg.matrix_wrap" title="looks.ffmpeg.matrix_wrap"><code class="xref py py-func docutils literal notranslate"><span class="pre">matrix_wrap()</span></code></a>: <code class="docutils literal notranslate"><span class="pre">"unknown"</span></code> (what ffprobe prints for an untagged
 stream) and any other unmapped name is <em>not</em> a declaration.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">has_scale_matrix</span><span class="p">(</span><span class="s2">"bt709"</span><span class="p">)</span>
 </span><span id="line-2"><span class="go">True</span>
@@ -379,6 +382,32 @@ compiler and <a class="reference internal" href="#looks.ffmpeg.vf" title="looks.
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.ffmpeg.matrix_wrap">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">matrix_wrap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/ffmpeg.html#matrix_wrap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.matrix_wrap" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.matrix_wrap'">¶</a></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">scale</span></code> that makes a YUV&lt;-&gt;RGB conversion use the clip’s own matrix.</p>
+<p>Rule 24’s mechanism: declare the matrix instead of trusting ffmpeg to read
+the tag. Placed on either side of each run of RGB-only steps, it is where
+that conversion happens (ffmpeg’s negotiation moves it into the <code class="docutils literal notranslate"><span class="pre">scale</span></code>),
+and costs nothing where the two sides already agree. <strong>Absent</strong> when the
+clip does not say its colour space: the conversion is then left to ffmpeg,
+which is what it always was. <a class="reference internal" href="looks.compile.html#looks.compile.compile_look" title="looks.compile.compile_look"><code class="xref py py-func docutils literal notranslate"><span class="pre">looks.compile.compile_look()</span></code></a> refuses
+before this is reached (rule 22), unless the colour was explicitly assumed.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">looks.spec</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClipSpec</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">matrix_wrap</span><span class="p">(</span><span class="n">ClipSpec</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color_space</span><span class="o">=</span><span class="s2">"bt709"</span><span class="p">))</span>
+</span><span id="line-3"><span class="go">'scale=in_color_matrix=bt709:out_color_matrix=bt709'</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">matrix_wrap</span><span class="p">(</span><span class="n">ClipSpec</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color_space</span><span class="o">=</span><span class="s2">"bt709"</span><span class="p">,</span> <span class="n">color_range</span><span class="o">=</span><span class="s2">"pc"</span><span class="p">))</span>
+</span><span id="line-5"><span class="go">'scale=in_color_matrix=bt709:out_color_matrix=bt709:in_range=full:out_range=full'</span>
+</span><span id="line-6"><span class="gp">&gt;&gt;&gt; </span><span class="n">matrix_wrap</span><span class="p">(</span><span class="n">ClipSpec</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">None</span>
+</span><span id="line-7"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -468,6 +497,7 @@ nothing here names a stream.</p>
 <li><a :data-current="activeSection === '#looks.ffmpeg.gated'" class="reference internal" href="#looks.ffmpeg.gated"><code class="docutils literal notranslate"><span class="pre">gated()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.has_scale_matrix'" class="reference internal" href="#looks.ffmpeg.has_scale_matrix"><code class="docutils literal notranslate"><span class="pre">has_scale_matrix()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.is_rgb_domain'" class="reference internal" href="#looks.ffmpeg.is_rgb_domain"><code class="docutils literal notranslate"><span class="pre">is_rgb_domain()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.matrix_wrap'" class="reference internal" href="#looks.ffmpeg.matrix_wrap"><code class="docutils literal notranslate"><span class="pre">matrix_wrap()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.register_defaults'" class="reference internal" href="#looks.ffmpeg.register_defaults"><code class="docutils literal notranslate"><span class="pre">register_defaults()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.split_filters'" class="reference internal" href="#looks.ffmpeg.split_filters"><code class="docutils literal notranslate"><span class="pre">split_filters()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.vf'" class="reference internal" href="#looks.ffmpeg.vf"><code class="docutils literal notranslate"><span class="pre">vf()</span></code></a></li>
@@ -484,7 +514,7 @@ nothing here names a stream.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=26ffa1e9"></script>
+<script src="../_static/documentation_options.js?v=828725f0"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

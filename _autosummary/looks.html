@@ -1799,8 +1799,10 @@ compiler asks one flag instead of knowing any backend’s filter
 list. <strong>Tri-state:</strong> <code class="docutils literal notranslate"><span class="pre">None</span></code> is undeclared. For an
 <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> implementation <a class="reference internal" href="#looks.EffectRegistry.register" title="looks.EffectRegistry.register"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EffectRegistry.register()</span></code></a> settles
 it from <code class="docutils literal notranslate"><span class="pre">requires_filters</span></code> (and refuses <code class="docutils literal notranslate"><span class="pre">False</span></code> on an RGB-only
-filter), so rule 22 never sees <code class="docutils literal notranslate"><span class="pre">None</span></code> there; for another backend
-<code class="docutils literal notranslate"><span class="pre">None</span></code> is not asserted, and only <code class="docutils literal notranslate"><span class="pre">True</span></code> triggers rule 22.
+filter), so rule 22 never sees <code class="docutils literal notranslate"><span class="pre">None</span></code> there; a <code class="docutils literal notranslate"><span class="pre">frame</span></code>
+implementation is always <code class="docutils literal notranslate"><span class="pre">True</span></code> (the pipe hands it RGB frames; it
+may not declare <code class="docutils literal notranslate"><span class="pre">False</span></code>); for another backend <code class="docutils literal notranslate"><span class="pre">None</span></code> is not
+asserted, and only <code class="docutils literal notranslate"><span class="pre">True</span></code> triggers rule 22.
 Changing it changes the backend’s pixels: bump <code class="docutils literal notranslate"><span class="pre">impl_version</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -5038,7 +5040,7 @@ count check — the obvious check — passes in both cases.</p></li>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=26ffa1e9"></script>
+<script src="../_static/documentation_options.js?v=828725f0"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

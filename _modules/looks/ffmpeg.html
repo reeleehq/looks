@@ -415,7 +415,7 @@
 </span><span id="line-218"><span class="sd">    """</span>
 </span><span id="line-219">    <span class="n">fragments</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="line-220">    <span class="n">in_rgb_run</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="line-221">    <span class="n">wrap</span> <span class="o">=</span> <span class="n">_matrix_wrap</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">clip</span><span class="p">)</span>
+</span><span id="line-221">    <span class="n">wrap</span> <span class="o">=</span> <span class="n">matrix_wrap</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">clip</span><span class="p">)</span>
 </span><span id="line-222">    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">steps</span><span class="p">):</span>
 </span><span id="line-223">        <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">backend</span> <span class="o">!=</span> <span class="s2">"ffmpeg"</span><span class="p">:</span>
 </span><span id="line-224">            <span class="k">raise</span> <span class="n">FfmpegBackendError</span><span class="p">(</span>
@@ -578,7 +578,7 @@
 </span><span id="line-375"><span class="w">    </span><span class="sd">"""Whether a declared colour space names a matrix ``scale`` knows.</span>
 </span><span id="line-376">
 </span><span id="line-377"><span class="sd">    The one predicate behind both the compile-time refusal (rule 22) and</span>
-</span><span id="line-378"><span class="sd">    :func:`_matrix_wrap`: ``"unknown"`` (what ffprobe prints for an untagged</span>
+</span><span id="line-378"><span class="sd">    :func:`matrix_wrap`: ``"unknown"`` (what ffprobe prints for an untagged</span>
 </span><span id="line-379"><span class="sd">    stream) and any other unmapped name is *not* a declaration.</span>
 </span><span id="line-380">
 </span><span id="line-381"><span class="sd">    &gt;&gt;&gt; has_scale_matrix("bt709")</span>
@@ -592,7 +592,9 @@
 
 </span><span id="line-389">
 </span><span id="line-390">
-</span><span id="line-391"><span class="k">def</span><span class="w"> </span><span class="nf">_matrix_wrap</span><span class="p">(</span><span class="n">clip</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="matrix_wrap">
+<a class="viewcode-back" href="../../_autosummary/looks.ffmpeg.html#looks.matrix_wrap">[docs]</a>
+</span><span id="line-391"><span class="k">def</span><span class="w"> </span><span class="nf">matrix_wrap</span><span class="p">(</span><span class="n">clip</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 </span><span id="line-392"><span class="w">    </span><span class="sd">"""The ``scale`` that makes a YUV&lt;-&gt;RGB conversion use the clip's own matrix.</span>
 </span><span id="line-393">
 </span><span id="line-394"><span class="sd">    Rule 24's mechanism: declare the matrix instead of trusting ffmpeg to read</span>
@@ -604,11 +606,11 @@
 </span><span id="line-400"><span class="sd">    before this is reached (rule 22), unless the colour was explicitly assumed.</span>
 </span><span id="line-401">
 </span><span id="line-402"><span class="sd">    &gt;&gt;&gt; from looks.spec import ClipSpec</span>
-</span><span id="line-403"><span class="sd">    &gt;&gt;&gt; _matrix_wrap(ClipSpec(width=2, height=2, fps=1, color_space="bt709"))</span>
+</span><span id="line-403"><span class="sd">    &gt;&gt;&gt; matrix_wrap(ClipSpec(width=2, height=2, fps=1, color_space="bt709"))</span>
 </span><span id="line-404"><span class="sd">    'scale=in_color_matrix=bt709:out_color_matrix=bt709'</span>
-</span><span id="line-405"><span class="sd">    &gt;&gt;&gt; _matrix_wrap(ClipSpec(width=2, height=2, fps=1, color_space="bt709", color_range="pc"))</span>
+</span><span id="line-405"><span class="sd">    &gt;&gt;&gt; matrix_wrap(ClipSpec(width=2, height=2, fps=1, color_space="bt709", color_range="pc"))</span>
 </span><span id="line-406"><span class="sd">    'scale=in_color_matrix=bt709:out_color_matrix=bt709:in_range=full:out_range=full'</span>
-</span><span id="line-407"><span class="sd">    &gt;&gt;&gt; _matrix_wrap(ClipSpec(width=2, height=2, fps=1)) is None</span>
+</span><span id="line-407"><span class="sd">    &gt;&gt;&gt; matrix_wrap(ClipSpec(width=2, height=2, fps=1)) is None</span>
 </span><span id="line-408"><span class="sd">    True</span>
 </span><span id="line-409"><span class="sd">    """</span>
 </span><span id="line-410">    <span class="k">if</span> <span class="n">clip</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">has_scale_matrix</span><span class="p">(</span><span class="n">clip</span><span class="o">.</span><span class="n">color_space</span><span class="p">):</span>
@@ -618,7 +620,8 @@
 </span><span id="line-414">    <span class="k">if</span> <span class="n">clip</span><span class="o">.</span><span class="n">color_range</span> <span class="ow">in</span> <span class="n">_SCALE_RANGES</span><span class="p">:</span>
 </span><span id="line-415">        <span class="n">range_</span> <span class="o">=</span> <span class="n">_SCALE_RANGES</span><span class="p">[</span><span class="n">clip</span><span class="o">.</span><span class="n">color_range</span><span class="p">]</span>
 </span><span id="line-416">        <span class="n">options</span> <span class="o">|=</span> <span class="p">{</span><span class="s2">"in_range"</span><span class="p">:</span> <span class="n">range_</span><span class="p">,</span> <span class="s2">"out_range"</span><span class="p">:</span> <span class="n">range_</span><span class="p">}</span>
-</span><span id="line-417">    <span class="k">return</span> <span class="n">filter_string</span><span class="p">(</span><span class="s2">"scale"</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+</span><span id="line-417">    <span class="k">return</span> <span class="n">filter_string</span><span class="p">(</span><span class="s2">"scale"</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span></div>
+
 </span><span id="line-418">
 </span><span id="line-419">
 </span><span id="line-420"><span class="c1"># ---------------------------------------------------------------- the effects</span>
@@ -1357,7 +1360,7 @@
 </footer>
     </div>
     
-    <script src="../../_static/documentation_options.js?v=26ffa1e9"></script>
+    <script src="../../_static/documentation_options.js?v=828725f0"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

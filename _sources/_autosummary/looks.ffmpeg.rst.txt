@@ -24,6 +24,7 @@ looks.ffmpeg
       gated
       has_scale_matrix
       is_rgb_domain
+      matrix_wrap
       register_defaults
       split_filters
       vf

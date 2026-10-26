@@ -1,4 +1,4 @@
-> built 2026-10-26 20:43 UTC from 7d53d2f (main) · looks 0.0.28. Details: build_info.json
+> built 2026-10-26 22:37 UTC from dc25b9a (main) · looks 0.0.29. Details: build_info.json
 
 # index.html.md
 
@@ -1647,15 +1647,16 @@ keeps the package honest would have nothing left to protect.
 
 ### Functions
 
-| [`escape_filter_value`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.escape_filter_value)(value)     | Escape a value for use as a filter option inside a filtergraph.     |
-|---------------------------------------------------------------------------------|---------------------------------------------------------------------|
-| [`filter_string`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.filter_string)(name[, options]) | One filter, with its options escaped.                               |
-| [`gated`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.gated)(fragment, at)            | Restrict a fragment to a span, using ffmpeg's own timeline support. |
-| [`has_scale_matrix`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.has_scale_matrix)(color_space)  | Whether a declared colour space names a matrix `scale` knows.       |
-| [`is_rgb_domain`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.is_rgb_domain)(filters)         | Whether any of these ffmpeg filters only takes RGB.                 |
-| [`register_defaults`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.register_defaults)([registry])  | Register the built-in ffmpeg effects.                               |
-| [`split_filters`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.split_filters)(fragment)        | A chain into its filters, splitting on UNESCAPED commas only.       |
-| [`vf`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.vf)(plan, \*[, gate])           | A whole plan as one `-vf` fragment: input-index-free, splice-ready. |
+| [`escape_filter_value`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.escape_filter_value)(value)     | Escape a value for use as a filter option inside a filtergraph.          |
+|---------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+| [`filter_string`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.filter_string)(name[, options]) | One filter, with its options escaped.                                    |
+| [`gated`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.gated)(fragment, at)            | Restrict a fragment to a span, using ffmpeg's own timeline support.      |
+| [`has_scale_matrix`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.has_scale_matrix)(color_space)  | Whether a declared colour space names a matrix `scale` knows.            |
+| [`is_rgb_domain`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.is_rgb_domain)(filters)         | Whether any of these ffmpeg filters only takes RGB.                      |
+| [`matrix_wrap`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.matrix_wrap)(clip)              | The `scale` that makes a YUV<->RGB conversion use the clip's own matrix. |
+| [`register_defaults`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.register_defaults)([registry])  | Register the built-in ffmpeg effects.                                    |
+| [`split_filters`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.split_filters)(fragment)        | A chain into its filters, splitting on UNESCAPED commas only.            |
+| [`vf`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.vf)(plan, \*[, gate])           | A whole plan as one `-vf` fragment: input-index-free, splice-ready.      |
 
 ### Exceptions
 
@@ -1779,7 +1780,7 @@ gate only the last one, silently:
 Whether a declared colour space names a matrix `scale` knows.
 
 The one predicate behind both the compile-time refusal (rule 22) and
-`_matrix_wrap()`: `"unknown"` (what ffprobe prints for an untagged
+[`matrix_wrap()`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.matrix_wrap): `"unknown"` (what ffprobe prints for an untagged
 stream) and any other unmapped name is *not* a declaration.
 
 ```pycon
@@ -1810,6 +1811,31 @@ False
 
 * **Return type:**
   [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+### looks.ffmpeg.matrix_wrap(clip)
+
+The `scale` that makes a YUV<->RGB conversion use the clip’s own matrix.
+
+Rule 24’s mechanism: declare the matrix instead of trusting ffmpeg to read
+the tag. Placed on either side of each run of RGB-only steps, it is where
+that conversion happens (ffmpeg’s negotiation moves it into the `scale`),
+and costs nothing where the two sides already agree. **Absent** when the
+clip does not say its colour space: the conversion is then left to ffmpeg,
+which is what it always was. [`looks.compile.compile_look()`](_autosummary/looks.compile.html.md#looks.compile.compile_look) refuses
+before this is reached (rule 22), unless the colour was explicitly assumed.
+
+```pycon
+>>> from looks.spec import ClipSpec
+>>> matrix_wrap(ClipSpec(width=2, height=2, fps=1, color_space="bt709"))
+'scale=in_color_matrix=bt709:out_color_matrix=bt709'
+>>> matrix_wrap(ClipSpec(width=2, height=2, fps=1, color_space="bt709", color_range="pc"))
+'scale=in_color_matrix=bt709:out_color_matrix=bt709:in_range=full:out_range=full'
+>>> matrix_wrap(ClipSpec(width=2, height=2, fps=1)) is None
+True
+```
+
+* **Return type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### looks.ffmpeg.register_defaults(registry=None)
 
@@ -3848,8 +3874,10 @@ compiler asks one flag instead of knowing any backend’s filter
 list. **Tri-state:** `None` is undeclared. For an
 `ffmpeg` implementation [`EffectRegistry.register()`](_autosummary/looks.html.md#looks.EffectRegistry.register) settles
 it from `requires_filters` (and refuses `False` on an RGB-only
-filter), so rule 22 never sees `None` there; for another backend
-`None` is not asserted, and only `True` triggers rule 22.
+filter), so rule 22 never sees `None` there; a `frame`
+implementation is always `True` (the pipe hands it RGB frames; it
+may not declare `False`); for another backend `None` is not
+asserted, and only `True` triggers rule 22.
 Changing it changes the backend’s pixels: bump `impl_version`.
 
 * **Type:**
@@ -9835,8 +9863,10 @@ compiler asks one flag instead of knowing any backend’s filter
 list. **Tri-state:** `None` is undeclared. For an
 `ffmpeg` implementation `EffectRegistry.register()` settles
 it from `requires_filters` (and refuses `False` on an RGB-only
-filter), so rule 22 never sees `None` there; for another backend
-`None` is not asserted, and only `True` triggers rule 22.
+filter), so rule 22 never sees `None` there; a `frame`
+implementation is always `True` (the pipe hands it RGB frames; it
+may not declare `False`); for another backend `None` is not
+asserted, and only `True` triggers rule 22.
 Changing it changes the backend’s pixels: bump `impl_version`.
 
 * **Type:**
@@ -10903,20 +10933,18 @@ frames...
 
 # About this build
 
-This documentation was built on **2026-10-26 20:43 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/7d53d2f63af079cb75307e4c41b363ab6cc468c4"><code>7d53d2f</code></a> on branch <code>main</code>, for **looks 0.0.28** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 22:37 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/dc25b9aff2bd4d83bd1c4410cab632fd0a4a87fa"><code>dc25b9a</code></a> on branch <code>main</code>, for **looks 0.0.29** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.28) is ahead of the latest release on PyPI (0.0.27): these docs describe unreleased code.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/looks/commit/7d53d2f63af079cb75307e4c41b363ab6cc468c4"><code>7d53d2f63af079cb75307e4c41b363ab6cc468c4</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/looks/commit/dc25b9aff2bd4d83bd1c4410cab632fd0a4a87fa"><code>dc25b9aff2bd4d83bd1c4410cab632fd0a4a87fa</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | <code>0.0.28</code>                                                                                                                                   |
+| Tags at this commit | <code>0.0.29</code>                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/looks</code>                                                                                                        |
 
@@ -10925,9 +10953,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/looks</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/40397596875">40397596875</a>       |
+| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/40407992498">40407992498</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>ec56780a0e749f76cea55bfb6fd14378997eb580</code> (in the history of the built commit) |
+| Event commit | <code>e4dbdfa00ec688b54fef89c66acc717883130950</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -10952,13 +10980,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/looks/0.0.27/">0.0.27</a>, older than the documented version (0.0.28).
+Latest release: <a href="https://pypi.org/project/looks/0.0.29/">0.0.29</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout 7d53d2f63af079cb75307e4c41b363ab6cc468c4
+git checkout dc25b9aff2bd4d83bd1c4410cab632fd0a4a87fa
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

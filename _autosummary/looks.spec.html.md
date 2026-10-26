@@ -325,8 +325,10 @@ compiler asks one flag instead of knowing any backend’s filter
 list. **Tri-state:** `None` is undeclared. For an
 `ffmpeg` implementation `EffectRegistry.register()` settles
 it from `requires_filters` (and refuses `False` on an RGB-only
-filter), so rule 22 never sees `None` there; for another backend
-`None` is not asserted, and only `True` triggers rule 22.
+filter), so rule 22 never sees `None` there; a `frame`
+implementation is always `True` (the pipe hands it RGB frames; it
+may not declare `False`); for another backend `None` is not
+asserted, and only `True` triggers rule 22.
 Changing it changes the backend’s pixels: bump `impl_version`.
 
 * **Type:**

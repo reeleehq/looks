@@ -58,15 +58,16 @@ keeps the package honest would have nothing left to protect.
 
 ### Functions
 
-| [`escape_filter_value`](#looks.ffmpeg.escape_filter_value)(value)     | Escape a value for use as a filter option inside a filtergraph.     |
-|---------------------------------------------------------------------------------|---------------------------------------------------------------------|
-| [`filter_string`](#looks.ffmpeg.filter_string)(name[, options]) | One filter, with its options escaped.                               |
-| [`gated`](#looks.ffmpeg.gated)(fragment, at)            | Restrict a fragment to a span, using ffmpeg's own timeline support. |
-| [`has_scale_matrix`](#looks.ffmpeg.has_scale_matrix)(color_space)  | Whether a declared colour space names a matrix `scale` knows.       |
-| [`is_rgb_domain`](#looks.ffmpeg.is_rgb_domain)(filters)         | Whether any of these ffmpeg filters only takes RGB.                 |
-| [`register_defaults`](#looks.ffmpeg.register_defaults)([registry])  | Register the built-in ffmpeg effects.                               |
-| [`split_filters`](#looks.ffmpeg.split_filters)(fragment)        | A chain into its filters, splitting on UNESCAPED commas only.       |
-| [`vf`](#looks.ffmpeg.vf)(plan, \*[, gate])           | A whole plan as one `-vf` fragment: input-index-free, splice-ready. |
+| [`escape_filter_value`](#looks.ffmpeg.escape_filter_value)(value)     | Escape a value for use as a filter option inside a filtergraph.          |
+|---------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+| [`filter_string`](#looks.ffmpeg.filter_string)(name[, options]) | One filter, with its options escaped.                                    |
+| [`gated`](#looks.ffmpeg.gated)(fragment, at)            | Restrict a fragment to a span, using ffmpeg's own timeline support.      |
+| [`has_scale_matrix`](#looks.ffmpeg.has_scale_matrix)(color_space)  | Whether a declared colour space names a matrix `scale` knows.            |
+| [`is_rgb_domain`](#looks.ffmpeg.is_rgb_domain)(filters)         | Whether any of these ffmpeg filters only takes RGB.                      |
+| [`matrix_wrap`](#looks.ffmpeg.matrix_wrap)(clip)              | The `scale` that makes a YUV<->RGB conversion use the clip's own matrix. |
+| [`register_defaults`](#looks.ffmpeg.register_defaults)([registry])  | Register the built-in ffmpeg effects.                                    |
+| [`split_filters`](#looks.ffmpeg.split_filters)(fragment)        | A chain into its filters, splitting on UNESCAPED commas only.            |
+| [`vf`](#looks.ffmpeg.vf)(plan, \*[, gate])           | A whole plan as one `-vf` fragment: input-index-free, splice-ready.      |
 
 ### Exceptions
 
@@ -190,7 +191,7 @@ gate only the last one, silently:
 Whether a declared colour space names a matrix `scale` knows.
 
 The one predicate behind both the compile-time refusal (rule 22) and
-`_matrix_wrap()`: `"unknown"` (what ffprobe prints for an untagged
+[`matrix_wrap()`](#looks.ffmpeg.matrix_wrap): `"unknown"` (what ffprobe prints for an untagged
 stream) and any other unmapped name is *not* a declaration.
 
 ```pycon
@@ -221,6 +222,31 @@ False
 
 * **Return type:**
   [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+### looks.ffmpeg.matrix_wrap(clip)
+
+The `scale` that makes a YUV<->RGB conversion use the clip’s own matrix.
+
+Rule 24’s mechanism: declare the matrix instead of trusting ffmpeg to read
+the tag. Placed on either side of each run of RGB-only steps, it is where
+that conversion happens (ffmpeg’s negotiation moves it into the `scale`),
+and costs nothing where the two sides already agree. **Absent** when the
+clip does not say its colour space: the conversion is then left to ffmpeg,
+which is what it always was. [`looks.compile.compile_look()`](looks.compile.html.md#looks.compile.compile_look) refuses
+before this is reached (rule 22), unless the colour was explicitly assumed.
+
+```pycon
+>>> from looks.spec import ClipSpec
+>>> matrix_wrap(ClipSpec(width=2, height=2, fps=1, color_space="bt709"))
+'scale=in_color_matrix=bt709:out_color_matrix=bt709'
+>>> matrix_wrap(ClipSpec(width=2, height=2, fps=1, color_space="bt709", color_range="pc"))
+'scale=in_color_matrix=bt709:out_color_matrix=bt709:in_range=full:out_range=full'
+>>> matrix_wrap(ClipSpec(width=2, height=2, fps=1)) is None
+True
+```
+
+* **Return type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### looks.ffmpeg.register_defaults(registry=None)
 
