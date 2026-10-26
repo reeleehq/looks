@@ -160,3 +160,61 @@ def test_both_blurs_read_the_same_parameter_and_agree_on_the_spread():
     box = get_compiler("blur.ffmpeg.boxblur")({"sigma": 5})["filter"]
     assert "sigma=5" in gauss
     assert f"luma_radius={_box_radius(5)}" in box
+    assert "luma_power=1" in box  # ffmpeg's default of 2 passes is 1.41x wider
+
+
+def test_a_stored_plan_with_bad_params_is_refused_at_the_compiler():
+    from looks.registry import get_compiler
+
+    with pytest.raises(ParamError, match="levels"):
+        get_compiler("posterize.ffmpeg.lutrgb")({"levels": 1})
+
+
+def test_a_box_radius_ffmpeg_would_refuse_is_refused_here_first():
+    from looks.ffmpeg import FfmpegBackendError
+    from looks.registry import get_compiler
+    from looks.spec import ClipSpec
+
+    clip = ClipSpec(width=64, height=48, fps=10)
+    boxblur = get_compiler("blur.ffmpeg.boxblur")
+    boxblur({"sigma": 5}, clip=clip)
+    with pytest.raises(FfmpegBackendError, match="gblur"):
+        boxblur({"sigma": 50}, clip=clip)
+
+
+def test_a_registry_that_declared_its_own_schema_keeps_it():
+    from looks.ffmpeg import register_defaults
+    from looks.params import real
+    from looks.registry import EffectRegistry
+
+    mine = EffectRegistry()
+    mine.declare_params("blur", {"scale": real("scale", 1.0)})
+    register_defaults(mine)
+    mine.check_params("blur", {"scale": 2})
+    with pytest.raises(ParamError):
+        mine.check_params("blur", {"sigma": 2})
+
+
+def test_the_two_blurs_have_the_same_spread_in_rendered_pixels():
+    """Rule 29b on pixels, not on filter text: a vertical line through each, read along a row (a point source's tails quantise away)."""
+    import shutil
+    import subprocess
+
+    if shutil.which("ffmpeg") is None:
+        pytest.skip("ffmpeg not on PATH")
+    from looks.registry import get_compiler
+
+    def spread(key):
+        fragment = get_compiler(key)({"sigma": 5})["filter"]
+        source = "color=c=black:size=66x66:rate=1,drawbox=x=33:y=0:w=1:h=66:color=white:t=fill"
+        raw = subprocess.run(
+            ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", source, "-vf",
+             f"format=gray,{fragment}", "-frames:v", "1", "-f", "rawvideo", "-"],
+            capture_output=True, check=True,
+        ).stdout
+        row = raw[33 * 66 : 34 * 66]
+        total = sum(row)
+        mean = sum(i * v for i, v in enumerate(row)) / total
+        return (sum(v * (i - mean) ** 2 for i, v in enumerate(row)) / total) ** 0.5
+
+    assert abs(spread("blur.ffmpeg.gblur") - spread("blur.ffmpeg.boxblur")) < 0.5

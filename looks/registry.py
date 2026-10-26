@@ -196,6 +196,10 @@ class EffectRegistry:
             )
         self._params[effect] = schema
 
+    def has_params(self, effect: str) -> bool:
+        """Has this registry declared a schema for ``effect``?"""
+        return effect in self._params
+
     def check_params(self, effect: str, params: Mapping[str, Any]) -> None:
         """Refuse parameters this registry's schema for ``effect`` rejects."""
         check_params(effect, params, schemas=self._params)
@@ -274,6 +278,9 @@ class EffectRegistry:
     def _defaulting(self, effect: str, function):
         @functools.wraps(function)
         def with_defaults_applied(params, **kwargs):
+            # A stored plan may have been edited or come from elsewhere: the
+            # compiler is a chokepoint, so it is checked here too.
+            self.check_params(effect, params)
             return function(self.with_defaults(effect, params), **kwargs)
 
         return with_defaults_applied

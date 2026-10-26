@@ -316,6 +316,33 @@ def _box_radius(sigma: float) -> int:
     return round((math.sqrt(12 * sigma * sigma + 1) - 1) / 2)
 
 
+def _boxblur_compiler(params, *, clip=None, **_kw):
+    """``boxblur`` at the radius that matches ``gblur``'s spread.
+
+    ``luma_power=1``: ffmpeg's default of 2 applies the box twice, which is
+    about 1.41x wider than the Gaussian it stands in for (measured: sigma 5
+    gave a spread of 6.93 against gblur's 4.90; with one pass, 4.90).
+
+    ``boxblur`` refuses a radius of a quarter of the smaller side or more
+    (chroma is half-size, and its bound is half of that). The schema cannot see
+    the frame, so the bound is checked here, where ``gblur`` has none.
+
+    >>> _boxblur_compiler({"sigma": 2})["filter"]
+    'boxblur=luma_radius=3:luma_power=1'
+    """
+    radius = _box_radius(params["sigma"])
+    if clip is not None and radius >= min(clip.width, clip.height) // 4:
+        raise FfmpegBackendError(
+            f"blur sigma {params['sigma']} needs a box radius of {radius}, which "
+            f"boxblur refuses on a {clip.width}x{clip.height} frame (it must be "
+            "under a quarter of the smaller side). Use a smaller sigma, or "
+            "gblur, which has no such bound."
+        )
+    return {
+        "filter": filter_string("boxblur", {"luma_radius": radius, "luma_power": 1})
+    }
+
+
 def _gamma_expression(params) -> Mapping[str, Any]:
     """Gamma through `lutrgb`, because rule 13 forbids the offset alternative.
 
@@ -406,7 +433,9 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         return reg
     terms = _ffmpeg_terms()
     for effect, schema in EFFECT_PARAMS.items():
-        reg.declare_params(effect, schema)
+        # A registry that declared its own schema for an effect keeps it.
+        if not reg.has_params(effect):
+            reg.declare_params(effect, schema)
 
     def add(
         key,
@@ -538,7 +567,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
     add(
         "blur.ffmpeg.boxblur",
         ("boxblur",),
-        _simple("boxblur", lambda p: {"luma_radius": _box_radius(p["sigma"])}),
+        _boxblur_compiler,
         preference=1,
         tags=("gpl-gated",),
         time_varying=False,

@@ -131,7 +131,7 @@ def compile_look(
     """
     reg = REGISTRY if registry is None else registry
     ceiling = look.policy if policy is None else policy
-    concrete = resolve(look, probe)
+    concrete = resolve(look, probe or EMPTY)
     available = None if env is None or not env.available else env.filters
 
     for message in check_stage_order(concrete.steps):

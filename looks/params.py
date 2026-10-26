@@ -40,6 +40,8 @@ import numbers
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping, Optional, Sequence
 
+from looks.lut import DFLT_CUBE_SIZE, DFLT_CUBE_TITLE
+
 #: A parameter with no default is left absent when omitted.
 NO_DEFAULT = object()
 
@@ -284,6 +286,10 @@ DFLT_WEAVE_FREQUENCY = (3.44, 2.33)
 #: the caller's choice, so the default is the filter's own.
 DFLT_INTERP = "tetrahedral"
 
+#: The largest `.cube` grid worth asking for (size**3 entries; ffmpeg's own
+#: limit is 256). The default and the title belong to ``looks.lut``.
+MAX_CUBE_SIZE = 129
+
 #: ``lut3d``'s ``interp`` values.
 INTERP_MODES = ("nearest", "trilinear", "tetrahedral", "pyramid", "prism")
 
@@ -330,8 +336,8 @@ EFFECT_PARAMS: Mapping[str, Mapping[str, Param]] = {
     ),
     "gradient_map": _params(
         anything("stops"),
-        whole("size", low=2),
-        text("title"),
+        whole("size", DFLT_CUBE_SIZE, low=2, high=MAX_CUBE_SIZE),
+        text("title", DFLT_CUBE_TITLE),
         real("contrast", 1.0),
         real("lift", 0.0),
         choice("interp", INTERP_MODES, DFLT_INTERP),
