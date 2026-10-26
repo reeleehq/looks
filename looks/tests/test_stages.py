@@ -1,6 +1,6 @@
 """Stage-order validation (issue #26): warn on a departure, never reorder.
 
-Pure data and the compiler; no ffmpeg process is started, so nothing skips.
+Pure data and the compiler. `probe()` runs ffmpeg for the compile tests.
 """
 
 import warnings
@@ -62,9 +62,21 @@ def test_a_resampler_after_posterize_is_reported_once():
     assert len(check_stage_order(_names("posterize", "fit"))) == 1
 
 
-def test_every_staged_effect_is_a_registered_effect():
-    """A name typo in the table would silently exempt that effect."""
-    assert set(EFFECT_STAGES) <= set(REGISTRY.effects())
+#: Registered effects deliberately outside the canon.
+UNSTAGED = {"blur", "sharpen", "gate_weave"}
+
+
+def test_every_registered_effect_is_staged_or_deliberately_not():
+    """A typo, or a new effect nobody placed, would silently go unchecked."""
+    registered = set(REGISTRY.effects())
+    assert set(EFFECT_STAGES) <= registered
+    assert registered - set(EFFECT_STAGES) == UNSTAGED
+
+
+@pytest.mark.parametrize("later", ["lut3d", "gradient_map", "blur", "sharpen"])
+def test_interpolating_after_posterize_is_reported(later):
+    (message,) = check_stage_order(_names("posterize", later))
+    assert "resamples" in message
 
 
 def _compile(*names):

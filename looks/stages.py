@@ -16,8 +16,7 @@ order compiled, and a departure from the canon is sometimes deliberate. The
 stage is a property of *what an effect does*, so it is declared here per
 effect, never per implementation (the same rule that puts parameter checks in
 ``looks.compile`` rather than inside a compiler). An effect with no stage is
-unconstrained, and the table is an argument, so a caller with their own effects
-can pass theirs.
+unconstrained, and the table is an argument of :func:`check_stage_order`.
 
 Callers who want a refusal rather than a warning escalate the category:
 ``warnings.simplefilter("error", StageOrderWarning)``.
@@ -66,9 +65,23 @@ EFFECT_STAGES: Mapping[str, Stage] = {
     "grain": Stage.GRAIN,
 }
 
-#: Effects that resample or interpolate the picture. Gate weave has no stage
-#: (it is a film artefact, not part of the canon) but still resamples.
-RESAMPLING_EFFECTS = frozenset({"fit", "fill", "stretch", "motion", "gate_weave"})
+#: Effects that resample, interpolate or smooth the picture, and so manufacture
+#: in-between values. After `posterize` they un-quantise it. Includes the LUT
+#: effects (posterise-then-LUT: 96 distinct colours against LUT-then-posterise's
+#: 51, note 05) and `gate_weave`, which has no stage but still resamples.
+RESAMPLING_EFFECTS = frozenset(
+    {
+        "fit",
+        "fill",
+        "stretch",
+        "motion",
+        "gate_weave",
+        "lut3d",
+        "gradient_map",
+        "blur",
+        "sharpen",
+    }
+)
 
 #: The effect after which nothing may resample.
 QUANTISER = "posterize"
@@ -104,15 +117,16 @@ def check_stage_order(
             messages.append(
                 f"{name} resamples the picture after {quantiser}, which "
                 "un-quantises it (measured: downscaling after posterize left "
-                "359 distinct colours where before it left 77)"
+                "359 distinct colours where before it left 77; a LUT after it, "
+                "96 where before it, 51)"
             )
         elif name in stages:
             stage = stages[name]
-            earlier = next((n for n, s in seen if s > stage), None)
+            earlier = next(((n, s) for n, s in seen if s > stage), None)
             if earlier is not None:
                 messages.append(
                     f"{name} (stage {stage.name.lower()}) follows "
-                    f"{earlier} (stage {dict(seen)[earlier].name.lower()}); "
+                    f"{earlier[0]} (stage {earlier[1].name.lower()}); "
                     f"the canonical order is {_CANON}"
                 )
         if name in stages:
