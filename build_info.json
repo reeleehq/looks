@@ -1,34 +1,34 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-26T19:32:38Z",
+  "built_at": "2026-10-26T19:44:48Z",
   "package": {
     "name": "looks",
-    "version": "0.0.26",
+    "version": "0.0.27",
     "display_name": "looks",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "96fac3dea7d1654e36ed857afe79e9b6708fb214",
-    "short_commit": "96fac3d",
+    "commit": "44b3eede5327f089b75f4134c7b638078288b809",
+    "short_commit": "44b3eed",
     "branch": "main",
     "tags": [
-      "0.0.26"
+      "0.0.27"
     ],
     "dirty": false,
     "remote_url": "https://github.com/reeleehq/looks",
-    "commit_url": "https://github.com/reeleehq/looks/commit/96fac3dea7d1654e36ed857afe79e9b6708fb214",
+    "commit_url": "https://github.com/reeleehq/looks/commit/44b3eede5327f089b75f4134c7b638078288b809",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "reeleehq/looks",
-    "sha": "82c8fe675890ee3358950ec249bb7b7611389656",
+    "sha": "c97875c1cda27d0539cf255fbe00ce4e9d382d49",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "40387152243",
-    "run_url": "https://github.com/reeleehq/looks/actions/runs/40387152243",
+    "run_id": "40388881974",
+    "run_url": "https://github.com/reeleehq/looks/actions/runs/40388881974",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -62,16 +62,16 @@
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.25",
+    "latest": "0.0.26",
     "relation": "ahead",
     "error": null
   },
-  "reproduce": "git clone https://github.com/reeleehq/looks && cd looks\ngit checkout 96fac3dea7d1654e36ed857afe79e9b6708fb214\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/reeleehq/looks && cd looks\ngit checkout 44b3eede5327f089b75f4134c7b638078288b809\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": false,
     "notes": [
-      "The documented version (0.0.26) is ahead of the latest release on PyPI (0.0.25): these docs describe unreleased code."
+      "The documented version (0.0.27) is ahead of the latest release on PyPI (0.0.26): these docs describe unreleased code."
     ]
   }
 }
