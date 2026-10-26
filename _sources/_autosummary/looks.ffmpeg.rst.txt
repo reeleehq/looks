@@ -10,25 +10,13 @@ looks.ffmpeg
    
       OPTION_LEVEL_SPECIALS
       GRAPH_LEVEL_SPECIALS
-      DFLT_VIGNETTE_ANGLE
-      MAX_VIGNETTE_ANGLE
-      MAX_HALATION_SIGMA
-      DFLT_HALATION_TINT
-      MAX_GRAIN_STRENGTH
-      DFLT_GRAIN_SEED
-      MAX_GRAIN_SEED
       SETSAR_MAX
-      DFLT_WEAVE_AMPLITUDE
-      DFLT_WEAVE_FREQUENCY
       LABEL_NAMESPACE
-      CURVES_CHANNELS
-      COLORBALANCE_ZONES
    
    .. rubric:: Functions
 
    .. autosummary::
    
-      as_emitted
       escape_filter_value
       filter_string
       gated

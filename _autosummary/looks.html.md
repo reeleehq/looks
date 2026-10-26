@@ -174,6 +174,7 @@ Two names are deliberately absent, and a test asserts it: there is no
 | [`RegistryError`](#looks.RegistryError)          | A registration that would make a later refusal point at the wrong thing.                                   |
 | [`ImplConflict`](#looks.ImplConflict)           | That key is taken.                                                                                         |
 | [`UnknownImpl`](#looks.UnknownImpl)            | A plan names an implementation this process does not have.                                                 |
+| [`StageOrderWarning`](#looks.StageOrderWarning)      | A Look puts an effect in a stage the catalogue measured as wrong.                                          |
 | [`CompileError`](#looks.CompileError)           | A Look that cannot be compiled against this clip and this binary.                                          |
 | [`PlanRefused`](#looks.PlanRefused)            | A stored plan that may not be run as it stands.                                                            |
 | [`TransitionError`](#looks.TransitionError)        | A transition that cannot be honoured as asked.                                                             |
@@ -779,9 +780,19 @@ available is not the same as asking for something:
 ()
 ```
 
+#### check_params(effect, params)
+
+Refuse parameters this registry’s schema for `effect` rejects.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### compiler(key)
 
 The code behind a key — how a stored plan becomes runnable work.
+
+Defaults are filled in before the code runs, so the params a plan
+stores (as asked, defaults absent) are all it needs.
 
 * **Return type:**
   [`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)[[`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis), [`Mapping`](https://docs.python.org/3/library/typing.html#typing.Mapping)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
@@ -793,12 +804,33 @@ The cost estimator, or `None` when none was declared.
 * **Return type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)[[`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis), [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]]]
 
+#### declare_params(effect, schema)
+
+Declare an effect’s parameters, once: see [`looks.params`](looks.params.html.md#module-looks.params).
+
+The schema belongs to the registry, not to the package, so a registry
+with its own implementation of an effect (a different `flatten`, say)
+declares that implementation’s keys and is not bound to ours. An effect
+with no declaration is not checked.
+
+* **Raises:**
+  [**RegistryError**](#looks.RegistryError) – If the effect already has a different schema.
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### effects()
 
 Every effect with at least one implementation, sorted.
 
 * **Return type:**
   [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
+
+#### has_params(effect)
+
+Has this registry declared a schema for `effect`?
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 #### impl(key)
 
@@ -840,6 +872,13 @@ Record an implementation. Returns it, so this reads well inline.
         or an ffmpeg implementation names a filter that does not exist.
 * **Return type:**
   [`ImplRef`](looks.spec.html.md#looks.spec.ImplRef)
+
+#### with_defaults(effect, params)
+
+`params` with this registry’s declared defaults filled in.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### *exception* looks.FfmpegBackendError
 
@@ -1782,6 +1821,12 @@ Clips the trim left outside the window. Empty under `full_range`.
 Named rather than counted, because *which* clip could not be fixed is
 the interesting half of the answer.
 
+### *exception* looks.StageOrderWarning
+
+Bases: [`UserWarning`](https://docs.python.org/3/builtins/exceptions.html#UserWarning)
+
+A Look puts an effect in a stage the catalogue measured as wrong.
+
 ### *class* looks.Step(, effect, impl, tier, params=FrozenMap(), at=None, payload=FrozenMap(), cpu_seconds=None, metadata=FrozenMap())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
@@ -2495,6 +2540,10 @@ Compile a Look into a plan. No process is started and no file is written.
     against.
   * **registry** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`EffectRegistry`](looks.registry.html.md#looks.registry.EffectRegistry)]) – Which implementations exist. Defaults to
     [`looks.registry.REGISTRY`](looks.registry.html.md#looks.registry.REGISTRY).
+* **Warns:**
+  **looks.stages.StageOrderWarning** – If the Look departs from the canonical
+  stage order. It is never reordered, and never a refusal unless the
+  caller escalates the warning.
 * **Return type:**
   [`LookPlan`](looks.spec.html.md#looks.spec.LookPlan)
 * **Returns:**
@@ -3958,7 +4007,9 @@ A path whose window size varies, compiled to `zoompan`.
 | [`licence`](looks.licence.html.md#module-looks.licence)                   | What an implementation costs you in obligations, and when to refuse it.               |
 | [`lut`](looks.lut.html.md#module-looks.lut)                           | Gradient-map 3D LUTs: a colour ramp in, an Iridas `.cube` out.                        |
 | [`motion`](looks.motion.html.md#module-looks.motion)                     | A camera path, compiled to an ffmpeg fragment — the compile half of RULE G.           |
+| [`params`](looks.params.html.md#module-looks.params)                     | One parameter schema per effect: names, types, defaults and bounds, once.             |
 | [`pipe`](looks.pipe.html.md#module-looks.pipe)                         | A plan that mixes backends, as a pipe — emitted as data, never spawned.               |
 | [`registry`](looks.registry.html.md#module-looks.registry)                 | Which implementations exist, and how to reach the code behind a plan.                 |
 | [`spec`](looks.spec.html.md#module-looks.spec)                         | What a stylization *is*, before anything runs.                                        |
+| [`stages`](looks.stages.html.md#module-looks.stages)                     | The canonical stage order, and a check that warns when a Look departs from it.        |
 | [`transition`](looks.transition.html.md#module-looks.transition)             | How one shot gives way to the next — the vocabulary, not the graph.                   |

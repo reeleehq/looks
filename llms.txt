@@ -19,12 +19,14 @@
 - [looks.licence](_autosummary/looks.licence.html.md): What an implementation costs you in obligations, and when to refuse it.
 - [looks.lut](_autosummary/looks.lut.html.md): Gradient-map 3D LUTs: a colour ramp in, an Iridas &#96;.cube&#96; out.
 - [looks.motion](_autosummary/looks.motion.html.md): A camera path, compiled to an ffmpeg fragment — the compile half of RULE G.
+- [looks.params](_autosummary/looks.params.html.md): One parameter schema per effect: names, types, defaults and bounds, once.
 - [looks.pipe](_autosummary/looks.pipe.html.md): A plan that mixes backends, as a pipe — emitted as data, never spawned.
 - [looks.registry](_autosummary/looks.registry.html.md): Which implementations exist, and how to reach the code behind a plan.
 - [looks.spec](_autosummary/looks.spec.html.md): What a stylization &#42;is&#42;, before anything runs. Pure data, no I/O, no registry.
+- [looks.stages](_autosummary/looks.stages.html.md): The canonical stage order, and a check that warns when a Look departs from it.
 - [looks.transition](_autosummary/looks.transition.html.md): How one shot gives way to the next — the vocabulary, not the graph.
 - [For AI agents](ai-agents.html.md): &#96;looks&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 15:05 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 16:15 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 

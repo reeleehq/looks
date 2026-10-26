@@ -1,0 +1,58 @@
+looks.params
+============
+
+.. automodule:: looks.params
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      NO_DEFAULT
+      DFLT_VIGNETTE_ANGLE
+      MAX_VIGNETTE_ANGLE
+      MAX_BLUR_SIGMA
+      DFLT_HALATION_TINT
+      MAX_GRAIN_STRENGTH
+      DFLT_GRAIN_SEED
+      MAX_GRAIN_SEED
+      DFLT_WEAVE_AMPLITUDE
+      DFLT_WEAVE_FREQUENCY
+      DFLT_INTERP
+      MAX_CUBE_SIZE
+      INTERP_MODES
+      MAX_POSTERIZE_LEVELS
+      MAX_FLATTEN_SPATIAL
+      CURVES_CHANNELS
+      COLORBALANCE_ZONES
+      EFFECT_PARAMS
+      PARAM_HINTS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      anything
+      as_emitted
+      check_params
+      choice
+      curve
+      flag
+      real
+      text
+      vector
+      whole
+      with_defaults
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Param
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      ParamError
+   

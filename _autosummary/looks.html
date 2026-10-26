@@ -95,9 +95,11 @@
 <li class="toctree-l3"><a class="reference internal" href="looks.licence.html">looks.licence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.lut.html">looks.lut</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.motion.html">looks.motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.params.html">looks.params</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.pipe.html">looks.pipe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.registry.html">looks.registry</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.spec.html">looks.spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.stages.html">looks.stages</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.transition.html">looks.transition</a></li>
 </ul>
 </li>
@@ -544,37 +546,40 @@ submodule it keeps its own short name.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#looks.UnknownImpl" title="looks.UnknownImpl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnknownImpl</span></code></a></p></td>
 <td><p>A plan names an implementation this process does not have.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.CompileError" title="looks.CompileError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompileError</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.StageOrderWarning" title="looks.StageOrderWarning"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StageOrderWarning</span></code></a></p></td>
+<td><p>A Look puts an effect in a stage the catalogue measured as wrong.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.CompileError" title="looks.CompileError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompileError</span></code></a></p></td>
 <td><p>A Look that cannot be compiled against this clip and this binary.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.PlanRefused" title="looks.PlanRefused"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PlanRefused</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.PlanRefused" title="looks.PlanRefused"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PlanRefused</span></code></a></p></td>
 <td><p>A stored plan that may not be run as it stands.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.TransitionError" title="looks.TransitionError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TransitionError</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.TransitionError" title="looks.TransitionError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TransitionError</span></code></a></p></td>
 <td><p>A transition that cannot be honoured as asked.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.AcrossError" title="looks.AcrossError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AcrossError</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.AcrossError" title="looks.AcrossError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AcrossError</span></code></a></p></td>
 <td><p>A set-relative question that cannot be answered as asked.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.PipeError" title="looks.PipeError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PipeError</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.PipeError" title="looks.PipeError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PipeError</span></code></a></p></td>
 <td><p>A plan that cannot be arranged as a pipe, or not safely.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.CacheError" title="looks.CacheError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CacheError</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.CacheError" title="looks.CacheError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CacheError</span></code></a></p></td>
 <td><p>The cache could not produce a usable file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.FfmpegBackendError" title="looks.FfmpegBackendError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FfmpegBackendError</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.FfmpegBackendError" title="looks.FfmpegBackendError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FfmpegBackendError</span></code></a></p></td>
 <td><p>A step that cannot be expressed as a filter fragment.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.MotionError" title="looks.MotionError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MotionError</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.MotionError" title="looks.MotionError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MotionError</span></code></a></p></td>
 <td><p>A path that cannot be compiled, or that would compile to a lie.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.LutError" title="looks.LutError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LutError</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.LutError" title="looks.LutError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LutError</span></code></a></p></td>
 <td><p>A ramp or lattice that cannot produce a usable LUT.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.MeasurementError" title="looks.MeasurementError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeasurementError</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.MeasurementError" title="looks.MeasurementError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeasurementError</span></code></a></p></td>
 <td><p>A measurement that could not be taken, or one that must not be compared.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.Incomparable" title="looks.Incomparable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Incomparable</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.Incomparable" title="looks.Incomparable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Incomparable</span></code></a></p></td>
 <td><p>Two measurements whose identity fields disagree.</p></td>
 </tr>
 </tbody>
@@ -1257,9 +1262,21 @@ available is not the same as asking for something:</p>
 <dl class="field-list simple">
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="looks.EffectRegistry.check_params">
+<span class="sig-name descname"><span class="pre">check_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">effect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/registry.html#EffectRegistry.check_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.EffectRegistry.check_params" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.EffectRegistry.check_params'">¶</a></dt>
+<dd><p>Refuse parameters this registry’s schema for <code class="docutils literal notranslate"><span class="pre">effect</span></code> rejects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="looks.EffectRegistry.compiler">
 <span class="sig-name descname"><span class="pre">compiler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/registry.html#EffectRegistry.compiler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.EffectRegistry.compiler" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.EffectRegistry.compiler'">¶</a></dt>
 <dd><p>The code behind a key — how a stored plan becomes runnable work.</p>
+<p>Defaults are filled in before the code runs, so the params a plan
+stores (as asked, defaults absent) are all it needs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/constants.html#Ellipsis" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]]</span></p>
@@ -1277,12 +1294,39 @@ available is not the same as asking for something:</p>
 </dl>
 </dd></dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="looks.EffectRegistry.declare_params">
+<span class="sig-name descname"><span class="pre">declare_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">effect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/registry.html#EffectRegistry.declare_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.EffectRegistry.declare_params" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.EffectRegistry.declare_params'">¶</a></dt>
+<dd><p>Declare an effect’s parameters, once: see <a class="reference internal" href="looks.params.html#module-looks.params" title="looks.params"><code class="xref py py-mod docutils literal notranslate"><span class="pre">looks.params</span></code></a>.</p>
+<p>The schema belongs to the registry, not to the package, so a registry
+with its own implementation of an effect (a different <code class="docutils literal notranslate"><span class="pre">flatten</span></code>, say)
+declares that implementation’s keys and is not bound to ours. An effect
+with no declaration is not checked.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#looks.RegistryError" title="looks.RegistryError"><strong>RegistryError</strong></a> – If the effect already has a different schema.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="looks.EffectRegistry.effects">
 <span class="sig-name descname"><span class="pre">effects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/registry.html#EffectRegistry.effects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.EffectRegistry.effects" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.EffectRegistry.effects'">¶</a></dt>
 <dd><p>Every effect with at least one implementation, sorted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#Ellipsis" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.EffectRegistry.has_params">
+<span class="sig-name descname"><span class="pre">has_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">effect</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/registry.html#EffectRegistry.has_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.EffectRegistry.has_params" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.EffectRegistry.has_params'">¶</a></dt>
+<dd><p>Has this registry declared a schema for <code class="docutils literal notranslate"><span class="pre">effect</span></code>?</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1340,6 +1384,16 @@ validate against that instead.</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="looks.spec.html#looks.spec.ImplRef" title="looks.spec.ImplRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImplRef</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.EffectRegistry.with_defaults">
+<span class="sig-name descname"><span class="pre">with_defaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">effect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/registry.html#EffectRegistry.with_defaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.EffectRegistry.with_defaults" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.EffectRegistry.with_defaults'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">params</span></code> with this registry’s declared defaults filled in.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2362,6 +2416,12 @@ Named rather than counted, because <em>which</em> clip could not be fixed is
 the interesting half of the answer.</p>
 </dd></dl>
 </dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="looks.StageOrderWarning">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.</span></span><span class="sig-name descname"><span class="pre">StageOrderWarning</span></span><a class="reference internal" href="../_modules/looks/stages.html#StageOrderWarning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.StageOrderWarning" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.StageOrderWarning'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#UserWarning" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserWarning</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A Look puts an effect in a stage the catalogue measured as wrong.</p>
+</dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="looks.Step">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.</span></span><span class="sig-name descname"><span class="pre">Step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">effect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">impl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FrozenMap()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FrozenMap()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpu_seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FrozenMap()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/spec.html#Step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.Step" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.Step'">¶</a></dt>
@@ -3095,15 +3155,20 @@ against.</p></li>
 <a class="reference internal" href="looks.registry.html#looks.registry.REGISTRY" title="looks.registry.REGISTRY"><code class="xref py py-data docutils literal notranslate"><span class="pre">looks.registry.REGISTRY</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="looks.spec.html#looks.spec.LookPlan" title="looks.spec.LookPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookPlan</span></code></a></span></p>
+<dt class="field-even">Warns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>looks.stages.StageOrderWarning</strong> – If the Look departs from the canonical
+stage order. It is never reordered, and never a refusal unless the
+caller escalates the warning.</p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A <a class="reference internal" href="looks.spec.html#looks.spec.LookPlan" title="looks.spec.LookPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookPlan</span></code></a> holding no live callables — the runner
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="looks.spec.html#looks.spec.LookPlan" title="looks.spec.LookPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookPlan</span></code></a></span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference internal" href="looks.spec.html#looks.spec.LookPlan" title="looks.spec.LookPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookPlan</span></code></a> holding no live callables — the runner
 resolves each step’s code from the registry by key.</p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
 <li><p><a class="reference internal" href="#looks.CompileError" title="looks.CompileError"><strong>CompileError</strong></a> – If an effect has no admissible implementation. The
     message says which constraint emptied the pool, because “no
     implementation available” alone is the least useful refusal in the
@@ -4605,14 +4670,20 @@ count check — the obvious check — passes in both cases.</p></li>
 <tr class="row-odd"><td><p><a class="reference internal" href="looks.motion.html#module-looks.motion" title="looks.motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">motion</span></code></a></p></td>
 <td><p>A camera path, compiled to an ffmpeg fragment — the compile half of RULE G.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="looks.pipe.html#module-looks.pipe" title="looks.pipe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pipe</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="looks.params.html#module-looks.params" title="looks.params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">params</span></code></a></p></td>
+<td><p>One parameter schema per effect: names, types, defaults and bounds, once.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="looks.pipe.html#module-looks.pipe" title="looks.pipe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pipe</span></code></a></p></td>
 <td><p>A plan that mixes backends, as a pipe — emitted as data, never spawned.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="looks.registry.html#module-looks.registry" title="looks.registry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">registry</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="looks.registry.html#module-looks.registry" title="looks.registry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">registry</span></code></a></p></td>
 <td><p>Which implementations exist, and how to reach the code behind a plan.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="looks.spec.html#module-looks.spec" title="looks.spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spec</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="looks.spec.html#module-looks.spec" title="looks.spec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spec</span></code></a></p></td>
 <td><p>What a stylization <em>is</em>, before anything runs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="looks.stages.html#module-looks.stages" title="looks.stages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stages</span></code></a></p></td>
+<td><p>The canonical stage order, and a check that warns when a Look departs from it.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="looks.transition.html#module-looks.transition" title="looks.transition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transition</span></code></a></p></td>
 <td><p>How one shot gives way to the next — the vocabulary, not the graph.</p></td>
@@ -4691,12 +4762,16 @@ count check — the obvious check — passes in both cases.</p></li>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#looks.EffectRegistry'" class="reference internal" href="#looks.EffectRegistry"><code class="docutils literal notranslate"><span class="pre">EffectRegistry</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.EffectRegistry.check_params'" class="reference internal" href="#looks.EffectRegistry.check_params"><code class="docutils literal notranslate"><span class="pre">EffectRegistry.check_params()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.EffectRegistry.compiler'" class="reference internal" href="#looks.EffectRegistry.compiler"><code class="docutils literal notranslate"><span class="pre">EffectRegistry.compiler()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.EffectRegistry.cost'" class="reference internal" href="#looks.EffectRegistry.cost"><code class="docutils literal notranslate"><span class="pre">EffectRegistry.cost()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.EffectRegistry.declare_params'" class="reference internal" href="#looks.EffectRegistry.declare_params"><code class="docutils literal notranslate"><span class="pre">EffectRegistry.declare_params()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.EffectRegistry.effects'" class="reference internal" href="#looks.EffectRegistry.effects"><code class="docutils literal notranslate"><span class="pre">EffectRegistry.effects()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.EffectRegistry.has_params'" class="reference internal" href="#looks.EffectRegistry.has_params"><code class="docutils literal notranslate"><span class="pre">EffectRegistry.has_params()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.EffectRegistry.impl'" class="reference internal" href="#looks.EffectRegistry.impl"><code class="docutils literal notranslate"><span class="pre">EffectRegistry.impl()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.EffectRegistry.implementations'" class="reference internal" href="#looks.EffectRegistry.implementations"><code class="docutils literal notranslate"><span class="pre">EffectRegistry.implementations()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.EffectRegistry.register'" class="reference internal" href="#looks.EffectRegistry.register"><code class="docutils literal notranslate"><span class="pre">EffectRegistry.register()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.EffectRegistry.with_defaults'" class="reference internal" href="#looks.EffectRegistry.with_defaults"><code class="docutils literal notranslate"><span class="pre">EffectRegistry.with_defaults()</span></code></a></li>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#looks.FfmpegBackendError'" class="reference internal" href="#looks.FfmpegBackendError"><code class="docutils literal notranslate"><span class="pre">FfmpegBackendError</span></code></a></li>
@@ -4813,6 +4888,7 @@ count check — the obvious check — passes in both cases.</p></li>
 <li><a :data-current="activeSection === '#looks.Spread.outside'" class="reference internal" href="#looks.Spread.outside"><code class="docutils literal notranslate"><span class="pre">Spread.outside</span></code></a></li>
 </ul>
 </li>
+<li><a :data-current="activeSection === '#looks.StageOrderWarning'" class="reference internal" href="#looks.StageOrderWarning"><code class="docutils literal notranslate"><span class="pre">StageOrderWarning</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.Step'" class="reference internal" href="#looks.Step"><code class="docutils literal notranslate"><span class="pre">Step</span></code></a><ul>
 <li><a :data-current="activeSection === '#looks.Step.time_varying'" class="reference internal" href="#looks.Step.time_varying"><code class="docutils literal notranslate"><span class="pre">Step.time_varying</span></code></a></li>
 </ul>
@@ -4916,7 +4992,7 @@ count check — the obvious check — passes in both cases.</p></li>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=3294188c"></script>
+<script src="../_static/documentation_options.js?v=f91d8841"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

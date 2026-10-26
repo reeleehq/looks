@@ -53,16 +53,11 @@ have, or one whose `impl_version` has moved. Both mean the same thing — the
 plan describes behaviour this build does not implement — and guessing a
 substitute is exactly the failure the version lock exists to prevent.
 
-### Module Attributes
-
-| [`EFFECT_PARAM_CHECKS`](#looks.compile.EFFECT_PARAM_CHECKS)   | What an effect's parameters must satisfy, keyed by EFFECT — never by implementation.   |
-|------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
-
 ### Functions
 
 | [`audit`](#looks.compile.audit)(plan, \*[, policy, registry])              | Re-check a plan against its own declared ceiling.                |
 |---------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
-| [`check_effect_params`](#looks.compile.check_effect_params)(effect)                      | Refuse parameters no implementation of this effect could honour. |
+| [`check_effect_params`](#looks.compile.check_effect_params)(effect[, registry])          | Refuse parameters no implementation of this effect could honour. |
 | [`compile_all`](#looks.compile.compile_all)(looks_, \*\*kwargs)                  | Compile several Looks under one set of arguments.                |
 | [`compile_look`](#looks.compile.compile_look)(look, \*[, clip, env, policy, ...]) | Compile a Look into a plan.                                      |
 | [`describe`](#looks.compile.describe)(plan)                                   | A plan as a few lines of text — for a CLI, a log, or a review.   |
@@ -80,16 +75,6 @@ substitute is exactly the failure the version lock exists to prevent.
 Bases: [`SpecError`](looks.spec.html.md#looks.spec.SpecError)
 
 A Look that cannot be compiled against this clip and this binary.
-
-### looks.compile.EFFECT_PARAM_CHECKS *= {'colorbalance': <function \_check_colorbalance>, 'contrast': <function \_check_contrast>, 'curves': <function \_check_curves>, 'gate_weave': <function \_check_gate_weave>, 'grain': <function \_check_grain>, 'halation': <function \_check_halation>, 'vignette': <function \_check_vignette>}*
-
-What an effect’s parameters must satisfy, keyed by EFFECT — never by
-implementation. A check that lives inside one compiler is a check the
-licence tier can switch off: `contrast` with `amount=-1` was refused on the
-LGPL path and emitted `eq=contrast=-1.0` on the GPL one, so the same Look was
-valid or invalid depending on how the binary was built. Rule 29b says the
-tier must not decide what the viewer sees; it must not decide whether the
-document is accepted either.
 
 ### *exception* looks.compile.PlanRefused
 
@@ -124,12 +109,19 @@ refresh.
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
-### looks.compile.check_effect_params(effect)
+### looks.compile.check_effect_params(effect, registry=EffectRegistry(name='looks', effects=20, implementations=23))
 
 Refuse parameters no implementation of this effect could honour.
 
 Called before an implementation is chosen, so every implementation of an
-effect accepts exactly the same documents.
+effect accepts exactly the same documents. The schema is
+the registry’s own declaration (`EffectRegistry.declare_params()`; the
+built-ins are [`looks.params.EFFECT_PARAMS`](looks.params.html.md#looks.params.EFFECT_PARAMS)), keyed by EFFECT, never by
+implementation: a check that lives inside one compiler is a check the
+licence tier can switch off (`contrast` with `amount=-1` was refused on the
+LGPL path and emitted `eq=contrast=-1.0` on the GPL one). Rule 29b says the
+tier must not decide what the viewer sees; it must not decide whether the
+document is accepted either.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -163,6 +155,10 @@ Compile a Look into a plan. No process is started and no file is written.
     against.
   * **registry** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`EffectRegistry`](looks.registry.html.md#looks.registry.EffectRegistry)]) – Which implementations exist. Defaults to
     [`looks.registry.REGISTRY`](looks.registry.html.md#looks.registry.REGISTRY).
+* **Warns:**
+  **looks.stages.StageOrderWarning** – If the Look departs from the canonical
+  stage order. It is never reordered, and never a refusal unless the
+  caller escalates the warning.
 * **Return type:**
   [`LookPlan`](looks.spec.html.md#looks.spec.LookPlan)
 * **Returns:**

@@ -17,9 +17,11 @@
 - [looks.licence](looks.licence.html.md): What an implementation costs you in obligations, and when to refuse it.
 - [looks.lut](looks.lut.html.md): Gradient-map 3D LUTs: a colour ramp in, an Iridas &#96;.cube&#96; out.
 - [looks.motion](looks.motion.html.md): A camera path, compiled to an ffmpeg fragment — the compile half of RULE G.
+- [looks.params](looks.params.html.md): One parameter schema per effect: names, types, defaults and bounds, once.
 - [looks.pipe](looks.pipe.html.md): A plan that mixes backends, as a pipe — emitted as data, never spawned.
 - [looks.registry](looks.registry.html.md): Which implementations exist, and how to reach the code behind a plan.
 - [looks.spec](looks.spec.html.md): What a stylization &#42;is&#42;, before anything runs. Pure data, no I/O, no registry.
+- [looks.stages](looks.stages.html.md): The canonical stage order, and a check that warns when a Look departs from it.
 - [looks.transition](looks.transition.html.md): How one shot gives way to the next — the vocabulary, not the graph.
 
 ## Optional

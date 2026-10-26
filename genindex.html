@@ -125,9 +125,11 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/looks.licence.html">looks.licence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/looks.lut.html">looks.lut</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/looks.motion.html">looks.motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/looks.params.html">looks.params</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/looks.pipe.html">looks.pipe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/looks.registry.html">looks.registry</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/looks.spec.html">looks.spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/looks.stages.html">looks.stages</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/looks.transition.html">looks.transition</a></li>
 </ul>
 </li>
@@ -209,7 +211,9 @@
         <li><a href="_autosummary/looks.html#looks.Policy.allow_field_restricted">(looks.Policy attribute)</a>
 </li>
       </ul></li>
-      <li><a href="_autosummary/looks.ffmpeg.html#looks.ffmpeg.as_emitted">as_emitted() (in module looks.ffmpeg)</a>
+      <li><a href="_autosummary/looks.params.html#looks.params.anything">anything() (in module looks.params)</a>
+</li>
+      <li><a href="_autosummary/looks.params.html#looks.params.as_emitted">as_emitted() (in module looks.params)</a>
 </li>
       <li><a href="_autosummary/looks.html#looks.ClipSpec.aspect">aspect (looks.ClipSpec property)</a>
 
@@ -339,6 +343,16 @@
       </ul></li>
       <li><a href="_autosummary/looks.compile.html#looks.compile.check_effect_params">check_effect_params() (in module looks.compile)</a>
 </li>
+      <li><a href="_autosummary/looks.params.html#looks.params.check_params">check_params() (in module looks.params)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="_autosummary/looks.html#looks.EffectRegistry.check_params">(looks.EffectRegistry method)</a>
+</li>
+        <li><a href="_autosummary/looks.registry.html#looks.registry.EffectRegistry.check_params">(looks.registry.EffectRegistry method)</a>
+</li>
+      </ul></li>
+      <li><a href="_autosummary/looks.stages.html#looks.stages.check_stage_order">check_stage_order() (in module looks.stages)</a>
+</li>
       <li><a href="_autosummary/looks.html#looks.check_visible">check_visible() (in module looks)</a>
 
       <ul style="list-style-type:none">
@@ -351,6 +365,8 @@
         <li><a href="_autosummary/looks.across.html#looks.across.Choice">(class in looks.across)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/looks.params.html#looks.params.choice">choice() (in module looks.params)</a>
+</li>
       <li><a href="_autosummary/looks.html#looks.classify">classify() (in module looks)</a>
 
       <ul style="list-style-type:none">
@@ -373,7 +389,7 @@
 </li>
       <li><a href="_autosummary/looks.html#looks.color_range">color_range() (in module looks)</a>
 </li>
-      <li><a href="_autosummary/looks.ffmpeg.html#looks.ffmpeg.COLORBALANCE_ZONES">COLORBALANCE_ZONES (in module looks.ffmpeg)</a>
+      <li><a href="_autosummary/looks.params.html#looks.params.COLORBALANCE_ZONES">COLORBALANCE_ZONES (in module looks.params)</a>
 </li>
       <li><a href="_autosummary/looks.html#looks.ClipSpec.colour_is_declared">colour_is_declared (looks.ClipSpec property)</a>
 
@@ -387,14 +403,14 @@
 </li>
       <li><a href="_autosummary/looks.compile.html#looks.compile.compile_all">compile_all() (in module looks.compile)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_autosummary/looks.html#looks.compile_look">compile_look() (in module looks)</a>
 
       <ul style="list-style-type:none">
         <li><a href="_autosummary/looks.compile.html#looks.compile.compile_look">(in module looks.compile)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_autosummary/looks.html#looks.compile_motion">compile_motion() (in module looks)</a>
 
       <ul style="list-style-type:none">
@@ -487,7 +503,9 @@
         <li><a href="_autosummary/looks.lut.html#looks.lut.cube_text">(in module looks.lut)</a>
 </li>
       </ul></li>
-      <li><a href="_autosummary/looks.ffmpeg.html#looks.ffmpeg.CURVES_CHANNELS">CURVES_CHANNELS (in module looks.ffmpeg)</a>
+      <li><a href="_autosummary/looks.params.html#looks.params.curve">curve() (in module looks.params)</a>
+</li>
+      <li><a href="_autosummary/looks.params.html#looks.params.CURVES_CHANNELS">CURVES_CHANNELS (in module looks.params)</a>
 </li>
   </ul></td>
   </tr>
@@ -500,6 +518,12 @@
 
       <ul style="list-style-type:none">
         <li><a href="_autosummary/looks.html#looks.Ramp.darkest">(looks.Ramp property)</a>
+</li>
+      </ul></li>
+      <li><a href="_autosummary/looks.html#looks.EffectRegistry.declare_params">declare_params() (looks.EffectRegistry method)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="_autosummary/looks.registry.html#looks.registry.EffectRegistry.declare_params">(looks.registry.EffectRegistry method)</a>
 </li>
       </ul></li>
       <li><a href="_autosummary/looks.html#looks.Dependency">Dependency (class in looks)</a>
@@ -542,17 +566,19 @@
 </li>
       <li><a href="_autosummary/looks.lut.html#looks.lut.DFLT_CUBE_SIZE">DFLT_CUBE_SIZE (in module looks.lut)</a>
 </li>
-      <li><a href="_autosummary/looks.lut.html#looks.lut.DFLT_CUBE_TITLE">DFLT_CUBE_TITLE (in module looks.lut)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
+      <li><a href="_autosummary/looks.lut.html#looks.lut.DFLT_CUBE_TITLE">DFLT_CUBE_TITLE (in module looks.lut)</a>
+</li>
       <li><a href="_autosummary/looks.transition.html#looks.transition.DFLT_CURVE">DFLT_CURVE (in module looks.transition)</a>
 </li>
       <li><a href="_autosummary/looks.environment.html#looks.environment.DFLT_FFMPEG">DFLT_FFMPEG (in module looks.environment)</a>
 </li>
-      <li><a href="_autosummary/looks.ffmpeg.html#looks.ffmpeg.DFLT_GRAIN_SEED">DFLT_GRAIN_SEED (in module looks.ffmpeg)</a>
+      <li><a href="_autosummary/looks.params.html#looks.params.DFLT_GRAIN_SEED">DFLT_GRAIN_SEED (in module looks.params)</a>
 </li>
-      <li><a href="_autosummary/looks.ffmpeg.html#looks.ffmpeg.DFLT_HALATION_TINT">DFLT_HALATION_TINT (in module looks.ffmpeg)</a>
+      <li><a href="_autosummary/looks.params.html#looks.params.DFLT_HALATION_TINT">DFLT_HALATION_TINT (in module looks.params)</a>
+</li>
+      <li><a href="_autosummary/looks.params.html#looks.params.DFLT_INTERP">DFLT_INTERP (in module looks.params)</a>
 </li>
       <li><a href="_autosummary/looks.licence.html#looks.licence.DFLT_LADDER">DFLT_LADDER (in module looks.licence)</a>
 </li>
@@ -566,11 +592,11 @@
 </li>
       <li><a href="_autosummary/looks.geometry.html#looks.geometry.DFLT_ROUNDING">DFLT_ROUNDING (in module looks.geometry)</a>
 </li>
-      <li><a href="_autosummary/looks.ffmpeg.html#looks.ffmpeg.DFLT_VIGNETTE_ANGLE">DFLT_VIGNETTE_ANGLE (in module looks.ffmpeg)</a>
+      <li><a href="_autosummary/looks.params.html#looks.params.DFLT_VIGNETTE_ANGLE">DFLT_VIGNETTE_ANGLE (in module looks.params)</a>
 </li>
-      <li><a href="_autosummary/looks.ffmpeg.html#looks.ffmpeg.DFLT_WEAVE_AMPLITUDE">DFLT_WEAVE_AMPLITUDE (in module looks.ffmpeg)</a>
+      <li><a href="_autosummary/looks.params.html#looks.params.DFLT_WEAVE_AMPLITUDE">DFLT_WEAVE_AMPLITUDE (in module looks.params)</a>
 </li>
-      <li><a href="_autosummary/looks.ffmpeg.html#looks.ffmpeg.DFLT_WEAVE_FREQUENCY">DFLT_WEAVE_FREQUENCY (in module looks.ffmpeg)</a>
+      <li><a href="_autosummary/looks.params.html#looks.params.DFLT_WEAVE_FREQUENCY">DFLT_WEAVE_FREQUENCY (in module looks.params)</a>
 </li>
       <li><a href="_autosummary/looks.cli.html#looks.cli.disclaimer">disclaimer() (in module looks.cli)</a>
 </li>
@@ -603,7 +629,9 @@
         <li><a href="_autosummary/looks.spec.html#looks.spec.ImplRef.effect">(looks.spec.ImplRef attribute)</a>
 </li>
       </ul></li>
-      <li><a href="_autosummary/looks.compile.html#looks.compile.EFFECT_PARAM_CHECKS">EFFECT_PARAM_CHECKS (in module looks.compile)</a>
+      <li><a href="_autosummary/looks.params.html#looks.params.EFFECT_PARAMS">EFFECT_PARAMS (in module looks.params)</a>
+</li>
+      <li><a href="_autosummary/looks.stages.html#looks.stages.EFFECT_STAGES">EFFECT_STAGES (in module looks.stages)</a>
 </li>
       <li><a href="_autosummary/looks.html#looks.EffectRegistry">EffectRegistry (class in looks)</a>
 
@@ -708,6 +736,8 @@
         <li><a href="_autosummary/looks.html#looks.FfmpegEnv.fingerprint">(looks.FfmpegEnv method)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/looks.params.html#looks.params.flag">flag() (in module looks.params)</a>
+</li>
       <li><a href="_autosummary/looks.cli.html#looks.cli.flicker">flicker() (in module looks.cli)</a>
 </li>
       <li><a href="_autosummary/looks.frame_dependency.html#looks.frame_dependency.FLICKER_FREE">FLICKER_FREE (in module looks.frame_dependency)</a>
@@ -794,14 +824,20 @@
         <li><a href="_autosummary/looks.html#looks.FfmpegEnv.has_filter">(looks.FfmpegEnv method)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/looks.html#looks.EffectRegistry.has_params">has_params() (looks.EffectRegistry method)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="_autosummary/looks.registry.html#looks.registry.EffectRegistry.has_params">(looks.registry.EffectRegistry method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_autosummary/looks.html#looks.LookPlan.has_unknown_costs">has_unknown_costs (looks.LookPlan property)</a>
 
       <ul style="list-style-type:none">
         <li><a href="_autosummary/looks.spec.html#looks.spec.LookPlan.has_unknown_costs">(looks.spec.LookPlan property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_autosummary/looks.lut.html#looks.lut.hex_to_rgb">hex_to_rgb() (in module looks.lut)</a>
 </li>
       <li><a href="_autosummary/looks.html#looks.Accent.hue">hue (looks.Accent attribute)</a>
@@ -861,9 +897,11 @@
       </ul></li>
       <li><a href="_autosummary/looks.html#looks.Incomparable">Incomparable</a>
 </li>
+      <li><a href="_autosummary/looks.html#looks.ClipStats.instrument">instrument (looks.ClipStats attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
-      <li><a href="_autosummary/looks.html#looks.ClipStats.instrument">instrument (looks.ClipStats attribute)</a>
+      <li><a href="_autosummary/looks.params.html#looks.params.INTERP_MODES">INTERP_MODES (in module looks.params)</a>
 </li>
       <li><a href="_autosummary/looks.html#looks.is_hard_cut">is_hard_cut() (in module looks)</a>
 
@@ -893,6 +931,8 @@
 </li>
       <li><a href="_autosummary/looks.motion.html#looks.motion.is_static">is_static() (in module looks.motion)</a>
 </li>
+      <li><a href="_autosummary/looks.params.html#looks.params.Param.is_type">is_type() (looks.params.Param method)</a>
+</li>
       <li><a href="_autosummary/looks.html#looks.Span.is_whole">is_whole (looks.Span property)</a>
 
       <ul style="list-style-type:none">
@@ -920,6 +960,8 @@
         <li><a href="_autosummary/looks.motion.html#looks.motion.Keyframe">(class in looks.motion)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/looks.params.html#looks.params.Param.kind">kind (looks.params.Param attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_autosummary/looks.licence.html#looks.licence.KNOWN_COMPONENTS">KNOWN_COMPONENTS (in module looks.licence)</a>
@@ -1033,8 +1075,6 @@
         <li><a href="_autosummary/looks.across.html#module-looks.across">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li>
     looks.cache
 
@@ -1042,6 +1082,8 @@
         <li><a href="_autosummary/looks.cache.html#module-looks.cache">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li>
     looks.cli
 
@@ -1106,6 +1148,13 @@
 </li>
       </ul></li>
       <li>
+    looks.params
+
+      <ul style="list-style-type:none">
+        <li><a href="_autosummary/looks.params.html#module-looks.params">module</a>
+</li>
+      </ul></li>
+      <li>
     looks.pipe
 
       <ul style="list-style-type:none">
@@ -1124,6 +1173,13 @@
 
       <ul style="list-style-type:none">
         <li><a href="_autosummary/looks.spec.html#module-looks.spec">module</a>
+</li>
+      </ul></li>
+      <li>
+    looks.stages
+
+      <ul style="list-style-type:none">
+        <li><a href="_autosummary/looks.stages.html#module-looks.stages">module</a>
 </li>
       </ul></li>
       <li>
@@ -1166,13 +1222,19 @@
 </li>
       <li><a href="_autosummary/looks.transition.html#looks.transition.max_blended_frames">max_blended_frames() (in module looks.transition)</a>
 </li>
-      <li><a href="_autosummary/looks.ffmpeg.html#looks.ffmpeg.MAX_GRAIN_SEED">MAX_GRAIN_SEED (in module looks.ffmpeg)</a>
+      <li><a href="_autosummary/looks.params.html#looks.params.MAX_BLUR_SIGMA">MAX_BLUR_SIGMA (in module looks.params)</a>
 </li>
-      <li><a href="_autosummary/looks.ffmpeg.html#looks.ffmpeg.MAX_GRAIN_STRENGTH">MAX_GRAIN_STRENGTH (in module looks.ffmpeg)</a>
+      <li><a href="_autosummary/looks.params.html#looks.params.MAX_CUBE_SIZE">MAX_CUBE_SIZE (in module looks.params)</a>
 </li>
-      <li><a href="_autosummary/looks.ffmpeg.html#looks.ffmpeg.MAX_HALATION_SIGMA">MAX_HALATION_SIGMA (in module looks.ffmpeg)</a>
+      <li><a href="_autosummary/looks.params.html#looks.params.MAX_FLATTEN_SPATIAL">MAX_FLATTEN_SPATIAL (in module looks.params)</a>
 </li>
-      <li><a href="_autosummary/looks.ffmpeg.html#looks.ffmpeg.MAX_VIGNETTE_ANGLE">MAX_VIGNETTE_ANGLE (in module looks.ffmpeg)</a>
+      <li><a href="_autosummary/looks.params.html#looks.params.MAX_GRAIN_SEED">MAX_GRAIN_SEED (in module looks.params)</a>
+</li>
+      <li><a href="_autosummary/looks.params.html#looks.params.MAX_GRAIN_STRENGTH">MAX_GRAIN_STRENGTH (in module looks.params)</a>
+</li>
+      <li><a href="_autosummary/looks.params.html#looks.params.MAX_POSTERIZE_LEVELS">MAX_POSTERIZE_LEVELS (in module looks.params)</a>
+</li>
+      <li><a href="_autosummary/looks.params.html#looks.params.MAX_VIGNETTE_ANGLE">MAX_VIGNETTE_ANGLE (in module looks.params)</a>
 </li>
       <li><a href="_autosummary/looks.motion.html#looks.motion.MAX_ZOOM">MAX_ZOOM (in module looks.motion)</a>
 </li>
@@ -1194,14 +1256,14 @@
 </li>
       <li><a href="_autosummary/looks.motion.html#looks.motion.MIN_WINDOW_FRACTION">MIN_WINDOW_FRACTION (in module looks.motion)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_autosummary/looks.environment.html#looks.environment.FfmpegEnv.missing">missing() (looks.environment.FfmpegEnv method)</a>
 
       <ul style="list-style-type:none">
         <li><a href="_autosummary/looks.html#looks.FfmpegEnv.missing">(looks.FfmpegEnv method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li>
     module
 
@@ -1230,11 +1292,15 @@
 </li>
         <li><a href="_autosummary/looks.motion.html#module-looks.motion">looks.motion</a>
 </li>
+        <li><a href="_autosummary/looks.params.html#module-looks.params">looks.params</a>
+</li>
         <li><a href="_autosummary/looks.pipe.html#module-looks.pipe">looks.pipe</a>
 </li>
         <li><a href="_autosummary/looks.registry.html#module-looks.registry">looks.registry</a>
 </li>
         <li><a href="_autosummary/looks.spec.html#module-looks.spec">looks.spec</a>
+</li>
+        <li><a href="_autosummary/looks.stages.html#module-looks.stages">looks.stages</a>
 </li>
         <li><a href="_autosummary/looks.transition.html#module-looks.transition">looks.transition</a>
 </li>
@@ -1268,6 +1334,8 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
+      <li><a href="_autosummary/looks.params.html#looks.params.NO_DEFAULT">NO_DEFAULT (in module looks.params)</a>
+</li>
       <li><a href="_autosummary/looks.frame_dependency.html#looks.frame_dependency.NOISE_FLOOR">NOISE_FLOOR (in module looks.frame_dependency)</a>
 </li>
       <li><a href="_autosummary/looks.licence.html#looks.licence.NONFREE_PROHIBITION">NONFREE_PROHIBITION (in module looks.licence)</a>
@@ -1322,6 +1390,12 @@
   <h2 id="P">P</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
+      <li><a href="_autosummary/looks.params.html#looks.params.Param">Param (class in looks.params)</a>
+</li>
+      <li><a href="_autosummary/looks.params.html#looks.params.PARAM_HINTS">PARAM_HINTS (in module looks.params)</a>
+</li>
+      <li><a href="_autosummary/looks.params.html#looks.params.ParamError">ParamError</a>
+</li>
       <li><a href="_autosummary/looks.environment.html#looks.environment.parse_configuration">parse_configuration() (in module looks.environment)</a>
 </li>
       <li><a href="_autosummary/looks.environment.html#looks.environment.parse_filters">parse_filters() (in module looks.environment)</a>
@@ -1376,6 +1450,8 @@
         <li><a href="_autosummary/looks.pipe.html#looks.pipe.PipePlan">(class in looks.pipe)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_autosummary/looks.cli.html#looks.cli.place">place() (in module looks.cli)</a>
 </li>
       <li><a href="_autosummary/looks.html#looks.Placement">Placement (class in looks)</a>
@@ -1384,8 +1460,6 @@
         <li><a href="_autosummary/looks.geometry.html#looks.geometry.Placement">(class in looks.geometry)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="_autosummary/looks.html#looks.placement">placement() (in module looks)</a>
 
       <ul style="list-style-type:none">
@@ -1452,6 +1526,15 @@
   </tr>
       </table>
   
+  <h2 id="Q">Q</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
+      <li><a href="_autosummary/looks.stages.html#looks.stages.QUANTISER">QUANTISER (in module looks.stages)</a>
+</li>
+  </ul></td>
+  </tr>
+      </table>
+  
   <h2 id="R">R</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
@@ -1494,6 +1577,8 @@
       <li><a href="_autosummary/looks.licence.html#looks.licence.REACH_BY_SPDX">REACH_BY_SPDX (in module looks.licence)</a>
 </li>
       <li><a href="_autosummary/looks.licence.html#looks.licence.reach_of">reach_of() (in module looks.licence)</a>
+</li>
+      <li><a href="_autosummary/looks.params.html#looks.params.real">real() (in module looks.params)</a>
 </li>
       <li><a href="_autosummary/looks.html#looks.LookPlan.realtime_factor">realtime_factor (looks.LookPlan property)</a>
 
@@ -1571,6 +1656,8 @@
         <li><a href="_autosummary/looks.html#looks.Placement.resamples">(looks.Placement property)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/looks.stages.html#looks.stages.RESAMPLING_EFFECTS">RESAMPLING_EFFECTS (in module looks.stages)</a>
+</li>
       <li><a href="_autosummary/looks.html#looks.resolve">resolve() (in module looks)</a>
 
       <ul style="list-style-type:none">
@@ -1722,7 +1809,11 @@
       </ul></li>
       <li><a href="_autosummary/looks.lut.html#looks.lut.srgb_to_linear">srgb_to_linear() (in module looks.lut)</a>
 </li>
+      <li><a href="_autosummary/looks.stages.html#looks.stages.Stage">Stage (class in looks.stages)</a>
+</li>
       <li><a href="_autosummary/looks.html#looks.ClipStats.stage">stage (looks.ClipStats attribute)</a>
+</li>
+      <li><a href="_autosummary/looks.html#looks.StageOrderWarning">StageOrderWarning</a>, <a href="_autosummary/looks.stages.html#looks.stages.StageOrderWarning">[1]</a>
 </li>
       <li><a href="_autosummary/looks.licence.html#looks.licence.STALE_AFTER_DAYS">STALE_AFTER_DAYS (in module looks.licence)</a>
 </li>
@@ -1911,6 +2002,8 @@
   <h2 id="V">V</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
+      <li><a href="_autosummary/looks.params.html#looks.params.vector">vector() (in module looks.params)</a>
+</li>
       <li><a href="_autosummary/looks.html#looks.Verdict">Verdict (class in looks)</a>
 
       <ul style="list-style-type:none">
@@ -1952,6 +2045,8 @@
         <li><a href="_autosummary/looks.lut.html#looks.lut.Accent.weight">(looks.lut.Accent method)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/looks.params.html#looks.params.whole">whole() (in module looks.params)</a>
+</li>
       <li><a href="_autosummary/looks.html#looks.Window">Window (class in looks)</a>
 
       <ul style="list-style-type:none">
@@ -1966,6 +2061,14 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
+      <li><a href="_autosummary/looks.params.html#looks.params.with_defaults">with_defaults() (in module looks.params)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="_autosummary/looks.html#looks.EffectRegistry.with_defaults">(looks.EffectRegistry method)</a>
+</li>
+        <li><a href="_autosummary/looks.registry.html#looks.registry.EffectRegistry.with_defaults">(looks.registry.EffectRegistry method)</a>
+</li>
+      </ul></li>
       <li><a href="_autosummary/looks.html#looks.Look.with_policy">with_policy() (looks.Look method)</a>
 
       <ul style="list-style-type:none">
@@ -2016,7 +2119,7 @@
 </div></div>
 <aside id="right-sidebar" class="hidden text-sm xl:block">
 <div class="sticky top-16 -mt-10 max-h-[calc(var(--vh)-4rem)] overflow-y-auto pt-6 space-y-2">
-<a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#A">A</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#B">B</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#C">C</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#D">D</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#E">E</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#F">F</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#G">G</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#H">H</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#I">I</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#K">K</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#L">L</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#M">M</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#N">N</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#O">O</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#P">P</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#R">R</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#S">S</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#T">T</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#U">U</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#V">V</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#W">W</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#X">X</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#Z">Z</a>
+<a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#A">A</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#B">B</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#C">C</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#D">D</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#E">E</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#F">F</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#G">G</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#H">H</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#I">I</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#K">K</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#L">L</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#M">M</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#N">N</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#O">O</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#P">P</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#Q">Q</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#R">R</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#S">S</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#T">T</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#U">U</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#V">V</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#W">W</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#X">X</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#Z">Z</a>
 </div>
 </aside>
           </main>
@@ -2030,7 +2133,7 @@
 </footer>
     </div>
     
-    <script src="_static/documentation_options.js?v=3294188c"></script>
+    <script src="_static/documentation_options.js?v=f91d8841"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>

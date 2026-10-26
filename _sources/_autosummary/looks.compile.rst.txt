@@ -4,12 +4,6 @@ looks.compile
 .. automodule:: looks.compile
 
    
-   .. rubric:: Module Attributes
-
-   .. autosummary::
-   
-      EFFECT_PARAM_CHECKS
-   
    .. rubric:: Functions
 
    .. autosummary::

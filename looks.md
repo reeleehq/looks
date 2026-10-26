@@ -1,4 +1,4 @@
-> built 2026-10-26 15:05 UTC from 53137c1 (main) · looks 0.0.23. Details: build_info.json
+> built 2026-10-26 16:15 UTC from 71bbb51 (main) · looks 0.0.24. Details: build_info.json
 
 # index.html.md
 
@@ -842,16 +842,11 @@ have, or one whose `impl_version` has moved. Both mean the same thing — the
 plan describes behaviour this build does not implement — and guessing a
 substitute is exactly the failure the version lock exists to prevent.
 
-### Module Attributes
-
-| [`EFFECT_PARAM_CHECKS`](_autosummary/looks.compile.html.md#looks.compile.EFFECT_PARAM_CHECKS)   | What an effect's parameters must satisfy, keyed by EFFECT — never by implementation.   |
-|------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
-
 ### Functions
 
 | [`audit`](_autosummary/looks.compile.html.md#looks.compile.audit)(plan, \*[, policy, registry])              | Re-check a plan against its own declared ceiling.                |
 |---------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
-| [`check_effect_params`](_autosummary/looks.compile.html.md#looks.compile.check_effect_params)(effect)                      | Refuse parameters no implementation of this effect could honour. |
+| [`check_effect_params`](_autosummary/looks.compile.html.md#looks.compile.check_effect_params)(effect[, registry])          | Refuse parameters no implementation of this effect could honour. |
 | [`compile_all`](_autosummary/looks.compile.html.md#looks.compile.compile_all)(looks_, \*\*kwargs)                  | Compile several Looks under one set of arguments.                |
 | [`compile_look`](_autosummary/looks.compile.html.md#looks.compile.compile_look)(look, \*[, clip, env, policy, ...]) | Compile a Look into a plan.                                      |
 | [`describe`](_autosummary/looks.compile.html.md#looks.compile.describe)(plan)                                   | A plan as a few lines of text — for a CLI, a log, or a review.   |
@@ -869,16 +864,6 @@ substitute is exactly the failure the version lock exists to prevent.
 Bases: [`SpecError`](_autosummary/looks.spec.html.md#looks.spec.SpecError)
 
 A Look that cannot be compiled against this clip and this binary.
-
-### looks.compile.EFFECT_PARAM_CHECKS *= {'colorbalance': <function \_check_colorbalance>, 'contrast': <function \_check_contrast>, 'curves': <function \_check_curves>, 'gate_weave': <function \_check_gate_weave>, 'grain': <function \_check_grain>, 'halation': <function \_check_halation>, 'vignette': <function \_check_vignette>}*
-
-What an effect’s parameters must satisfy, keyed by EFFECT — never by
-implementation. A check that lives inside one compiler is a check the
-licence tier can switch off: `contrast` with `amount=-1` was refused on the
-LGPL path and emitted `eq=contrast=-1.0` on the GPL one, so the same Look was
-valid or invalid depending on how the binary was built. Rule 29b says the
-tier must not decide what the viewer sees; it must not decide whether the
-document is accepted either.
 
 ### *exception* looks.compile.PlanRefused
 
@@ -913,12 +898,19 @@ refresh.
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
-### looks.compile.check_effect_params(effect)
+### looks.compile.check_effect_params(effect, registry=EffectRegistry(name='looks', effects=20, implementations=23))
 
 Refuse parameters no implementation of this effect could honour.
 
 Called before an implementation is chosen, so every implementation of an
-effect accepts exactly the same documents.
+effect accepts exactly the same documents. The schema is
+the registry’s own declaration (`EffectRegistry.declare_params()`; the
+built-ins are [`looks.params.EFFECT_PARAMS`](_autosummary/looks.params.html.md#looks.params.EFFECT_PARAMS)), keyed by EFFECT, never by
+implementation: a check that lives inside one compiler is a check the
+licence tier can switch off (`contrast` with `amount=-1` was refused on the
+LGPL path and emitted `eq=contrast=-1.0` on the GPL one). Rule 29b says the
+tier must not decide what the viewer sees; it must not decide whether the
+document is accepted either.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -952,6 +944,10 @@ Compile a Look into a plan. No process is started and no file is written.
     against.
   * **registry** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`EffectRegistry`](_autosummary/looks.registry.html.md#looks.registry.EffectRegistry)]) – Which implementations exist. Defaults to
     [`looks.registry.REGISTRY`](_autosummary/looks.registry.html.md#looks.registry.REGISTRY).
+* **Warns:**
+  **looks.stages.StageOrderWarning** – If the Look departs from the canonical
+  stage order. It is never reordered, and never a refusal unless the
+  caller escalates the warning.
 * **Return type:**
   [`LookPlan`](_autosummary/looks.spec.html.md#looks.spec.LookPlan)
 * **Returns:**
@@ -1636,68 +1632,23 @@ keeps the package honest would have nothing left to protect.
 | [`OPTION_LEVEL_SPECIALS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.OPTION_LEVEL_SPECIALS)   | Characters the **option** parser gives meaning to, within one filter's arguments.                                                                                   |
 |--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [`GRAPH_LEVEL_SPECIALS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.GRAPH_LEVEL_SPECIALS)    | Characters the **filtergraph** parser gives meaning to across the graph: `,` chains, `;` separates, `[]` delimit pad labels, `\\` and `'` do that parser's quoting. |
-| [`DFLT_VIGNETTE_ANGLE`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.DFLT_VIGNETTE_ANGLE)     | Vignette half-angle, radians.                                                                                                                                       |
-| [`MAX_VIGNETTE_ANGLE`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.MAX_VIGNETTE_ANGLE)      | `vignette` clips its angle to [0, PI/2] instead of refusing, so a larger one would compile to a picture nobody asked for.                                           |
-| [`MAX_HALATION_SIGMA`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.MAX_HALATION_SIGMA)      | `gblur` refuses a larger sigma ("Result too large"; 9.0 and 6.1).                                                                                                   |
-| [`DFLT_HALATION_TINT`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.DFLT_HALATION_TINT)      | film halation is the red layer scattering back off the base.                                                                                                        |
-| [`MAX_GRAIN_STRENGTH`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.MAX_GRAIN_STRENGTH)      | `noise`'s `alls` range is 0..100.                                                                                                                                   |
-| [`DFLT_GRAIN_SEED`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.DFLT_GRAIN_SEED)         | Pinned rather than ffmpeg's own default, for portability across builds.                                                                                             |
-| [`MAX_GRAIN_SEED`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.MAX_GRAIN_SEED)          | `noise`'s `all_seed` tops out at INT_MAX; its `-1` (a random seed) is below the range on purpose, since a seed is what makes grain reproducible.                    |
 | [`SETSAR_MAX`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.SETSAR_MAX)              | `setsar`'s largest allowed rational term.                                                                                                                           |
-| [`DFLT_WEAVE_AMPLITUDE`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.DFLT_WEAVE_AMPLITUDE)    | Gate-weave wander, in pixels either side of centre.                                                                                                                 |
-| [`DFLT_WEAVE_FREQUENCY`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.DFLT_WEAVE_FREQUENCY)    | Horizontal and vertical wander, Hz.                                                                                                                                 |
 | [`LABEL_NAMESPACE`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.LABEL_NAMESPACE)         | Prefix of the pad labels a branching effect uses internally, so they stay clear of a host's own (`[a]`, `[bg]`: note 05, label rule 2).                             |
-| [`CURVES_CHANNELS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.CURVES_CHANNELS)         | `looks` channel names to ffmpeg `curves` option names.                                                                                                              |
-| [`COLORBALANCE_ZONES`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.COLORBALANCE_ZONES)      | `colorbalance` tonal zones, keyed to the letter its options end in.                                                                                                 |
 
 ### Functions
 
-| [`as_emitted`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.as_emitted)(value)              | A number as the compilers write it into a filter string, read back.   |
-|---------------------------------------------------------------------------------|-----------------------------------------------------------------------|
-| [`escape_filter_value`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.escape_filter_value)(value)     | Escape a value for use as a filter option inside a filtergraph.       |
-| [`filter_string`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.filter_string)(name[, options]) | One filter, with its options escaped.                                 |
-| [`gated`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.gated)(fragment, at)            | Restrict a fragment to a span, using ffmpeg's own timeline support.   |
-| [`register_defaults`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.register_defaults)([registry])  | Register the built-in ffmpeg effects.                                 |
-| [`split_filters`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.split_filters)(fragment)        | A chain into its filters, splitting on UNESCAPED commas only.         |
-| [`vf`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.vf)(plan, \*[, gate])           | A whole plan as one `-vf` fragment: input-index-free, splice-ready.   |
+| [`escape_filter_value`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.escape_filter_value)(value)     | Escape a value for use as a filter option inside a filtergraph.     |
+|---------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| [`filter_string`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.filter_string)(name[, options]) | One filter, with its options escaped.                               |
+| [`gated`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.gated)(fragment, at)            | Restrict a fragment to a span, using ffmpeg's own timeline support. |
+| [`register_defaults`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.register_defaults)([registry])  | Register the built-in ffmpeg effects.                               |
+| [`split_filters`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.split_filters)(fragment)        | A chain into its filters, splitting on UNESCAPED commas only.       |
+| [`vf`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.vf)(plan, \*[, gate])           | A whole plan as one `-vf` fragment: input-index-free, splice-ready. |
 
 ### Exceptions
 
 | [`FfmpegBackendError`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.FfmpegBackendError)   | A step that cannot be expressed as a filter fragment.   |
 |-----------------------------------------------------------------------|---------------------------------------------------------|
-
-### looks.ffmpeg.COLORBALANCE_ZONES *= {'highlights': 'h', 'midtones': 'm', 'shadows': 's'}*
-
-`colorbalance` tonal zones, keyed to the letter its options end in.
-
-### looks.ffmpeg.CURVES_CHANNELS *= ('all', 'red', 'green', 'blue')*
-
-`looks` channel names to ffmpeg `curves` option names.
-
-### looks.ffmpeg.DFLT_GRAIN_SEED *= 0*
-
-Pinned rather than ffmpeg’s own default, for portability across builds.
-Note `0` is a different picture from an unseeded `noise`.
-
-### looks.ffmpeg.DFLT_HALATION_TINT *= (1.0, 0.35, 0.2)*
-
-film halation is the red layer scattering back off the base.
-
-* **Type:**
-  Red-orange
-
-### looks.ffmpeg.DFLT_VIGNETTE_ANGLE *= 0.6283185307179586*
-
-Vignette half-angle, radians.
-
-### looks.ffmpeg.DFLT_WEAVE_AMPLITUDE *= 2*
-
-Gate-weave wander, in pixels either side of centre.
-
-### looks.ffmpeg.DFLT_WEAVE_FREQUENCY *= (3.44, 2.33)*
-
-Horizontal and vertical wander, Hz. Incommensurate so the path never loops
-visibly: the production’s `n*0.9` and `n*0.61` rad/frame, at 24 fps.
 
 ### *exception* looks.ffmpeg.FfmpegBackendError
 
@@ -1716,24 +1667,6 @@ do that parser’s quoting.
 Prefix of the pad labels a branching effect uses internally, so they stay
 clear of a host’s own (`[a]`, `[bg]`: note 05, label rule 2).
 
-### looks.ffmpeg.MAX_GRAIN_SEED *= 2147483647*
-
-`noise`’s `all_seed` tops out at INT_MAX; its `-1` (a random seed) is
-below the range on purpose, since a seed is what makes grain reproducible.
-
-### looks.ffmpeg.MAX_GRAIN_STRENGTH *= 100*
-
-`noise`’s `alls` range is 0..100.
-
-### looks.ffmpeg.MAX_HALATION_SIGMA *= 1024*
-
-`gblur` refuses a larger sigma (“Result too large”; 9.0 and 6.1).
-
-### looks.ffmpeg.MAX_VIGNETTE_ANGLE *= 1.5707963267948966*
-
-`vignette` clips its angle to [0, PI/2] instead of refusing, so a larger
-one would compile to a picture nobody asked for.
-
 ### looks.ffmpeg.OPTION_LEVEL_SPECIALS *= ('\\\\', "'", ':')*
 
 Characters the **option** parser gives meaning to, within one filter’s
@@ -1744,24 +1677,6 @@ characters must not themselves be escaped by the `\\` pass.
 
 `setsar`’s largest allowed rational term. Its default of 100 rewrites any
 SAR with a bigger term (118/81 -> 67/46, 1001/1000 -> 1/1).
-
-### looks.ffmpeg.as_emitted(value)
-
-A number as the compilers write it into a filter string, read back.
-
-A parameter check compares this, not the value asked for: six decimals are
-kept, so two curve x-points `1e-7` apart are written as one point, which
-`curves` refuses, and a vignette `angle` of `1e-9` is written `0`.
-
-```pycon
->>> as_emitted(1e-9)
-0.0
->>> as_emitted(0.1234567)
-0.123457
-```
-
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ### looks.ffmpeg.escape_filter_value(value)
 
@@ -2829,6 +2744,7 @@ Two names are deliberately absent, and a test asserts it: there is no
 | [`RegistryError`](_autosummary/looks.html.md#looks.RegistryError)          | A registration that would make a later refusal point at the wrong thing.                                   |
 | [`ImplConflict`](_autosummary/looks.html.md#looks.ImplConflict)           | That key is taken.                                                                                         |
 | [`UnknownImpl`](_autosummary/looks.html.md#looks.UnknownImpl)            | A plan names an implementation this process does not have.                                                 |
+| [`StageOrderWarning`](_autosummary/looks.html.md#looks.StageOrderWarning)      | A Look puts an effect in a stage the catalogue measured as wrong.                                          |
 | [`CompileError`](_autosummary/looks.html.md#looks.CompileError)           | A Look that cannot be compiled against this clip and this binary.                                          |
 | [`PlanRefused`](_autosummary/looks.html.md#looks.PlanRefused)            | A stored plan that may not be run as it stands.                                                            |
 | [`TransitionError`](_autosummary/looks.html.md#looks.TransitionError)        | A transition that cannot be honoured as asked.                                                             |
@@ -3434,9 +3350,19 @@ available is not the same as asking for something:
 ()
 ```
 
+#### check_params(effect, params)
+
+Refuse parameters this registry’s schema for `effect` rejects.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### compiler(key)
 
 The code behind a key — how a stored plan becomes runnable work.
+
+Defaults are filled in before the code runs, so the params a plan
+stores (as asked, defaults absent) are all it needs.
 
 * **Return type:**
   [`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)[[`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis), [`Mapping`](https://docs.python.org/3/library/typing.html#typing.Mapping)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
@@ -3448,12 +3374,33 @@ The cost estimator, or `None` when none was declared.
 * **Return type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)[[`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis), [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]]]
 
+#### declare_params(effect, schema)
+
+Declare an effect’s parameters, once: see [`looks.params`](_autosummary/looks.params.html.md#module-looks.params).
+
+The schema belongs to the registry, not to the package, so a registry
+with its own implementation of an effect (a different `flatten`, say)
+declares that implementation’s keys and is not bound to ours. An effect
+with no declaration is not checked.
+
+* **Raises:**
+  [**RegistryError**](_autosummary/looks.html.md#looks.RegistryError) – If the effect already has a different schema.
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### effects()
 
 Every effect with at least one implementation, sorted.
 
 * **Return type:**
   [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
+
+#### has_params(effect)
+
+Has this registry declared a schema for `effect`?
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 #### impl(key)
 
@@ -3495,6 +3442,13 @@ Record an implementation. Returns it, so this reads well inline.
         or an ffmpeg implementation names a filter that does not exist.
 * **Return type:**
   [`ImplRef`](_autosummary/looks.spec.html.md#looks.spec.ImplRef)
+
+#### with_defaults(effect, params)
+
+`params` with this registry’s declared defaults filled in.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### *exception* looks.FfmpegBackendError
 
@@ -4437,6 +4391,12 @@ Clips the trim left outside the window. Empty under `full_range`.
 Named rather than counted, because *which* clip could not be fixed is
 the interesting half of the answer.
 
+### *exception* looks.StageOrderWarning
+
+Bases: [`UserWarning`](https://docs.python.org/3/builtins/exceptions.html#UserWarning)
+
+A Look puts an effect in a stage the catalogue measured as wrong.
+
 ### *class* looks.Step(, effect, impl, tier, params=FrozenMap(), at=None, payload=FrozenMap(), cpu_seconds=None, metadata=FrozenMap())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
@@ -5150,6 +5110,10 @@ Compile a Look into a plan. No process is started and no file is written.
     against.
   * **registry** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`EffectRegistry`](_autosummary/looks.registry.html.md#looks.registry.EffectRegistry)]) – Which implementations exist. Defaults to
     [`looks.registry.REGISTRY`](_autosummary/looks.registry.html.md#looks.registry.REGISTRY).
+* **Warns:**
+  **looks.stages.StageOrderWarning** – If the Look departs from the canonical
+  stage order. It is never reordered, and never a refusal unless the
+  caller escalates the warning.
 * **Return type:**
   [`LookPlan`](_autosummary/looks.spec.html.md#looks.spec.LookPlan)
 * **Returns:**
@@ -6613,9 +6577,11 @@ A path whose window size varies, compiled to `zoompan`.
 | [`licence`](_autosummary/looks.licence.html.md#module-looks.licence)                   | What an implementation costs you in obligations, and when to refuse it.               |
 | [`lut`](_autosummary/looks.lut.html.md#module-looks.lut)                           | Gradient-map 3D LUTs: a colour ramp in, an Iridas `.cube` out.                        |
 | [`motion`](_autosummary/looks.motion.html.md#module-looks.motion)                     | A camera path, compiled to an ffmpeg fragment — the compile half of RULE G.           |
+| [`params`](_autosummary/looks.params.html.md#module-looks.params)                     | One parameter schema per effect: names, types, defaults and bounds, once.             |
 | [`pipe`](_autosummary/looks.pipe.html.md#module-looks.pipe)                         | A plan that mixes backends, as a pipe — emitted as data, never spawned.               |
 | [`registry`](_autosummary/looks.registry.html.md#module-looks.registry)                 | Which implementations exist, and how to reach the code behind a plan.                 |
 | [`spec`](_autosummary/looks.spec.html.md#module-looks.spec)                         | What a stylization *is*, before anything runs.                                        |
+| [`stages`](_autosummary/looks.stages.html.md#module-looks.stages)                     | The canonical stage order, and a check that warns when a Look departs from it.        |
 | [`transition`](_autosummary/looks.transition.html.md#module-looks.transition)             | How one shot gives way to the next — the vocabulary, not the graph.                   |
 
 
@@ -8645,6 +8611,283 @@ False
   [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 
+# _autosummary/looks.params.html.md
+
+# looks.params
+
+One parameter schema per effect: names, types, defaults and bounds, once.
+
+An effect’s parameters used to live in three places that could drift: the
+compiler lambdas (a default read with `params.get(name, DFLT)`), the
+effect-level checks in `looks.compile` (ranges), and the research catalogue.
+Unknown keys were ignored, so `colorbalance` with `shadow=` (singular)
+compiled to an identity grade without a word.
+
+[`EFFECT_PARAMS`](_autosummary/looks.params.html.md#looks.params.EFFECT_PARAMS) is the single declaration. It is read by
+[`check_params()`](_autosummary/looks.params.html.md#looks.params.check_params) (`looks.compile` calls it before an implementation is
+chosen, so every implementation of an effect accepts the same documents) and by
+[`with_defaults()`](_autosummary/looks.params.html.md#looks.params.with_defaults) (`looks.compile` fills defaults before a compiler or
+cost estimator runs, so the compilers read `p["sigma"]`, never a second copy
+of the default). Keyed by EFFECT, never by implementation: two implementations
+of one effect must not disagree on what an omitted parameter means (rule 29b),
+and a check inside one compiler is a check the licence tier can switch off.
+
+An effect with no entry here is unchecked: a caller’s own registered effects
+are theirs to validate. A parameter declared without a default stays absent
+when omitted, and the compiler decides (usually by refusing).
+
+The checks refuse what ffmpeg would silently change or what is not a number:
+`True` and `"0.5"` are not floats, `inf` and `nan` are not finite,
+`7.9` is not a whole number (it would be emitted as `7`).
+
+### Examples
+
+```pycon
+>>> check_params("grain", {"strength": 7})
+>>> check_params("grain", {"strenght": 7})
+Traceback (most recent call last):
+...
+looks.params.ParamError: grain: unknown parameter 'strenght'; it takes ['seed', 'strength']
+>>> with_defaults("grain", {"seed": 3})["strength"]
+8
+```
+
+### Module Attributes
+
+| [`NO_DEFAULT`](_autosummary/looks.params.html.md#looks.params.NO_DEFAULT)           | A parameter with no default is left absent when omitted.                                                                                         |
+|-----------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`DFLT_VIGNETTE_ANGLE`](_autosummary/looks.params.html.md#looks.params.DFLT_VIGNETTE_ANGLE)  | Vignette half-angle, radians.                                                                                                                    |
+| [`MAX_VIGNETTE_ANGLE`](_autosummary/looks.params.html.md#looks.params.MAX_VIGNETTE_ANGLE)   | `vignette` clips its angle to [0, PI/2] instead of refusing, so a larger one would compile to a picture nobody asked for.                        |
+| [`MAX_BLUR_SIGMA`](_autosummary/looks.params.html.md#looks.params.MAX_BLUR_SIGMA)       | `gblur` refuses a larger sigma ("Result too large"; 9.0 and 6.1).                                                                                |
+| [`DFLT_HALATION_TINT`](_autosummary/looks.params.html.md#looks.params.DFLT_HALATION_TINT)   | film halation is the red layer scattering back off the base.                                                                                     |
+| [`MAX_GRAIN_STRENGTH`](_autosummary/looks.params.html.md#looks.params.MAX_GRAIN_STRENGTH)   | `noise`'s `alls` range is 0..100.                                                                                                                |
+| [`DFLT_GRAIN_SEED`](_autosummary/looks.params.html.md#looks.params.DFLT_GRAIN_SEED)      | Pinned rather than ffmpeg's own default, for portability across builds.                                                                          |
+| [`MAX_GRAIN_SEED`](_autosummary/looks.params.html.md#looks.params.MAX_GRAIN_SEED)       | `noise`'s `all_seed` tops out at INT_MAX; its `-1` (a random seed) is below the range on purpose, since a seed is what makes grain reproducible. |
+| [`DFLT_WEAVE_AMPLITUDE`](_autosummary/looks.params.html.md#looks.params.DFLT_WEAVE_AMPLITUDE) | Gate-weave wander, in pixels either side of centre.                                                                                              |
+| [`DFLT_WEAVE_FREQUENCY`](_autosummary/looks.params.html.md#looks.params.DFLT_WEAVE_FREQUENCY) | Horizontal and vertical wander, Hz.                                                                                                              |
+| [`DFLT_INTERP`](_autosummary/looks.params.html.md#looks.params.DFLT_INTERP)          | `lut3d`'s interpolation.                                                                                                                         |
+| [`MAX_CUBE_SIZE`](_autosummary/looks.params.html.md#looks.params.MAX_CUBE_SIZE)        | The largest `.cube` grid worth asking for (size\*\*3 entries; ffmpeg's own limit is 256).                                                        |
+| [`INTERP_MODES`](_autosummary/looks.params.html.md#looks.params.INTERP_MODES)         | `lut3d`'s `interp` values.                                                                                                                       |
+| [`MAX_POSTERIZE_LEVELS`](_autosummary/looks.params.html.md#looks.params.MAX_POSTERIZE_LEVELS) | One code value per level on an 8-bit channel; more levels than that is the identity, and an absurd count only makes a huge expression.           |
+| [`MAX_FLATTEN_SPATIAL`](_autosummary/looks.params.html.md#looks.params.MAX_FLATTEN_SPATIAL)  | sigmaS 0..512, sigmaR 0..1, planes a 4-bit mask.                                                                                                 |
+| [`CURVES_CHANNELS`](_autosummary/looks.params.html.md#looks.params.CURVES_CHANNELS)      | `looks` channel names to ffmpeg `curves` option names.                                                                                           |
+| [`COLORBALANCE_ZONES`](_autosummary/looks.params.html.md#looks.params.COLORBALANCE_ZONES)   | `colorbalance` tonal zones, keyed to the letter its options end in.                                                                              |
+| [`EFFECT_PARAMS`](_autosummary/looks.params.html.md#looks.params.EFFECT_PARAMS)        | Effect -> its parameters.                                                                                                                        |
+| [`PARAM_HINTS`](_autosummary/looks.params.html.md#looks.params.PARAM_HINTS)          | A refused key that deserves more than "unknown parameter".                                                                                       |
+
+### Functions
+
+| [`anything`](_autosummary/looks.params.html.md#looks.params.anything)(name[, default])                       | A key the effect takes whose shape its compiler owns (a path, a size, a ramp).   |
+|--------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| [`as_emitted`](_autosummary/looks.params.html.md#looks.params.as_emitted)(value)                               | A number as the compilers write it into a filter string, read back.              |
+| [`check_params`](_autosummary/looks.params.html.md#looks.params.check_params)(effect, params, \*[, schemas])     | Refuse an unknown key or a value the effect could not honour.                    |
+| [`choice`](_autosummary/looks.params.html.md#looks.params.choice)(name, options[, default])                | One of a closed set of strings (an ffmpeg option's enum).                        |
+| [`curve`](_autosummary/looks.params.html.md#looks.params.curve)(name)                                     | At least two `(x, y)` points in 0..1 with x strictly increasing.                 |
+| [`flag`](_autosummary/looks.params.html.md#looks.params.flag)(name[, default])                           | A bool, not truthiness: `"false"` would otherwise be true.                       |
+| [`real`](_autosummary/looks.params.html.md#looks.params.real)(name[, default, low, high, low_open, ...]) | A finite number, optionally bounded.                                             |
+| `text`(name[, default])                                                                          |                                                                                  |
+| [`vector`](_autosummary/looks.params.html.md#looks.params.vector)(name, length[, default, low, high])      | `length` finite numbers, each optionally bounded.                                |
+| [`whole`](_autosummary/looks.params.html.md#looks.params.whole)(name[, default, low, high])               | A whole number (`8.0` is fine, `7.9` and `True` are not).                        |
+| [`with_defaults`](_autosummary/looks.params.html.md#looks.params.with_defaults)(effect, params, \*[, schemas])    | The parameters with every declared default filled in; the input is untouched.    |
+
+### Classes
+
+| [`Param`](_autosummary/looks.params.html.md#looks.params.Param)(name, accepts, expects[, default, ...])   | One named parameter: how to recognise a valid value, and what omitted means.   |
+|--------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+
+### Exceptions
+
+| [`ParamError`](_autosummary/looks.params.html.md#looks.params.ParamError)   | Parameters no implementation of an effect could honour.   |
+|---------------------------------------------------------------|-----------------------------------------------------------|
+
+### looks.params.COLORBALANCE_ZONES *= {'highlights': 'h', 'midtones': 'm', 'shadows': 's'}*
+
+`colorbalance` tonal zones, keyed to the letter its options end in.
+
+### looks.params.CURVES_CHANNELS *= ('all', 'red', 'green', 'blue')*
+
+`looks` channel names to ffmpeg `curves` option names.
+
+### looks.params.DFLT_GRAIN_SEED *= 0*
+
+Pinned rather than ffmpeg’s own default, for portability across builds.
+Note `0` is a different picture from an unseeded `noise`.
+
+### looks.params.DFLT_HALATION_TINT *= (1.0, 0.35, 0.2)*
+
+film halation is the red layer scattering back off the base.
+
+* **Type:**
+  Red-orange
+
+### looks.params.DFLT_INTERP *= 'tetrahedral'*
+
+`lut3d`’s interpolation. `posterize` after it needs `nearest`; that is
+the caller’s choice, so the default is the filter’s own.
+
+### looks.params.DFLT_VIGNETTE_ANGLE *= 0.6283185307179586*
+
+Vignette half-angle, radians.
+
+### looks.params.DFLT_WEAVE_AMPLITUDE *= 2*
+
+Gate-weave wander, in pixels either side of centre.
+
+### looks.params.DFLT_WEAVE_FREQUENCY *= (3.44, 2.33)*
+
+Horizontal and vertical wander, Hz. Incommensurate so the path never loops
+visibly: the production’s `n*0.9` and `n*0.61` rad/frame, at 24 fps.
+
+### looks.params.EFFECT_PARAMS *: [Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Param](_autosummary/looks.params.html.md#looks.params.Param)]]* *= {'blur': {'sigma': Param(name='sigma', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [0, 1024]', default=2, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'colorbalance': {'highlights': Param(name='highlights', accepts=<function vector.<locals>.<lambda>>, expects='must be 3 numbers, each in [-1, 1]', default=(0, 0, 0), kind='vector', is_type=<function vector.<locals>.<lambda>>, type_expects='3 finite numbers'), 'midtones': Param(name='midtones', accepts=<function vector.<locals>.<lambda>>, expects='must be 3 numbers, each in [-1, 1]', default=(0, 0, 0), kind='vector', is_type=<function vector.<locals>.<lambda>>, type_expects='3 finite numbers'), 'preserve_lightness': Param(name='preserve_lightness', accepts=<function flag.<locals>.<lambda>>, expects='must be True or False', default=False, kind='flag', is_type=<function Param.<lambda>>, type_expects=''), 'shadows': Param(name='shadows', accepts=<function vector.<locals>.<lambda>>, expects='must be 3 numbers, each in [-1, 1]', default=(0, 0, 0), kind='vector', is_type=<function vector.<locals>.<lambda>>, type_expects='3 finite numbers')}, 'contrast': {'amount': Param(name='amount', accepts=<function real.<locals>.<lambda>>, expects='must not be negative', default=1.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'curves': {'all': Param(name='all', accepts=<function curve.<locals>.accepts>, expects='must be at least two (x, y) points in 0..1 with x strictly increasing at six decimals', default=<object object>, kind='curve', is_type=<function Param.<lambda>>, type_expects=''), 'blue': Param(name='blue', accepts=<function curve.<locals>.accepts>, expects='must be at least two (x, y) points in 0..1 with x strictly increasing at six decimals', default=<object object>, kind='curve', is_type=<function Param.<lambda>>, type_expects=''), 'green': Param(name='green', accepts=<function curve.<locals>.accepts>, expects='must be at least two (x, y) points in 0..1 with x strictly increasing at six decimals', default=<object object>, kind='curve', is_type=<function Param.<lambda>>, type_expects=''), 'red': Param(name='red', accepts=<function curve.<locals>.accepts>, expects='must be at least two (x, y) points in 0..1 with x strictly increasing at six decimals', default=<object object>, kind='curve', is_type=<function Param.<lambda>>, type_expects='')}, 'fill': {'target': Param(name='target', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects='')}, 'fit': {'target': Param(name='target', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects='')}, 'flatten': {'planes': Param(name='planes', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [0, 15]', default=7, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number'), 'range': Param(name='range', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [0, 1]', default=0.05, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'spatial': Param(name='spatial', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [0, 512]', default=60, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'gamma': {'gamma': Param(name='gamma', accepts=<function real.<locals>.<lambda>>, expects='must be a number in (0, inf]', default=1.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'gate_weave': {'amplitude': Param(name='amplitude', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [0, inf]', default=2, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number'), 'frequency': Param(name='frequency', accepts=<function vector.<locals>.<lambda>>, expects='must be 2 numbers, each in [0, inf]', default=(3.44, 2.33), kind='vector', is_type=<function vector.<locals>.<lambda>>, type_expects='2 finite numbers')}, 'gradient_map': {'contrast': Param(name='contrast', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-inf, inf]', default=1.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'interp': Param(name='interp', accepts=<function choice.<locals>.<lambda>>, expects="must be one of ['nearest', 'trilinear', 'tetrahedral', 'pyramid', 'prism']", default='tetrahedral', kind='choice', is_type=<function Param.<lambda>>, type_expects=''), 'lift': Param(name='lift', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-inf, inf]', default=0.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'size': Param(name='size', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [2, 129]', default=33, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number'), 'stops': Param(name='stops', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects=''), 'title': Param(name='title', accepts=<function text.<locals>.<lambda>>, expects='must be a string', default='looks_gradient_map', kind='text', is_type=<function Param.<lambda>>, type_expects='')}, 'grain': {'seed': Param(name='seed', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [0, 2147483647]', default=0, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number'), 'strength': Param(name='strength', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [0, 100]', default=8, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number')}, 'halation': {'amount': Param(name='amount', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [0, 1]', default=0.5, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'sigma': Param(name='sigma', accepts=<function real.<locals>.<lambda>>, expects='must be a number in (0, 1024], as written to six decimals', default=24.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'threshold': Param(name='threshold', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [0, 1]', default=0.78, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'tint': Param(name='tint', accepts=<function vector.<locals>.<lambda>>, expects='must be 3 numbers, each in [0, inf]', default=(1.0, 0.35, 0.2), kind='vector', is_type=<function vector.<locals>.<lambda>>, type_expects='3 finite numbers')}, 'levels': {'black': Param(name='black', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-1, 1]', default=0, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'white': Param(name='white', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-1, 1]', default=1, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'lut3d': {'cube': Param(name='cube', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects=''), 'interp': Param(name='interp', accepts=<function choice.<locals>.<lambda>>, expects="must be one of ['nearest', 'trilinear', 'tetrahedral', 'pyramid', 'prism']", default='tetrahedral', kind='choice', is_type=<function Param.<lambda>>, type_expects='')}, 'motion': {'fps': Param(name='fps', accepts=<function real.<locals>.<lambda>>, expects='must be a number in (0, inf]', default=<object object>, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'keyframes': Param(name='keyframes', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects=''), 'output': Param(name='output', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects='')}, 'posterize': {'levels': Param(name='levels', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [2, 256]', default=8, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number')}, 'saturation': {'amount': Param(name='amount', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-inf, inf]', default=1.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'sharpen': {'amount': Param(name='amount', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-2, 5]', default=1.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'stretch': {'target': Param(name='target', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects='')}, 'vignette': {'angle': Param(name='angle', accepts=<function real.<locals>.<lambda>>, expects='must be a number in (0, 1.5707963267948966], as written to six decimals', default=0.6283185307179586, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}}*
+
+Effect -> its parameters. Geometry’s `target`, `gradient_map`’s `size`
+and `title`, and `motion`’s keyframes have their defaults (or refusals)
+where the value is built: `looks.geometry`, `looks.lut`, `looks.motion`.
+
+### looks.params.INTERP_MODES *= ('nearest', 'trilinear', 'tetrahedral', 'pyramid', 'prism')*
+
+`lut3d`’s `interp` values.
+
+### looks.params.MAX_BLUR_SIGMA *= 1024*
+
+`gblur` refuses a larger sigma (“Result too large”; 9.0 and 6.1).
+
+### looks.params.MAX_CUBE_SIZE *= 129*
+
+The largest `.cube` grid worth asking for (size\*\*3 entries; ffmpeg’s own
+limit is 256). The default and the title belong to `looks.lut`.
+
+### looks.params.MAX_FLATTEN_SPATIAL *= 512*
+
+sigmaS 0..512, sigmaR 0..1, planes a 4-bit mask.
+
+* **Type:**
+  `bilateral`’s ranges
+
+### looks.params.MAX_GRAIN_SEED *= 2147483647*
+
+`noise`’s `all_seed` tops out at INT_MAX; its `-1` (a random seed) is
+below the range on purpose, since a seed is what makes grain reproducible.
+
+### looks.params.MAX_GRAIN_STRENGTH *= 100*
+
+`noise`’s `alls` range is 0..100.
+
+### looks.params.MAX_POSTERIZE_LEVELS *= 256*
+
+One code value per level on an 8-bit channel; more levels than that is the
+identity, and an absurd count only makes a huge expression.
+
+### looks.params.MAX_VIGNETTE_ANGLE *= 1.5707963267948966*
+
+`vignette` clips its angle to [0, PI/2] instead of refusing, so a larger
+one would compile to a picture nobody asked for.
+
+### looks.params.NO_DEFAULT *= <object object>*
+
+A parameter with no default is left absent when omitted.
+
+### looks.params.PARAM_HINTS *: [Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping)[[tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [str](https://docs.python.org/3/builtins/stdtypes.html#str)], [str](https://docs.python.org/3/builtins/stdtypes.html#str)]* *= {('grain', 'temporal'): "there is no 'temporal' switch: grain is always re-drawn per frame, because static noise reads as dirt on the lens, not as grain"}*
+
+A refused key that deserves more than “unknown parameter”.
+
+### *class* looks.params.Param(name, accepts, expects, default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects='')
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One named parameter: how to recognise a valid value, and what omitted means.
+
+`accepts` is the strategy; the constructors below ([`real()`](_autosummary/looks.params.html.md#looks.params.real),
+[`whole()`](_autosummary/looks.params.html.md#looks.params.whole), [`flag()`](_autosummary/looks.params.html.md#looks.params.flag), `text()`, [`vector()`](_autosummary/looks.params.html.md#looks.params.vector), [`curve()`](_autosummary/looks.params.html.md#looks.params.curve),
+[`anything()`](_autosummary/looks.params.html.md#looks.params.anything)) cover every kind the registered effects need.
+
+#### is_type()
+
+Is the value of the right TYPE, bounds aside? A wrong type is reported
+as one, never as a bound it did not fail.
+
+#### kind *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)* *= 'any'*
+
+What sort of value this is, so a caller (or a test) can select
+parameters by it rather than by parsing `expects`.
+
+### *exception* looks.params.ParamError
+
+Bases: [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
+
+Parameters no implementation of an effect could honour.
+
+### looks.params.anything(name, default=<object object>)
+
+A key the effect takes whose shape its compiler owns (a path, a size, a ramp).
+
+### looks.params.as_emitted(value)
+
+A number as the compilers write it into a filter string, read back.
+
+A parameter check compares this, not the value asked for: six decimals are
+kept, so two curve x-points `1e-7` apart are written as one point, which
+`curves` refuses, and a vignette `angle` of `1e-9` is written `0`.
+
+```pycon
+>>> as_emitted(1e-9)
+0.0
+>>> as_emitted(0.1234567)
+0.123457
+```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+### looks.params.check_params(effect, params, \*, schemas={'blur': {'sigma': Param(name='sigma', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [0, 1024]', default=2, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'colorbalance': {'highlights': Param(name='highlights', accepts=<function vector.<locals>.<lambda>>, expects='must be 3 numbers, each in [-1, 1]', default=(0, 0, 0), kind='vector', is_type=<function vector.<locals>.<lambda>>, type_expects='3 finite numbers'), 'midtones': Param(name='midtones', accepts=<function vector.<locals>.<lambda>>, expects='must be 3 numbers, each in [-1, 1]', default=(0, 0, 0), kind='vector', is_type=<function vector.<locals>.<lambda>>, type_expects='3 finite numbers'), 'preserve_lightness': Param(name='preserve_lightness', accepts=<function flag.<locals>.<lambda>>, expects='must be True or False', default=False, kind='flag', is_type=<function Param.<lambda>>, type_expects=''), 'shadows': Param(name='shadows', accepts=<function vector.<locals>.<lambda>>, expects='must be 3 numbers, each in [-1, 1]', default=(0, 0, 0), kind='vector', is_type=<function vector.<locals>.<lambda>>, type_expects='3 finite numbers')}, 'contrast': {'amount': Param(name='amount', accepts=<function real.<locals>.<lambda>>, expects='must not be negative', default=1.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'curves': {'all': Param(name='all', accepts=<function curve.<locals>.accepts>, expects='must be at least two (x, y) points in 0..1 with x strictly increasing at six decimals', default=<object object>, kind='curve', is_type=<function Param.<lambda>>, type_expects=''), 'blue': Param(name='blue', accepts=<function curve.<locals>.accepts>, expects='must be at least two (x, y) points in 0..1 with x strictly increasing at six decimals', default=<object object>, kind='curve', is_type=<function Param.<lambda>>, type_expects=''), 'green': Param(name='green', accepts=<function curve.<locals>.accepts>, expects='must be at least two (x, y) points in 0..1 with x strictly increasing at six decimals', default=<object object>, kind='curve', is_type=<function Param.<lambda>>, type_expects=''), 'red': Param(name='red', accepts=<function curve.<locals>.accepts>, expects='must be at least two (x, y) points in 0..1 with x strictly increasing at six decimals', default=<object object>, kind='curve', is_type=<function Param.<lambda>>, type_expects='')}, 'fill': {'target': Param(name='target', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects='')}, 'fit': {'target': Param(name='target', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects='')}, 'flatten': {'planes': Param(name='planes', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [0, 15]', default=7, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number'), 'range': Param(name='range', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [0, 1]', default=0.05, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'spatial': Param(name='spatial', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [0, 512]', default=60, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'gamma': {'gamma': Param(name='gamma', accepts=<function real.<locals>.<lambda>>, expects='must be a number in (0, inf]', default=1.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'gate_weave': {'amplitude': Param(name='amplitude', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [0, inf]', default=2, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number'), 'frequency': Param(name='frequency', accepts=<function vector.<locals>.<lambda>>, expects='must be 2 numbers, each in [0, inf]', default=(3.44, 2.33), kind='vector', is_type=<function vector.<locals>.<lambda>>, type_expects='2 finite numbers')}, 'gradient_map': {'contrast': Param(name='contrast', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-inf, inf]', default=1.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'interp': Param(name='interp', accepts=<function choice.<locals>.<lambda>>, expects="must be one of ['nearest', 'trilinear', 'tetrahedral', 'pyramid', 'prism']", default='tetrahedral', kind='choice', is_type=<function Param.<lambda>>, type_expects=''), 'lift': Param(name='lift', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-inf, inf]', default=0.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'size': Param(name='size', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [2, 129]', default=33, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number'), 'stops': Param(name='stops', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects=''), 'title': Param(name='title', accepts=<function text.<locals>.<lambda>>, expects='must be a string', default='looks_gradient_map', kind='text', is_type=<function Param.<lambda>>, type_expects='')}, 'grain': {'seed': Param(name='seed', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [0, 2147483647]', default=0, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number'), 'strength': Param(name='strength', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [0, 100]', default=8, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number')}, 'halation': {'amount': Param(name='amount', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [0, 1]', default=0.5, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'sigma': Param(name='sigma', accepts=<function real.<locals>.<lambda>>, expects='must be a number in (0, 1024], as written to six decimals', default=24.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'threshold': Param(name='threshold', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [0, 1]', default=0.78, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'tint': Param(name='tint', accepts=<function vector.<locals>.<lambda>>, expects='must be 3 numbers, each in [0, inf]', default=(1.0, 0.35, 0.2), kind='vector', is_type=<function vector.<locals>.<lambda>>, type_expects='3 finite numbers')}, 'levels': {'black': Param(name='black', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-1, 1]', default=0, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'white': Param(name='white', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-1, 1]', default=1, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'lut3d': {'cube': Param(name='cube', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects=''), 'interp': Param(name='interp', accepts=<function choice.<locals>.<lambda>>, expects="must be one of ['nearest', 'trilinear', 'tetrahedral', 'pyramid', 'prism']", default='tetrahedral', kind='choice', is_type=<function Param.<lambda>>, type_expects='')}, 'motion': {'fps': Param(name='fps', accepts=<function real.<locals>.<lambda>>, expects='must be a number in (0, inf]', default=<object object>, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'keyframes': Param(name='keyframes', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects=''), 'output': Param(name='output', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects='')}, 'posterize': {'levels': Param(name='levels', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [2, 256]', default=8, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number')}, 'saturation': {'amount': Param(name='amount', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-inf, inf]', default=1.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'sharpen': {'amount': Param(name='amount', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-2, 5]', default=1.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'stretch': {'target': Param(name='target', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects='')}, 'vignette': {'angle': Param(name='angle', accepts=<function real.<locals>.<lambda>>, expects='must be a number in (0, 1.5707963267948966], as written to six decimals', default=0.6283185307179586, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}})
+
+Refuse an unknown key or a value the effect could not honour.
+
+An effect with no schema is not checked. Only present keys are checked:
+an absent one takes its declared default, so a check never has a second
+copy of it.
+
+* **Raises:**
+  [**ParamError**](_autosummary/looks.params.html.md#looks.params.ParamError) – Naming the effect, the key and what it expects.
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### looks.params.choice(name, options, default=<object object>)
+
+One of a closed set of strings (an ffmpeg option’s enum).
+
+### looks.params.curve(name)
+
+At least two `(x, y)` points in 0..1 with x strictly increasing.
+
+Checked as emitted: x-points closer than the six decimals the compiler
+writes become one point, and `curves` refuses the curve. An empty value
+is accepted, because the compiler skips an empty channel too.
+
+### looks.params.flag(name, default=<object object>)
+
+A bool, not truthiness: `"false"` would otherwise be true.
+
+### looks.params.real(name, default=<object object>, \*, low=None, high=None, low_open=False, emitted=False)
+
+A finite number, optionally bounded. `emitted` bounds it as written.
+
+### looks.params.vector(name, length, default=<object object>, \*, low=None, high=None)
+
+`length` finite numbers, each optionally bounded.
+
+### looks.params.whole(name, default=<object object>, \*, low=None, high=None)
+
+A whole number (`8.0` is fine, `7.9` and `True` are not).
+
+### looks.params.with_defaults(effect, params, \*, schemas={'blur': {'sigma': Param(name='sigma', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [0, 1024]', default=2, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'colorbalance': {'highlights': Param(name='highlights', accepts=<function vector.<locals>.<lambda>>, expects='must be 3 numbers, each in [-1, 1]', default=(0, 0, 0), kind='vector', is_type=<function vector.<locals>.<lambda>>, type_expects='3 finite numbers'), 'midtones': Param(name='midtones', accepts=<function vector.<locals>.<lambda>>, expects='must be 3 numbers, each in [-1, 1]', default=(0, 0, 0), kind='vector', is_type=<function vector.<locals>.<lambda>>, type_expects='3 finite numbers'), 'preserve_lightness': Param(name='preserve_lightness', accepts=<function flag.<locals>.<lambda>>, expects='must be True or False', default=False, kind='flag', is_type=<function Param.<lambda>>, type_expects=''), 'shadows': Param(name='shadows', accepts=<function vector.<locals>.<lambda>>, expects='must be 3 numbers, each in [-1, 1]', default=(0, 0, 0), kind='vector', is_type=<function vector.<locals>.<lambda>>, type_expects='3 finite numbers')}, 'contrast': {'amount': Param(name='amount', accepts=<function real.<locals>.<lambda>>, expects='must not be negative', default=1.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'curves': {'all': Param(name='all', accepts=<function curve.<locals>.accepts>, expects='must be at least two (x, y) points in 0..1 with x strictly increasing at six decimals', default=<object object>, kind='curve', is_type=<function Param.<lambda>>, type_expects=''), 'blue': Param(name='blue', accepts=<function curve.<locals>.accepts>, expects='must be at least two (x, y) points in 0..1 with x strictly increasing at six decimals', default=<object object>, kind='curve', is_type=<function Param.<lambda>>, type_expects=''), 'green': Param(name='green', accepts=<function curve.<locals>.accepts>, expects='must be at least two (x, y) points in 0..1 with x strictly increasing at six decimals', default=<object object>, kind='curve', is_type=<function Param.<lambda>>, type_expects=''), 'red': Param(name='red', accepts=<function curve.<locals>.accepts>, expects='must be at least two (x, y) points in 0..1 with x strictly increasing at six decimals', default=<object object>, kind='curve', is_type=<function Param.<lambda>>, type_expects='')}, 'fill': {'target': Param(name='target', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects='')}, 'fit': {'target': Param(name='target', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects='')}, 'flatten': {'planes': Param(name='planes', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [0, 15]', default=7, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number'), 'range': Param(name='range', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [0, 1]', default=0.05, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'spatial': Param(name='spatial', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [0, 512]', default=60, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'gamma': {'gamma': Param(name='gamma', accepts=<function real.<locals>.<lambda>>, expects='must be a number in (0, inf]', default=1.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'gate_weave': {'amplitude': Param(name='amplitude', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [0, inf]', default=2, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number'), 'frequency': Param(name='frequency', accepts=<function vector.<locals>.<lambda>>, expects='must be 2 numbers, each in [0, inf]', default=(3.44, 2.33), kind='vector', is_type=<function vector.<locals>.<lambda>>, type_expects='2 finite numbers')}, 'gradient_map': {'contrast': Param(name='contrast', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-inf, inf]', default=1.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'interp': Param(name='interp', accepts=<function choice.<locals>.<lambda>>, expects="must be one of ['nearest', 'trilinear', 'tetrahedral', 'pyramid', 'prism']", default='tetrahedral', kind='choice', is_type=<function Param.<lambda>>, type_expects=''), 'lift': Param(name='lift', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-inf, inf]', default=0.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'size': Param(name='size', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [2, 129]', default=33, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number'), 'stops': Param(name='stops', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects=''), 'title': Param(name='title', accepts=<function text.<locals>.<lambda>>, expects='must be a string', default='looks_gradient_map', kind='text', is_type=<function Param.<lambda>>, type_expects='')}, 'grain': {'seed': Param(name='seed', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [0, 2147483647]', default=0, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number'), 'strength': Param(name='strength', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [0, 100]', default=8, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number')}, 'halation': {'amount': Param(name='amount', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [0, 1]', default=0.5, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'sigma': Param(name='sigma', accepts=<function real.<locals>.<lambda>>, expects='must be a number in (0, 1024], as written to six decimals', default=24.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'threshold': Param(name='threshold', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [0, 1]', default=0.78, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'tint': Param(name='tint', accepts=<function vector.<locals>.<lambda>>, expects='must be 3 numbers, each in [0, inf]', default=(1.0, 0.35, 0.2), kind='vector', is_type=<function vector.<locals>.<lambda>>, type_expects='3 finite numbers')}, 'levels': {'black': Param(name='black', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-1, 1]', default=0, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'white': Param(name='white', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-1, 1]', default=1, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'lut3d': {'cube': Param(name='cube', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects=''), 'interp': Param(name='interp', accepts=<function choice.<locals>.<lambda>>, expects="must be one of ['nearest', 'trilinear', 'tetrahedral', 'pyramid', 'prism']", default='tetrahedral', kind='choice', is_type=<function Param.<lambda>>, type_expects='')}, 'motion': {'fps': Param(name='fps', accepts=<function real.<locals>.<lambda>>, expects='must be a number in (0, inf]', default=<object object>, kind='real', is_type=<function \_is_real>, type_expects='a finite number'), 'keyframes': Param(name='keyframes', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects=''), 'output': Param(name='output', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects='')}, 'posterize': {'levels': Param(name='levels', accepts=<function whole.<locals>.<lambda>>, expects='must be a whole number in [2, 256]', default=8, kind='whole', is_type=<function \_is_whole>, type_expects='a whole number')}, 'saturation': {'amount': Param(name='amount', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-inf, inf]', default=1.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'sharpen': {'amount': Param(name='amount', accepts=<function real.<locals>.<lambda>>, expects='must be a number in [-2, 5]', default=1.0, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}, 'stretch': {'target': Param(name='target', accepts=<function anything.<locals>.<lambda>>, expects='', default=<object object>, kind='any', is_type=<function Param.<lambda>>, type_expects='')}, 'vignette': {'angle': Param(name='angle', accepts=<function real.<locals>.<lambda>>, expects='must be a number in (0, 1.5707963267948966], as written to six decimals', default=0.6283185307179586, kind='real', is_type=<function \_is_real>, type_expects='a finite number')}})
+
+The parameters with every declared default filled in; the input is untouched.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
+
 # _autosummary/looks.pipe.html.md
 
 # looks.pipe
@@ -8992,9 +9235,19 @@ available is not the same as asking for something:
 ()
 ```
 
+#### check_params(effect, params)
+
+Refuse parameters this registry’s schema for `effect` rejects.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### compiler(key)
 
 The code behind a key — how a stored plan becomes runnable work.
+
+Defaults are filled in before the code runs, so the params a plan
+stores (as asked, defaults absent) are all it needs.
 
 * **Return type:**
   [`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)[[`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis), [`Mapping`](https://docs.python.org/3/library/typing.html#typing.Mapping)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
@@ -9006,12 +9259,33 @@ The cost estimator, or `None` when none was declared.
 * **Return type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)[[`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis), [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]]]
 
+#### declare_params(effect, schema)
+
+Declare an effect’s parameters, once: see [`looks.params`](_autosummary/looks.params.html.md#module-looks.params).
+
+The schema belongs to the registry, not to the package, so a registry
+with its own implementation of an effect (a different `flatten`, say)
+declares that implementation’s keys and is not bound to ours. An effect
+with no declaration is not checked.
+
+* **Raises:**
+  [**RegistryError**](_autosummary/looks.registry.html.md#looks.registry.RegistryError) – If the effect already has a different schema.
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### effects()
 
 Every effect with at least one implementation, sorted.
 
 * **Return type:**
   [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
+
+#### has_params(effect)
+
+Has this registry declared a schema for `effect`?
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 #### impl(key)
 
@@ -9053,6 +9327,13 @@ Record an implementation. Returns it, so this reads well inline.
         or an ffmpeg implementation names a filter that does not exist.
 * **Return type:**
   [`ImplRef`](_autosummary/looks.spec.html.md#looks.spec.ImplRef)
+
+#### with_defaults(effect, params)
+
+`params` with this registry’s declared defaults filled in.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### *exception* looks.registry.ImplConflict
 
@@ -10077,6 +10358,115 @@ looks.spec.SpecError: no implementation of 'blur' survived...
 ```
 
 
+# _autosummary/looks.stages.html.md
+
+# looks.stages
+
+The canonical stage order, and a check that warns when a Look departs from it.
+
+The effect catalogue (`docs/research/13` §1.3) states an order that is
+load-bearing rather than aesthetic:
+
+```default
+geometry -> grade -> flatten -> look (LUT, posterize) -> optical -> grain
+```
+
+Five measured constraints sit behind it: nothing that resamples after
+`posterize` (downscale-after-posterize left 359 distinct colours where
+downscale-before left 77); `flatten` before the LUT; `grain` last (before a
+LUT it is colour-mapped, before `posterize` it is quantised away); optical
+effects after the look; `deband` before `posterize`.
+
+`looks` **validates and warns, never reorders**: the order asked for is the
+order compiled, and a departure from the canon is sometimes deliberate. The
+stage is a property of *what an effect does*, so it is declared here per
+effect, never per implementation (the same rule that puts parameter checks in
+`looks.compile` rather than inside a compiler). An effect with no stage is
+unconstrained, and the table is an argument of [`check_stage_order()`](_autosummary/looks.stages.html.md#looks.stages.check_stage_order).
+
+Callers who want a refusal rather than a warning escalate the category:
+`warnings.simplefilter("error", StageOrderWarning)`.
+
+### Examples
+
+```pycon
+>>> from looks.spec import Effect
+>>> check_stage_order([Effect(name="grain"), Effect(name="lut3d")])
+['lut3d (stage look) follows grain (stage grain); the canonical order is geometry -> grade -> flatten -> look -> optical -> grain']
+>>> check_stage_order([Effect(name="lut3d"), Effect(name="grain")])
+[]
+```
+
+### Module Attributes
+
+| [`EFFECT_STAGES`](_autosummary/looks.stages.html.md#looks.stages.EFFECT_STAGES)      | Effect name -> stage.                                                                           |
+|---------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| [`RESAMPLING_EFFECTS`](_autosummary/looks.stages.html.md#looks.stages.RESAMPLING_EFFECTS) | Effects that resample, interpolate or smooth the picture, and so manufacture in-between values. |
+| [`QUANTISER`](_autosummary/looks.stages.html.md#looks.stages.QUANTISER)          | The effect after which nothing may resample.                                                    |
+
+### Functions
+
+| [`check_stage_order`](_autosummary/looks.stages.html.md#looks.stages.check_stage_order)(effects, \*[, stages, ...])   | Describe each departure from the canonical order; empty when there is none.   |
+|--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+
+### Classes
+
+| [`Stage`](_autosummary/looks.stages.html.md#looks.stages.Stage)(\*values)   | Pipeline stages, in canonical order.   |
+|--------------------------------------------------------------------|----------------------------------------|
+
+### Exceptions
+
+| [`StageOrderWarning`](_autosummary/looks.stages.html.md#looks.stages.StageOrderWarning)   | A Look puts an effect in a stage the catalogue measured as wrong.   |
+|----------------------------------------------------------------------|---------------------------------------------------------------------|
+
+### looks.stages.EFFECT_STAGES *: [Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Stage](_autosummary/looks.stages.html.md#looks.stages.Stage)]* *= {'colorbalance': Stage.GRADE, 'contrast': Stage.GRADE, 'curves': Stage.GRADE, 'fill': Stage.GEOMETRY, 'fit': Stage.GEOMETRY, 'flatten': Stage.FLATTEN, 'gamma': Stage.GRADE, 'gradient_map': Stage.LOOK, 'grain': Stage.GRAIN, 'halation': Stage.OPTICAL, 'levels': Stage.GRADE, 'lut3d': Stage.LOOK, 'motion': Stage.GEOMETRY, 'posterize': Stage.LOOK, 'saturation': Stage.GRADE, 'stretch': Stage.GEOMETRY, 'vignette': Stage.OPTICAL}*
+
+Effect name -> stage. An effect absent from here is unconstrained.
+
+### looks.stages.QUANTISER *= 'posterize'*
+
+The effect after which nothing may resample.
+
+### looks.stages.RESAMPLING_EFFECTS *= frozenset({'blur', 'fill', 'fit', 'gate_weave', 'gradient_map', 'lut3d', 'motion', 'sharpen', 'stretch'})*
+
+Effects that resample, interpolate or smooth the picture, and so manufacture
+in-between values. After `posterize` they un-quantise it. Includes the LUT
+effects (posterise-then-LUT: 96 distinct colours against LUT-then-posterise’s
+51, note 05) and `gate_weave`, which has no stage but still resamples.
+
+### *class* looks.stages.Stage(\*values)
+
+Bases: [`IntEnum`](https://docs.python.org/3/library/enum.html#enum.IntEnum)
+
+Pipeline stages, in canonical order.
+
+### *exception* looks.stages.StageOrderWarning
+
+Bases: [`UserWarning`](https://docs.python.org/3/builtins/exceptions.html#UserWarning)
+
+A Look puts an effect in a stage the catalogue measured as wrong.
+
+### looks.stages.check_stage_order(effects, , stages={'colorbalance': Stage.GRADE, 'contrast': Stage.GRADE, 'curves': Stage.GRADE, 'fill': Stage.GEOMETRY, 'fit': Stage.GEOMETRY, 'flatten': Stage.FLATTEN, 'gamma': Stage.GRADE, 'gradient_map': Stage.LOOK, 'grain': Stage.GRAIN, 'halation': Stage.OPTICAL, 'levels': Stage.GRADE, 'lut3d': Stage.LOOK, 'motion': Stage.GEOMETRY, 'posterize': Stage.LOOK, 'saturation': Stage.GRADE, 'stretch': Stage.GEOMETRY, 'vignette': Stage.OPTICAL}, resampling=frozenset({'blur', 'fill', 'fit', 'gate_weave', 'gradient_map', 'lut3d', 'motion', 'sharpen', 'stretch'}), quantiser='posterize')
+
+Describe each departure from the canonical order; empty when there is none.
+
+Each message names the offending (later) effect once, against the first
+earlier effect that belongs after it.
+
+### Examples
+
+```pycon
+>>> from looks.spec import Effect
+>>> check_stage_order([Effect(name="posterize"), Effect(name="fit")])
+['fit resamples the picture after posterize...']
+>>> check_stage_order([Effect(name="fit"), Effect(name="saturation"), Effect(name="grain")])
+[]
+```
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+
 # _autosummary/looks.transition.html.md
 
 # looks.transition
@@ -10378,18 +10768,20 @@ frames...
 
 # About this build
 
-This documentation was built on **2026-10-26 15:05 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/53137c150d7242b0087691c6be7ec20ebe268ee2"><code>53137c1</code></a> on branch <code>main</code>, for **looks 0.0.23** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-26 16:15 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/71bbb518723ef9703fe8acc3b45dea9cbdcb9c16"><code>71bbb51</code></a> on branch <code>main</code>, for **looks 0.0.24** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.24) is ahead of the latest release on PyPI (0.0.23): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/looks/commit/53137c150d7242b0087691c6be7ec20ebe268ee2"><code>53137c150d7242b0087691c6be7ec20ebe268ee2</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/looks/commit/71bbb518723ef9703fe8acc3b45dea9cbdcb9c16"><code>71bbb518723ef9703fe8acc3b45dea9cbdcb9c16</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | <code>0.0.23</code>                                                                                                                                   |
+| Tags at this commit | <code>0.0.24</code>                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/looks</code>                                                                                                        |
 
@@ -10398,9 +10790,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/looks</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/40344151451">40344151451</a>       |
+| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/40356748299">40356748299</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>c5a88c8e8977d8281aa4f8cfacb545cee957e819</code> (in the history of the built commit) |
+| Event commit | <code>d7d6f0875f001eef7d073edebbed273287cf012b</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -10425,13 +10817,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/looks/0.0.23/">0.0.23</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/looks/0.0.23/">0.0.23</a>, older than the documented version (0.0.24).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout 53137c150d7242b0087691c6be7ec20ebe268ee2
+git checkout 71bbb518723ef9703fe8acc3b45dea9cbdcb9c16
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

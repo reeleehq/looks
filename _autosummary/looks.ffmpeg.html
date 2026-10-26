@@ -95,9 +95,11 @@
 <li class="toctree-l3"><a class="reference internal" href="looks.licence.html">looks.licence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.lut.html">looks.lut</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.motion.html">looks.motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.params.html">looks.params</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.pipe.html">looks.pipe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.registry.html">looks.registry</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.spec.html">looks.spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.stages.html">looks.stages</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.transition.html">looks.transition</a></li>
 </ul>
 </li>
@@ -174,69 +176,33 @@ keeps the package honest would have nothing left to protect.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.GRAPH_LEVEL_SPECIALS" title="looks.ffmpeg.GRAPH_LEVEL_SPECIALS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GRAPH_LEVEL_SPECIALS</span></code></a></p></td>
 <td><p>Characters the <strong>filtergraph</strong> parser gives meaning to across the graph: <code class="docutils literal notranslate"><span class="pre">,</span></code> chains, <code class="docutils literal notranslate"><span class="pre">;</span></code> separates, <code class="docutils literal notranslate"><span class="pre">[]</span></code> delimit pad labels, <code class="docutils literal notranslate"><span class="pre">\\</span></code> and <code class="docutils literal notranslate"><span class="pre">'</span></code> do that parser's quoting.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.DFLT_VIGNETTE_ANGLE" title="looks.ffmpeg.DFLT_VIGNETTE_ANGLE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_VIGNETTE_ANGLE</span></code></a></p></td>
-<td><p>Vignette half-angle, radians.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.MAX_VIGNETTE_ANGLE" title="looks.ffmpeg.MAX_VIGNETTE_ANGLE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MAX_VIGNETTE_ANGLE</span></code></a></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">vignette</span></code> clips its angle to [0, PI/2] instead of refusing, so a larger one would compile to a picture nobody asked for.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.MAX_HALATION_SIGMA" title="looks.ffmpeg.MAX_HALATION_SIGMA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MAX_HALATION_SIGMA</span></code></a></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">gblur</span></code> refuses a larger sigma ("Result too large"; 9.0 and 6.1).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.DFLT_HALATION_TINT" title="looks.ffmpeg.DFLT_HALATION_TINT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_HALATION_TINT</span></code></a></p></td>
-<td><p>film halation is the red layer scattering back off the base.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.MAX_GRAIN_STRENGTH" title="looks.ffmpeg.MAX_GRAIN_STRENGTH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MAX_GRAIN_STRENGTH</span></code></a></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">noise</span></code>'s <code class="docutils literal notranslate"><span class="pre">alls</span></code> range is 0..100.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.DFLT_GRAIN_SEED" title="looks.ffmpeg.DFLT_GRAIN_SEED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_GRAIN_SEED</span></code></a></p></td>
-<td><p>Pinned rather than ffmpeg's own default, for portability across builds.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.MAX_GRAIN_SEED" title="looks.ffmpeg.MAX_GRAIN_SEED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MAX_GRAIN_SEED</span></code></a></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">noise</span></code>'s <code class="docutils literal notranslate"><span class="pre">all_seed</span></code> tops out at INT_MAX; its <code class="docutils literal notranslate"><span class="pre">-1</span></code> (a random seed) is below the range on purpose, since a seed is what makes grain reproducible.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.SETSAR_MAX" title="looks.ffmpeg.SETSAR_MAX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SETSAR_MAX</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.SETSAR_MAX" title="looks.ffmpeg.SETSAR_MAX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SETSAR_MAX</span></code></a></p></td>
 <td><p><code class="code docutils literal notranslate"><span class="pre">setsar</span></code>'s largest allowed rational term.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.DFLT_WEAVE_AMPLITUDE" title="looks.ffmpeg.DFLT_WEAVE_AMPLITUDE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_WEAVE_AMPLITUDE</span></code></a></p></td>
-<td><p>Gate-weave wander, in pixels either side of centre.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.DFLT_WEAVE_FREQUENCY" title="looks.ffmpeg.DFLT_WEAVE_FREQUENCY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_WEAVE_FREQUENCY</span></code></a></p></td>
-<td><p>Horizontal and vertical wander, Hz.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.LABEL_NAMESPACE" title="looks.ffmpeg.LABEL_NAMESPACE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LABEL_NAMESPACE</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.LABEL_NAMESPACE" title="looks.ffmpeg.LABEL_NAMESPACE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LABEL_NAMESPACE</span></code></a></p></td>
 <td><p>Prefix of the pad labels a branching effect uses internally, so they stay clear of a host's own (<code class="docutils literal notranslate"><span class="pre">[a]</span></code>, <code class="docutils literal notranslate"><span class="pre">[bg]</span></code>: note 05, label rule 2).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.CURVES_CHANNELS" title="looks.ffmpeg.CURVES_CHANNELS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CURVES_CHANNELS</span></code></a></p></td>
-<td><p><code class="code docutils literal notranslate"><span class="pre">looks</span></code> channel names to ffmpeg <code class="code docutils literal notranslate"><span class="pre">curves</span></code> option names.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.COLORBALANCE_ZONES" title="looks.ffmpeg.COLORBALANCE_ZONES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">COLORBALANCE_ZONES</span></code></a></p></td>
-<td><p><code class="code docutils literal notranslate"><span class="pre">colorbalance</span></code> tonal zones, keyed to the letter its options end in.</p></td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.as_emitted" title="looks.ffmpeg.as_emitted"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_emitted</span></code></a>(value)</p></td>
-<td><p>A number as the compilers write it into a filter string, read back.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.escape_filter_value" title="looks.ffmpeg.escape_filter_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">escape_filter_value</span></code></a>(value)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.escape_filter_value" title="looks.ffmpeg.escape_filter_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">escape_filter_value</span></code></a>(value)</p></td>
 <td><p>Escape a value for use as a filter option inside a filtergraph.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.filter_string" title="looks.ffmpeg.filter_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_string</span></code></a>(name[, options])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.filter_string" title="looks.ffmpeg.filter_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_string</span></code></a>(name[, options])</p></td>
 <td><p>One filter, with its options escaped.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.gated" title="looks.ffmpeg.gated"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gated</span></code></a>(fragment, at)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.gated" title="looks.ffmpeg.gated"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gated</span></code></a>(fragment, at)</p></td>
 <td><p>Restrict a fragment to a span, using ffmpeg's own timeline support.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.register_defaults" title="looks.ffmpeg.register_defaults"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_defaults</span></code></a>([registry])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.register_defaults" title="looks.ffmpeg.register_defaults"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_defaults</span></code></a>([registry])</p></td>
 <td><p>Register the built-in ffmpeg effects.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.split_filters" title="looks.ffmpeg.split_filters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_filters</span></code></a>(fragment)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.split_filters" title="looks.ffmpeg.split_filters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_filters</span></code></a>(fragment)</p></td>
 <td><p>A chain into its filters, splitting on UNESCAPED commas only.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.vf" title="looks.ffmpeg.vf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vf</span></code></a>(plan, *[, gate])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.vf" title="looks.ffmpeg.vf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vf</span></code></a>(plan, *[, gate])</p></td>
 <td><p>A whole plan as one <code class="docutils literal notranslate"><span class="pre">-vf</span></code> fragment: input-index-free, splice-ready.</p></td>
 </tr>
 </tbody>
@@ -249,48 +215,6 @@ keeps the package honest would have nothing left to protect.</p>
 </tr>
 </tbody>
 </table>
-<dl class="py data">
-<dt class="sig sig-object py" id="looks.ffmpeg.COLORBALANCE_ZONES">
-<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">COLORBALANCE_ZONES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'highlights':</span> <span class="pre">'h',</span> <span class="pre">'midtones':</span> <span class="pre">'m',</span> <span class="pre">'shadows':</span> <span class="pre">'s'}</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.COLORBALANCE_ZONES" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.COLORBALANCE_ZONES'">¶</a></dt>
-<dd><p><code class="code docutils literal notranslate"><span class="pre">colorbalance</span></code> tonal zones, keyed to the letter its options end in.</p>
-</dd></dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="looks.ffmpeg.CURVES_CHANNELS">
-<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">CURVES_CHANNELS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('all',</span> <span class="pre">'red',</span> <span class="pre">'green',</span> <span class="pre">'blue')</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.CURVES_CHANNELS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.CURVES_CHANNELS'">¶</a></dt>
-<dd><p><code class="code docutils literal notranslate"><span class="pre">looks</span></code> channel names to ffmpeg <code class="code docutils literal notranslate"><span class="pre">curves</span></code> option names.</p>
-</dd></dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="looks.ffmpeg.DFLT_GRAIN_SEED">
-<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">DFLT_GRAIN_SEED</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.DFLT_GRAIN_SEED" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.DFLT_GRAIN_SEED'">¶</a></dt>
-<dd><p>Pinned rather than ffmpeg’s own default, for portability across builds.
-Note <code class="docutils literal notranslate"><span class="pre">0</span></code> is a different picture from an unseeded <code class="docutils literal notranslate"><span class="pre">noise</span></code>.</p>
-</dd></dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="looks.ffmpeg.DFLT_HALATION_TINT">
-<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">DFLT_HALATION_TINT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(1.0,</span> <span class="pre">0.35,</span> <span class="pre">0.2)</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.DFLT_HALATION_TINT" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.DFLT_HALATION_TINT'">¶</a></dt>
-<dd><p>film halation is the red layer scattering back off the base.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Red-orange</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="looks.ffmpeg.DFLT_VIGNETTE_ANGLE">
-<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">DFLT_VIGNETTE_ANGLE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.6283185307179586</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.DFLT_VIGNETTE_ANGLE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.DFLT_VIGNETTE_ANGLE'">¶</a></dt>
-<dd><p>Vignette half-angle, radians.</p>
-</dd></dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="looks.ffmpeg.DFLT_WEAVE_AMPLITUDE">
-<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">DFLT_WEAVE_AMPLITUDE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.DFLT_WEAVE_AMPLITUDE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.DFLT_WEAVE_AMPLITUDE'">¶</a></dt>
-<dd><p>Gate-weave wander, in pixels either side of centre.</p>
-</dd></dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="looks.ffmpeg.DFLT_WEAVE_FREQUENCY">
-<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">DFLT_WEAVE_FREQUENCY</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(3.44,</span> <span class="pre">2.33)</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.DFLT_WEAVE_FREQUENCY" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.DFLT_WEAVE_FREQUENCY'">¶</a></dt>
-<dd><p>Horizontal and vertical wander, Hz. Incommensurate so the path never loops
-visibly: the production’s <code class="docutils literal notranslate"><span class="pre">n*0.9</span></code> and <code class="docutils literal notranslate"><span class="pre">n*0.61</span></code> rad/frame, at 24 fps.</p>
-</dd></dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="looks.ffmpeg.FfmpegBackendError">
 <span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">FfmpegBackendError</span></span><a class="reference internal" href="../_modules/looks/ffmpeg.html#FfmpegBackendError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.FfmpegBackendError" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.FfmpegBackendError'">¶</a></dt>
@@ -311,28 +235,6 @@ do that parser’s quoting.</p>
 clear of a host’s own (<code class="docutils literal notranslate"><span class="pre">[a]</span></code>, <code class="docutils literal notranslate"><span class="pre">[bg]</span></code>: note 05, label rule 2).</p>
 </dd></dl>
 <dl class="py data">
-<dt class="sig sig-object py" id="looks.ffmpeg.MAX_GRAIN_SEED">
-<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">MAX_GRAIN_SEED</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2147483647</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.MAX_GRAIN_SEED" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.MAX_GRAIN_SEED'">¶</a></dt>
-<dd><p><code class="docutils literal notranslate"><span class="pre">noise</span></code>’s <code class="docutils literal notranslate"><span class="pre">all_seed</span></code> tops out at INT_MAX; its <code class="docutils literal notranslate"><span class="pre">-1</span></code> (a random seed) is
-below the range on purpose, since a seed is what makes grain reproducible.</p>
-</dd></dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="looks.ffmpeg.MAX_GRAIN_STRENGTH">
-<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">MAX_GRAIN_STRENGTH</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.MAX_GRAIN_STRENGTH" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.MAX_GRAIN_STRENGTH'">¶</a></dt>
-<dd><p><code class="docutils literal notranslate"><span class="pre">noise</span></code>’s <code class="docutils literal notranslate"><span class="pre">alls</span></code> range is 0..100.</p>
-</dd></dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="looks.ffmpeg.MAX_HALATION_SIGMA">
-<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">MAX_HALATION_SIGMA</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1024</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.MAX_HALATION_SIGMA" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.MAX_HALATION_SIGMA'">¶</a></dt>
-<dd><p><code class="docutils literal notranslate"><span class="pre">gblur</span></code> refuses a larger sigma (“Result too large”; 9.0 and 6.1).</p>
-</dd></dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="looks.ffmpeg.MAX_VIGNETTE_ANGLE">
-<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">MAX_VIGNETTE_ANGLE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.5707963267948966</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.MAX_VIGNETTE_ANGLE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.MAX_VIGNETTE_ANGLE'">¶</a></dt>
-<dd><p><code class="docutils literal notranslate"><span class="pre">vignette</span></code> clips its angle to [0, PI/2] instead of refusing, so a larger
-one would compile to a picture nobody asked for.</p>
-</dd></dl>
-<dl class="py data">
 <dt class="sig sig-object py" id="looks.ffmpeg.OPTION_LEVEL_SPECIALS">
 <span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">OPTION_LEVEL_SPECIALS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('\\',</span> <span class="pre">"'",</span> <span class="pre">':')</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.OPTION_LEVEL_SPECIALS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.OPTION_LEVEL_SPECIALS'">¶</a></dt>
 <dd><p>Characters the <strong>option</strong> parser gives meaning to, within one filter’s
@@ -344,25 +246,6 @@ characters must not themselves be escaped by the <code class="docutils literal n
 <span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">SETSAR_MAX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2147483647</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.SETSAR_MAX" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.SETSAR_MAX'">¶</a></dt>
 <dd><p><code class="code docutils literal notranslate"><span class="pre">setsar</span></code>’s largest allowed rational term. Its default of 100 rewrites any
 SAR with a bigger term (118/81 -&gt; 67/46, 1001/1000 -&gt; 1/1).</p>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="looks.ffmpeg.as_emitted">
-<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">as_emitted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/ffmpeg.html#as_emitted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.as_emitted" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.as_emitted'">¶</a></dt>
-<dd><p>A number as the compilers write it into a filter string, read back.</p>
-<p>A parameter check compares this, not the value asked for: six decimals are
-kept, so two curve x-points <code class="docutils literal notranslate"><span class="pre">1e-7</span></code> apart are written as one point, which
-<code class="docutils literal notranslate"><span class="pre">curves</span></code> refuses, and a vignette <code class="docutils literal notranslate"><span class="pre">angle</span></code> of <code class="docutils literal notranslate"><span class="pre">1e-9</span></code> is written <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">as_emitted</span><span class="p">(</span><span class="mf">1e-9</span><span class="p">)</span>
-</span><span id="line-2"><span class="go">0.0</span>
-</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">as_emitted</span><span class="p">(</span><span class="mf">0.1234567</span><span class="p">)</span>
-</span><span id="line-4"><span class="go">0.123457</span>
-</span></code></pre></div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
-</dd>
-</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="looks.ffmpeg.escape_filter_value">
@@ -508,23 +391,11 @@ nothing here names a stream.</p>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
-<li><a :data-current="activeSection === '#looks.ffmpeg.COLORBALANCE_ZONES'" class="reference internal" href="#looks.ffmpeg.COLORBALANCE_ZONES"><code class="docutils literal notranslate"><span class="pre">COLORBALANCE_ZONES</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.ffmpeg.CURVES_CHANNELS'" class="reference internal" href="#looks.ffmpeg.CURVES_CHANNELS"><code class="docutils literal notranslate"><span class="pre">CURVES_CHANNELS</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.ffmpeg.DFLT_GRAIN_SEED'" class="reference internal" href="#looks.ffmpeg.DFLT_GRAIN_SEED"><code class="docutils literal notranslate"><span class="pre">DFLT_GRAIN_SEED</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.ffmpeg.DFLT_HALATION_TINT'" class="reference internal" href="#looks.ffmpeg.DFLT_HALATION_TINT"><code class="docutils literal notranslate"><span class="pre">DFLT_HALATION_TINT</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.ffmpeg.DFLT_VIGNETTE_ANGLE'" class="reference internal" href="#looks.ffmpeg.DFLT_VIGNETTE_ANGLE"><code class="docutils literal notranslate"><span class="pre">DFLT_VIGNETTE_ANGLE</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.ffmpeg.DFLT_WEAVE_AMPLITUDE'" class="reference internal" href="#looks.ffmpeg.DFLT_WEAVE_AMPLITUDE"><code class="docutils literal notranslate"><span class="pre">DFLT_WEAVE_AMPLITUDE</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.ffmpeg.DFLT_WEAVE_FREQUENCY'" class="reference internal" href="#looks.ffmpeg.DFLT_WEAVE_FREQUENCY"><code class="docutils literal notranslate"><span class="pre">DFLT_WEAVE_FREQUENCY</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.FfmpegBackendError'" class="reference internal" href="#looks.ffmpeg.FfmpegBackendError"><code class="docutils literal notranslate"><span class="pre">FfmpegBackendError</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.GRAPH_LEVEL_SPECIALS'" class="reference internal" href="#looks.ffmpeg.GRAPH_LEVEL_SPECIALS"><code class="docutils literal notranslate"><span class="pre">GRAPH_LEVEL_SPECIALS</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.LABEL_NAMESPACE'" class="reference internal" href="#looks.ffmpeg.LABEL_NAMESPACE"><code class="docutils literal notranslate"><span class="pre">LABEL_NAMESPACE</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.ffmpeg.MAX_GRAIN_SEED'" class="reference internal" href="#looks.ffmpeg.MAX_GRAIN_SEED"><code class="docutils literal notranslate"><span class="pre">MAX_GRAIN_SEED</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.ffmpeg.MAX_GRAIN_STRENGTH'" class="reference internal" href="#looks.ffmpeg.MAX_GRAIN_STRENGTH"><code class="docutils literal notranslate"><span class="pre">MAX_GRAIN_STRENGTH</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.ffmpeg.MAX_HALATION_SIGMA'" class="reference internal" href="#looks.ffmpeg.MAX_HALATION_SIGMA"><code class="docutils literal notranslate"><span class="pre">MAX_HALATION_SIGMA</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.ffmpeg.MAX_VIGNETTE_ANGLE'" class="reference internal" href="#looks.ffmpeg.MAX_VIGNETTE_ANGLE"><code class="docutils literal notranslate"><span class="pre">MAX_VIGNETTE_ANGLE</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.OPTION_LEVEL_SPECIALS'" class="reference internal" href="#looks.ffmpeg.OPTION_LEVEL_SPECIALS"><code class="docutils literal notranslate"><span class="pre">OPTION_LEVEL_SPECIALS</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.SETSAR_MAX'" class="reference internal" href="#looks.ffmpeg.SETSAR_MAX"><code class="docutils literal notranslate"><span class="pre">SETSAR_MAX</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.ffmpeg.as_emitted'" class="reference internal" href="#looks.ffmpeg.as_emitted"><code class="docutils literal notranslate"><span class="pre">as_emitted()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.escape_filter_value'" class="reference internal" href="#looks.ffmpeg.escape_filter_value"><code class="docutils literal notranslate"><span class="pre">escape_filter_value()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.filter_string'" class="reference internal" href="#looks.ffmpeg.filter_string"><code class="docutils literal notranslate"><span class="pre">filter_string()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.gated'" class="reference internal" href="#looks.ffmpeg.gated"><code class="docutils literal notranslate"><span class="pre">gated()</span></code></a></li>
@@ -544,7 +415,7 @@ nothing here names a stream.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=3294188c"></script>
+<script src="../_static/documentation_options.js?v=f91d8841"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

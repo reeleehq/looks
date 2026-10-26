@@ -130,9 +130,19 @@ available is not the same as asking for something:
 ()
 ```
 
+#### check_params(effect, params)
+
+Refuse parameters this registry’s schema for `effect` rejects.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### compiler(key)
 
 The code behind a key — how a stored plan becomes runnable work.
+
+Defaults are filled in before the code runs, so the params a plan
+stores (as asked, defaults absent) are all it needs.
 
 * **Return type:**
   [`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)[[`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis), [`Mapping`](https://docs.python.org/3/library/typing.html#typing.Mapping)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]]
@@ -144,12 +154,33 @@ The cost estimator, or `None` when none was declared.
 * **Return type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)[[`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis), [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]]]
 
+#### declare_params(effect, schema)
+
+Declare an effect’s parameters, once: see [`looks.params`](looks.params.html.md#module-looks.params).
+
+The schema belongs to the registry, not to the package, so a registry
+with its own implementation of an effect (a different `flatten`, say)
+declares that implementation’s keys and is not bound to ours. An effect
+with no declaration is not checked.
+
+* **Raises:**
+  [**RegistryError**](#looks.registry.RegistryError) – If the effect already has a different schema.
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### effects()
 
 Every effect with at least one implementation, sorted.
 
 * **Return type:**
   [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
+
+#### has_params(effect)
+
+Has this registry declared a schema for `effect`?
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 #### impl(key)
 
@@ -191,6 +222,13 @@ Record an implementation. Returns it, so this reads well inline.
         or an ffmpeg implementation names a filter that does not exist.
 * **Return type:**
   [`ImplRef`](looks.spec.html.md#looks.spec.ImplRef)
+
+#### with_defaults(effect, params)
+
+`params` with this registry’s declared defaults filled in.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### *exception* looks.registry.ImplConflict
 

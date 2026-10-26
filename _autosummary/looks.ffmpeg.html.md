@@ -51,68 +51,23 @@ keeps the package honest would have nothing left to protect.
 | [`OPTION_LEVEL_SPECIALS`](#looks.ffmpeg.OPTION_LEVEL_SPECIALS)   | Characters the **option** parser gives meaning to, within one filter's arguments.                                                                                   |
 |--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [`GRAPH_LEVEL_SPECIALS`](#looks.ffmpeg.GRAPH_LEVEL_SPECIALS)    | Characters the **filtergraph** parser gives meaning to across the graph: `,` chains, `;` separates, `[]` delimit pad labels, `\\` and `'` do that parser's quoting. |
-| [`DFLT_VIGNETTE_ANGLE`](#looks.ffmpeg.DFLT_VIGNETTE_ANGLE)     | Vignette half-angle, radians.                                                                                                                                       |
-| [`MAX_VIGNETTE_ANGLE`](#looks.ffmpeg.MAX_VIGNETTE_ANGLE)      | `vignette` clips its angle to [0, PI/2] instead of refusing, so a larger one would compile to a picture nobody asked for.                                           |
-| [`MAX_HALATION_SIGMA`](#looks.ffmpeg.MAX_HALATION_SIGMA)      | `gblur` refuses a larger sigma ("Result too large"; 9.0 and 6.1).                                                                                                   |
-| [`DFLT_HALATION_TINT`](#looks.ffmpeg.DFLT_HALATION_TINT)      | film halation is the red layer scattering back off the base.                                                                                                        |
-| [`MAX_GRAIN_STRENGTH`](#looks.ffmpeg.MAX_GRAIN_STRENGTH)      | `noise`'s `alls` range is 0..100.                                                                                                                                   |
-| [`DFLT_GRAIN_SEED`](#looks.ffmpeg.DFLT_GRAIN_SEED)         | Pinned rather than ffmpeg's own default, for portability across builds.                                                                                             |
-| [`MAX_GRAIN_SEED`](#looks.ffmpeg.MAX_GRAIN_SEED)          | `noise`'s `all_seed` tops out at INT_MAX; its `-1` (a random seed) is below the range on purpose, since a seed is what makes grain reproducible.                    |
 | [`SETSAR_MAX`](#looks.ffmpeg.SETSAR_MAX)              | `setsar`'s largest allowed rational term.                                                                                                                           |
-| [`DFLT_WEAVE_AMPLITUDE`](#looks.ffmpeg.DFLT_WEAVE_AMPLITUDE)    | Gate-weave wander, in pixels either side of centre.                                                                                                                 |
-| [`DFLT_WEAVE_FREQUENCY`](#looks.ffmpeg.DFLT_WEAVE_FREQUENCY)    | Horizontal and vertical wander, Hz.                                                                                                                                 |
 | [`LABEL_NAMESPACE`](#looks.ffmpeg.LABEL_NAMESPACE)         | Prefix of the pad labels a branching effect uses internally, so they stay clear of a host's own (`[a]`, `[bg]`: note 05, label rule 2).                             |
-| [`CURVES_CHANNELS`](#looks.ffmpeg.CURVES_CHANNELS)         | `looks` channel names to ffmpeg `curves` option names.                                                                                                              |
-| [`COLORBALANCE_ZONES`](#looks.ffmpeg.COLORBALANCE_ZONES)      | `colorbalance` tonal zones, keyed to the letter its options end in.                                                                                                 |
 
 ### Functions
 
-| [`as_emitted`](#looks.ffmpeg.as_emitted)(value)              | A number as the compilers write it into a filter string, read back.   |
-|---------------------------------------------------------------------------------|-----------------------------------------------------------------------|
-| [`escape_filter_value`](#looks.ffmpeg.escape_filter_value)(value)     | Escape a value for use as a filter option inside a filtergraph.       |
-| [`filter_string`](#looks.ffmpeg.filter_string)(name[, options]) | One filter, with its options escaped.                                 |
-| [`gated`](#looks.ffmpeg.gated)(fragment, at)            | Restrict a fragment to a span, using ffmpeg's own timeline support.   |
-| [`register_defaults`](#looks.ffmpeg.register_defaults)([registry])  | Register the built-in ffmpeg effects.                                 |
-| [`split_filters`](#looks.ffmpeg.split_filters)(fragment)        | A chain into its filters, splitting on UNESCAPED commas only.         |
-| [`vf`](#looks.ffmpeg.vf)(plan, \*[, gate])           | A whole plan as one `-vf` fragment: input-index-free, splice-ready.   |
+| [`escape_filter_value`](#looks.ffmpeg.escape_filter_value)(value)     | Escape a value for use as a filter option inside a filtergraph.     |
+|---------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| [`filter_string`](#looks.ffmpeg.filter_string)(name[, options]) | One filter, with its options escaped.                               |
+| [`gated`](#looks.ffmpeg.gated)(fragment, at)            | Restrict a fragment to a span, using ffmpeg's own timeline support. |
+| [`register_defaults`](#looks.ffmpeg.register_defaults)([registry])  | Register the built-in ffmpeg effects.                               |
+| [`split_filters`](#looks.ffmpeg.split_filters)(fragment)        | A chain into its filters, splitting on UNESCAPED commas only.       |
+| [`vf`](#looks.ffmpeg.vf)(plan, \*[, gate])           | A whole plan as one `-vf` fragment: input-index-free, splice-ready. |
 
 ### Exceptions
 
 | [`FfmpegBackendError`](#looks.ffmpeg.FfmpegBackendError)   | A step that cannot be expressed as a filter fragment.   |
 |-----------------------------------------------------------------------|---------------------------------------------------------|
-
-### looks.ffmpeg.COLORBALANCE_ZONES *= {'highlights': 'h', 'midtones': 'm', 'shadows': 's'}*
-
-`colorbalance` tonal zones, keyed to the letter its options end in.
-
-### looks.ffmpeg.CURVES_CHANNELS *= ('all', 'red', 'green', 'blue')*
-
-`looks` channel names to ffmpeg `curves` option names.
-
-### looks.ffmpeg.DFLT_GRAIN_SEED *= 0*
-
-Pinned rather than ffmpeg’s own default, for portability across builds.
-Note `0` is a different picture from an unseeded `noise`.
-
-### looks.ffmpeg.DFLT_HALATION_TINT *= (1.0, 0.35, 0.2)*
-
-film halation is the red layer scattering back off the base.
-
-* **Type:**
-  Red-orange
-
-### looks.ffmpeg.DFLT_VIGNETTE_ANGLE *= 0.6283185307179586*
-
-Vignette half-angle, radians.
-
-### looks.ffmpeg.DFLT_WEAVE_AMPLITUDE *= 2*
-
-Gate-weave wander, in pixels either side of centre.
-
-### looks.ffmpeg.DFLT_WEAVE_FREQUENCY *= (3.44, 2.33)*
-
-Horizontal and vertical wander, Hz. Incommensurate so the path never loops
-visibly: the production’s `n*0.9` and `n*0.61` rad/frame, at 24 fps.
 
 ### *exception* looks.ffmpeg.FfmpegBackendError
 
@@ -131,24 +86,6 @@ do that parser’s quoting.
 Prefix of the pad labels a branching effect uses internally, so they stay
 clear of a host’s own (`[a]`, `[bg]`: note 05, label rule 2).
 
-### looks.ffmpeg.MAX_GRAIN_SEED *= 2147483647*
-
-`noise`’s `all_seed` tops out at INT_MAX; its `-1` (a random seed) is
-below the range on purpose, since a seed is what makes grain reproducible.
-
-### looks.ffmpeg.MAX_GRAIN_STRENGTH *= 100*
-
-`noise`’s `alls` range is 0..100.
-
-### looks.ffmpeg.MAX_HALATION_SIGMA *= 1024*
-
-`gblur` refuses a larger sigma (“Result too large”; 9.0 and 6.1).
-
-### looks.ffmpeg.MAX_VIGNETTE_ANGLE *= 1.5707963267948966*
-
-`vignette` clips its angle to [0, PI/2] instead of refusing, so a larger
-one would compile to a picture nobody asked for.
-
 ### looks.ffmpeg.OPTION_LEVEL_SPECIALS *= ('\\\\', "'", ':')*
 
 Characters the **option** parser gives meaning to, within one filter’s
@@ -159,24 +96,6 @@ characters must not themselves be escaped by the `\\` pass.
 
 `setsar`’s largest allowed rational term. Its default of 100 rewrites any
 SAR with a bigger term (118/81 -> 67/46, 1001/1000 -> 1/1).
-
-### looks.ffmpeg.as_emitted(value)
-
-A number as the compilers write it into a filter string, read back.
-
-A parameter check compares this, not the value asked for: six decimals are
-kept, so two curve x-points `1e-7` apart are written as one point, which
-`curves` refuses, and a vignette `angle` of `1e-9` is written `0`.
-
-```pycon
->>> as_emitted(1e-9)
-0.0
->>> as_emitted(0.1234567)
-0.123457
-```
-
-* **Return type:**
-  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 ### looks.ffmpeg.escape_filter_value(value)
 

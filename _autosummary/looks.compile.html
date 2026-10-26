@@ -95,9 +95,11 @@
 <li class="toctree-l3"><a class="reference internal" href="looks.licence.html">looks.licence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.lut.html">looks.lut</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.motion.html">looks.motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.params.html">looks.params</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.pipe.html">looks.pipe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.registry.html">looks.registry</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.spec.html">looks.spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.stages.html">looks.stages</a></li>
 <li class="toctree-l3"><a class="reference internal" href="looks.transition.html">looks.transition</a></li>
 </ul>
 </li>
@@ -172,21 +174,13 @@ plan is just the version of that with a filesystem in between.</p>
 have, or one whose <code class="docutils literal notranslate"><span class="pre">impl_version</span></code> has moved. Both mean the same thing — the
 plan describes behaviour this build does not implement — and guessing a
 substitute is exactly the failure the version lock exists to prevent.</p>
-<p class="rubric">Module Attributes</p>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.compile.EFFECT_PARAM_CHECKS" title="looks.compile.EFFECT_PARAM_CHECKS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EFFECT_PARAM_CHECKS</span></code></a></p></td>
-<td><p>What an effect's parameters must satisfy, keyed by EFFECT — never by implementation.</p></td>
-</tr>
-</tbody>
-</table>
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#looks.compile.audit" title="looks.compile.audit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">audit</span></code></a>(plan, *[, policy, registry])</p></td>
 <td><p>Re-check a plan against its own declared ceiling.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.compile.check_effect_params" title="looks.compile.check_effect_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_effect_params</span></code></a>(effect)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.compile.check_effect_params" title="looks.compile.check_effect_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_effect_params</span></code></a>(effect[, registry])</p></td>
 <td><p>Refuse parameters no implementation of this effect could honour.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#looks.compile.compile_all" title="looks.compile.compile_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compile_all</span></code></a>(looks_, **kwargs)</p></td>
@@ -222,17 +216,6 @@ substitute is exactly the failure the version lock exists to prevent.</p>
 <span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.compile.</span></span><span class="sig-name descname"><span class="pre">CompileError</span></span><a class="reference internal" href="../_modules/looks/compile.html#CompileError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.compile.CompileError" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.compile.CompileError'">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="looks.spec.html#looks.spec.SpecError" title="looks.spec.SpecError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpecError</span></code></a></p>
 <p>A Look that cannot be compiled against this clip and this binary.</p>
-</dd></dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="looks.compile.EFFECT_PARAM_CHECKS">
-<span class="sig-prename descclassname"><span class="pre">looks.compile.</span></span><span class="sig-name descname"><span class="pre">EFFECT_PARAM_CHECKS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'colorbalance':</span> <span class="pre">&lt;function</span> <span class="pre">_check_colorbalance&gt;,</span> <span class="pre">'contrast':</span> <span class="pre">&lt;function</span> <span class="pre">_check_contrast&gt;,</span> <span class="pre">'curves':</span> <span class="pre">&lt;function</span> <span class="pre">_check_curves&gt;,</span> <span class="pre">'gate_weave':</span> <span class="pre">&lt;function</span> <span class="pre">_check_gate_weave&gt;,</span> <span class="pre">'grain':</span> <span class="pre">&lt;function</span> <span class="pre">_check_grain&gt;,</span> <span class="pre">'halation':</span> <span class="pre">&lt;function</span> <span class="pre">_check_halation&gt;,</span> <span class="pre">'vignette':</span> <span class="pre">&lt;function</span> <span class="pre">_check_vignette&gt;}</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.compile.EFFECT_PARAM_CHECKS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.compile.EFFECT_PARAM_CHECKS'">¶</a></dt>
-<dd><p>What an effect’s parameters must satisfy, keyed by EFFECT — never by
-implementation. A check that lives inside one compiler is a check the
-licence tier can switch off: <code class="code docutils literal notranslate"><span class="pre">contrast</span></code> with <code class="code docutils literal notranslate"><span class="pre">amount=-1</span></code> was refused on the
-LGPL path and emitted <code class="code docutils literal notranslate"><span class="pre">eq=contrast=-1.0</span></code> on the GPL one, so the same Look was
-valid or invalid depending on how the binary was built. Rule 29b says the
-tier must not decide what the viewer sees; it must not decide whether the
-document is accepted either.</p>
 </dd></dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="looks.compile.PlanRefused">
@@ -276,10 +259,17 @@ ask whether it may run under <em>your</em> ceiling.</p></li>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="looks.compile.check_effect_params">
-<span class="sig-prename descclassname"><span class="pre">looks.compile.</span></span><span class="sig-name descname"><span class="pre">check_effect_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">effect</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/compile.html#check_effect_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.compile.check_effect_params" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.compile.check_effect_params'">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">looks.compile.</span></span><span class="sig-name descname"><span class="pre">check_effect_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">effect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">EffectRegistry(name='looks',</span> <span class="pre">effects=20,</span> <span class="pre">implementations=23)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/compile.html#check_effect_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.compile.check_effect_params" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.compile.check_effect_params'">¶</a></dt>
 <dd><p>Refuse parameters no implementation of this effect could honour.</p>
 <p>Called before an implementation is chosen, so every implementation of an
-effect accepts exactly the same documents.</p>
+effect accepts exactly the same documents. The schema is
+the registry’s own declaration (<code class="xref py py-meth docutils literal notranslate"><span class="pre">EffectRegistry.declare_params()</span></code>; the
+built-ins are <a class="reference internal" href="looks.params.html#looks.params.EFFECT_PARAMS" title="looks.params.EFFECT_PARAMS"><code class="xref py py-data docutils literal notranslate"><span class="pre">looks.params.EFFECT_PARAMS</span></code></a>), keyed by EFFECT, never by
+implementation: a check that lives inside one compiler is a check the
+licence tier can switch off (<code class="code docutils literal notranslate"><span class="pre">contrast</span></code> with <code class="code docutils literal notranslate"><span class="pre">amount=-1</span></code> was refused on the
+LGPL path and emitted <code class="code docutils literal notranslate"><span class="pre">eq=contrast=-1.0</span></code> on the GPL one). Rule 29b says the
+tier must not decide what the viewer sees; it must not decide whether the
+document is accepted either.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></span></p>
@@ -321,15 +311,20 @@ against.</p></li>
 <a class="reference internal" href="looks.registry.html#looks.registry.REGISTRY" title="looks.registry.REGISTRY"><code class="xref py py-data docutils literal notranslate"><span class="pre">looks.registry.REGISTRY</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="looks.spec.html#looks.spec.LookPlan" title="looks.spec.LookPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookPlan</span></code></a></span></p>
+<dt class="field-even">Warns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>looks.stages.StageOrderWarning</strong> – If the Look departs from the canonical
+stage order. It is never reordered, and never a refusal unless the
+caller escalates the warning.</p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A <a class="reference internal" href="looks.spec.html#looks.spec.LookPlan" title="looks.spec.LookPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookPlan</span></code></a> holding no live callables — the runner
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="looks.spec.html#looks.spec.LookPlan" title="looks.spec.LookPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookPlan</span></code></a></span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference internal" href="looks.spec.html#looks.spec.LookPlan" title="looks.spec.LookPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookPlan</span></code></a> holding no live callables — the runner
 resolves each step’s code from the registry by key.</p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
 <li><p><a class="reference internal" href="#looks.compile.CompileError" title="looks.compile.CompileError"><strong>CompileError</strong></a> – If an effect has no admissible implementation. The
     message says which constraint emptied the pool, because “no
     implementation available” alone is the least useful refusal in the
@@ -386,7 +381,6 @@ them produces a message that helps neither.</p>
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
 <li><a :data-current="activeSection === '#looks.compile.CompileError'" class="reference internal" href="#looks.compile.CompileError"><code class="docutils literal notranslate"><span class="pre">CompileError</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.compile.EFFECT_PARAM_CHECKS'" class="reference internal" href="#looks.compile.EFFECT_PARAM_CHECKS"><code class="docutils literal notranslate"><span class="pre">EFFECT_PARAM_CHECKS</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.compile.PlanRefused'" class="reference internal" href="#looks.compile.PlanRefused"><code class="docutils literal notranslate"><span class="pre">PlanRefused</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.compile.audit'" class="reference internal" href="#looks.compile.audit"><code class="docutils literal notranslate"><span class="pre">audit()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.compile.check_effect_params'" class="reference internal" href="#looks.compile.check_effect_params"><code class="docutils literal notranslate"><span class="pre">check_effect_params()</span></code></a></li>
@@ -408,7 +402,7 @@ them produces a message that helps neither.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=3294188c"></script>
+<script src="../_static/documentation_options.js?v=f91d8841"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

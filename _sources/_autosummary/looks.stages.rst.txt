@@ -1,0 +1,32 @@
+looks.stages
+============
+
+.. automodule:: looks.stages
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      EFFECT_STAGES
+      RESAMPLING_EFFECTS
+      QUANTISER
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      check_stage_order
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Stage
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      StageOrderWarning
+   
