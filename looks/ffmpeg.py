@@ -197,6 +197,21 @@ def _num(value: float) -> str:
     return text or "0"
 
 
+def as_emitted(value: float) -> float:
+    """A number as the compilers write it into a filter string, read back.
+
+    A parameter check compares this, not the value asked for: six decimals are
+    kept, so two curve x-points ``1e-7`` apart are written as one point, which
+    ``curves`` refuses, and a vignette ``angle`` of ``1e-9`` is written ``0``.
+
+    >>> as_emitted(1e-9)
+    0.0
+    >>> as_emitted(0.1234567)
+    0.123457
+    """
+    return float(_num(float(value)))
+
+
 def vf(plan: LookPlan, *, gate: bool = True) -> str:
     """A whole plan as one ``-vf`` fragment: input-index-free, splice-ready.
 
@@ -731,19 +746,29 @@ def _motion_compiler(params, *, clip=None, env=None, **_kw):
 # halation tint and the gate weave are the 2026-10-16 production's (issue #25),
 # where they read as 16 mm at 720p.
 
-#: Vignette half-angle, radians. ffmpeg accepts (0, PI/2].
+#: Vignette half-angle, radians.
 DFLT_VIGNETTE_ANGLE = math.pi / 5
+#: ``vignette`` clips its angle to [0, PI/2] instead of refusing, so a larger
+#: one would compile to a picture nobody asked for.
+MAX_VIGNETTE_ANGLE = math.pi / 2
 
 DFLT_HALATION_THRESHOLD = 0.78
 DFLT_HALATION_SIGMA = 24.0
+#: ``gblur`` refuses a larger sigma ("Result too large"; 9.0 and 6.1).
+MAX_HALATION_SIGMA = 1024
 DFLT_HALATION_AMOUNT = 0.5
 #: Red-orange: film halation is the red layer scattering back off the base.
 DFLT_HALATION_TINT = (1.0, 0.35, 0.2)
 
 DFLT_GRAIN_STRENGTH = 8
+#: ``noise``'s ``alls`` range is 0..100.
+MAX_GRAIN_STRENGTH = 100
 #: Pinned rather than ffmpeg's own default, for portability across builds.
 #: Note ``0`` is a different picture from an unseeded ``noise``.
 DFLT_GRAIN_SEED = 0
+#: ``noise``'s ``all_seed`` tops out at INT_MAX; its ``-1`` (a random seed) is
+#: below the range on purpose, since a seed is what makes grain reproducible.
+MAX_GRAIN_SEED = 2**31 - 1
 
 #: Gate-weave wander, in pixels either side of centre.
 DFLT_WEAVE_AMPLITUDE = 2

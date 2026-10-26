@@ -336,11 +336,90 @@ class TestGammaDirection:
         ("grain", {"seed": -1}),
         ("gate_weave", {"amplitude": -1}),
         ("gate_weave", {"frequency": (1,)}),
+        # Checked as EMITTED (six decimals): two x-points that collapse into
+        # one, which `curves` refuses; an angle written as `angle=0`; a sigma
+        # written as `sigma=0`.
+        ("curves", {"all": [(0, 0), (0.5, 0.4), (0.5000001, 0.6), (1, 1)]}),
+        ("vignette", {"angle": 1e-9}),
+        ("halation", {"sigma": 1e-9}),
+        # Past what the filter accepts.
+        ("halation", {"sigma": 1025}),
+        ("grain", {"seed": 2**31}),
+        # Would be silently coerced: 7.9 -> 7, True -> 1, 2.9 -> 2, -0.5 -> 0.
+        ("grain", {"strength": 7.9}),
+        ("grain", {"strength": True}),
+        ("grain", {"strength": "8"}),
+        ("gate_weave", {"amplitude": 2.9}),
+        ("gate_weave", {"amplitude": -0.5}),
+        # A string is a sequence: "12" would read as the frequencies (1, 2).
+        ("gate_weave", {"frequency": "12"}),
+        ("halation", {"tint": "rgb"}),
+        ("colorbalance", {"shadows": "abc"}),
+        ("curves", {"all": "0/0 1/1"}),
+        ("curves", {"all": [(0, 0), "11"]}),
+        # A wrong type reaches the caller as a CompileError, not a bare
+        # TypeError / ValueError from inside a check.
+        ("halation", {"threshold": None}),
+        ("vignette", {"angle": "wide"}),
+        ("colorbalance", {"midtones": (0, 0, "x")}),
     ],
 )
 def test_a_parameter_no_implementation_could_honour_is_refused(env, effect, params):
     with pytest.raises(CompileError, match=effect):
         _vf(env, Effect(name=effect, params=params))
+
+
+def test_an_integer_valued_float_is_accepted_as_that_integer(env):
+    """Accepted, deliberately: ``8.0`` is emitted as ``8``, the picture asked for.
+
+    Refusing it would refuse a value neither ffmpeg nor the compiler mishandles.
+    """
+    for effect, key, value in [
+        ("grain", "strength", 8),
+        ("grain", "seed", 3),
+        ("gate_weave", "amplitude", 2),
+    ]:
+        as_float = _vf(env, Effect(name=effect, params={key: float(value)}))
+        assert as_float == _vf(env, Effect(name=effect, params={key: value}))
+
+
+def test_the_sigma_bound_is_gblurs(env):
+    _ffmpeg_or_skip()
+    halation = Effect(name="halation", params={"sigma": 1024})
+    assert len(frames(_vf(env, halation))) == 1
+
+
+def test_the_parameter_checks_carry_no_defaults():
+    """A check validates what is present; an absent key is the compiler's.
+
+    A default in a check is a second copy of the compiler's, and the first
+    copies disagreed (halation sigma 1 against 24, grain strength 0 against 8).
+    """
+    import ast
+    import inspect
+
+    from looks import compile as compile_module
+
+    names = ("curves", "colorbalance", "vignette", "halation", "grain", "gate_weave")
+    for name in names:
+        tree = ast.parse(inspect.getsource(compile_module.EFFECT_PARAM_CHECKS[name]))
+        defaulted = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "get"
+            and len(node.args) > 1
+        ]
+        assert not defaulted, name
+
+
+def test_the_effect_vocabulary_has_one_copy():
+    from looks import compile as compile_module
+    from looks import ffmpeg
+
+    assert compile_module.CURVES_CHANNELS is ffmpeg.CURVES_CHANNELS
+    assert compile_module.COLORBALANCE_ZONES is ffmpeg.COLORBALANCE_ZONES
 
 
 def test_curves_needs_points(env):
