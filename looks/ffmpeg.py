@@ -289,6 +289,35 @@ RGB_DOMAIN_FILTERS = frozenset(
         "colorcontrast",
         "selectivecolor",
         "lut1d",
+        # Found by sweeping every V->V filter with default arguments and
+        # reading its `auto_scale` line (#42; `test_rgb_domain_filters.py`
+        # repeats the sweep, so a filter missing here fails the suite). The
+        # list means "converts around itself", so scalers, scopes and
+        # quantisers are included: wrapping them in the matrix declaration
+        # costs nothing. No built-in emits any of them.
+        # `geq` is deliberately absent: it takes RGB only when given r=/g=/b=
+        # expressions and stays in YUV otherwise, which a list of names cannot
+        # tell apart. An implementation that emits the RGB form must declare
+        # `rgb_only=True` itself.
+        "histeq",
+        "normalize",
+        "tonemap",
+        "dctdnoiz",
+        "grayworld",
+        "greyedge",
+        "rgbashift",
+        "colorhold",
+        "colorkey",
+        "despill",
+        "photosensitivity",
+        "stereo3d",
+        "ciescope",
+        "elbg",
+        "palettegen",
+        "epx",
+        "hqx",
+        "xbr",
+        "super2xsai",
     }
 )
 
