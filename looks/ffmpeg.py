@@ -611,7 +611,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
     )
     add(
         "gate_weave.ffmpeg.crop",
-        ("crop", "scale"),
+        ("crop", "scale", "setsar"),
         _gate_weave_compiler,
         timeline=False,
         time_varying=True,
@@ -814,9 +814,12 @@ def _halation_compiler(params, **_kw):
     (measured on 9.0 and 6.1: pixel-identical to per-step labels). The
     fragment still comma-splices, because its first and last pads are
     unlabelled. **Forced to RGB**
-    (``format=gbrp``) because a ``screen`` blend negotiated in YUV screens the
+    (``format=gbrp16le``) because a ``screen`` blend negotiated in YUV screens the
     chroma planes too: measured on ``testsrc2``, the unforced form *lowered*
     mean green by 26/255 — a screen that darkens. In RGB it only ever adds.
+    Sixteen bits, not ``gbrp``: a bare 8-bit format is what rule 23 forbids —
+    on a 10-bit ramp ``gbrp`` kept 19 of 64 codes — and at 720p the 16-bit
+    branch measured no slower (11-13 against 14-16 ms/frame).
 
     The mask is Rec.709 luma, thresholded per channel — the channels are equal
     after the grey matrix, so that is a luma threshold — and scaled by the tint
@@ -839,7 +842,7 @@ def _halation_compiler(params, **_kw):
         )
     )
     screen = filter_string("blend", {"all_mode": "screen", "all_opacity": _num(amount)})
-    return {"filter": f"format=gbrp,split{a}{b};{b}{branch}{h};{a}{h}{screen}"}
+    return {"filter": f"format=gbrp16le,split{a}{b};{b}{branch}{h};{a}{h}{screen}"}
 
 
 def _grain_compiler(params, **_kw):
@@ -865,28 +868,45 @@ def _grain_compiler(params, **_kw):
     }
 
 
-def _gate_weave_compiler(params, **_kw):
+def _gate_weave_compiler(params, *, clip=None, **_kw):
     """A film gate's wander: a sinusoidal crop, scaled back to the input size.
 
     Reads ``t`` rather than the frame index, so the wander's speed does not
     change with the frame rate. The scale-back is a zoom of ``2A`` pixels,
-    which is what a real gate's matte hides too.
+    which is what a real gate's matte hides too. Two details, each measured
+    (review of #27):
+
+    - ``exact=1``: without it ``crop`` snaps to the chroma grid on 4:2:0, so
+      the gate moved in 2-pixel steps (9 positions in 96 frames, not 24) and an
+      odd 65x49 frame came back 64x48.
+    - ``setsar`` undoes the aspect ``scale`` assigns to a non-uniform stretch
+      (1920x1080 came out ``sar 4311:4304``, which a concat then refuses). It
+      is written in the stream's own ``sar``/``w``/``h``, so it assumes no
+      aspect and needs no ClipSpec.
 
     >>> _gate_weave_compiler({"amplitude": 2, "frequency": (3, 2)})["filter"]
-    'crop=w=iw-4:h=ih-4:x=2+2*sin(2*PI*3*t):y=2+2*cos(2*PI*2*t),scale=w=iw+4:h=ih+4'
+    'crop=w=iw-4:h=ih-4:x=2+2*sin(2*PI*3*t):y=2+2*cos(2*PI*2*t):exact=1,scale=w=iw+4:h=ih+4,setsar=sar=sar*w*(h-4)/(h*(w-4))'
     """
     amplitude = int(params.get("amplitude", DFLT_WEAVE_AMPLITUDE))
+    margin = 2 * amplitude
+    if clip is not None and margin >= min(clip.width, clip.height):
+        raise FfmpegBackendError(
+            f"gate_weave amplitude {amplitude} leaves nothing of a "
+            f"{clip.width}x{clip.height} frame: 2 * amplitude must be below its "
+            "smaller side"
+        )
     fx, fy = (_num(float(f)) for f in params.get("frequency", DFLT_WEAVE_FREQUENCY))
     crop = filter_string(
         "crop",
         {
-            "w": f"iw-{2 * amplitude}",
-            "h": f"ih-{2 * amplitude}",
+            "w": f"iw-{margin}",
+            "h": f"ih-{margin}",
             "x": f"{amplitude}+{amplitude}*sin(2*PI*{fx}*t)",
             "y": f"{amplitude}+{amplitude}*cos(2*PI*{fy}*t)",
+            "exact": 1,
         },
     )
-    scale = filter_string(
-        "scale", {"w": f"iw+{2 * amplitude}", "h": f"ih+{2 * amplitude}"}
-    )
-    return {"filter": f"{crop},{scale}"}
+    scale = filter_string("scale", {"w": f"iw+{margin}", "h": f"ih+{margin}"})
+    # The inverse of scale's own SAR correction for (w-2A, h-2A) -> (w, h).
+    setsar = filter_string("setsar", {"sar": f"sar*w*(h-{margin})/(h*(w-{margin}))"})
+    return {"filter": f"{crop},{scale},{setsar}"}

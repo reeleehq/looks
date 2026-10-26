@@ -4,7 +4,7 @@
 `test_time_varying.py` measures each one's clock-reading against its
 declaration. This file asserts what each effect does to a **colour** picture,
 on every channel (rule 29b's lesson: a grey ramp hides a per-channel bug), plus
-the two mechanisms the effects brought with them — scoped pad labels for a
+the two mechanisms the effects brought with them — fixed pad labels inside a
 branching step, and effect-level parameter refusals.
 
 Offline and free: every source is `lavfi`, every process ends in `-f null -` or
@@ -27,6 +27,10 @@ COLOUR = f"testsrc2=size={SIZE[0]}x{SIZE[1]}:rate=10"
 #: A colour bar pattern carries both shadows and highlights; testsrc2 alone is
 #: mostly mid-tones and saturated primaries.
 BARS = f"smptehdbars=size={SIZE[0]}x{SIZE[1]}:rate=10"
+#: The baseline for a step that works in RGB: the same conversion halation
+#: makes, so a comparison measures the effect and not the conversion (an 8-bit
+#: `gbrp` path differs from the 16-bit one by up to 117/255 on testsrc2).
+RGB = "format=gbrp16le"
 
 
 def _ffmpeg_or_skip():
@@ -75,7 +79,7 @@ class TestHalation:
         """A screen cannot darken. Negotiated in YUV it did: mean green fell
         26/255, because the chroma planes were screened too."""
         _ffmpeg_or_skip()
-        (before,) = frames("format=gbrp", source=BARS)
+        (before,) = frames(RGB, source=BARS)
         (after,) = frames(_vf(env, Effect(name="halation")), source=BARS)
         darker = sum(1 for b, a in zip(before, after) if a < b - 1)
         assert darker == 0, f"{darker} channel samples got darker"
@@ -83,14 +87,14 @@ class TestHalation:
 
     def test_the_default_tint_is_red_orange(self, env):
         _ffmpeg_or_skip()
-        (before,) = frames("format=gbrp", source=BARS)
+        (before,) = frames(RGB, source=BARS)
         (after,) = frames(_vf(env, Effect(name="halation")), source=BARS)
         gain = [a - b for a, b in zip(channel_means(after), channel_means(before))]
         assert gain[0] > gain[1] > 0 and gain[0] > gain[2] > 0, gain
 
     def test_a_threshold_above_every_pixel_changes_nothing(self, env):
         _ffmpeg_or_skip()
-        (before,) = frames("format=gbrp")
+        (before,) = frames(RGB)
         (after,) = frames(
             _vf(env, Effect(name="halation", params={"threshold": 1.0}))
         )
@@ -99,6 +103,37 @@ class TestHalation:
     def test_it_cannot_be_gated_to_a_span(self, env):
         with pytest.raises(SpanUnsupported):
             _vf(env, Effect(name="halation", at=Span(0.0, 1.0)))
+
+    def _gain(self, env, **params):
+        (before,) = frames(RGB, source=BARS)
+        (after,) = frames(_vf(env, Effect(name="halation", params=params)), source=BARS)
+        return [a - b for a, b in zip(channel_means(after), channel_means(before))]
+
+    def test_amount_scales_the_glow(self, env):
+        _ffmpeg_or_skip()
+        assert max(abs(g) for g in self._gain(env, amount=0)) < 0.5
+        assert self._gain(env, amount=1)[0] > self._gain(env, amount=0.5)[0] + 1
+
+    def test_sigma_spreads_the_glow(self, env):
+        """A wider blur reaches more pixels around each highlight."""
+        _ffmpeg_or_skip()
+        (before,) = frames(RGB, source=BARS)
+
+        def reached(sigma):
+            (after,) = frames(
+                _vf(env, Effect(name="halation", params={"sigma": sigma})), source=BARS
+            )
+            return sum(1 for a, b in zip(after, before) if a > b + 1)
+
+        assert reached(12) > reached(1)
+
+    @pytest.mark.parametrize("lit", [0, 1, 2])
+    def test_the_tint_says_which_channel_glows(self, env, lit):
+        _ffmpeg_or_skip()
+        tint = tuple(1.0 if c == lit else 0.0 for c in range(3))
+        gain = self._gain(env, tint=tint)
+        assert gain[lit] > 1
+        assert all(abs(g) < 0.5 for c, g in enumerate(gain) if c != lit), gain
 
 
 class TestBranchLabels:
@@ -111,9 +146,11 @@ class TestBranchLabels:
         blue = Effect(name="halation", params={"tint": (0, 0, 1), "threshold": 0.3})
         both = _vf(env, red, blue)
         assert both.count("[lk_a]") == 4, both
-        in_one = frames(both)
-        in_two = frames(f"{_vf(env, red)},format=rgb24,{_vf(env, blue)}")
-        assert in_one == in_two
+        # The same chain with the second step's labels renamed apart: if reuse
+        # rewired anything, the pictures would differ.
+        first = _vf(env, red)
+        apart = first + "," + _vf(env, blue).replace("[lk_", "[other_")
+        assert frames(both) == frames(apart)
 
     def test_a_plan_splices_between_host_filters(self, env):
         _ffmpeg_or_skip()
@@ -133,7 +170,7 @@ class TestCurvesAndColorbalance:
 
     def test_a_shadow_shift_moves_shadows_more_than_highlights(self, env):
         _ffmpeg_or_skip()
-        (before,) = frames("format=gbrp", source=BARS)
+        (before,) = frames(RGB, source=BARS)
         (after,) = frames(
             _vf(env, Effect(name="colorbalance", params={"shadows": (0, 0, 0.5)})),
             source=BARS,
@@ -145,6 +182,18 @@ class TestCurvesAndColorbalance:
         assert lift(dark) > lift(bright) + 5, (lift(dark), lift(bright))
 
 
+    def test_preserve_lightness_changes_the_picture(self, env):
+        _ffmpeg_or_skip()
+        shift = {"midtones": (0.4, 0, -0.4)}
+        plain = frames(_vf(env, Effect(name="colorbalance", params=shift)), source=BARS)
+        kept = frames(
+            _vf(env, Effect(name="colorbalance",
+                            params={**shift, "preserve_lightness": True})),
+            source=BARS,
+        )
+        assert plain != kept
+
+
 class TestVignette:
     def test_it_darkens_the_corners_and_not_the_centre(self, env):
         _ffmpeg_or_skip()
@@ -153,6 +202,18 @@ class TestVignette:
         centre, corner = pixel(after, 32, 24), pixel(after, 0, 0)
         assert all(c >= 0xC0 - 3 for c in centre), centre
         assert all(k < c - 20 for k, c in zip(corner, centre)), (corner, centre)
+
+    def test_a_wider_angle_darkens_the_corners_more(self, env):
+        _ffmpeg_or_skip()
+        flat = "color=c=0xC0C0C0:size=64x48:rate=10"
+
+        def corner(angle):
+            (out,) = frames(
+                _vf(env, Effect(name="vignette", params={"angle": angle})), source=flat
+            )
+            return sum(pixel(out, 0, 0))
+
+        assert corner(1.2) < corner(0.4) - 20
 
 
 class TestGrain:
@@ -185,6 +246,58 @@ class TestGateWeave:
         fragment = _vf(env, Effect(name="gate_weave", params={"amplitude": 4}))
         out = frames(fragment, source="testsrc2=size=64x48:rate=10,loop=-1:1", count=4)
         assert len(set(out)) > 1, "a still picture did not wander"
+
+    @pytest.mark.parametrize(
+        "source, size, sar",
+        [
+            ("testsrc2=size=1920x1080", "1920x1080", "1/1"),
+            ("testsrc2=size=720x480", "720x480", "8/9"),
+            # An odd 4:2:0 frame. `color` keeps 65x49 where `testsrc2` rounds
+            # it to 64x48 — and some builds' `color` does too, so the source's
+            # own size is read first.
+            ("color=c=gray:size=65x49", "65x49", "1/1"),
+        ],
+    )
+    def test_it_keeps_the_frame_size_and_aspect(self, env, source, size, sar):
+        """Read through `showinfo`: raw frames carry no aspect ratio, which is
+        how a SAR of 4311:4304 — refused by a concat — first got past."""
+        _ffmpeg_or_skip()
+        source = f"{source}:rate=10,format=yuv420p,setsar={sar}"
+
+        def shown(fragment):
+            proc = subprocess.run(
+                ["ffmpeg", "-v", "info", "-f", "lavfi", "-i", source,
+                 "-vf", f"{fragment},showinfo", "-frames:v", "3",
+                 "-f", "null", "-"],
+                capture_output=True, text=True,
+            )
+            assert proc.returncode == 0, proc.stderr[-600:]
+            return [line for line in proc.stderr.splitlines() if " n:" in line]
+
+        if f"s:{size}" not in shown("null")[0]:
+            pytest.skip(f"this build's lavfi source does not produce {size}")
+        lines = shown(_vf(env, Effect(name="gate_weave")))
+        assert lines
+        for line in lines:
+            assert f"s:{size} " in line and f"sar:{sar} " in line, line
+
+    def test_it_moves_by_single_pixels_on_420(self, env):
+        """Without `exact=1`, crop snaps to the chroma grid: at amplitude 1, 48
+        frames visit 4 positions instead of 9."""
+        _ffmpeg_or_skip()
+        fragment = _vf(env, Effect(name="gate_weave", params={"amplitude": 1}))
+        out = frames(
+            fragment,
+            source="testsrc2=size=64x48:rate=10,format=yuv444p,loop=-1:1,format=yuv420p",
+            count=48,
+        )
+        assert len(set(out)) > 6, len(set(out))
+
+    def test_an_amplitude_bigger_than_the_frame_is_refused(self, env):
+        from looks.ffmpeg import FfmpegBackendError
+
+        with pytest.raises(FfmpegBackendError, match="amplitude"):
+            _vf(env, Effect(name="gate_weave", params={"amplitude": 24}))
 
     def test_it_reads_the_clock_and_cannot_be_gated(self, env):
         plan = compile_look(
