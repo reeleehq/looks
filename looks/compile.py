@@ -161,6 +161,103 @@ def _check_contrast(params) -> None:
         )
 
 
+def _require(ok: bool, effect: str, message: str) -> None:
+    if not ok:
+        raise CompileError(f"{effect}: {message}")
+
+
+def _in_range(value, low: float, high: float) -> bool:
+    return low <= float(value) <= high
+
+
+def _check_curves(params) -> None:
+    for channel in ("all", "red", "green", "blue"):
+        points = params.get(channel)
+        if not points:
+            continue
+        xs = [float(x) for x, _y in points]
+        _require(
+            len(points) >= 2
+            and all(_in_range(v, 0, 1) for pair in points for v in pair)
+            and all(a < b for a, b in zip(xs, xs[1:])),
+            "curves",
+            f"{channel!r} must be at least two (x, y) points in 0..1 with x "
+            f"strictly increasing; got {points!r}",
+        )
+
+
+def _check_colorbalance(params) -> None:
+    for zone in ("shadows", "midtones", "highlights"):
+        shift = params.get(zone, (0, 0, 0))
+        _require(
+            len(shift) == 3 and all(_in_range(v, -1, 1) for v in shift),
+            "colorbalance",
+            f"{zone!r} must be an (r, g, b) shift, each in -1..1; got {shift!r}",
+        )
+
+
+def _check_vignette(params) -> None:
+    import math
+
+    angle = float(params.get("angle", math.pi / 5))
+    _require(
+        0 < angle <= math.pi / 2,
+        "vignette",
+        f"angle must be in (0, pi/2] radians; got {angle!r}",
+    )
+
+
+def _check_halation(params) -> None:
+    _require(
+        _in_range(params.get("threshold", 0.5), 0, 1),
+        "halation",
+        "threshold is a fraction of full scale, 0..1",
+    )
+    _require(float(params.get("sigma", 1)) > 0, "halation", "sigma must be > 0")
+    _require(
+        _in_range(params.get("amount", 0.5), 0, 1),
+        "halation",
+        "amount is a blend opacity, 0..1",
+    )
+    tint = params.get("tint", (1, 1, 1))
+    _require(
+        len(tint) == 3 and all(float(v) >= 0 for v in tint),
+        "halation",
+        f"tint must be three non-negative gains (r, g, b); got {tint!r}",
+    )
+
+
+def _check_grain(params) -> None:
+    _require(
+        "temporal" not in params,
+        "grain",
+        "there is no 'temporal' switch: grain is always re-drawn per frame, "
+        "because static noise reads as dirt on the lens, not as grain",
+    )
+    _require(
+        _in_range(params.get("strength", 0), 0, 100),
+        "grain",
+        "strength must be in 0..100",
+    )
+    _require(
+        _in_range(params.get("seed", 0), 0, 2**31 - 1),
+        "grain",
+        "seed must be in 0..2**31-1",
+    )
+
+
+def _check_gate_weave(params) -> None:
+    _require(
+        int(params.get("amplitude", 0)) >= 0, "gate_weave", "amplitude must be >= 0"
+    )
+    frequency = params.get("frequency", (0, 0))
+    _require(
+        len(frequency) == 2 and all(float(f) >= 0 for f in frequency),
+        "gate_weave",
+        f"frequency must be two non-negative values, Hz; got {frequency!r}",
+    )
+
+
 #: What an effect's parameters must satisfy, keyed by EFFECT — never by
 #: implementation. A check that lives inside one compiler is a check the
 #: licence tier can switch off: `contrast` with `amount=-1` was refused on the
@@ -170,6 +267,12 @@ def _check_contrast(params) -> None:
 #: document is accepted either.
 EFFECT_PARAM_CHECKS = {
     "contrast": _check_contrast,
+    "curves": _check_curves,
+    "colorbalance": _check_colorbalance,
+    "vignette": _check_vignette,
+    "halation": _check_halation,
+    "grain": _check_grain,
+    "gate_weave": _check_gate_weave,
 }
 
 

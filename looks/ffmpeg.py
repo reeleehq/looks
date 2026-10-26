@@ -47,6 +47,7 @@ keeps the package honest would have nothing left to protect.
 
 from __future__ import annotations
 
+import math
 from typing import Any, Mapping, Optional, Sequence
 
 from looks.geometry import Size, ffmpeg_chain, placement, social_size
@@ -300,6 +301,9 @@ def _simple(name: str, build):
 
 def _gamma_expression(params) -> Mapping[str, Any]:
     """Gamma through `lutrgb`, because rule 13 forbids the offset alternative.
+
+    **``gamma > 1`` brightens**, the ``eq`` convention: the curve is
+    ``pow(val/maxval, 1/gamma)``, so a mid-grey rises as ``gamma`` grows.
 
     An additive brightness offset lifts the black floor and reads as haze; a
     gamma curve keeps the endpoints. ``eq=gamma=`` would say this in one option
@@ -567,6 +571,51 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         # and close-to-inverse question.
         time_varying=True,
     )
+
+    # --- film: grade, optical, grain (issue #25) ----------------------------
+    # The catalogue's stage order is geometry -> grade -> look -> optical ->
+    # grain; `looks` composes in the order asked and does not reorder.
+    add("curves.ffmpeg.curves", ("curves",), _curves_compiler, time_varying=False)
+    add(
+        "colorbalance.ffmpeg.colorbalance",
+        ("colorbalance",),
+        _colorbalance_compiler,
+        time_varying=False,
+    )
+    add(
+        "vignette.ffmpeg.vignette",
+        ("vignette",),
+        _simple(
+            "vignette",
+            lambda p: {"angle": _num(float(p.get("angle", DFLT_VIGNETTE_ANGLE)))},
+        ),
+        time_varying=False,
+    )
+    add(
+        "halation.ffmpeg.blend",
+        ("format", "split", "colorchannelmixer", "lutrgb", "gblur", "blend"),
+        _halation_compiler,
+        # A branch: `split` has no timeline support, and `gated()` gates every
+        # filter of a fragment, so a span is refused at selection instead.
+        timeline=False,
+        time_varying=False,
+    )
+    add(
+        "grain.ffmpeg.noise",
+        ("noise",),
+        _grain_compiler,
+        # The `t` flag re-draws the noise every frame — the catalogue's INDEXED
+        # class. Deterministic for a fixed seed, and it reads the clock, which
+        # is exactly what `time_varying` is for (issue #17).
+        time_varying=True,
+    )
+    add(
+        "gate_weave.ffmpeg.crop",
+        ("crop", "scale"),
+        _gate_weave_compiler,
+        timeline=False,
+        time_varying=True,
+    )
     return reg
 
 
@@ -674,3 +723,170 @@ def _motion_compiler(params, *, clip=None, env=None, **_kw):
     if output is not None:
         payload["out_size"] = [output.width, output.height]
     return payload
+
+
+# ------------------------------------------------------------ the film effects
+#
+# Defaults are the effect catalogue's (docs/research/13 §3) unless noted; the
+# halation tint and the gate weave are the 2026-10-16 production's (issue #25),
+# where they read as 16 mm at 720p.
+
+#: Vignette half-angle, radians. ffmpeg accepts (0, PI/2].
+DFLT_VIGNETTE_ANGLE = math.pi / 5
+
+DFLT_HALATION_THRESHOLD = 0.78
+DFLT_HALATION_SIGMA = 24.0
+DFLT_HALATION_AMOUNT = 0.5
+#: Red-orange: film halation is the red layer scattering back off the base.
+DFLT_HALATION_TINT = (1.0, 0.35, 0.2)
+
+DFLT_GRAIN_STRENGTH = 8
+#: Pinned rather than ffmpeg's own default, for portability across builds.
+#: Note ``0`` is a different picture from an unseeded ``noise``.
+DFLT_GRAIN_SEED = 0
+
+#: Gate-weave wander, in pixels either side of centre.
+DFLT_WEAVE_AMPLITUDE = 2
+#: Horizontal and vertical wander, Hz. Incommensurate so the path never loops
+#: visibly: the production's ``n*0.9`` and ``n*0.61`` rad/frame, at 24 fps.
+DFLT_WEAVE_FREQUENCY = (3.44, 2.33)
+
+#: Prefix of the pad labels a branching effect uses internally, so they stay
+#: clear of a host's own (``[a]``, ``[bg]``: note 05, label rule 2).
+LABEL_NAMESPACE = "lk_"
+
+#: `looks` channel names to ffmpeg `curves` option names.
+CURVES_CHANNELS = ("all", "red", "green", "blue")
+
+#: `colorbalance` tonal zones, keyed to the letter its options end in.
+COLORBALANCE_ZONES = {"shadows": "s", "midtones": "m", "highlights": "h"}
+
+
+def _curve_points(points) -> str:
+    """``[(0, 0.03), (1, 0.95)]`` -> ``'0/0.03 1/0.95'``."""
+    return " ".join(f"{_num(float(x))}/{_num(float(y))}" for x, y in points)
+
+
+def _curves_compiler(params, **_kw):
+    """Per-channel tone curves, always ``interp=pchip``.
+
+    ``curves`` defaults to a natural cubic spline, which overshoots at a knee —
+    21 non-monotone steps out of 255 on a steep curve, against 0 under pchip
+    (rule 26, measured in the catalogue). Points are ``(x, y)`` pairs in 0..1.
+
+    >>> _curves_compiler({"all": [(0, 0.03), (0.5, 0.47), (1, 0.95)]})["filter"]
+    'curves=all=0/0.03 0.5/0.47 1/0.95:interp=pchip'
+    """
+    options = {
+        channel: _curve_points(params[channel])
+        for channel in CURVES_CHANNELS
+        if params.get(channel)
+    }
+    if not options:
+        raise FfmpegBackendError(
+            f"the 'curves' effect needs points for at least one of "
+            f"{list(CURVES_CHANNELS)}: [(x, y), ...] in 0..1"
+        )
+    return {"filter": filter_string("curves", {**options, "interp": "pchip"})}
+
+
+def _colorbalance_compiler(params, **_kw):
+    """Shadow / midtone / highlight RGB shifts, each in -1..1.
+
+    >>> _colorbalance_compiler({"shadows": (-0.03, 0, 0.04)})["filter"]
+    'colorbalance=rs=-0.03:gs=0:bs=0.04:rm=0:gm=0:bm=0:rh=0:gh=0:bh=0:pl=0'
+    """
+    options = {}
+    for zone, letter in COLORBALANCE_ZONES.items():
+        for channel, shift in zip("rgb", params.get(zone, (0, 0, 0))):
+            options[f"{channel}{letter}"] = _num(float(shift))
+    options["pl"] = int(bool(params.get("preserve_lightness", False)))
+    return {"filter": filter_string("colorbalance", options)}
+
+
+def _halation_compiler(params, **_kw):
+    """Highlights, tinted and blurred, screened back over the picture.
+
+    A branch, so it carries pad labels — under :data:`LABEL_NAMESPACE`, and
+    the same ones every time. Two halations in one chain do not collide:
+    ffmpeg binds a label to the next use of it in parse order, so a label
+    that is opened and closed inside one fragment is free again after it
+    (measured on 9.0 and 6.1: pixel-identical to per-step labels). The
+    fragment still comma-splices, because its first and last pads are
+    unlabelled. **Forced to RGB**
+    (``format=gbrp``) because a ``screen`` blend negotiated in YUV screens the
+    chroma planes too: measured on ``testsrc2``, the unforced form *lowered*
+    mean green by 26/255 — a screen that darkens. In RGB it only ever adds.
+
+    The mask is Rec.709 luma, thresholded per channel — the channels are equal
+    after the grey matrix, so that is a luma threshold — and scaled by the tint
+    in the same lookup, since a blur commutes with a per-channel gain.
+    """
+    threshold = float(params.get("threshold", DFLT_HALATION_THRESHOLD))
+    sigma = float(params.get("sigma", DFLT_HALATION_SIGMA))
+    amount = float(params.get("amount", DFLT_HALATION_AMOUNT))
+    tint = params.get("tint", DFLT_HALATION_TINT)
+    a, b, h = (f"[{LABEL_NAMESPACE}{name}]" for name in "abh")
+    mask = {
+        channel: f"if(gt(val,{_num(threshold)}*maxval),val*{_num(float(gain))},0)"
+        for channel, gain in zip("rgb", tint)
+    }
+    branch = ",".join(
+        (
+            filter_string("colorchannelmixer", _saturation_matrix({"amount": 0.0})),
+            filter_string("lutrgb", mask),
+            filter_string("gblur", {"sigma": _num(sigma)}),
+        )
+    )
+    screen = filter_string("blend", {"all_mode": "screen", "all_opacity": _num(amount)})
+    return {"filter": f"format=gbrp,split{a}{b};{b}{branch}{h};{a}{h}{screen}"}
+
+
+def _grain_compiler(params, **_kw):
+    """Temporal uniform noise: ``noise=alls=S:allf=t+u:all_seed=K``.
+
+    Always temporal. Untagged ``noise`` is a fixed pattern, which reads as dirt
+    on the lens rather than as grain, so there is no ``temporal`` switch — and
+    one would make ``time_varying`` a function of the params, which an
+    :class:`~looks.spec.ImplRef` declaration cannot express.
+
+    >>> _grain_compiler({})["filter"]
+    'noise=alls=8:allf=t+u:all_seed=0'
+    """
+    return {
+        "filter": filter_string(
+            "noise",
+            {
+                "alls": int(params.get("strength", DFLT_GRAIN_STRENGTH)),
+                "allf": "t+u",
+                "all_seed": int(params.get("seed", DFLT_GRAIN_SEED)),
+            },
+        )
+    }
+
+
+def _gate_weave_compiler(params, **_kw):
+    """A film gate's wander: a sinusoidal crop, scaled back to the input size.
+
+    Reads ``t`` rather than the frame index, so the wander's speed does not
+    change with the frame rate. The scale-back is a zoom of ``2A`` pixels,
+    which is what a real gate's matte hides too.
+
+    >>> _gate_weave_compiler({"amplitude": 2, "frequency": (3, 2)})["filter"]
+    'crop=w=iw-4:h=ih-4:x=2+2*sin(2*PI*3*t):y=2+2*cos(2*PI*2*t),scale=w=iw+4:h=ih+4'
+    """
+    amplitude = int(params.get("amplitude", DFLT_WEAVE_AMPLITUDE))
+    fx, fy = (_num(float(f)) for f in params.get("frequency", DFLT_WEAVE_FREQUENCY))
+    crop = filter_string(
+        "crop",
+        {
+            "w": f"iw-{2 * amplitude}",
+            "h": f"ih-{2 * amplitude}",
+            "x": f"{amplitude}+{amplitude}*sin(2*PI*{fx}*t)",
+            "y": f"{amplitude}+{amplitude}*cos(2*PI*{fy}*t)",
+        },
+    )
+    scale = filter_string(
+        "scale", {"w": f"iw+{2 * amplitude}", "h": f"ih+{2 * amplitude}"}
+    )
+    return {"filter": f"{crop},{scale}"}

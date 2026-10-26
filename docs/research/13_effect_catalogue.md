@@ -112,7 +112,7 @@ This family answers the kickoff's second open question, *does `looks` own normal
 
 ### `gamma`
 
-**Parameters.** `gamma: float = 1.0`, range 0.1–4.0 (the Que Calor grade used 1.78 for the indoor clip [9]) · `channels: {"luma", "rgb"} = "luma"`.
+**Parameters.** `gamma: float = 1.0`, range 0.1–4.0 (the Que Calor grade used 1.78 for the indoor clip [9]) · `channels: {"luma", "rgb"} = "luma"`. **`gamma > 1` brightens**, like `eq`: the shipped curve is `pow(val/maxval, 1/gamma)` (issue #25 — a survey agent assumed the opposite and wrote it into a plan).
 
 **Documentation this effect carries, verbatim, because it is the single most reusable lesson in the source material:** *gamma, never a brightness offset.* An additive offset lifts the black floor and reads as haze [9]. ffmpeg gives you two ways to make that mistake and `looks` closes both: the `exposure` filter's `black` option (range −1…1) is deliberately **not exposed** by `looks.exposure`, and `eq=brightness=` is reachable only through the GPL-tier `eq` implementation, where the docstring names it as the wrong knob. This is documentation with teeth — an omitted parameter, not a warning.
 

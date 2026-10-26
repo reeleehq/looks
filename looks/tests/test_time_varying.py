@@ -58,6 +58,12 @@ PARAMS = {
     "fill": {"target": "shorts"},
     "stretch": {"target": "square"},
     "motion": {"keyframes": [(0.0, (0.0, 0.0, 0.5, 0.5)), (0.5, (0.5, 0.5, 0.5, 0.5))]},
+    "curves": {"all": [(0, 0.03), (0.5, 0.47), (1, 0.95)]},
+    "colorbalance": {"shadows": (-0.03, 0, 0.04), "highlights": (0.04, 0, -0.04)},
+    "vignette": {},
+    "halation": {"sigma": 12},
+    "grain": {"strength": 7, "seed": 7},
+    "gate_weave": {},
 }
 
 ALL_IMPLS = tuple(
