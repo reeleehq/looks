@@ -959,6 +959,19 @@ def _grain_compiler(params, **_kw):
     one would make ``time_varying`` a function of the params, which an
     :class:`~looks.spec.ImplRef` declaration cannot express.
 
+    **A fixed ``seed`` repeats at every cut** (issue #30). A step is applied per
+    cut, before assembly, and the noise sequence starts again at each cut's own
+    ``t=0``: with one seed for the whole edit the grain is identical in every
+    cut, which a long edit of short cuts may show. The seed is part of the
+    document, so ``looks`` does not derive one: **the host passes one per part**,
+    for example an integer taken from a hex digest of the part's source bytes
+    (``int(digest[:7], 16)`` fits ``0..MAX_GRAIN_SEED``), as
+    ``Effect(name="grain", params={"seed": n})``. Not the part's
+    :func:`~looks.spec.output_key`: that hashes the plan, which contains the
+    seed. Left deterministic on purpose:
+    a seed derived inside ``looks`` would make a step's pixels depend on more
+    than its params.
+
     >>> from looks.params import with_defaults
     >>> _grain_compiler(with_defaults("grain", {}))["filter"]
     'noise=alls=8:allf=t+u:all_seed=0'
