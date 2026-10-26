@@ -106,13 +106,13 @@ class TestTheSameLookOnTwoBinaries:
     """The thesis. One document, two machines, two answers."""
 
     def test_the_binary_picks_the_chain(self, registry, env, look):
-        gpl = compile_look(look, clip=CLIP, env=env, registry=registry)
+        gpl = compile_look(look, clip=CLIP, env=env, registry=registry, assume_color_space="bt709")
         lgpl = compile_look(
             look,
             clip=CLIP,
             env=lgpl_build(env),
             registry=registry,
-            policy=Policy(max_tier=Tier.WEAK_COPYLEFT),
+            policy=Policy(max_tier=Tier.WEAK_COPYLEFT), assume_color_space="bt709",
         )
         assert [s.impl.impl for s in gpl.steps] == [
             "lut3d.ffmpeg.default",
@@ -133,10 +133,10 @@ class TestTheSameLookOnTwoBinaries:
     def test_the_plan_records_which_binary_it_was_compiled_against(
         self, registry, env, look
     ):
-        gpl = compile_look(look, clip=CLIP, env=env, registry=registry)
+        gpl = compile_look(look, clip=CLIP, env=env, registry=registry, assume_color_space="bt709")
         lgpl = compile_look(
             look, clip=CLIP, env=lgpl_build(env), registry=registry,
-            policy=Policy(max_tier=Tier.WEAK_COPYLEFT),
+            policy=Policy(max_tier=Tier.WEAK_COPYLEFT), assume_color_space="bt709",
         )
         assert gpl.env is not None and gpl.env != lgpl.env, (
             "two binaries must not fingerprint alike, or a plan hash lies"
@@ -148,7 +148,7 @@ class TestTheBinaryIsRequiredForAnFfmpegStep:
 
     def test_no_env_is_refused_rather_than_assumed(self, registry, look):
         with pytest.raises(CompileError, match="property of the binary"):
-            compile_look(look, clip=CLIP, registry=registry)
+            compile_look(look, clip=CLIP, registry=registry, assume_color_space="bt709")
 
     def test_an_unusable_binary_is_refused_and_says_so(self, registry, look):
         broken = FfmpegEnv(
@@ -157,7 +157,7 @@ class TestTheBinaryIsRequiredForAnFfmpegStep:
             notes=("not on PATH",),
         )
         with pytest.raises(CompileError, match="not usable"):
-            compile_look(look, clip=CLIP, env=broken, registry=registry)
+            compile_look(look, clip=CLIP, env=broken, registry=registry, assume_color_space="bt709")
 
     def test_a_non_ffmpeg_backend_needs_no_binary(self):
         """The requirement is about ffmpeg, not about compiling."""
@@ -167,7 +167,7 @@ class TestTheBinaryIsRequiredForAnFfmpegStep:
             lambda params, **kw: {"callable": "blur.frame.numpy"},
         )
         plan = compile_look(
-            Look(steps=(Effect(name="blur"),)), clip=CLIP, registry=reg
+            Look(steps=(Effect(name="blur"),)), clip=CLIP, registry=reg, assume_color_space="bt709",
         )
         assert plan.steps[0].impl.backend == "frame"
 
@@ -229,7 +229,7 @@ class TestTheRegistryRefusesEarly:
         with pytest.raises(CompileError, match="nobody implements"):
             compile_look(
                 Look(steps=(Effect(name="nonesuch"),)),
-                clip=CLIP, env=env, registry=registry,
+                clip=CLIP, env=env, registry=registry, assume_color_space="bt709",
             )
 
 
@@ -238,7 +238,7 @@ class TestAStoredPlanIsNotTrusted:
 
     @pytest.fixture
     def plan(self, registry, env, look):
-        return compile_look(look, clip=CLIP, env=env, registry=registry)
+        return compile_look(look, clip=CLIP, env=env, registry=registry, assume_color_space="bt709")
 
     def test_an_untampered_plan_passes(self, plan, registry):
         assert audit(plan, registry=registry) is None
@@ -305,13 +305,13 @@ class TestAStoredPlanIsNotTrusted:
 
 class TestCostIsUnknownRatherThanZero:
     def test_a_declared_estimator_is_used(self, registry, env, look):
-        plan = compile_look(look, clip=CLIP, env=env, registry=registry)
+        plan = compile_look(look, clip=CLIP, env=env, registry=registry, assume_color_space="bt709")
         assert plan.steps[0].cpu_seconds == 0.25
 
     def test_an_absent_estimator_is_none_and_poisons_the_total(
         self, registry, env, look
     ):
-        plan = compile_look(look, clip=CLIP, env=env, registry=registry)
+        plan = compile_look(look, clip=CLIP, env=env, registry=registry, assume_color_space="bt709")
         assert plan.steps[1].cpu_seconds is None
         assert plan.has_unknown_costs
         assert "unknown" in describe(plan)
@@ -319,7 +319,7 @@ class TestCostIsUnknownRatherThanZero:
 
 class TestReadingAPlan:
     def test_an_ffmpeg_payload_is_fully_inspectable(self, registry, env, look):
-        plan = compile_look(look, clip=CLIP, env=env, registry=registry)
+        plan = compile_look(look, clip=CLIP, env=env, registry=registry, assume_color_space="bt709")
         assert payloads(plan, "ffmpeg") == (
             {"filter": "lut3d=a.cube"},
             {"filter": "eq="},
@@ -333,7 +333,7 @@ class TestReadingAPlan:
         )
         with pytest.raises(CompileError, match="not a mapping"):
             compile_look(
-                Look(steps=(Effect(name="bad"),)), clip=CLIP, env=env, registry=reg
+                Look(steps=(Effect(name="bad"),)), clip=CLIP, env=env, registry=reg, assume_color_space="bt709",
             )
 
     def test_missing_filters_are_a_separate_question_from_licence(
@@ -341,7 +341,7 @@ class TestReadingAPlan:
     ):
         """A ceiling is about what a caller may do; a missing filter is about
         what a machine can do. Different refusals, different fixes."""
-        plan = compile_look(look, clip=CLIP, env=env, registry=registry)
+        plan = compile_look(look, clip=CLIP, env=env, registry=registry, assume_color_space="bt709")
         assert unmet_filters(plan, env) == ()
         stripped = dataclasses.replace(
             env, filters=frozenset(env.filters) - {"lut3d"}
@@ -349,7 +349,7 @@ class TestReadingAPlan:
         assert unmet_filters(plan, stripped) == ("lut3d",)
 
     def test_describe_says_unknown_where_it_is_unknown(self, registry, env, look):
-        text = describe(compile_look(look, clip=CLIP, env=env, registry=registry))
+        text = describe(compile_look(look, clip=CLIP, env=env, registry=registry, assume_color_space="bt709"))
         assert "lut3d.ffmpeg.default" in text and "cpu=unknown" in text
 
     def test_an_empty_plan_describes_as_empty(self):
@@ -360,12 +360,12 @@ class TestReadingAPlan:
 
 class TestCompilingSeveral:
     def test_all_or_none(self, registry, env, look):
-        good = compile_all([look, look], clip=CLIP, env=env, registry=registry)
+        good = compile_all([look, look], clip=CLIP, env=env, registry=registry, assume_color_space="bt709")
         assert len(good) == 2
         with pytest.raises(CompileError):
             compile_all(
                 [look, Look(steps=(Effect(name="nonesuch"),))],
-                clip=CLIP, env=env, registry=registry,
+                clip=CLIP, env=env, registry=registry, assume_color_space="bt709",
             )
 
 
@@ -410,7 +410,7 @@ class TestTheRegistryIsAPlainDictOnPurpose:
             a_filter("curves"),
         )
         plan = compile_look(
-            Look(steps=(Effect(name="grade"),)), clip=CLIP, env=env, registry=reg
+            Look(steps=(Effect(name="grade"),)), clip=CLIP, env=env, registry=reg, assume_color_space="bt709",
         )
         assert plan.steps[0].impl.impl == "grade.ffmpeg.eq"
         assert reg.tags("grade.ffmpeg.eq") == frozenset(
@@ -437,7 +437,7 @@ class TestTheRegistryIsAPlainDictOnPurpose:
         }
 
     def test_a_plan_holds_no_live_callables(self, registry, env, look):
-        plan = compile_look(look, clip=CLIP, env=env, registry=registry)
+        plan = compile_look(look, clip=CLIP, env=env, registry=registry, assume_color_space="bt709")
         for step in plan.steps:
             assert all(not callable(v) for v in step.payload.values())
             assert not callable(step.impl)
@@ -456,7 +456,7 @@ class TestACompiledPlanIsStillData:
 
     @pytest.fixture
     def plan(self, registry, env, look):
-        return compile_look(look, clip=CLIP, env=env, registry=registry)
+        return compile_look(look, clip=CLIP, env=env, registry=registry, assume_color_space="bt709")
 
     def test_the_env_is_a_fingerprint_not_a_method(self, plan):
         from looks.environment import EnvFingerprint
@@ -487,9 +487,9 @@ class TestACompiledPlanIsStillData:
         from looks.environment import Licence
         from looks.spec import plan_hash
 
-        one = compile_look(look, clip=CLIP, env=env, registry=registry)
+        one = compile_look(look, clip=CLIP, env=env, registry=registry, assume_color_space="bt709")
         other_env = dataclasses.replace(env, version="ffmpeg version 7.1")
-        other = compile_look(look, clip=CLIP, env=other_env, registry=registry)
+        other = compile_look(look, clip=CLIP, env=other_env, registry=registry, assume_color_space="bt709")
         assert plan_hash(one) != plan_hash(other)
 
 
@@ -517,14 +517,14 @@ class TestAStoredPlanKeepsItsCeiling:
         "ceiling", [Tier.PURE, Tier.PERMISSIVE, Tier.WEAK_COPYLEFT, Tier.COPYLEFT_SHIPPED]
     )
     def test_the_ceiling_survives(self, registry, env, look, ceiling):
-        plan = compile_look(look, clip=CLIP, env=env, registry=registry)
+        plan = compile_look(look, clip=CLIP, env=env, registry=registry, assume_color_space="bt709")
         raised = dataclasses.replace(plan, policy=Policy(max_tier=ceiling))
         assert self._round_trip(raised).policy.max_tier is ceiling
 
     def test_the_whole_policy_survives_not_only_the_tier(self, registry, env, look):
         from looks.licence import FieldOfUse
 
-        plan = compile_look(look, clip=CLIP, env=env, registry=registry)
+        plan = compile_look(look, clip=CLIP, env=env, registry=registry, assume_color_space="bt709")
         odd = Policy(
             max_tier=Tier.PERMISSIVE,
             allow_field_restricted=frozenset({FieldOfUse.NON_COMMERCIAL}),
@@ -545,7 +545,7 @@ class TestAStoredPlanKeepsItsCeiling:
         self, registry, env, look
     ):
         """The consequence, rather than the field. This is what the hole cost."""
-        plan = compile_look(look, clip=CLIP, env=env, registry=registry)
+        plan = compile_look(look, clip=CLIP, env=env, registry=registry, assume_color_space="bt709")
         strict = dataclasses.replace(plan, policy=Policy(max_tier=Tier.PURE))
         with pytest.raises((LooksLicenceError, PlanRefused)):
             audit(strict, registry=registry)
@@ -557,7 +557,7 @@ class TestAStoredPlanKeepsItsCeiling:
         so two plans differing only in policy are the same plan by identity."""
         from looks.spec import plan_hash
 
-        plan = compile_look(look, clip=CLIP, env=env, registry=registry)
+        plan = compile_look(look, clip=CLIP, env=env, registry=registry, assume_color_space="bt709")
         other = dataclasses.replace(plan, policy=Policy(max_tier=Tier.PURE))
         assert plan_hash(plan) == plan_hash(other)
 
@@ -566,7 +566,7 @@ class TestAStoredPlanKeepsItsCeiling:
         the default rather than failing."""
         from looks.spec import plan_from_dict, plan_to_dict
 
-        plan = compile_look(look, clip=CLIP, env=env, registry=registry)
+        plan = compile_look(look, clip=CLIP, env=env, registry=registry, assume_color_space="bt709")
         document = plan_to_dict(plan)
         del document["policy"]
         impls = {s.impl.impl: s.impl for s in plan.steps}

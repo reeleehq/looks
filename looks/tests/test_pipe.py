@@ -83,7 +83,7 @@ def registry():
 
 
 def plan_of(steps, *, registry, env, clip=CLIP):
-    return compile_look(Look(steps=tuple(steps)), clip=clip, env=env, registry=registry)
+    return compile_look(Look(steps=tuple(steps)), clip=clip, env=env, registry=registry, assume_color_space="bt709")
 
 
 class TestRunsAndFolding:

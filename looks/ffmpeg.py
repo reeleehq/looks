@@ -250,7 +250,7 @@ def vf(plan: LookPlan, *, gate: bool = True) -> str:
                 )
             fragment = gated(fragment, step.at)
         if wrap:
-            rgb = bool(RGB_DOMAIN_FILTERS & set(step.impl.requires_filters))
+            rgb = is_rgb_domain(step.impl)
             if rgb != in_rgb_run:
                 fragments.append(wrap)
                 in_rgb_run = rgb
@@ -268,6 +268,18 @@ def vf(plan: LookPlan, *, gate: bool = True) -> str:
 RGB_DOMAIN_FILTERS = frozenset(
     {"lutrgb", "colorchannelmixer", "colorbalance", "colorlevels", "curves", "lut3d"}
 )
+
+def is_rgb_domain(impl) -> bool:
+    """Whether an implementation has a step that only takes RGB.
+
+    >>> from types import SimpleNamespace as Impl
+    >>> is_rgb_domain(Impl(requires_filters=("curves",)))
+    True
+    >>> is_rgb_domain(Impl(requires_filters=("gblur",)))
+    False
+    """
+    return bool(RGB_DOMAIN_FILTERS & set(impl.requires_filters))
+
 
 #: The version of an implementation that sits in an RGB-only run.
 RGB_ONLY_IMPL_VERSION = "2"
@@ -300,8 +312,8 @@ def _matrix_wrap(clip) -> Optional[str]:
     that conversion happens (ffmpeg's negotiation moves it into the ``scale``),
     and costs nothing where the two sides already agree. **Absent** when the
     clip does not say its colour space: the conversion is then left to ffmpeg,
-    which is what it always was. Rule 22 would refuse there, and refusing is
-    not built yet.
+    which is what it always was. :func:`looks.compile.compile_look` refuses
+    before this is reached (rule 22), unless the colour was explicitly assumed.
 
     >>> from looks.spec import ClipSpec
     >>> _matrix_wrap(ClipSpec(width=2, height=2, fps=1, color_space="bt709"))

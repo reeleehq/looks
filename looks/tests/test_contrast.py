@@ -133,7 +133,7 @@ def ours(amount, env):
     """What the package emits for this amount, as a bare -vf fragment."""
     return vf(compile_look(
         Look(steps=(Effect(name="contrast", params={"amount": amount}),)),
-        clip=CLIP, env=env,
+        clip=CLIP, env=env, assume_color_space="bt709",
     ))
 
 
@@ -202,7 +202,7 @@ class TestTheTwoImplementationsAreOneEffect:
         to all of them."""
         _ffmpeg_or_skip()
         fragment = vf(compile_look(
-            Look(steps=(Effect(name="contrast"),)), clip=CLIP, env=env,
+            Look(steps=(Effect(name="contrast"),)), clip=CLIP, env=env, assume_color_space="bt709",
         ))
         mine = transfer(fragment)
         assert mine is not None
@@ -300,7 +300,7 @@ class TestItRendersAtEveryAmount:
         """
         step = Effect(name="contrast", params={"amount": -1.0}, impl=impl)
         with pytest.raises(SpecError, match="must not be negative"):
-            vf(compile_look(Look(steps=(step,)), clip=CLIP, env=env))
+            vf(compile_look(Look(steps=(step,)), clip=CLIP, env=env, assume_color_space="bt709"))
 
 
 class TestTheTransferIsMonotone:
@@ -388,7 +388,7 @@ class TestRule26HoldsForAnythingThatEmitsCurves:
                 try:
                     fragment = vf(compile_look(
                         Look(steps=(Effect(name=name, params=params),)),
-                        clip=CLIP, env=env, registry=registry,
+                        clip=CLIP, env=env, registry=registry, assume_color_space="bt709",
                     ))
                 except Exception:
                     continue

@@ -13,10 +13,17 @@ import subprocess
 
 import pytest
 
-from looks.compile import compile_look
+from looks.compile import CompileError, compile_look
 from looks.environment import probe
 from looks.ffmpeg import vf
-from looks.spec import ClipSpec, Effect, Look
+from looks.spec import (
+    ClipSpec,
+    Effect,
+    Look,
+    plan_from_dict,
+    plan_hash,
+    plan_to_dict,
+)
 
 SIZE = (64, 48)
 def _source(range_):
@@ -122,11 +129,38 @@ def test_a_yuv_only_look_is_left_alone(env):
     assert "color_matrix" not in _fragment(env, TAGGED, ("blur", {"sigma": 1}))
 
 
-def test_an_undeclared_colour_space_is_left_to_ffmpeg(env):
-    """Rule 22 would refuse; that is not built, and is the status quo."""
-    fragment = _fragment(env, UNTAGGED, ("gamma", {"gamma": 1.0}))
-    assert "color_matrix" not in fragment
+def test_an_undeclared_colour_space_is_refused(env):
+    """Rule 22: an RGB-only step on a clip of unknown colour space refuses."""
+    with pytest.raises(CompileError, match="colour space"):
+        _fragment(env, UNTAGGED, ("gamma", {"gamma": 1.0}))
 
+
+def test_a_yuv_only_look_needs_no_declared_colour(env):
+    assert "color_matrix" not in _fragment(env, UNTAGGED, ("blur", {"sigma": 1}))
+
+
+def test_an_assumed_colour_space_is_declared_and_recorded(env):
+    look = Look(steps=(Effect(name="gamma", params={"gamma": 1.0}),))
+    assumed = compile_look(look, clip=UNTAGGED, env=env, assume_color_space="bt709")
+    probed = compile_look(look, clip=TAGGED, env=env)
+    assert assumed.clip.color_assumed and not probed.clip.color_assumed
+    assert "in_color_matrix=bt709" in vf(assumed)
+    assert plan_hash(assumed) != plan_hash(probed)
+    assert plan_from_dict(
+        plan_to_dict(assumed), impls={s.impl.impl: s.impl for s in assumed.steps}
+    ).clip.color_assumed
+
+
+def test_the_assumption_yields_to_a_declared_space(env):
+    look = Look(steps=(Effect(name="gamma", params={"gamma": 1.0}),))
+    plan = compile_look(look, clip=TAGGED, env=env, assume_color_space="bt601")
+    assert plan.clip.color_space == "bt709" and not plan.clip.color_assumed
+
+
+def test_assuming_with_no_clip_is_an_error(env):
+    look = Look(steps=(Effect(name="gamma", params={"gamma": 1.0}),))
+    with pytest.raises(CompileError, match="needs a clip"):
+        compile_look(look, env=env, assume_color_space="bt709")
 
 #: Sources with no hard colour edge and nothing outside the RGB gamut. On these a
 #: 10-bit identity RGB step must be lossless; `smptehdbars` is not one of them

@@ -22,11 +22,16 @@ from looks.ffmpeg import vf
 from looks.spec import ClipSpec, Effect, Look, Span, SpanUnsupported
 
 SIZE = (64, 48)
-CLIP = ClipSpec(width=SIZE[0], height=SIZE[1], fps=10)
-COLOUR = f"testsrc2=size={SIZE[0]}x{SIZE[1]}:rate=10"
+#: Rule 22 refuses an RGB-only step on a clip that does not declare its colour
+#: space, so the clip says bt709 and the sources below are tagged to match.
+TAG = "format=yuv420p,setparams=colorspace=bt709:range=tv"
+CLIP = ClipSpec(
+    width=SIZE[0], height=SIZE[1], fps=10, color_space="bt709", color_range="tv"
+)
+COLOUR = f"testsrc2=size={SIZE[0]}x{SIZE[1]}:rate=10,{TAG}"
 #: A colour bar pattern carries both shadows and highlights; testsrc2 alone is
 #: mostly mid-tones and saturated primaries.
-BARS = f"smptehdbars=size={SIZE[0]}x{SIZE[1]}:rate=10"
+BARS = f"smptehdbars=size={SIZE[0]}x{SIZE[1]}:rate=10,{TAG}"
 #: The baseline for a step that works in RGB: the same conversion halation
 #: makes, so a comparison measures the effect and not the conversion (an 8-bit
 #: `gbrp` path differs from the 16-bit one by up to 117/255 on testsrc2).
@@ -166,7 +171,7 @@ class TestCurvesAndColorbalance:
 
     def test_curves_is_always_pchip(self, env):
         fragment = _vf(env, Effect(name="curves", params={"red": [(0, 0), (1, 1)]}))
-        assert fragment.endswith(":interp=pchip")
+        assert ":interp=pchip" in fragment
 
     def test_a_shadow_shift_moves_shadows_more_than_highlights(self, env):
         _ffmpeg_or_skip()
