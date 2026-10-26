@@ -196,13 +196,11 @@ def _with_assumed_colour(clip, assumed: Optional[str]):
 
 def _require_declared_colour(steps, clip) -> None:
     """Rule 22: an RGB-only step on a clip of unknown colour space is a refusal."""
-    from looks.ffmpeg import has_scale_matrix, is_rgb_domain
+    from looks.ffmpeg import has_scale_matrix
 
     if clip is not None and has_scale_matrix(clip.color_space):
         return
-    rgb = [
-        s.effect for s in steps if s.impl.backend == "ffmpeg" and is_rgb_domain(s.impl)
-    ]
+    rgb = [s.effect for s in steps if s.impl.rgb_only is True]
     if rgb:
         raise CompileError(
             f"{sorted(set(rgb))} convert the picture to RGB and back, and the "

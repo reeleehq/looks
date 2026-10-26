@@ -651,3 +651,57 @@ class TestAStoredPlanKeepsItsCeiling:
         del document["policy"]
         impls = {s.impl.impl: s.impl for s in plan.steps}
         assert plan_from_dict(document, impls=impls).policy is not None
+
+
+def _lone(impl_, compiler_filter="curves"):
+    reg = EffectRegistry()
+    reg.register(impl_, a_filter(compiler_filter))
+    return reg
+
+
+def test_a_user_impl_declares_rgb_only_and_compile_reads_the_flag(env):
+    """Rule 22 reads `ImplRef.rgb_only`, not any backend's filter list."""
+    from dataclasses import replace
+
+    ref = replace(impl_ref("tint.custom.rgb", filters=("gblur",), backend="custom"), rgb_only=True)
+    reg = _lone(ref, "gblur")
+    with pytest.raises(CompileError, match="tint"):
+        compile_look(Look(steps=(Effect(name="tint"),)), clip=CLIP, env=env, registry=reg)
+
+
+@pytest.mark.parametrize("declared", [None, True])
+def test_an_ffmpeg_impl_naming_an_rgb_only_filter_is_settled_to_rgb_only(env, declared):
+    """Leaving `rgb_only` out is not a way past rule 22."""
+    from dataclasses import replace
+
+    ref = replace(impl_ref("tint.ffmpeg.c", filters=("curves",)), rgb_only=declared)
+    reg = _lone(ref)
+    assert reg.impl("tint.ffmpeg.c").rgb_only is True
+    with pytest.raises(CompileError, match="tint"):
+        compile_look(Look(steps=(Effect(name="tint"),)), clip=CLIP, env=env, registry=reg)
+
+
+def test_an_ffmpeg_impl_cannot_deny_an_rgb_only_filter():
+    from dataclasses import replace
+
+    ref = replace(impl_ref("tint.ffmpeg.c", filters=("curves",)), rgb_only=False)
+    with pytest.raises(RegistryError, match="rgb_only=False"):
+        _lone(ref)
+
+
+def test_a_yuv_ffmpeg_impl_settles_to_not_rgb_only():
+    assert _lone(impl_ref("tint.ffmpeg.g", filters=("gblur",)), "gblur").impl(
+        "tint.ffmpeg.g"
+    ).rgb_only is False
+
+
+def test_every_builtin_flag_matches_its_filters():
+    from looks.ffmpeg import is_rgb_domain
+    from looks.registry import REGISTRY
+
+    assert REGISTRY.effects()
+    for effect in REGISTRY.effects():
+        for ref in REGISTRY.implementations(effect):
+            if ref.backend == "ffmpeg":
+                assert ref.rgb_only is is_rgb_domain(ref.requires_filters), ref.impl
+                assert (ref.impl_version == "2") is ref.rgb_only, ref.impl
