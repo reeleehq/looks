@@ -89,13 +89,13 @@ def test_an_identity_rgb_step_leaves_a_tagged_picture_alone(env, effect, range_)
     assert max(drift) < TOLERANCE, (effect, range_, drift)
 
 
-def test_the_pipe_path_declares_the_matrix_too():
+def test_the_pipe_path_declares_the_matrix_too(env):
     from looks.pipe import pipe_plan
 
     plan = compile_look(
         Look(steps=(Effect(name="gamma", params={"gamma": 1.0}),)),
         clip=TAGGED,
-        env=probe(),
+        env=env,
     )
     assert "in_color_matrix=bt709" in pipe_plan(plan, source="in.mp4").segments[0].vf
 
