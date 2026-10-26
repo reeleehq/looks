@@ -249,7 +249,7 @@ def vf(plan: LookPlan, *, gate: bool = True) -> str:
                     "silently applies everywhere."
                 )
             fragment = gated(fragment, step.at)
-        rgb = step.impl.rgb_only is True
+        rgb = _is_rgb_only(step.impl)
         if rgb and not wrap:
             raise FfmpegBackendError(
                 f"step {index} ({step.effect!r}) only takes RGB and the plan's "
@@ -305,6 +305,18 @@ def is_rgb_domain(filters) -> bool:
     False
     """
     return bool(RGB_DOMAIN_FILTERS & set(filters))
+
+
+def _is_rgb_only(impl) -> bool:
+    """The flag, or the filter list when a hand-built impl never declared it.
+
+    :meth:`EffectRegistry.register` settles an undeclared flag, but a plan can
+    be built or rehydrated around an ``ImplRef`` that never went through it,
+    and ``None`` must not read as "no" at the place the matrix is emitted.
+    """
+    if impl.rgb_only is None:
+        return is_rgb_domain(impl.requires_filters)
+    return impl.rgb_only
 
 
 #: The version of an implementation that sits in an RGB-only run.

@@ -256,6 +256,26 @@ def test_a_plan_that_never_went_through_compile_cannot_emit_an_unwrapped_rgb_run
         vf(bare)
 
 
+def test_an_impl_that_never_declared_rgb_only_cannot_emit_an_unwrapped_rgb_run(env):
+    """`rgb_only=None` on a hand-built or rehydrated plan reads from the filters."""
+    import dataclasses
+
+    plan = compile_look(
+        Look(steps=(Effect(name="gamma", params={"gamma": 1.0}),)),
+        clip=TAGGED,
+        env=env,
+    )
+    undeclared = tuple(
+        dataclasses.replace(
+            st, impl=dataclasses.replace(st.impl, rgb_only=None)
+        )
+        for st in plan.steps
+    )
+    bare = dataclasses.replace(plan, steps=undeclared, clip=UNTAGGED)
+    with pytest.raises(FfmpegBackendError, match="rule 22"):
+        vf(bare)
+
+
 def test_a_stored_clip_without_color_assumed_loads_as_not_assumed(env):
     plan = compile_look(
         Look(steps=(Effect(name="gamma", params={"gamma": 1.0}),)),
