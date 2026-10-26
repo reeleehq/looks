@@ -62,7 +62,7 @@ import warnings
 
 from looks.environment import FfmpegEnv
 from looks.licence import Policy, classify, check, ffmpeg_terms
-from looks.params import ParamError, check_params, with_defaults
+from looks.params import ParamError
 from looks.registry import REGISTRY, EffectRegistry, UnknownImpl
 from looks.stages import StageOrderWarning, check_stage_order
 from looks.spec import (
@@ -131,7 +131,7 @@ def compile_look(
     """
     reg = REGISTRY if registry is None else registry
     ceiling = look.policy if policy is None else policy
-    concrete = resolve(look, probe) if probe else look
+    concrete = resolve(look, probe)
     available = None if env is None or not env.available else env.filters
 
     for message in check_stage_order(concrete.steps):
@@ -163,12 +163,13 @@ def compile_look(
     )
 
 
-def check_effect_params(effect: Effect) -> None:
+def check_effect_params(effect: Effect, registry: EffectRegistry = REGISTRY) -> None:
     """Refuse parameters no implementation of this effect could honour.
 
     Called before an implementation is chosen, so every implementation of an
     effect accepts exactly the same documents. The schema is
-    :data:`looks.params.EFFECT_PARAMS`, keyed by EFFECT, never by
+    the registry's own declaration (:meth:`EffectRegistry.declare_params`; the
+    built-ins are :data:`looks.params.EFFECT_PARAMS`), keyed by EFFECT, never by
     implementation: a check that lives inside one compiler is a check the
     licence tier can switch off (`contrast` with `amount=-1` was refused on the
     LGPL path and emitted `eq=contrast=-1.0` on the GPL one). Rule 29b says the
@@ -176,7 +177,7 @@ def check_effect_params(effect: Effect) -> None:
     document is accepted either.
     """
     try:
-        check_params(effect.name, effect.params)
+        registry.check_params(effect.name, effect.params)
     except ParamError as error:
         raise CompileError(str(error)) from error
 
@@ -189,7 +190,7 @@ def _select(
     available: Optional[frozenset],
     env: Optional[FfmpegEnv],
 ) -> Any:
-    check_effect_params(effect)
+    check_effect_params(effect, registry)
     candidates = registry.implementations(effect.name)
     if not candidates:
         raise CompileError(
@@ -241,9 +242,7 @@ def _tier(impl) -> Any:
 def _payload(
     registry: EffectRegistry, impl, effect: Effect, *, clip, env
 ) -> Mapping[str, Any]:
-    payload = registry.compiler(impl.impl)(
-        with_defaults(effect.name, effect.params), clip=clip, env=env
-    )
+    payload = registry.compiler(impl.impl)(effect.params, clip=clip, env=env)
     if not isinstance(payload, Mapping):
         raise CompileError(
             f"{impl.impl!r} returned {type(payload).__name__}, not a mapping. "
@@ -258,7 +257,7 @@ def _cost(registry: EffectRegistry, impl, effect: Effect, *, clip, env):
     estimator = registry.cost(impl.impl)
     if estimator is None:
         return None
-    return estimator(with_defaults(effect.name, effect.params), clip=clip, env=env)
+    return estimator(effect.params, clip=clip, env=env)
 
 
 def audit(

@@ -55,8 +55,7 @@ from looks.licence import Terms, terms_for
 from looks.params import (
     COLORBALANCE_ZONES,
     CURVES_CHANNELS,
-    as_emitted,
-    with_defaults,
+    EFFECT_PARAMS,
 )
 from looks.registry import REGISTRY, EffectRegistry
 from looks.spec import ImplRef, LookPlan, Span, SpecError
@@ -305,6 +304,18 @@ def _simple(name: str, build):
     return compiler
 
 
+def _box_radius(sigma: float) -> int:
+    """The ``boxblur`` radius whose spread matches a Gaussian of ``sigma``.
+
+    A box of radius ``r`` is ``2r + 1`` wide, with variance ``((2r+1)**2 - 1)/12``;
+    solving that for ``sigma**2`` gives the radius.
+
+    >>> [_box_radius(s) for s in (0, 1, 2, 5)]
+    [0, 1, 3, 8]
+    """
+    return round((math.sqrt(12 * sigma * sigma + 1) - 1) / 2)
+
+
 def _gamma_expression(params) -> Mapping[str, Any]:
     """Gamma through `lutrgb`, because rule 13 forbids the offset alternative.
 
@@ -394,6 +405,8 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
     if "lut3d.ffmpeg.default" in reg:
         return reg
     terms = _ffmpeg_terms()
+    for effect, schema in EFFECT_PARAMS.items():
+        reg.declare_params(effect, schema)
 
     def add(
         key,
@@ -525,7 +538,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
     add(
         "blur.ffmpeg.boxblur",
         ("boxblur",),
-        _simple("boxblur", lambda p: {"luma_radius": p["radius"]}),
+        _simple("boxblur", lambda p: {"luma_radius": _box_radius(p["sigma"])}),
         preference=1,
         tags=("gpl-gated",),
         time_varying=False,
@@ -772,7 +785,9 @@ def _curves_compiler(params, **_kw):
 def _colorbalance_compiler(params, **_kw):
     """Shadow / midtone / highlight RGB shifts, each in -1..1.
 
-    >>> _colorbalance_compiler(with_defaults("colorbalance", {"shadows": (-0.03, 0, 0.04)}))["filter"]
+    >>> from looks.params import with_defaults
+    >>> params = with_defaults("colorbalance", {"shadows": (-0.03, 0, 0.04)})
+    >>> _colorbalance_compiler(params)["filter"]
     'colorbalance=rs=-0.03:gs=0:bs=0.04:rm=0:gm=0:bm=0:rh=0:gh=0:bh=0:pl=0'
     """
     options = {}
@@ -839,6 +854,7 @@ def _grain_compiler(params, **_kw):
     one would make ``time_varying`` a function of the params, which an
     :class:`~looks.spec.ImplRef` declaration cannot express.
 
+    >>> from looks.params import with_defaults
     >>> _grain_compiler(with_defaults("grain", {}))["filter"]
     'noise=alls=8:allf=t+u:all_seed=0'
     """

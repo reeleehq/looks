@@ -20,17 +20,25 @@ from looks.registry import REGISTRY
 from looks.spec import Effect
 
 ALL = [(e, p) for e, schema in sorted(EFFECT_PARAMS.items()) for p in sorted(schema)]
-NUMERIC = [
-    (e, p)
-    for e, p in ALL
-    if EFFECT_PARAMS[e][p].expects.startswith(("must be a number", "must not"))
-    or EFFECT_PARAMS[e][p].expects.startswith("must be a whole")
-]
+NUMERIC = [(e, p) for e, p in ALL if EFFECT_PARAMS[e][p].kind in ("real", "whole")]
+VECTORS = [(e, p) for e, p in ALL if EFFECT_PARAMS[e][p].kind == "vector"]
 
 
-def test_every_registered_effect_has_a_schema_and_the_reverse():
+@pytest.mark.parametrize("effect", REGISTRY.effects())
+def test_every_registered_effect_has_a_schema(effect):
     """A new effect nobody declared would be silently unchecked."""
-    assert set(EFFECT_PARAMS) == set(REGISTRY.effects())
+    with pytest.raises(ParamError, match="unknown parameter"):
+        REGISTRY.check_params(effect, {"nonesuch": 1})
+
+
+def test_the_schema_belongs_to_the_registry_not_the_package():
+    """A registry with its own `flatten` is not bound to bilateral's keys."""
+    from looks.registry import EffectRegistry
+
+    other = EffectRegistry()
+    other.check_params("flatten", {"scale": 3})  # undeclared: unchecked
+    with pytest.raises(ParamError):
+        REGISTRY.check_params("flatten", {"scale": 3})
 
 
 @pytest.mark.parametrize("effect, key", ALL)
@@ -68,10 +76,35 @@ def test_a_number_parameter_refuses_a_bool_a_string_and_a_non_finite(effect, key
         check_params(effect, {key: bad})
 
 
-def test_gate_weave_refuses_an_infinite_frequency():
-    """It compiled to `sin(2*PI*inf*t)` and ffmpeg exited 0."""
-    with pytest.raises(ParamError, match="frequency"):
-        check_params("gate_weave", {"frequency": (math.inf, 1)})
+@pytest.mark.parametrize("effect, key", VECTORS)
+@pytest.mark.parametrize("bad", [True, "abc", math.inf, math.nan, (None,) * 3])
+def test_a_vector_parameter_refuses_the_same_laxities(effect, key, bad):
+    """`gate_weave` frequency `inf` compiled to `sin(2*PI*inf*t)`; ffmpeg exited 0."""
+    with pytest.raises(ParamError, match=key):
+        check_params(effect, {key: bad})
+
+
+@pytest.mark.parametrize("bad", [True, "0/0 1/1", [(0, math.inf), (1, 1)], [(0, True), (1, 1)]])
+def test_a_curve_refuses_the_same_laxities(bad):
+    with pytest.raises(ParamError, match="all"):
+        check_params("curves", {"all": bad})
+
+
+def test_a_wrong_type_is_not_reported_as_a_bound():
+    with pytest.raises(ParamError, match="must be a finite number"):
+        check_params("contrast", {"amount": True})
+    with pytest.raises(ParamError, match="must not be negative"):
+        check_params("contrast", {"amount": -1})
+
+
+def test_interp_is_one_of_ffmpegs():
+    check_params("lut3d", {"interp": "nearest"})
+    with pytest.raises(ParamError, match="interp"):
+        check_params("lut3d", {"interp": "bogus"})
+
+
+def test_a_black_point_below_zero_is_what_colorlevels_accepts():
+    check_params("levels", {"black": -0.1})
 
 
 def test_an_effect_without_a_schema_is_not_checked():
@@ -108,3 +141,22 @@ def test_the_plan_records_the_params_as_asked_not_with_defaults_filled_in():
     plan = compile_look(look, clip=ClipSpec(width=64, height=48, fps=10), env=env)
     assert dict(plan.steps[0].params) == {}
     assert "alls=8" in plan.steps[0].payload["filter"]
+
+
+def test_a_stored_plans_params_are_enough_to_run_its_compiler():
+    """`get_compiler(key)(step.params)` is how a plan becomes work again; the
+    plan stores params as asked, defaults absent."""
+    from looks.registry import get_compiler
+
+    assert "alls=8" in get_compiler("grain.ffmpeg.noise")({})["filter"]
+
+
+def test_both_blurs_read_the_same_parameter_and_agree_on_the_spread():
+    """Rule 29b: the licence tier that picks the implementation must not pick the picture."""
+    from looks.ffmpeg import _box_radius
+    from looks.registry import get_compiler
+
+    gauss = get_compiler("blur.ffmpeg.gblur")({"sigma": 5})["filter"]
+    box = get_compiler("blur.ffmpeg.boxblur")({"sigma": 5})["filter"]
+    assert "sigma=5" in gauss
+    assert f"luma_radius={_box_radius(5)}" in box

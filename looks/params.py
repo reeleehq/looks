@@ -61,6 +61,13 @@ class Param:
     accepts: Callable[[Any], bool]
     expects: str
     default: Any = NO_DEFAULT
+    #: What sort of value this is, so a caller (or a test) can select
+    #: parameters by it rather than by parsing ``expects``.
+    kind: str = "any"
+    #: Is the value of the right TYPE, bounds aside? A wrong type is reported
+    #: as one, never as a bound it did not fail.
+    is_type: Callable[[Any], bool] = lambda value: True
+    type_expects: str = ""
 
 
 def as_emitted(value: float) -> float:
@@ -136,7 +143,15 @@ def real(
         else "must be a number "
         + _describe(low, high, low_open=low_open, emitted=emitted)
     )
-    return Param(name, lambda v: _is_real(v) and within(v), expects, default)
+    return Param(
+        name,
+        lambda v: _is_real(v) and within(v),
+        expects,
+        default,
+        kind="real",
+        is_type=_is_real,
+        type_expects="a finite number",
+    )
 
 
 def whole(name, default=NO_DEFAULT, *, low=None, high=None):
@@ -147,16 +162,38 @@ def whole(name, default=NO_DEFAULT, *, low=None, high=None):
         lambda v: _is_whole(v) and within(v),
         "must be a whole number " + _describe(low, high),
         default,
+        kind="whole",
+        is_type=_is_whole,
+        type_expects="a whole number",
     )
 
 
 def flag(name, default=NO_DEFAULT):
     """A bool, not truthiness: ``"false"`` would otherwise be true."""
-    return Param(name, lambda v: isinstance(v, bool), "must be True or False", default)
+    return Param(
+        name,
+        lambda v: isinstance(v, bool),
+        "must be True or False",
+        default,
+        kind="flag",
+    )
 
 
 def text(name, default=NO_DEFAULT):
-    return Param(name, lambda v: isinstance(v, str), "must be a string", default)
+    return Param(
+        name, lambda v: isinstance(v, str), "must be a string", default, kind="text"
+    )
+
+
+def choice(name, options: Sequence[str], default=NO_DEFAULT):
+    """One of a closed set of strings (an ffmpeg option's enum)."""
+    return Param(
+        name,
+        lambda v: isinstance(v, str) and v in options,
+        f"must be one of {list(options)}",
+        default,
+        kind="choice",
+    )
 
 
 def anything(name, default=NO_DEFAULT):
@@ -172,6 +209,9 @@ def vector(name, length, default=NO_DEFAULT, *, low=None, high=None):
         lambda v: _is_sequence(v, length) and all(_is_real(c) and within(c) for c in v),
         f"must be {length} numbers, each " + _describe(low, high),
         default,
+        kind="vector",
+        is_type=lambda v: _is_sequence(v, length) and all(_is_real(c) for c in v),
+        type_expects=f"{length} finite numbers",
     )
 
 
@@ -201,6 +241,7 @@ def curve(name):
         accepts,
         "must be at least two (x, y) points in 0..1 with x strictly "
         "increasing at six decimals",
+        kind="curve",
     )
 
 
@@ -243,6 +284,13 @@ DFLT_WEAVE_FREQUENCY = (3.44, 2.33)
 #: the caller's choice, so the default is the filter's own.
 DFLT_INTERP = "tetrahedral"
 
+#: ``lut3d``'s ``interp`` values.
+INTERP_MODES = ("nearest", "trilinear", "tetrahedral", "pyramid", "prism")
+
+#: One code value per level on an 8-bit channel; more levels than that is the
+#: identity, and an absurd count only makes a huge expression.
+MAX_POSTERIZE_LEVELS = 256
+
 #: ``bilateral``'s ranges: sigmaS 0..512, sigmaR 0..1, planes a 4-bit mask.
 MAX_FLATTEN_SPATIAL = 512
 MAX_FLATTEN_PLANES = 15
@@ -268,7 +316,9 @@ EFFECT_PARAMS: Mapping[str, Mapping[str, Param]] = {
         anything("output"),
         real("fps", low=0, low_open=True),
     ),
-    "levels": _params(real("black", 0, low=0, high=1), real("white", 1, low=0, high=1)),
+    "levels": _params(
+        real("black", 0, low=-1, high=1), real("white", 1, low=-1, high=1)
+    ),
     "gamma": _params(real("gamma", 1.0, low=0, low_open=True)),
     # Negative would invert the picture, which is a different effect.
     "contrast": _params(real("amount", 1.0, low=0)),
@@ -284,10 +334,10 @@ EFFECT_PARAMS: Mapping[str, Mapping[str, Param]] = {
         text("title"),
         real("contrast", 1.0),
         real("lift", 0.0),
-        text("interp", DFLT_INTERP),
+        choice("interp", INTERP_MODES, DFLT_INTERP),
     ),
-    "lut3d": _params(anything("cube"), text("interp", DFLT_INTERP)),
-    "posterize": _params(whole("levels", 8, low=2)),
+    "lut3d": _params(anything("cube"), choice("interp", INTERP_MODES, DFLT_INTERP)),
+    "posterize": _params(whole("levels", 8, low=2, high=MAX_POSTERIZE_LEVELS)),
     "flatten": _params(
         real("spatial", 60, low=0, high=MAX_FLATTEN_SPATIAL),
         real("range", 0.05, low=0, high=1),
@@ -296,12 +346,10 @@ EFFECT_PARAMS: Mapping[str, Mapping[str, Param]] = {
         # was for.
         whole("planes", 7, low=0, high=MAX_FLATTEN_PLANES),
     ),
-    # Both implementations' keys are one effect's: `sigma` is gblur's, `radius`
-    # boxblur's, and each implementation reads the one that is its own.
-    "blur": _params(
-        real("sigma", 2, low=0, high=MAX_BLUR_SIGMA),
-        real("radius", 2, low=0),
-    ),
+    # One parameter for the effect: `gblur` takes it as its sigma and `boxblur`
+    # derives the radius with the same spread, so the licence tier that picks
+    # the implementation does not pick the picture (rule 29b).
+    "blur": _params(real("sigma", 2, low=0, high=MAX_BLUR_SIGMA)),
     # unsharp's luma_amount range.
     "sharpen": _params(real("amount", 1.0, low=-2, high=5)),
     "vignette": _params(
@@ -373,6 +421,10 @@ def check_params(
                 else f"{effect}: unknown parameter {key!r}; it takes {sorted(schema)}"
             )
         param = schema[key]
+        if not param.is_type(value):
+            raise ParamError(
+                f"{effect}: {key} must be {param.type_expects}; got {value!r}"
+            )
         if not param.accepts(value):
             raise ParamError(f"{effect}: {key} {param.expects}; got {value!r}")
 
