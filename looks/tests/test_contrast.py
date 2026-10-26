@@ -33,7 +33,7 @@ from looks.registry import EffectRegistry, effects
 from looks.ffmpeg import register_defaults
 from looks.spec import ClipSpec, Effect, Look, SpecError
 
-CLIP = ClipSpec(width=256, height=1, fps=10)
+CLIP = ClipSpec(width=256, height=1, fps=10, color_space="bt709")
 
 #: Amounts a caller would plausibly ask for. 2.0 and 3.0 are here because they
 #: are exactly where the old implementation stopped rendering.
@@ -171,7 +171,6 @@ def ours(amount, env):
             Look(steps=(Effect(name="contrast", params={"amount": amount}),)),
             clip=CLIP,
             env=env,
-            assume_color_space="bt709",
         )
     )
 
@@ -245,7 +244,6 @@ class TestTheTwoImplementationsAreOneEffect:
                 Look(steps=(Effect(name="contrast"),)),
                 clip=CLIP,
                 env=env,
-                assume_color_space="bt709",
             )
         )
         mine = transfer(fragment)
@@ -346,7 +344,7 @@ class TestItRendersAtEveryAmount:
         with pytest.raises(SpecError, match="must not be negative"):
             vf(
                 compile_look(
-                    Look(steps=(step,)), clip=CLIP, env=env, assume_color_space="bt709"
+                    Look(steps=(step,)), clip=CLIP, env=env
                 )
             )
 
@@ -440,7 +438,6 @@ class TestRule26HoldsForAnythingThatEmitsCurves:
                             clip=CLIP,
                             env=env,
                             registry=registry,
-                            assume_color_space="bt709",
                         )
                     )
                 except Exception:

@@ -37,7 +37,7 @@ from looks.spec import ClipSpec, Effect, Look, Span
 QUE_CALOR_STOPS = [(8.2, "#2E0C18"), (46.8, "#D5254A"), (100.0, "#FEF0DC")]
 
 SOURCE = "testsrc2=size=320x240:rate=10:duration=0.5"
-CLIP = ClipSpec(width=320, height=240, fps=10)
+CLIP = ClipSpec(width=320, height=240, fps=10, color_space="bt709")
 
 #: One set of parameters per registered effect that is enough to compile it.
 PARAMS = {
@@ -132,7 +132,6 @@ class TestEveryRegisteredEffectConfigures:
             Look(steps=(Effect(name=effect, params=params),)),
             clip=CLIP,
             env=env,
-            assume_color_space="bt709",
         )
         # `gradient_map` compiles to a cube REQUEST, because compiling writes no
         # files. Supplying it is a separate verb, and the sweep exercises both.
@@ -161,7 +160,7 @@ class TestEveryRegisteredEffectConfigures:
             name="que-calor-ish",
         )
         fragment = vf(
-            compile_look(look, clip=CLIP, env=env, assume_color_space="bt709")
+            compile_look(look, clip=CLIP, env=env)
         )
         assert configure(fragment).returncode == 0, fragment
 
@@ -182,7 +181,6 @@ class TestTheLgplOneIsTheDefault:
             Look(steps=(Effect(name="saturation", params={"amount": 1.2}),)),
             clip=CLIP,
             env=env,
-            assume_color_space="bt709",
         )
         assert plan.steps[0].impl.impl == "saturation.ffmpeg.colorchannelmixer"
 
@@ -199,7 +197,6 @@ class TestTheLgplOneIsTheDefault:
             ),
             clip=CLIP,
             env=env,
-            assume_color_space="bt709",
         )
         assert plan.steps[0].impl.impl == "saturation.ffmpeg.eq"
 
@@ -215,7 +212,6 @@ class TestTheLgplOneIsTheDefault:
                 Look(steps=(Effect(name="saturation", params={"amount": 0.0}),)),
                 clip=CLIP,
                 env=env,
-                assume_color_space="bt709",
             )
         )
         proc = subprocess.run(
@@ -270,7 +266,6 @@ class TestEscaping:
             Look(steps=(Effect(name="lut3d", params={"cube": str(path)}),)),
             clip=CLIP,
             env=env,
-            assume_color_space="bt709",
         )
         proc = configure(vf(plan))
         assert proc.returncode == 0, f"{vf(plan)!r}\n{proc.stderr[-600:]}"
@@ -284,7 +279,6 @@ class TestEscaping:
             Look(steps=(Effect(name="lut3d", params={"cube": str(path)}),)),
             clip=CLIP,
             env=env,
-            assume_color_space="bt709",
         )
         assert configure(vf(plan)).returncode == 0
 
@@ -318,7 +312,6 @@ class TestTimelineGating:
             Look(steps=(Effect(name="blur", params={"sigma": 3}, at=Span(0.1, 0.3)),)),
             clip=CLIP,
             env=env,
-            assume_color_space="bt709",
         )
         assert configure(vf(plan)).returncode == 0, vf(plan)
 
@@ -346,7 +339,6 @@ class TestTimelineGating:
                 ),
                 clip=CLIP,
                 env=env,
-                assume_color_space="bt709",
             )
 
     def test_and_the_emitter_refuses_too_for_a_plan_built_by_hand(self, env):
@@ -358,7 +350,6 @@ class TestTimelineGating:
             Look(steps=(Effect(name="motion", params=PARAMS["motion"]),)),
             clip=CLIP,
             env=env,
-            assume_color_space="bt709",
         )
         forced = dataclasses.replace(
             plan,
@@ -425,7 +416,6 @@ class TestTheBackendStaysOutOfEncoding:
             clip=CLIP,
             env=env,
             registry=reg,
-            assume_color_space="bt709",
         )
         with pytest.raises(FfmpegBackendError, match="no filter form"):
             vf(plan)
@@ -516,7 +506,6 @@ class TestGatingDoesNotCutInsideAnExpression:
             Look(steps=(Effect(name=effect, params=params, at=Span(1.0, 2.0)),)),
             clip=CLIP,
             env=env,
-            assume_color_space="bt709",
         )
         fragment = vf(plan)
         assert ":enable=" in fragment
@@ -561,7 +550,6 @@ class TestGeometryCannotBeGated:
                 ),
                 clip=CLIP,
                 env=env,
-                assume_color_space="bt709",
             )
 
     @pytest.mark.parametrize("effect", ["fit", "fill", "stretch"])
@@ -571,6 +559,5 @@ class TestGeometryCannotBeGated:
             Look(steps=(Effect(name=effect, params={"target": "320x240"}),)),
             clip=CLIP,
             env=env,
-            assume_color_space="bt709",
         )
         assert configure(vf(plan)).returncode == 0

@@ -13,7 +13,7 @@ from looks.registry import REGISTRY
 from looks.spec import ClipSpec, Effect, Look
 from looks.stages import EFFECT_STAGES, StageOrderWarning, check_stage_order
 
-CLIP = ClipSpec(width=64, height=48, fps=10)
+CLIP = ClipSpec(width=64, height=48, fps=10, color_space="bt709")
 
 
 def _names(*names):
@@ -84,7 +84,7 @@ def _compile(*names):
     if not env.available:
         pytest.skip("ffmpeg not usable")
     return compile_look(
-        Look(steps=_names(*names)), clip=CLIP, env=env, assume_color_space="bt709"
+        Look(steps=_names(*names)), clip=CLIP, env=env
     )
 
 

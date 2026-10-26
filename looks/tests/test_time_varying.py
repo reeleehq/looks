@@ -35,7 +35,7 @@ from looks.licence import terms_for
 from looks.registry import REGISTRY
 from looks.spec import ClipSpec, Effect, ImplRef, Look, LookPlan, Span, Step
 
-CLIP = ClipSpec(width=320, height=240, fps=10)
+CLIP = ClipSpec(width=320, height=240, fps=10, color_space="bt709")
 
 #: The minimal params each registered effect needs to compile, mirroring
 #: test_ffmpeg.py's own sweep fixture — kept independent so this file does not
@@ -223,7 +223,7 @@ class TestDeclarationAgreesWithMeasurement:
         if impl.effect == "lut3d":
             params["cube"] = str(cube)
         look = Look(steps=(Effect(name=impl.effect, params=params, impl=impl.impl),))
-        plan = compile_look(look, clip=CLIP, env=env, assume_color_space="bt709")
+        plan = compile_look(look, clip=CLIP, env=env)
         plan = materialize(plan, into=tmp_path_factory.mktemp("materialize"))
         fragment = vf(plan)
         report = classify(fragment)
@@ -263,7 +263,7 @@ class TestTheStillProbeSeesAMovingCropWindow:
                 ),
             )
         )
-        plan = compile_look(look, clip=CLIP, env=env, assume_color_space="bt709")
+        plan = compile_look(look, clip=CLIP, env=env)
         report = classify(vf(plan))
         assert report.time_delta > NOISE_FLOOR
         assert report.dependency is Dependency.TIME_VARYING
@@ -288,10 +288,10 @@ class TestAgainstTheRealRegistry:
         )
         grade = Look(steps=(Effect(name="gamma", params={"gamma": 1.2}),))
         motion_plan = compile_look(
-            motion, clip=CLIP, env=env_, assume_color_space="bt709"
+            motion, clip=CLIP, env=env_
         )
         grade_plan = compile_look(
-            grade, clip=CLIP, env=env_, assume_color_space="bt709"
+            grade, clip=CLIP, env=env_
         )
         assert motion_plan.time_varying is True
         assert grade_plan.time_varying is False
@@ -307,5 +307,5 @@ class TestAgainstTheRealRegistry:
         gated = Look(
             steps=(Effect(name="gamma", params={"gamma": 1.2}, at=Span(1.0, 2.0)),)
         )
-        plan = compile_look(gated, clip=CLIP, env=env_, assume_color_space="bt709")
+        plan = compile_look(gated, clip=CLIP, env=env_)
         assert plan.time_varying is True

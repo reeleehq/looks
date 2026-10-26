@@ -164,9 +164,11 @@ def test_an_assumed_colour_space_is_declared_and_recorded(env):
     assert assumed.clip.color_assumed and not probed.clip.color_assumed
     assert "in_color_matrix=bt709" in vf(assumed)
     assert plan_hash(assumed) != plan_hash(probed)
-    assert plan_from_dict(
+    again = plan_from_dict(
         plan_to_dict(assumed), impls={s.impl.impl: s.impl for s in assumed.steps}
-    ).clip.color_assumed
+    )
+    assert again.clip.color_assumed
+    assert plan_hash(again) == plan_hash(assumed)
 
 
 def test_the_assumption_yields_to_a_declared_space(env):
