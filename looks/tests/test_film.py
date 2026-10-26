@@ -235,9 +235,11 @@ class TestGrain:
         get the same grain, so the host passes a seed per part."""
         _ffmpeg_or_skip()
         flat = "color=c=gray:size=64x48:rate=10"
-        part_a = _vf(env, Effect(name="grain", params={"seed": 5}))
-        part_b = _vf(env, Effect(name="grain", params={"seed": 5}))
-        assert frames(part_a, source=flat, count=3) == frames(
+        grain = _vf(env, Effect(name="grain", params={"seed": 5}))
+        # Part B starts 3 frames later in the same source, timestamps kept: if
+        # the noise followed them it would differ from part A's.
+        part_b = f"trim=start_frame=3,{grain}"
+        assert frames(grain, source=flat, count=3) == frames(
             part_b, source=flat, count=3
         )
 
