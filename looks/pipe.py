@@ -224,10 +224,12 @@ def _refuse_foreign_gate(steps: Sequence[Step], where: str) -> None:
             )
 
 
-def _vf_of(steps: Sequence[Step]) -> str:
+def _vf_of(steps: Sequence[Step], clip) -> str:
     from looks.ffmpeg import vf
 
-    return vf(LookPlan(steps=tuple(steps)))
+    # The clip rides along because `vf` declares its colour matrix around
+    # RGB-only steps (issue #29); each segment converts on its own.
+    return vf(LookPlan(steps=tuple(steps), clip=clip))
 
 
 def piped_size(clip: ClipSpec, folded: Sequence[Step]) -> tuple[int, int]:
@@ -346,7 +348,7 @@ def pipe_plan(
     frame_runs = [i for i, (backend, _) in enumerate(grouped) if backend == "frame"]
     if not frame_runs:
         return PipePlan(
-            segments=(FilterSegment(vf=_vf_of(plan.steps)),),
+            segments=(FilterSegment(vf=_vf_of(plan.steps, clip)),),
             boundaries=0,
             source=source,
         )
@@ -376,7 +378,7 @@ def pipe_plan(
 
         # Folding into the DECODER is always safe — it reads a container and
         # keeps the host's timeline. Nothing to rebase, nothing to refuse.
-        decode_chain = _vf_of(before) if before else ""
+        decode_chain = _vf_of(before, clip) if before else ""
 
         # Folding into the ENCODER crosses the raw-frame boundary, where the
         # timeline restarts at 0. This is rule 27.
@@ -411,7 +413,7 @@ def pipe_plan(
                         "difference is a look on the wrong frames with no error."
                     )
             after = [_rebased(s, clip.origin_s or 0.0) for s in after]
-        encode_chain = _vf_of(after) if after else ""
+        encode_chain = _vf_of(after, clip) if after else ""
 
         width, height = piped_size(clip, before)
         piped = dataclasses.replace(clip, width=width, height=height)
