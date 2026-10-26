@@ -230,6 +230,19 @@ class TestGrain:
         assert frames(grain(3), source=flat) == frames(grain(3), source=flat)
         assert frames(grain(3), source=flat) != frames(grain(4), source=flat)
 
+    def test_one_seed_restarts_the_same_noise_at_every_cut(self, env):
+        """The behaviour issue #30 documents: two parts rendered with one seed
+        get the same grain, so the host passes a seed per part."""
+        _ffmpeg_or_skip()
+        flat = "color=c=gray:size=64x48:rate=10"
+        grain = _vf(env, Effect(name="grain", params={"seed": 5}))
+        # Part B starts 3 frames later in the same source, timestamps kept: if
+        # the noise followed them it would differ from part A's.
+        part_b = f"trim=start_frame=3,{grain}"
+        assert frames(grain, source=flat, count=3) == frames(
+            part_b, source=flat, count=3
+        )
+
     def test_there_is_no_static_switch(self, env):
         with pytest.raises(CompileError, match="temporal"):
             _vf(env, Effect(name="grain", params={"temporal": False}))
