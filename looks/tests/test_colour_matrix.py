@@ -126,3 +126,43 @@ def test_an_undeclared_colour_space_is_left_to_ffmpeg(env):
     """Rule 22 would refuse; that is not built, and is the status quo."""
     fragment = _fragment(env, UNTAGGED, ("gamma", {"gamma": 1.0}))
     assert "color_matrix" not in fragment
+
+
+#: Sources with no hard colour edge and nothing outside the RGB gamut. On these a
+#: 10-bit identity RGB step must be lossless; `smptehdbars` is not one of them
+#: (issue #37): its edges are resampled by 4:2:0 <-> RGB and its PLUGE patches
+#: are out of gamut, which no bit depth or matrix declaration recovers.
+SMOOTH_10BIT = {
+    "flat": "color=c=0x3070b0:s=64x48:r=1",
+    "gradient": (
+        "gradients=s=64x48:r=1:speed=0.01:seed=3:c0=0x103060:c1=0xc08040"
+        ":x0=0:y0=0:x1=64:y1=48:nb_colors=2"
+    ),
+}
+
+
+def _planes_10bit(fragment, source):
+    chain = f"{fragment}," if fragment else ""
+    out = subprocess.run(
+        ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", source, "-vf",
+         f"{chain}format=yuv420p10le", "-frames:v", "1", "-f", "rawvideo", "-"],
+        capture_output=True, check=True,
+    ).stdout
+    return [int.from_bytes(out[i : i + 2], "little") for i in range(0, len(out), 2)]
+
+
+@pytest.mark.parametrize("space", ["bt709", "bt2020nc"])
+@pytest.mark.parametrize("kind", sorted(SMOOTH_10BIT))
+@pytest.mark.parametrize("effect", sorted(RGB_EFFECTS))
+def test_an_identity_rgb_step_is_lossless_on_smooth_10_bit(env, effect, kind, space):
+    """Refutes issue #37's premise: no 8-bit intermediate costs a 10-bit source."""
+    source = (
+        f"{SMOOTH_10BIT[kind]},format=yuv420p10le,"
+        f"setparams=colorspace={space}:range=tv"
+    )
+    clip = ClipSpec(
+        width=SIZE[0], height=SIZE[1], fps=1, color_space=space, color_range="tv"
+    )
+    fragment = _fragment(env, clip, (effect, RGB_EFFECTS[effect]))
+    before, after = _planes_10bit("", source), _planes_10bit(fragment, source)
+    assert max(abs(a - b) for a, b in zip(before, after)) <= 2, (effect, kind, space)
