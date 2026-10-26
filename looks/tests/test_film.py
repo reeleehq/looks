@@ -248,21 +248,24 @@ class TestGateWeave:
         assert len(set(out)) > 1, "a still picture did not wander"
 
     @pytest.mark.parametrize(
-        "source, size, sar",
+        "source, size, sar, expected",
         [
-            ("testsrc2=size=1920x1080", "1920x1080", "1/1"),
-            ("testsrc2=size=720x480", "720x480", "8/9"),
-            # An odd 4:2:0 frame. `color` keeps 65x49 where `testsrc2` rounds
-            # it to 64x48 — and some builds' `color` does too, so the source's
-            # own size is read first.
-            ("color=c=gray:size=65x49", "65x49", "1/1"),
+            ("testsrc2=size=1920x1080", "1920x1080", "1", "1/1"),
+            ("testsrc2=size=720x480", "720x480", "8/9", "8/9"),
+            # A term above setsar's default max=100, which rounded to 67/46.
+            ("testsrc2=size=720x576", "720x576", "118/81", "118/81"),
+            # Unknown: made square, not left for the inverse to make 99/100.
+            ("testsrc2=size=1280x720", "1280x720", "0/1", "1/1"),
+            # An odd 4:2:0 frame. Through yuv444p, because a lavfi source
+            # rounds an odd size when asked for 4:2:0 directly.
+            ("color=c=gray:size=65x49", "65x49", "1", "1/1"),
         ],
     )
-    def test_it_keeps_the_frame_size_and_aspect(self, env, source, size, sar):
+    def test_it_keeps_the_frame_size_and_aspect(self, env, source, size, sar, expected):
         """Read through `showinfo`: raw frames carry no aspect ratio, which is
         how a SAR of 4311:4304 — refused by a concat — first got past."""
         _ffmpeg_or_skip()
-        source = f"{source}:rate=10,format=yuv420p,setsar={sar}"
+        source = f"{source}:rate=10,format=yuv444p,format=yuv420p,setsar={sar}:max=1000"
 
         def shown(fragment):
             proc = subprocess.run(
@@ -274,12 +277,12 @@ class TestGateWeave:
             assert proc.returncode == 0, proc.stderr[-600:]
             return [line for line in proc.stderr.splitlines() if " n:" in line]
 
-        if f"s:{size}" not in shown("null")[0]:
-            pytest.skip(f"this build's lavfi source does not produce {size}")
-        lines = shown(_vf(env, Effect(name="gate_weave")))
+        assert f"s:{size} " in shown("null")[0], "the test source is not that size"
+        assert f"sar:{sar if '/' in sar else sar + '/1'} " in shown("null")[0]
+        lines = shown(_vf(env, Effect(name="gate_weave", params={"amplitude": 6})))
         assert lines
         for line in lines:
-            assert f"s:{size} " in line and f"sar:{sar} " in line, line
+            assert f"s:{size} " in line and f"sar:{expected} " in line, line
 
     def test_it_moves_by_single_pixels_on_420(self, env):
         """Without `exact=1`, crop snaps to the chroma grid: at amplitude 1, 48
@@ -336,6 +339,7 @@ class TestGammaDirection:
         ("grain", {"seed": -1}),
         ("gate_weave", {"amplitude": -1}),
         ("gate_weave", {"frequency": (1,)}),
+        ("colorbalance", {"preserve_lightness": "false"}),
         # Checked as EMITTED (six decimals): two x-points that collapse into
         # one, which `curves` refuses; an angle written as `angle=0`; a sigma
         # written as `sigma=0`.
@@ -389,37 +393,43 @@ def test_the_sigma_bound_is_gblurs(env):
     assert len(frames(_vf(env, halation))) == 1
 
 
-def test_the_parameter_checks_carry_no_defaults():
-    """A check validates what is present; an absent key is the compiler's.
-
-    A default in a check is a second copy of the compiler's, and the first
-    copies disagreed (halation sigma 1 against 24, grain strength 0 against 8).
-    """
-    import ast
-    import inspect
-
-    from looks import compile as compile_module
-
-    names = ("curves", "colorbalance", "vignette", "halation", "grain", "gate_weave")
-    for name in names:
-        tree = ast.parse(inspect.getsource(compile_module.EFFECT_PARAM_CHECKS[name]))
-        defaulted = [
-            node
-            for node in ast.walk(tree)
-            if isinstance(node, ast.Call)
-            and isinstance(node.func, ast.Attribute)
-            and node.func.attr == "get"
-            and len(node.args) > 1
-        ]
-        assert not defaulted, name
+#: Every parameter of every film effect, given explicitly and validly. A check
+#: that crashed on every input would be wrapped into a CompileError and still
+#: satisfy the refusal tests above; this is the test it would fail.
+EVERY_PARAM = {
+    "curves": {"all": [(0, 0.03), (1, 0.95)], "red": [(0, 0), (1, 1)],
+               "green": [(0, 0), (1, 1)], "blue": [(0, 0), (1, 1)]},
+    "colorbalance": {"shadows": (-0.03, 0, 0.04), "midtones": (0, 0, 0),
+                     "highlights": (0.04, 0, -0.04), "preserve_lightness": True},
+    "vignette": {"angle": 0.7},
+    "halation": {"threshold": 0.7, "sigma": 8, "amount": 0.4, "tint": (1, 0.3, 0.2)},
+    "grain": {"strength": 7, "seed": 7},
+    "gate_weave": {"amplitude": 3, "frequency": (2.5, 1.5)},
+}
 
 
-def test_the_effect_vocabulary_has_one_copy():
-    from looks import compile as compile_module
-    from looks import ffmpeg
+@pytest.mark.parametrize("effect", sorted(EVERY_PARAM))
+def test_every_parameter_given_validly_compiles_and_runs(env, effect):
+    fragment = _vf(env, Effect(name=effect, params=EVERY_PARAM[effect]))
+    _ffmpeg_or_skip()
+    frames(fragment)
 
-    assert compile_module.CURVES_CHANNELS is ffmpeg.CURVES_CHANNELS
-    assert compile_module.COLORBALANCE_ZONES is ffmpeg.COLORBALANCE_ZONES
+
+def test_halation_keeps_ten_bits(env):
+    """Rule 23: an 8-bit `gbrp` kept 256 of 1024 codes on a 10-bit ramp."""
+    _ffmpeg_or_skip()
+    identity = _vf(env, Effect(name="halation", params={"threshold": 1.0}))
+    proc = subprocess.run(
+        ["ffmpeg", "-v", "error", "-f", "lavfi",
+         "-i", "nullsrc=size=1024x2:rate=10,format=yuv444p10le,geq=lum=X:cb=512:cr=512",
+         "-vf", f"{identity},format=gbrp16le", "-frames:v", "1",
+         "-f", "rawvideo", "-pix_fmt", "gbrp16le", "-"],
+        capture_output=True,
+    )
+    assert proc.returncode == 0, proc.stderr[-600:]
+    plane = proc.stdout[: 1024 * 2 * 2]
+    codes = {int.from_bytes(plane[i:i + 2], "little") for i in range(0, len(plane), 2)}
+    assert len(codes) > 512, len(codes)
 
 
 def test_curves_needs_points(env):

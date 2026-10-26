@@ -770,6 +770,10 @@ DFLT_GRAIN_SEED = 0
 #: below the range on purpose, since a seed is what makes grain reproducible.
 MAX_GRAIN_SEED = 2**31 - 1
 
+#: `setsar`'s largest allowed rational term. Its default of 100 rewrites any
+#: SAR with a bigger term (118/81 -> 67/46, 1001/1000 -> 1/1).
+SETSAR_MAX = 2**31 - 1
+
 #: Gate-weave wander, in pixels either side of centre.
 DFLT_WEAVE_AMPLITUDE = 2
 #: Horizontal and vertical wander, Hz. Incommensurate so the path never loops
@@ -907,10 +911,12 @@ def _gate_weave_compiler(params, *, clip=None, **_kw):
     - ``setsar`` undoes the aspect ``scale`` assigns to a non-uniform stretch
       (1920x1080 came out ``sar 4311:4304``, which a concat then refuses). It
       is written in the stream's own ``sar``/``w``/``h``, so it assumes no
-      aspect and needs no ClipSpec.
+      aspect and needs no ClipSpec; :data:`SETSAR_MAX` stops its default
+      ``max=100`` approximating ``118/81`` as ``67/46``; and an unknown
+      ``0/1`` is made ``1/1`` first, which every player reads it as anyway.
 
     >>> _gate_weave_compiler({"amplitude": 2, "frequency": (3, 2)})["filter"]
-    'crop=w=iw-4:h=ih-4:x=2+2*sin(2*PI*3*t):y=2+2*cos(2*PI*2*t):exact=1,scale=w=iw+4:h=ih+4,setsar=sar=sar*w*(h-4)/(h*(w-4))'
+    'setsar=sar=sar:max=2147483647,crop=w=iw-4:h=ih-4:x=2+2*sin(2*PI*3*t):y=2+2*cos(2*PI*2*t):exact=1,scale=w=iw+4:h=ih+4,setsar=sar=sar*w*(h-4)/(h*(w-4)):max=2147483647'
     """
     amplitude = int(params.get("amplitude", DFLT_WEAVE_AMPLITUDE))
     margin = 2 * amplitude
@@ -932,6 +938,12 @@ def _gate_weave_compiler(params, *, clip=None, **_kw):
         },
     )
     scale = filter_string("scale", {"w": f"iw+{margin}", "h": f"ih+{margin}"})
+    # An unknown SAR (0/1) is read as 1 by the inverse below, so it is made 1/1
+    # first; otherwise it came out 99/100 and a concat with a 0/1 part failed.
+    square_unknown = filter_string("setsar", {"sar": "sar", "max": SETSAR_MAX})
     # The inverse of scale's own SAR correction for (w-2A, h-2A) -> (w, h).
-    setsar = filter_string("setsar", {"sar": f"sar*w*(h-{margin})/(h*(w-{margin}))"})
-    return {"filter": f"{crop},{scale},{setsar}"}
+    restore = filter_string(
+        "setsar",
+        {"sar": f"sar*w*(h-{margin})/(h*(w-{margin}))", "max": SETSAR_MAX},
+    )
+    return {"filter": f"{square_unknown},{crop},{scale},{restore}"}

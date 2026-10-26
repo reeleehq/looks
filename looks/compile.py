@@ -253,6 +253,13 @@ def _check_colorbalance(params) -> None:
                 "must be an (r, g, b) shift, each in -1..1",
             )
             for zone in COLORBALANCE_ZONES
+        }
+        | {
+            # A bool, not truthiness: "false" would otherwise compile to pl=1.
+            "preserve_lightness": (
+                lambda v: isinstance(v, bool),
+                "must be True or False",
+            ),
         },
     )
 
