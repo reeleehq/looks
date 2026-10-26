@@ -47,6 +47,7 @@ keeps the package honest would have nothing left to protect.
 
 from __future__ import annotations
 
+import math
 from typing import Any, Mapping, Optional, Sequence
 
 from looks.geometry import Size, ffmpeg_chain, placement, social_size
@@ -196,6 +197,21 @@ def _num(value: float) -> str:
     return text or "0"
 
 
+def as_emitted(value: float) -> float:
+    """A number as the compilers write it into a filter string, read back.
+
+    A parameter check compares this, not the value asked for: six decimals are
+    kept, so two curve x-points ``1e-7`` apart are written as one point, which
+    ``curves`` refuses, and a vignette ``angle`` of ``1e-9`` is written ``0``.
+
+    >>> as_emitted(1e-9)
+    0.0
+    >>> as_emitted(0.1234567)
+    0.123457
+    """
+    return float(_num(float(value)))
+
+
 def vf(plan: LookPlan, *, gate: bool = True) -> str:
     """A whole plan as one ``-vf`` fragment: input-index-free, splice-ready.
 
@@ -300,6 +316,9 @@ def _simple(name: str, build):
 
 def _gamma_expression(params) -> Mapping[str, Any]:
     """Gamma through `lutrgb`, because rule 13 forbids the offset alternative.
+
+    **``gamma > 1`` brightens**, the ``eq`` convention: the curve is
+    ``pow(val/maxval, 1/gamma)``, so a mid-grey rises as ``gamma`` grows.
 
     An additive brightness offset lifts the black floor and reads as haze; a
     gamma curve keeps the endpoints. ``eq=gamma=`` would say this in one option
@@ -567,6 +586,51 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         # and close-to-inverse question.
         time_varying=True,
     )
+
+    # --- film: grade, optical, grain (issue #25) ----------------------------
+    # The catalogue's stage order is geometry -> grade -> look -> optical ->
+    # grain; `looks` composes in the order asked and does not reorder.
+    add("curves.ffmpeg.curves", ("curves",), _curves_compiler, time_varying=False)
+    add(
+        "colorbalance.ffmpeg.colorbalance",
+        ("colorbalance",),
+        _colorbalance_compiler,
+        time_varying=False,
+    )
+    add(
+        "vignette.ffmpeg.vignette",
+        ("vignette",),
+        _simple(
+            "vignette",
+            lambda p: {"angle": _num(float(p.get("angle", DFLT_VIGNETTE_ANGLE)))},
+        ),
+        time_varying=False,
+    )
+    add(
+        "halation.ffmpeg.blend",
+        ("format", "split", "colorchannelmixer", "lutrgb", "gblur", "blend"),
+        _halation_compiler,
+        # A branch: `split` has no timeline support, and `gated()` gates every
+        # filter of a fragment, so a span is refused at selection instead.
+        timeline=False,
+        time_varying=False,
+    )
+    add(
+        "grain.ffmpeg.noise",
+        ("noise",),
+        _grain_compiler,
+        # The `t` flag re-draws the noise every frame — the catalogue's INDEXED
+        # class. Deterministic for a fixed seed, and it reads the clock, which
+        # is exactly what `time_varying` is for (issue #17).
+        time_varying=True,
+    )
+    add(
+        "gate_weave.ffmpeg.crop",
+        ("crop", "scale", "setsar"),
+        _gate_weave_compiler,
+        timeline=False,
+        time_varying=True,
+    )
     return reg
 
 
@@ -674,3 +738,219 @@ def _motion_compiler(params, *, clip=None, env=None, **_kw):
     if output is not None:
         payload["out_size"] = [output.width, output.height]
     return payload
+
+
+# ------------------------------------------------------------ the film effects
+#
+# Defaults are the effect catalogue's (docs/research/13 §3) unless noted; the
+# halation tint and the gate weave are the 2026-10-16 production's (issue #25),
+# where they read as 16 mm at 720p.
+
+#: Vignette half-angle, radians.
+DFLT_VIGNETTE_ANGLE = math.pi / 5
+#: ``vignette`` clips its angle to [0, PI/2] instead of refusing, so a larger
+#: one would compile to a picture nobody asked for.
+MAX_VIGNETTE_ANGLE = math.pi / 2
+
+DFLT_HALATION_THRESHOLD = 0.78
+DFLT_HALATION_SIGMA = 24.0
+#: ``gblur`` refuses a larger sigma ("Result too large"; 9.0 and 6.1).
+MAX_HALATION_SIGMA = 1024
+DFLT_HALATION_AMOUNT = 0.5
+#: Red-orange: film halation is the red layer scattering back off the base.
+DFLT_HALATION_TINT = (1.0, 0.35, 0.2)
+
+DFLT_GRAIN_STRENGTH = 8
+#: ``noise``'s ``alls`` range is 0..100.
+MAX_GRAIN_STRENGTH = 100
+#: Pinned rather than ffmpeg's own default, for portability across builds.
+#: Note ``0`` is a different picture from an unseeded ``noise``.
+DFLT_GRAIN_SEED = 0
+#: ``noise``'s ``all_seed`` tops out at INT_MAX; its ``-1`` (a random seed) is
+#: below the range on purpose, since a seed is what makes grain reproducible.
+MAX_GRAIN_SEED = 2**31 - 1
+
+#: `setsar`'s largest allowed rational term. Its default of 100 rewrites any
+#: SAR with a bigger term (118/81 -> 67/46, 1001/1000 -> 1/1).
+SETSAR_MAX = 2**31 - 1
+
+#: Gate-weave wander, in pixels either side of centre.
+DFLT_WEAVE_AMPLITUDE = 2
+#: Horizontal and vertical wander, Hz. Incommensurate so the path never loops
+#: visibly: the production's ``n*0.9`` and ``n*0.61`` rad/frame, at 24 fps.
+DFLT_WEAVE_FREQUENCY = (3.44, 2.33)
+
+#: Prefix of the pad labels a branching effect uses internally, so they stay
+#: clear of a host's own (``[a]``, ``[bg]``: note 05, label rule 2).
+LABEL_NAMESPACE = "lk_"
+
+#: `looks` channel names to ffmpeg `curves` option names.
+CURVES_CHANNELS = ("all", "red", "green", "blue")
+
+#: `colorbalance` tonal zones, keyed to the letter its options end in.
+COLORBALANCE_ZONES = {"shadows": "s", "midtones": "m", "highlights": "h"}
+
+
+def _curve_points(points) -> str:
+    """``[(0, 0.03), (1, 0.95)]`` -> ``'0/0.03 1/0.95'``."""
+    return " ".join(f"{_num(float(x))}/{_num(float(y))}" for x, y in points)
+
+
+def _curves_compiler(params, **_kw):
+    """Per-channel tone curves, always ``interp=pchip``.
+
+    ``curves`` defaults to a natural cubic spline, which overshoots at a knee —
+    21 non-monotone steps out of 255 on a steep curve, against 0 under pchip
+    (rule 26, measured in the catalogue). Points are ``(x, y)`` pairs in 0..1.
+
+    >>> _curves_compiler({"all": [(0, 0.03), (0.5, 0.47), (1, 0.95)]})["filter"]
+    'curves=all=0/0.03 0.5/0.47 1/0.95:interp=pchip'
+    """
+    options = {
+        channel: _curve_points(params[channel])
+        for channel in CURVES_CHANNELS
+        if params.get(channel)
+    }
+    if not options:
+        raise FfmpegBackendError(
+            f"the 'curves' effect needs points for at least one of "
+            f"{list(CURVES_CHANNELS)}: [(x, y), ...] in 0..1"
+        )
+    return {"filter": filter_string("curves", {**options, "interp": "pchip"})}
+
+
+def _colorbalance_compiler(params, **_kw):
+    """Shadow / midtone / highlight RGB shifts, each in -1..1.
+
+    >>> _colorbalance_compiler({"shadows": (-0.03, 0, 0.04)})["filter"]
+    'colorbalance=rs=-0.03:gs=0:bs=0.04:rm=0:gm=0:bm=0:rh=0:gh=0:bh=0:pl=0'
+    """
+    options = {}
+    for zone, letter in COLORBALANCE_ZONES.items():
+        for channel, shift in zip("rgb", params.get(zone, (0, 0, 0))):
+            options[f"{channel}{letter}"] = _num(float(shift))
+    options["pl"] = int(bool(params.get("preserve_lightness", False)))
+    return {"filter": filter_string("colorbalance", options)}
+
+
+def _halation_compiler(params, **_kw):
+    """Highlights, tinted and blurred, screened back over the picture.
+
+    A branch, so it carries pad labels — under :data:`LABEL_NAMESPACE`, and
+    the same ones every time. Two halations in one chain do not collide:
+    ffmpeg binds a label to the next use of it in parse order, so a label
+    that is opened and closed inside one fragment is free again after it
+    (measured on 9.0 and 6.1: pixel-identical to per-step labels). The
+    fragment still comma-splices, because its first and last pads are
+    unlabelled. **Forced to RGB**
+    (``format=gbrp16le``) because a ``screen`` blend negotiated in YUV screens the
+    chroma planes too: measured on ``testsrc2``, the unforced form *lowered*
+    mean green by 26/255 — a screen that darkens. In RGB it only ever adds.
+    Sixteen bits, not ``gbrp``: a bare 8-bit format is what rule 23 forbids —
+    on a 10-bit ramp ``gbrp`` kept 19 of 64 codes — and at 720p the 16-bit
+    branch measured no slower (11-13 against 14-16 ms/frame).
+
+    The mask is Rec.709 luma, thresholded per channel — the channels are equal
+    after the grey matrix, so that is a luma threshold — and scaled by the tint
+    in the same lookup, since a blur commutes with a per-channel gain.
+
+    ``amount`` is folded into that gain, not passed as ``all_opacity``:
+    ``screen(A, k*B)`` *is* ``A + k*(screen(A, B) - A)`` (within 1/65535,
+    measured), so the blend runs at opacity 1. The opacity path was wrong on
+    CI's ffmpeg 6.1.1 at 16 bits — an identity halation moved pixels by 129/255,
+    and ``amount=0.5`` glowed more than ``amount=1`` — while 6.1.6 and 9.0 were
+    exact.
+    """
+    threshold = float(params.get("threshold", DFLT_HALATION_THRESHOLD))
+    sigma = float(params.get("sigma", DFLT_HALATION_SIGMA))
+    amount = float(params.get("amount", DFLT_HALATION_AMOUNT))
+    tint = params.get("tint", DFLT_HALATION_TINT)
+    a, b, h = (f"[{LABEL_NAMESPACE}{name}]" for name in "abh")
+    mask = {
+        channel: f"if(gt(val,{_num(threshold)}*maxval),val*{_num(amount * float(gain))},0)"
+        for channel, gain in zip("rgb", tint)
+    }
+    branch = ",".join(
+        (
+            filter_string("colorchannelmixer", _saturation_matrix({"amount": 0.0})),
+            filter_string("lutrgb", mask),
+            filter_string("gblur", {"sigma": _num(sigma)}),
+        )
+    )
+    screen = filter_string("blend", {"all_mode": "screen"})
+    return {"filter": f"format=gbrp16le,split{a}{b};{b}{branch}{h};{a}{h}{screen}"}
+
+
+def _grain_compiler(params, **_kw):
+    """Temporal uniform noise: ``noise=alls=S:allf=t+u:all_seed=K``.
+
+    Always temporal. Untagged ``noise`` is a fixed pattern, which reads as dirt
+    on the lens rather than as grain, so there is no ``temporal`` switch — and
+    one would make ``time_varying`` a function of the params, which an
+    :class:`~looks.spec.ImplRef` declaration cannot express.
+
+    >>> _grain_compiler({})["filter"]
+    'noise=alls=8:allf=t+u:all_seed=0'
+    """
+    return {
+        "filter": filter_string(
+            "noise",
+            {
+                "alls": int(params.get("strength", DFLT_GRAIN_STRENGTH)),
+                "allf": "t+u",
+                "all_seed": int(params.get("seed", DFLT_GRAIN_SEED)),
+            },
+        )
+    }
+
+
+def _gate_weave_compiler(params, *, clip=None, **_kw):
+    """A film gate's wander: a sinusoidal crop, scaled back to the input size.
+
+    Reads ``t`` rather than the frame index, so the wander's speed does not
+    change with the frame rate. The scale-back is a zoom of ``2A`` pixels,
+    which is what a real gate's matte hides too. Two details, each measured
+    (review of #27):
+
+    - ``exact=1``: without it ``crop`` snaps to the chroma grid on 4:2:0, so
+      the gate moved in 2-pixel steps (9 positions in 96 frames, not 24) and an
+      odd 65x49 frame came back 64x48.
+    - ``setsar`` undoes the aspect ``scale`` assigns to a non-uniform stretch
+      (1920x1080 came out ``sar 4311:4304``, which a concat then refuses). It
+      is written in the stream's own ``sar``/``w``/``h``, so it assumes no
+      aspect and needs no ClipSpec; :data:`SETSAR_MAX` stops its default
+      ``max=100`` approximating ``118/81`` as ``67/46``; and an unknown
+      ``0/1`` is made ``1/1`` first, which every player reads it as anyway.
+
+    >>> _gate_weave_compiler({"amplitude": 2, "frequency": (3, 2)})["filter"]
+    'setsar=sar=sar:max=2147483647,crop=w=iw-4:h=ih-4:x=2+2*sin(2*PI*3*t):y=2+2*cos(2*PI*2*t):exact=1,scale=w=iw+4:h=ih+4,setsar=sar=sar*w*(h-4)/(h*(w-4)):max=2147483647'
+    """
+    amplitude = int(params.get("amplitude", DFLT_WEAVE_AMPLITUDE))
+    margin = 2 * amplitude
+    if clip is not None and margin >= min(clip.width, clip.height):
+        raise FfmpegBackendError(
+            f"gate_weave amplitude {amplitude} leaves nothing of a "
+            f"{clip.width}x{clip.height} frame: 2 * amplitude must be below its "
+            "smaller side"
+        )
+    fx, fy = (_num(float(f)) for f in params.get("frequency", DFLT_WEAVE_FREQUENCY))
+    crop = filter_string(
+        "crop",
+        {
+            "w": f"iw-{margin}",
+            "h": f"ih-{margin}",
+            "x": f"{amplitude}+{amplitude}*sin(2*PI*{fx}*t)",
+            "y": f"{amplitude}+{amplitude}*cos(2*PI*{fy}*t)",
+            "exact": 1,
+        },
+    )
+    scale = filter_string("scale", {"w": f"iw+{margin}", "h": f"ih+{margin}"})
+    # An unknown SAR (0/1) is read as 1 by the inverse below, so it is made 1/1
+    # first; otherwise it came out 99/100 and a concat with a 0/1 part failed.
+    square_unknown = filter_string("setsar", {"sar": "sar", "max": SETSAR_MAX})
+    # The inverse of scale's own SAR correction for (w-2A, h-2A) -> (w, h).
+    restore = filter_string(
+        "setsar",
+        {"sar": f"sar*w*(h-{margin})/(h*(w-{margin}))", "max": SETSAR_MAX},
+    )
+    return {"filter": f"{square_unknown},{crop},{scale},{restore}"}
