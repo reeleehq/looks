@@ -47,11 +47,11 @@ RGB_EFFECTS = {
 }
 
 
-def _planes(fragment, source):
+def _planes(fragment, source, *, pix_fmt="yuv420p"):
     chain = f"{fragment}," if fragment else ""
     return subprocess.run(
         ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", source, "-vf",
-         f"{chain}format=yuv420p", "-frames:v", "1", "-f", "rawvideo", "-"],
+         f"{chain}format={pix_fmt}", "-frames:v", "1", "-f", "rawvideo", "-"],
         capture_output=True, check=True,
     ).stdout
 
@@ -126,3 +126,39 @@ def test_an_undeclared_colour_space_is_left_to_ffmpeg(env):
     """Rule 22 would refuse; that is not built, and is the status quo."""
     fragment = _fragment(env, UNTAGGED, ("gamma", {"gamma": 1.0}))
     assert "color_matrix" not in fragment
+
+
+#: Sources with no hard colour edge and nothing outside the RGB gamut. On these a
+#: 10-bit identity RGB step must be lossless; `smptehdbars` is not one of them
+#: (issue #37): its edges are resampled by 4:2:0 <-> RGB and its PLUGE patches
+#: are out of gamut, which no bit depth or matrix declaration recovers.
+#: A gradient, not a flat colour: a flat 8-bit colour survives an 8-bit trip, so
+#: only a ramp can see a narrowed intermediate.
+SMOOTH_10BIT = {
+    "gradient": (
+        "gradients=s=64x48:r=1:speed=0.01:seed=3:c0=0x103060:c1=0xc08040"
+        ":x0=0:y0=0:x1=64:y1=48:nb_colors=2"
+    ),
+}
+
+
+def _samples_10bit(raw):
+    return [int.from_bytes(raw[i : i + 2], "little") for i in range(0, len(raw), 2)]
+
+
+@pytest.mark.parametrize("space", ["bt709", "bt2020nc"])
+@pytest.mark.parametrize("kind", sorted(SMOOTH_10BIT))
+@pytest.mark.parametrize("effect", sorted(RGB_EFFECTS))
+def test_an_identity_rgb_step_is_lossless_on_smooth_10_bit(env, effect, kind, space):
+    """Refutes issue #37's premise: no 8-bit intermediate costs a 10-bit source."""
+    source = (
+        f"{SMOOTH_10BIT[kind]},format=yuv420p10le,"
+        f"setparams=colorspace={space}:range=tv"
+    )
+    clip = ClipSpec(
+        width=SIZE[0], height=SIZE[1], fps=1, color_space=space, color_range="tv"
+    )
+    fragment = _fragment(env, clip, (effect, RGB_EFFECTS[effect]))
+    before = _samples_10bit(_planes("", source, pix_fmt="yuv420p10le"))
+    after = _samples_10bit(_planes(fragment, source, pix_fmt="yuv420p10le"))
+    assert max(abs(a - b) for a, b in zip(before, after)) <= 1, (effect, kind, space)
