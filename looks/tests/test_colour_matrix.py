@@ -19,13 +19,20 @@ from looks.ffmpeg import vf
 from looks.spec import ClipSpec, Effect, Look
 
 SIZE = (64, 48)
-SOURCE = (
-    f"smptehdbars=size={SIZE[0]}x{SIZE[1]}:rate=1,format=yuv420p,"
-    "setparams=colorspace=bt709:range=tv:color_primaries=bt709:color_trc=bt709"
-)
-TAGGED = ClipSpec(
-    width=SIZE[0], height=SIZE[1], fps=1, color_space="bt709", color_range="tv"
-)
+def _source(range_):
+    return (
+        f"smptehdbars=size={SIZE[0]}x{SIZE[1]}:rate=1,format=yuv420p,"
+        f"setparams=colorspace=bt709:range={range_}:color_primaries=bt709:color_trc=bt709"
+    )
+
+
+def _clip(range_):
+    return ClipSpec(
+        width=SIZE[0], height=SIZE[1], fps=1, color_space="bt709", color_range=range_
+    )
+
+
+TAGGED = _clip("tv")
 UNTAGGED = ClipSpec(width=SIZE[0], height=SIZE[1], fps=1)
 #: ffmpeg 9 round-trips this source to within 0.16 mean luma; 6.1 without the
 #: matrix is off by 6.4. Anything under this passes on every build.
@@ -40,13 +47,13 @@ RGB_EFFECTS = {
 }
 
 
-def _luma(fragment):
+def _planes(fragment, source):
     chain = f"{fragment}," if fragment else ""
     return subprocess.run(
-        ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", SOURCE, "-vf",
+        ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", source, "-vf",
          f"{chain}format=yuv420p", "-frames:v", "1", "-f", "rawvideo", "-"],
         capture_output=True, check=True,
-    ).stdout[: SIZE[0] * SIZE[1]]
+    ).stdout
 
 
 @pytest.fixture(scope="module")
@@ -62,12 +69,35 @@ def _fragment(env, clip, *names_params):
     return vf(compile_look(Look(steps=steps), clip=clip, env=env))
 
 
+def _plane_drift(reference, after):
+    luma = SIZE[0] * SIZE[1]
+    chroma = luma // 4
+    cuts = [(0, luma), (luma, luma + chroma), (luma + chroma, luma + 2 * chroma)]
+    return [
+        sum(abs(a - b) for a, b in zip(reference[i:j], after[i:j])) / (j - i)
+        for i, j in cuts
+    ]
+
+
+@pytest.mark.parametrize("range_", ["tv", "pc"])
 @pytest.mark.parametrize("effect", sorted(RGB_EFFECTS))
-def test_an_identity_rgb_step_leaves_a_tagged_picture_alone(env, effect):
-    reference = _luma("")
-    after = _luma(_fragment(env, TAGGED, (effect, RGB_EFFECTS[effect])))
-    drift = sum(abs(a - b) for a, b in zip(reference, after)) / len(reference)
-    assert drift < TOLERANCE, (effect, drift)
+def test_an_identity_rgb_step_leaves_a_tagged_picture_alone(env, effect, range_):
+    """All three planes (rule 29b: a luma-only check hides a chroma shift)."""
+    source = _source(range_)
+    fragment = _fragment(env, _clip(range_), (effect, RGB_EFFECTS[effect]))
+    drift = _plane_drift(_planes("", source), _planes(fragment, source))
+    assert max(drift) < TOLERANCE, (effect, range_, drift)
+
+
+def test_the_pipe_path_declares_the_matrix_too():
+    from looks.pipe import pipe_plan
+
+    plan = compile_look(
+        Look(steps=(Effect(name="gamma", params={"gamma": 1.0}),)),
+        clip=TAGGED,
+        env=probe(),
+    )
+    assert "in_color_matrix=bt709" in pipe_plan(plan, source="in.mp4").segments[0].vf
 
 
 def test_a_run_of_rgb_steps_shares_one_conversion_pair(env):

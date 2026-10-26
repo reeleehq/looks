@@ -269,6 +269,9 @@ RGB_DOMAIN_FILTERS = frozenset(
     {"lutrgb", "colorchannelmixer", "colorbalance", "colorlevels", "curves", "lut3d"}
 )
 
+#: The version of an implementation that sits in an RGB-only run.
+RGB_ONLY_IMPL_VERSION = "2"
+
 #: ClipSpec.color_space (the tag's name) -> scale's matrix name, where they differ.
 _SCALE_MATRICES = {
     "bt709": "bt709",
@@ -524,6 +527,12 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
             ImplRef(
                 effect=effect,
                 impl=key,
+                # `vf` now declares the colour matrix around an RGB-only step
+                # (issue #29), which changes its pixels: version 2, so a plan
+                # stored with the old behaviour is refused rather than trusted.
+                impl_version=RGB_ONLY_IMPL_VERSION
+                if RGB_DOMAIN_FILTERS & set(filters)
+                else "1",
                 backend=backend,
                 terms=terms,
                 requires_filters=filters,
