@@ -420,3 +420,14 @@ def test_a_tagged_picture_survives_the_pipe_unshifted(env, frame_registry, tmp_p
     ).stdout
     drift = _plane_drift(_planes("", _source("tv")), after)
     assert max(drift) < TOLERANCE, drift
+
+
+def test_a_pipe_over_an_undeclared_clip_is_refused(env, frame_registry):
+    from looks.pipe import PipeError, pipe_plan
+
+    plan = compile_look(
+        Look(steps=(Effect(name="meanshift"),)), clip=TAGGED, env=env, registry=frame_registry
+    )
+    with pytest.raises(PipeError, match="colour space"):
+        pipe_plan(plan, source="in.mkv", clip=UNTAGGED)
+    pipe_plan(plan, source="in.mkv", clip=UNTAGGED, pix_fmt="gray")  # luma has no matrix

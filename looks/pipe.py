@@ -82,8 +82,8 @@ PIPE_BYTES_PER_PIXEL = {
 
 
 #: Raw formats that carry RGB, so the pipe's edge conversion to or from YUV has a
-#: matrix to get wrong. ``gray`` is luma alone and has none.
-_RGB_PIX_FMTS = frozenset({"bgr24", "rgb24", "bgra", "rgba", "argb", "abgr"})
+#: matrix to get wrong: every packed format but ``gray``, which is luma alone.
+_RGB_PIX_FMTS = frozenset(PIPE_BYTES_PER_PIXEL) - {"gray"}
 
 
 class PipeError(SpecError):
@@ -246,17 +246,26 @@ def _with_edge_matrix(chain: str, clip, pix_fmt: str, *, leading: bool) -> str:
     goes last in the decoder's chain, so the conversion to the pipe format is its
     own, and in the encoder's it goes first and last, so a conversion from RGB
     into a YUV filter and the final one into the encoder are both declared. It
-    is a no-op where the picture is already in the format. Absent when the clip
-    declares no matrix (rule 22 refuses RGB-only steps there) or the pipe is not RGB.
+    is a no-op where the picture is already in the format. Left alone when the pipe is
+    not RGB; refused when the clip declares no matrix.
     """
     from looks.ffmpeg import matrix_wrap
 
-    wrap = matrix_wrap(clip) if pix_fmt in _RGB_PIX_FMTS else None
-    if not wrap:
+    if pix_fmt not in _RGB_PIX_FMTS:
         return chain
+    wrap = matrix_wrap(clip)
+    if not wrap:
+        raise PipeError(
+            f"the pipe carries {pix_fmt!r}, converted from and to YUV by ffmpeg, "
+            "and the clip declares no colour space `scale` knows, so the matrix "
+            "would be the build's guess (rule 22, issue #46). Declare "
+            "ClipSpec.color_space, or compile with assume_color_space=."
+        )
     if not chain:
         return wrap  # one `scale` is both the first and the last
-    return ",".join(([wrap] if leading else []) + [chain, wrap])
+    head = [] if not leading or chain.split(",", 1)[0] == wrap else [wrap]
+    tail = [] if chain.rsplit(",", 1)[-1] == wrap else [wrap]
+    return ",".join([*head, chain, *tail])
 
 
 def piped_size(clip: ClipSpec, folded: Sequence[Step]) -> tuple[int, int]:
