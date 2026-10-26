@@ -58,6 +58,7 @@ from typing import Any, Mapping, Optional, Sequence
 
 import dataclasses
 import numbers
+import warnings
 
 from looks.environment import FfmpegEnv
 from looks.ffmpeg import (
@@ -71,6 +72,7 @@ from looks.ffmpeg import (
 )
 from looks.licence import Policy, classify, check, ffmpeg_terms
 from looks.registry import REGISTRY, EffectRegistry, UnknownImpl
+from looks.stages import StageOrderWarning, check_stage_order
 from looks.spec import (
     ClipSpec,
     Effect,
@@ -117,6 +119,11 @@ def compile_look(
         registry: Which implementations exist. Defaults to
             :data:`looks.registry.REGISTRY`.
 
+    Warns:
+        looks.stages.StageOrderWarning: If the Look departs from the canonical
+            stage order. It is never reordered, and never a refusal unless the
+            caller escalates the warning.
+
     Returns:
         A :class:`~looks.spec.LookPlan` holding no live callables — the runner
         resolves each step's code from the registry by key.
@@ -134,6 +141,9 @@ def compile_look(
     ceiling = look.policy if policy is None else policy
     concrete = resolve(look, probe) if probe else look
     available = None if env is None or not env.available else env.filters
+
+    for message in check_stage_order(concrete.steps):
+        warnings.warn(message, StageOrderWarning, stacklevel=2)
 
     steps = []
     for effect in concrete.steps:

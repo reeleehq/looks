@@ -208,6 +208,8 @@ from looks.measure import (
     measure,
 )
 
+from looks.stages import StageOrderWarning
+
 __all__ = [
     # the environment: what this machine's ffmpeg is and what it may do
     "FfmpegEnv",
@@ -288,6 +290,7 @@ __all__ = [
     "ImplConflict",
     "UnknownImpl",
     "compile_look",
+    "StageOrderWarning",
     "audit",
     "describe",
     "payloads",
