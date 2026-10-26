@@ -175,27 +175,39 @@ def compile_look(
 
 
 def _with_assumed_colour(clip, assumed: Optional[str]):
-    """The clip with ``assumed`` declared on it, when it declares nothing itself."""
-    if assumed is None or (clip is not None and clip.color_space is not None):
+    """The clip with ``assumed`` declared on it, when it declares nothing usable."""
+    from looks.ffmpeg import has_scale_matrix
+
+    if assumed is None:
         return clip
+    if not has_scale_matrix(assumed):
+        raise CompileError(
+            f"assume_color_space={assumed!r} is not a colour space `scale` knows "
+            "(bt709, bt601, smpte170m, bt470bg, bt2020nc, smpte240m, fcc)"
+        )
     if clip is None:
         raise CompileError(
             "assume_color_space needs a clip to declare it on; pass clip=ClipSpec(...)"
         )
+    if has_scale_matrix(clip.color_space):
+        return clip
     return dataclasses.replace(clip, color_space=assumed, color_assumed=True)
 
 
 def _require_declared_colour(steps, clip) -> None:
     """Rule 22: an RGB-only step on a clip of unknown colour space is a refusal."""
-    from looks.ffmpeg import is_rgb_domain
+    from looks.ffmpeg import has_scale_matrix, is_rgb_domain
 
-    if clip is not None and clip.color_space is not None:
+    if clip is not None and has_scale_matrix(clip.color_space):
         return
-    rgb = [s.effect for s in steps if s.impl.backend == "ffmpeg" and is_rgb_domain(s.impl)]
+    rgb = [
+        s.effect for s in steps if s.impl.backend == "ffmpeg" and is_rgb_domain(s.impl)
+    ]
     if rgb:
         raise CompileError(
             f"{sorted(set(rgb))} convert the picture to RGB and back, and the "
-            "clip does not declare its colour space, so the matrix would be "
+            "clip does not declare a colour space `scale` knows (note: a YUV-only "
+            "alternative may have been excluded by the licence policy), so the matrix would be "
             "whatever the ffmpeg build guesses (a visible luma shift on 6.1). "
             "Declare it on the ClipSpec (color_space, from a probe of the file), "
             "or pass assume_color_space='bt709' to record a guess on the plan."

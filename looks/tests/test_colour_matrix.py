@@ -13,19 +13,22 @@ import subprocess
 
 import pytest
 
-from looks.compile import CompileError, compile_look
+from looks.compile import CompileError, compile_all, compile_look
 from looks.environment import probe
-from looks.ffmpeg import vf
+from looks.ffmpeg import FfmpegBackendError, vf
 from looks.spec import (
     ClipSpec,
     Effect,
     Look,
+    SpecError,
     plan_from_dict,
     plan_hash,
     plan_to_dict,
 )
 
 SIZE = (64, 48)
+
+
 def _source(range_):
     return (
         f"smptehdbars=size={SIZE[0]}x{SIZE[1]}:rate=1,format=yuv420p,"
@@ -57,9 +60,24 @@ RGB_EFFECTS = {
 def _planes(fragment, source, *, pix_fmt="yuv420p"):
     chain = f"{fragment}," if fragment else ""
     return subprocess.run(
-        ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", source, "-vf",
-         f"{chain}format={pix_fmt}", "-frames:v", "1", "-f", "rawvideo", "-"],
-        capture_output=True, check=True,
+        [
+            "ffmpeg",
+            "-v",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            source,
+            "-vf",
+            f"{chain}format={pix_fmt}",
+            "-frames:v",
+            "1",
+            "-f",
+            "rawvideo",
+            "-",
+        ],
+        capture_output=True,
+        check=True,
     ).stdout
 
 
@@ -162,6 +180,7 @@ def test_assuming_with_no_clip_is_an_error(env):
     with pytest.raises(CompileError, match="needs a clip"):
         compile_look(look, env=env, assume_color_space="bt709")
 
+
 #: Sources with no hard colour edge and nothing outside the RGB gamut. On these a
 #: 10-bit identity RGB step must be lossless; `smptehdbars` is not one of them
 #: (issue #37): its edges are resampled by 4:2:0 <-> RGB and its PLUGE patches
@@ -186,8 +205,7 @@ def _samples_10bit(raw):
 def test_an_identity_rgb_step_is_lossless_on_smooth_10_bit(env, effect, kind, space):
     """Refutes issue #37's premise: no 8-bit intermediate costs a 10-bit source."""
     source = (
-        f"{SMOOTH_10BIT[kind]},format=yuv420p10le,"
-        f"setparams=colorspace={space}:range=tv"
+        f"{SMOOTH_10BIT[kind]},format=yuv420p10le,setparams=colorspace={space}:range=tv"
     )
     clip = ClipSpec(
         width=SIZE[0], height=SIZE[1], fps=1, color_space=space, color_range="tv"
@@ -196,3 +214,60 @@ def test_an_identity_rgb_step_is_lossless_on_smooth_10_bit(env, effect, kind, sp
     before = _samples_10bit(_planes("", source, pix_fmt="yuv420p10le"))
     after = _samples_10bit(_planes(fragment, source, pix_fmt="yuv420p10le"))
     assert max(abs(a - b) for a, b in zip(before, after)) <= 1, (effect, kind, space)
+
+
+@pytest.mark.parametrize("space", ["unknown", "reserved", "bt2020c", "bt790"])
+def test_a_declared_but_unmapped_space_is_not_a_declaration(env, space):
+    clip = ClipSpec(width=SIZE[0], height=SIZE[1], fps=1, color_space=space)
+    with pytest.raises(CompileError, match="colour space"):
+        _fragment(env, clip, ("gamma", {"gamma": 1.0}))
+
+
+def test_an_unmapped_space_yields_to_the_assumption(env):
+    clip = ClipSpec(width=SIZE[0], height=SIZE[1], fps=1, color_space="unknown")
+    look = Look(steps=(Effect(name="gamma", params={"gamma": 1.0}),))
+    plan = compile_look(look, clip=clip, env=env, assume_color_space="bt709")
+    assert plan.clip.color_space == "bt709" and plan.clip.color_assumed
+
+
+@pytest.mark.parametrize("bad", ["BT709", "nope"])
+def test_an_assumption_that_names_no_matrix_is_refused(env, bad):
+    look = Look(steps=(Effect(name="blur", params={"sigma": 1}),))
+    with pytest.raises(CompileError, match="not a colour space"):
+        compile_look(look, clip=UNTAGGED, env=env, assume_color_space=bad)
+
+
+def test_compile_all_refuses_too(env):
+    look = Look(steps=(Effect(name="gamma", params={"gamma": 1.0}),))
+    with pytest.raises(CompileError):
+        compile_all([look], clip=UNTAGGED, env=env)
+
+
+def test_a_plan_that_never_went_through_compile_cannot_emit_an_unwrapped_rgb_run(env):
+    import dataclasses
+
+    plan = compile_look(
+        Look(steps=(Effect(name="gamma", params={"gamma": 1.0}),)),
+        clip=TAGGED,
+        env=env,
+    )
+    bare = dataclasses.replace(plan, clip=UNTAGGED)
+    with pytest.raises(FfmpegBackendError, match="rule 22"):
+        vf(bare)
+
+
+def test_a_stored_clip_without_color_assumed_loads_as_not_assumed(env):
+    plan = compile_look(
+        Look(steps=(Effect(name="gamma", params={"gamma": 1.0}),)),
+        clip=TAGGED,
+        env=env,
+    )
+    d = plan_to_dict(plan)
+    del d["clip"]["color_assumed"]
+    loaded = plan_from_dict(d, impls={s.impl.impl: s.impl for s in plan.steps})
+    assert loaded.clip.color_assumed is False and plan_hash(loaded) == plan_hash(plan)
+
+
+def test_an_assumed_flag_with_nothing_assumed_is_incoherent():
+    with pytest.raises(SpecError):
+        ClipSpec(width=2, height=2, fps=1, color_assumed=True)

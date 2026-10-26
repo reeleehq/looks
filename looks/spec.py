@@ -368,6 +368,8 @@ class ClipSpec:
     color_assumed: bool = False
 
     def __post_init__(self) -> None:
+        if self.color_assumed and self.color_space is None:
+            raise SpecError("color_assumed=True with no color_space to have assumed")
         if self.width <= 0 or self.height <= 0:
             raise SpecError(
                 f"a ClipSpec needs positive dimensions, got {self.width}x{self.height}"

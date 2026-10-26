@@ -83,7 +83,9 @@ def _compile(*names):
     env = probe()
     if not env.available:
         pytest.skip("ffmpeg not usable")
-    return compile_look(Look(steps=_names(*names)), clip=CLIP, env=env, assume_color_space="bt709")
+    return compile_look(
+        Look(steps=_names(*names)), clip=CLIP, env=env, assume_color_space="bt709"
+    )
 
 
 def test_compile_look_warns_and_does_not_reorder():

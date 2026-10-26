@@ -107,9 +107,7 @@ class TestTheRace:
     def test_many_writers_produce_one_correct_file(self, cache):
         cache.mkdir(parents=True, exist_ok=True)
         with ProcessPoolExecutor(max_workers=8) as pool:
-            results = list(
-                pool.map(_materialise_in, [(str(cache), STOPS, SIZE)] * 16)
-            )
+            results = list(pool.map(_materialise_in, [(str(cache), STOPS, SIZE)] * 16))
         paths = {path for path, _ in results}
         assert len(paths) == 1, f"writers disagreed on the address: {paths}"
         written = Path(paths.pop())
@@ -252,12 +250,21 @@ class TestFfmpegAcceptsIt:
         cube = cube_file(ramp, size=17, into=cache)
         proc = subprocess.run(
             [
-                "ffmpeg", "-v", "error", "-f", "lavfi",
-                "-i", "testsrc2=size=64x48:rate=5:duration=0.2",
-                "-vf", f"lut3d=file={os.fspath(cube)}",
-                "-f", "null", "-",
+                "ffmpeg",
+                "-v",
+                "error",
+                "-f",
+                "lavfi",
+                "-i",
+                "testsrc2=size=64x48:rate=5:duration=0.2",
+                "-vf",
+                f"lut3d=file={os.fspath(cube)}",
+                "-f",
+                "null",
+                "-",
             ],
-            capture_output=True, text=True,
+            capture_output=True,
+            text=True,
         )
         assert proc.returncode == 0, proc.stderr[-500:]
 
@@ -274,12 +281,21 @@ class TestFfmpegAcceptsIt:
         half.write_text(text[: len(text) // 2])
         proc = subprocess.run(
             [
-                "ffmpeg", "-v", "error", "-f", "lavfi",
-                "-i", "testsrc2=size=64x48:rate=5:duration=0.2",
-                "-vf", f"lut3d=file={half}",
-                "-f", "null", "-",
+                "ffmpeg",
+                "-v",
+                "error",
+                "-f",
+                "lavfi",
+                "-i",
+                "testsrc2=size=64x48:rate=5:duration=0.2",
+                "-vf",
+                f"lut3d=file={half}",
+                "-f",
+                "null",
+                "-",
             ],
-            capture_output=True, text=True,
+            capture_output=True,
+            text=True,
         )
         # Whatever ffmpeg does with it, the point is that the cache never lets
         # a reader see this file at all.
@@ -313,7 +329,10 @@ class TestThePlanLevelVerb:
             name="que-calor",
         )
         return compile_look(
-            look, clip=ClipSpec(width=480, height=850, fps=30), env=env, assume_color_space="bt709",
+            look,
+            clip=ClipSpec(width=480, height=850, fps=30),
+            env=env,
+            assume_color_space="bt709",
         )
 
     def test_compiling_writes_no_file(self, cache):
@@ -362,7 +381,9 @@ class TestThePlanLevelVerb:
             pytest.skip("ffmpeg not usable")
         plan = compile_look(
             Look(steps=(Effect(name="blur", params={"sigma": 2}),)),
-            clip=ClipSpec(width=64, height=48, fps=10), env=env, assume_color_space="bt709",
+            clip=ClipSpec(width=64, height=48, fps=10),
+            env=env,
+            assume_color_space="bt709",
         )
         assert materialize(plan) is plan
 
@@ -388,10 +409,22 @@ class TestThePlanLevelVerb:
         awkward = tmp_path / "cache,with:punctuation"
         fragment = vf(materialize(self._plan(), into=awkward))
         proc = subprocess.run(
-            ["ffmpeg", "-v", "error", "-f", "lavfi",
-             "-i", "testsrc2=size=64x48:rate=5:duration=0.2",
-             "-vf", fragment, "-f", "null", "-"],
-            capture_output=True, text=True,
+            [
+                "ffmpeg",
+                "-v",
+                "error",
+                "-f",
+                "lavfi",
+                "-i",
+                "testsrc2=size=64x48:rate=5:duration=0.2",
+                "-vf",
+                fragment,
+                "-f",
+                "null",
+                "-",
+            ],
+            capture_output=True,
+            text=True,
         )
         assert proc.returncode == 0, proc.stderr[-400:]
 

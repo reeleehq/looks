@@ -287,8 +287,12 @@ class TestAgainstTheRealRegistry:
             )
         )
         grade = Look(steps=(Effect(name="gamma", params={"gamma": 1.2}),))
-        motion_plan = compile_look(motion, clip=CLIP, env=env_, assume_color_space="bt709")
-        grade_plan = compile_look(grade, clip=CLIP, env=env_, assume_color_space="bt709")
+        motion_plan = compile_look(
+            motion, clip=CLIP, env=env_, assume_color_space="bt709"
+        )
+        grade_plan = compile_look(
+            grade, clip=CLIP, env=env_, assume_color_space="bt709"
+        )
         assert motion_plan.time_varying is True
         assert grade_plan.time_varying is False
         # The obvious-but-wrong field, named so a future reader sees why this
