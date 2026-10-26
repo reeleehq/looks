@@ -1,0 +1,38 @@
+looks.cache
+===========
+
+.. automodule:: looks.cache
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DFLT_CACHE_ENV
+      CUBE_SUFFIX
+      PENDING
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      cache_dir
+      cube_file
+      entries
+      materialize
+      materialize_many
+      pending
+      sweep
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Materialised
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      CacheError
+   

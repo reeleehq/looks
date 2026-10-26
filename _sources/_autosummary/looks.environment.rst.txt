@@ -1,0 +1,42 @@
+looks.environment
+=================
+
+.. automodule:: looks.environment
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DFLT_PROBE_TIMEOUT_S
+      DFLT_FFMPEG
+      GATES_PATH
+      LICENCE_ORDER
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      gates
+      gpl_only_filters
+      known_filters
+      needs_gpl
+      parse_configuration
+      parse_filters
+      parse_licence
+      probe
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      EnvFingerprint
+      FfmpegEnv
+      Licence
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      UnknownFilter
+   

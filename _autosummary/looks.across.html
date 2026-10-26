@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html :class="{ 'dark' : darkMode === true }" data-content_root="../" lang="en" x-data="{ darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches), activeSection: ''}">
+<head>
+<script>
+    (function () {
+      // Set initial color scheme
+      if ((localStorage.getItem("_x_darkMode") === "true") || (window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Watch for media preference changes
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+        localStorage.setItem("_x_darkMode", event.matches);
+        document.documentElement.classList.toggle("dark", event.matches);
+      });
+    })();
+  </script>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="#ffffff" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="#030711" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="looks.across.html.md" rel="alternate" type="text/markdown"/>
+<link href="../llms.txt" rel="describedby" type="text/markdown"/>
+<link href="looks.across.html.md" rel="alternate" type="text/markdown"/>
+<link href="llms.txt" rel="describedby"/>
+<title>looks.across | looks</title>
+<meta content="looks.across | looks" property="og:title"/>
+<meta content="looks.across | looks" name="twitter:title"/>
+<link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=009055c6" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx_autodoc_typehints.css?v=057ac668" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/epythet.css?v=ecce5bdd" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="looks.cache.html" rel="next" title="looks.cache"/>
+<link href="looks.html" rel="prev" title="looks"/>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">looks</span>
+</a><nav class="flex items-center gap-6 text-sm font-medium">
+<a class="transition-colors hover:text-foreground/80 text-foreground/60" href="https://github.com/thorwhalen/looks" rel="noopener nofollow">GitHub</a>
+</nav></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 gap-2 sm:gap-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center gap-1">
+<button @click="darkMode = !darkMode" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" title="Toggle color scheme" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="justify-start text-sm md:!hidden bg-background" href="../index.html"><span class="font-bold text-clip whitespace-nowrap">looks</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="flex md:hidden flex-col font-medium mt-4">
+<a href="https://github.com/thorwhalen/looks" rel="nofollow noopener">GitHub</a>
+</nav><nav class="table w-full min-w-full my-6 lg:my-8">
+<ul class="current">
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../api.html">API reference<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="looks.html">looks<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">looks.across</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.cache.html">looks.cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.cli.html">looks.cli</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.compile.html">looks.compile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.environment.html">looks.environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.ffmpeg.html">looks.ffmpeg</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.frame_dependency.html">looks.frame_dependency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.geometry.html">looks.geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.licence.html">looks.licence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.lut.html">looks.lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.motion.html">looks.motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.pipe.html">looks.pipe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.registry.html">looks.registry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.spec.html">looks.spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.transition.html">looks.transition</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ai-agents.html">For AI agents</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">looks</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="../api.html">API reference</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="looks.html">looks</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">looks.across</span>
+</nav>
+<div id="content" role="main">
+<section id="module-looks.across">
+<span id="looks-across"></span><h1>looks.across<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#module-looks.across">¶</a></h1>
+<p>Choosing one parameter per clip so a SET looks consistent — exactly, not by search.</p>
+<p>The measured rule this mechanises: a single global flattening scale made the
+softest of three sources softer still, so it became the softest thing on screen.
+Per-clip choice beat it — **2.004x against uniform’s 2.213x and
+sharpest-everywhere’s 2.364x** — where the number is the ratio between the
+brightest and dimmest post-effect measurement across the set. Lower is more
+consistent.</p>
+<p>So the question is: given a grid of candidate parameter values per clip, and a
+measurement of what each candidate produces, which value does each clip get?</p>
+<p class="rubric">It is closed-form, and the closed form matters</p>
+<p>Reaching for the exhaustive product is the natural move and it is hopeless:
+<a href="#id1"><span class="problematic" id="id2">|G|^|S|</span></a> is <strong>8³⁰ ≈ 1.24 x 10²⁷</strong> at the documented size. But the problem is the
+classic <em>narrowest window containing one element from each of N sorted lists</em>,
+which a single sorted sweep with two pointers answers exactly. Measured here:
+<strong>0.093 ms at N=30, |G|=8</strong>, and 4000 randomised trials against brute force with
+ties, duplicates and repeated values across lists — <strong>zero disagreements</strong>.</p>
+<p class="rubric">Why logs</p>
+<p>Minimising the spread of <code class="docutils literal notranslate"><span class="pre">log(x)</span></code> <em>is</em> minimising the ratio <code class="docutils literal notranslate"><span class="pre">max/min</span></code> — the
+same objective, the same chosen values, verified. Logs are what turn a ratio
+into a difference, which is what a sweep can add up. The consequence worth
+having is that the objective is <strong>scale-independent</strong>: multiply every
+measurement by a thousand and the answer does not move.</p>
+<p>The consequence worth refusing is that <code class="docutils literal notranslate"><span class="pre">log(0)</span></code> does not exist, and a
+Laplacian variance genuinely can be 0 on a flat clip. So a non-positive
+measurement is a refusal. Clamping it to a small epsilon would be inventing a
+measurement, which is the one thing this package will not do.</p>
+<p class="rubric">Why the dispersion functional is a separate field</p>
+<p><code class="docutils literal notranslate"><span class="pre">max/min</span></code> is defensible at N=3 and fragile at N=30, because one clip that
+cannot be fixed sets the whole window. Measured, with 29 clips that can all land
+near one value and a thirtieth whose entire grid sits ten times away:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>functional</p></th>
+<th class="head"><p>ratio</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>every clip (max/min)</p></td>
+<td><p><strong>9.026x</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>dropping the worst one</p></td>
+<td><p><strong>1.037x</strong></p></td>
+</tr>
+</tbody>
+</table>
+<p>The outlier accounts for <strong>98.3%</strong> of the log window, and the other 29 clips’
+whole remaining freedom moves the objective by about 13%. Their choices have
+stopped mattering.</p>
+<p>And the trim costs no exactness — that is the point. “Narrowest window covering
+at least N-k of the lists” is the same sweep with a <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code> in place of an <code class="docutils literal notranslate"><span class="pre">==</span></code>,
+and it agreed with brute force over 1500 trials. So the functional is a field
+rather than a fork.</p>
+<p class="rubric">What this module does not do</p>
+<p>It does not measure. <a class="reference internal" href="looks.html#looks.measure" title="looks.measure"><code class="xref py py-mod docutils literal notranslate"><span class="pre">looks.measure</span></code></a> does that, by running ffmpeg, and
+<a class="reference internal" href="looks.html#looks.resolve_across" title="looks.resolve_across"><code class="xref py py-func docutils literal notranslate"><span class="pre">looks.resolve_across()</span></code></a> applies the answer. This is the arithmetic in
+between: measurements in, one value per clip out.</p>
+<p class="rubric">Module Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.across.Objective" title="looks.across.Objective"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Objective</span></code></a></p></td>
+<td><p>there is no honest reason to <em>maximise</em> the spread of a set's appearance, and a one-member Literal makes asking for it unrepresentable rather than merely unwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.across.Statistic" title="looks.across.Statistic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Statistic</span></code></a></p></td>
+<td><p>Which measurement to make consistent.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.across.Dispersion" title="looks.across.Dispersion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dispersion</span></code></a></p></td>
+<td><p>How the spread of the chosen values is summarised.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.across.probes_for" title="looks.across.probes_for"><code class="xref py py-obj docutils literal notranslate"><span class="pre">probes_for</span></code></a>(spread, parameter)</p></td>
+<td><p>A <a class="reference internal" href="#looks.across.Spread" title="looks.across.Spread"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spread</span></code></a> as the probes <a class="reference internal" href="looks.html#looks.resolve_across" title="looks.resolve_across"><code class="xref py py-func docutils literal notranslate"><span class="pre">looks.resolve_across()</span></code></a> takes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.across.solve_across" title="looks.across.solve_across"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_across</span></code></a>(candidates, *[, statistic, ...])</p></td>
+<td><p>One parameter value per clip, so the set's measurements sit close together.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.across.Candidate" title="looks.across.Candidate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Candidate</span></code></a>(value, stats)</p></td>
+<td><p>One candidate parameter value, and what it measured.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.across.Choice" title="looks.across.Choice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Choice</span></code></a>(source_id, value, statistic)</p></td>
+<td><p>The value one clip was given, and the measurement that justifies it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.across.Spread" title="looks.across.Spread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Spread</span></code></a>(choices, ratio, log_spread, ...[, ...])</p></td>
+<td><p>The answer: one choice per clip, and how consistent the set now is.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Exceptions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.across.AcrossError" title="looks.across.AcrossError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AcrossError</span></code></a></p></td>
+<td><p>A set-relative question that cannot be answered as asked.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py exception">
+<dt class="sig sig-object py" id="looks.across.AcrossError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.across.</span></span><span class="sig-name descname"><span class="pre">AcrossError</span></span><a class="reference internal" href="../_modules/looks/across.html#AcrossError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.across.AcrossError" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.across.AcrossError'">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="looks.html#looks.MeasurementError" title="looks.measure.MeasurementError"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeasurementError</span></code></a></p>
+<p>A set-relative question that cannot be answered as asked.</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.across.Candidate">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.across.</span></span><span class="sig-name descname"><span class="pre">Candidate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/across.html#Candidate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.across.Candidate" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.across.Candidate'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>One candidate parameter value, and what it measured.</p>
+<p><code class="docutils literal notranslate"><span class="pre">value</span></code> is whatever the parameter is — a flattening scale, a sigma, a
+level count. It is carried opaquely: this module compares <em>measurements</em>,
+never parameters.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.across.Choice">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.across.</span></span><span class="sig-name descname"><span class="pre">Choice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">statistic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/across.html#Choice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.across.Choice" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.across.Choice'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>The value one clip was given, and the measurement that justifies it.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.across.Dispersion">
+<span class="sig-prename descclassname"><span class="pre">looks.across.</span></span><span class="sig-name descname"><span class="pre">Dispersion</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.across.Dispersion" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.across.Dispersion'">¶</a></dt>
+<dd><p>How the spread of the chosen values is summarised.</p>
+<p><code class="docutils literal notranslate"><span class="pre">full_range</span></code> is <code class="docutils literal notranslate"><span class="pre">max/min</span></code> over every clip. <code class="docutils literal notranslate"><span class="pre">trimmed_range</span></code> allows
+<code class="docutils literal notranslate"><span class="pre">drop</span></code> clips to sit outside the window, which is what keeps one unfixable
+clip from setting the objective for the other twenty-nine. Both are solved
+exactly by the same sweep.</p>
+<p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[‘full_range’, ‘trimmed_range’]</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.across.Objective">
+<span class="sig-prename descclassname"><span class="pre">looks.across.</span></span><span class="sig-name descname"><span class="pre">Objective</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.across.Objective" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.across.Objective'">¶</a></dt>
+<dd><p>there is no honest
+reason to <em>maximise</em> the spread of a set’s appearance, and a one-member
+Literal makes asking for it unrepresentable rather than merely unwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The objective. <strong>Exactly one member, deliberately</strong></p>
+</dd>
+</dl>
+<p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[‘min_spread’]</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.across.Spread">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.across.</span></span><span class="sig-name descname"><span class="pre">Spread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">choices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_spread</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dispersion</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">statistic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outside</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/across.html#Spread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.across.Spread" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.across.Spread'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>The answer: one choice per clip, and how consistent the set now is.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ratio</span></code> is the headline — the same number the measured rule is quoted in,
+so a caller can compare it against uniform’s 2.213x directly. It is
+<code class="docutils literal notranslate"><span class="pre">exp(log_spread)</span></code> and the two are reported together because the first is
+what a person reads and the second is what the solver minimised.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.across.Spread.outside">
+<span class="sig-name descname"><span class="pre">outside</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">tuple</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">()</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.across.Spread.outside" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.across.Spread.outside'">¶</a></dt>
+<dd><p>Clips the trim left outside the window. Empty under <code class="docutils literal notranslate"><span class="pre">full_range</span></code>.
+Named rather than counted, because <em>which</em> clip could not be fixed is
+the interesting half of the answer.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.across.Statistic">
+<span class="sig-prename descclassname"><span class="pre">looks.across.</span></span><span class="sig-name descname"><span class="pre">Statistic</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.across.Statistic" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.across.Statistic'">¶</a></dt>
+<dd><p>Which measurement to make consistent. Closed, because the objective is a
+RATIO and only a positive-valued statistic has one — an offset-valued field
+would give a ratio that changes when the offset does.</p>
+<p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[‘sharpness’, ‘blur’]</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.across.probes_for">
+<span class="sig-prename descclassname"><span class="pre">looks.across.</span></span><span class="sig-name descname"><span class="pre">probes_for</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spread</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/across.html#probes_for"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.across.probes_for" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.across.probes_for'">¶</a></dt>
+<dd><p>A <a class="reference internal" href="#looks.across.Spread" title="looks.across.Spread"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spread</span></code></a> as the probes <a class="reference internal" href="looks.html#looks.resolve_across" title="looks.resolve_across"><code class="xref py py-func docutils literal notranslate"><span class="pre">looks.resolve_across()</span></code></a> takes.</p>
+<p>The join between the two halves of RULE N: this module answers the
+set-relative question, and <code class="docutils literal notranslate"><span class="pre">resolve_across</span></code> applies the answer, turning
+each <code class="docutils literal notranslate"><span class="pre">SET_RELATIVE</span></code> Look into an <code class="docutils literal notranslate"><span class="pre">EXTERNAL</span></code> one that will not be asked
+again against a different set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parameter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span>) – The <a class="reference internal" href="looks.spec.html#looks.spec.Ref" title="looks.spec.Ref"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ref</span></code></a> key the value fills in.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#Ellipsis" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">spread</span> <span class="o">=</span> <span class="n">Spread</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="p">(</span><span class="n">Choice</span><span class="p">(</span><span class="s1">'c01'</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">),</span>
+</span><span id="line-2"><span class="gp">... </span>                         <span class="n">Choice</span><span class="p">(</span><span class="s1">'c02'</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">)),</span>
+</span><span id="line-3"><span class="gp">... </span>                <span class="n">ratio</span><span class="o">=</span><span class="mf">1.05</span><span class="p">,</span> <span class="n">log_spread</span><span class="o">=</span><span class="mf">0.049</span><span class="p">,</span>
+</span><span id="line-4"><span class="gp">... </span>                <span class="n">dispersion</span><span class="o">=</span><span class="s1">'full_range'</span><span class="p">,</span> <span class="n">statistic</span><span class="o">=</span><span class="s1">'sharpness'</span><span class="p">)</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="n">probes_for</span><span class="p">(</span><span class="n">spread</span><span class="p">,</span> <span class="s1">'scale'</span><span class="p">)</span>
+</span><span id="line-6"><span class="go">({'scale': 0.75}, {'scale': 0.5})</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.across.solve_across">
+<span class="sig-prename descclassname"><span class="pre">looks.across.</span></span><span class="sig-name descname"><span class="pre">solve_across</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candidates</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">statistic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sharpness'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">objective</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'min_spread'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dispersion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full_range'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/across.html#solve_across"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.across.solve_across" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.across.solve_across'">¶</a></dt>
+<dd><p>One parameter value per clip, so the set’s measurements sit close together.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>candidates</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#looks.across.Candidate" title="looks.across.Candidate"><code class="xref py py-class docutils literal notranslate"><span class="pre">Candidate</span></code></a>]]</span>) – <code class="docutils literal notranslate"><span class="pre">{source_id:</span> <span class="pre">[Candidate,</span> <span class="pre">...]}</span></code> — the grid, already
+measured. This module does not measure; see <a class="reference internal" href="looks.html#looks.measure" title="looks.measure"><code class="xref py py-mod docutils literal notranslate"><span class="pre">looks.measure</span></code></a>.</p></li>
+<li><p><strong>statistic</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<span class="highlight sphinx_autodoc_typehints-value"><code class="docutils literal notranslate"><span class="s1"><span class="pre">'sharpness'</span></span></code></span>, <span class="highlight sphinx_autodoc_typehints-value"><code class="docutils literal notranslate"><span class="s1"><span class="pre">'blur'</span></span></code></span>]</span>) – Which measurement to make consistent.</p></li>
+<li><p><strong>objective</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<span class="highlight sphinx_autodoc_typehints-value"><code class="docutils literal notranslate"><span class="s1"><span class="pre">'min_spread'</span></span></code></span>]</span>) – <code class="docutils literal notranslate"><span class="pre">"min_spread"</span></code>, and only that. See <a class="reference internal" href="#looks.across.Objective" title="looks.across.Objective"><code class="xref py py-data docutils literal notranslate"><span class="pre">Objective</span></code></a>.</p></li>
+<li><p><strong>dispersion</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<span class="highlight sphinx_autodoc_typehints-value"><code class="docutils literal notranslate"><span class="s1"><span class="pre">'full_range'</span></span></code></span>, <span class="highlight sphinx_autodoc_typehints-value"><code class="docutils literal notranslate"><span class="s1"><span class="pre">'trimmed_range'</span></span></code></span>]</span>) – <code class="docutils literal notranslate"><span class="pre">"full_range"</span></code> (max/min over every clip) or
+<code class="docutils literal notranslate"><span class="pre">"trimmed_range"</span></code> (allow <code class="docutils literal notranslate"><span class="pre">drop</span></code> clips outside the window).</p></li>
+<li><p><strong>drop</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span>) – How many clips may sit outside. Only with <code class="docutils literal notranslate"><span class="pre">trimmed_range</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#looks.across.AcrossError" title="looks.across.AcrossError"><strong>AcrossError</strong></a> – If the inputs cannot yield an answer — no clips, a clip
+    with an empty grid, measurements that are not comparable with each
+    other, a missing or non-positive statistic, or a <code class="docutils literal notranslate"><span class="pre">drop</span></code> that would
+    leave nothing to be consistent about.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.across.Spread" title="looks.across.Spread"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spread</span></code></a></span></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Three clips, each with two candidates. The solver picks the combination
+whose measurements sit closest together, not the sharpest one each:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">stats</span><span class="p">(</span><span class="n">source_id</span><span class="p">,</span> <span class="n">sharpness</span><span class="p">):</span>
+</span><span id="line-2"><span class="gp">... </span>    <span class="k">return</span> <span class="n">ClipStats</span><span class="p">(</span><span class="n">source_id</span><span class="o">=</span><span class="n">source_id</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s1">'post_effect'</span><span class="p">,</span>
+</span><span id="line-3"><span class="gp">... </span>                     <span class="n">instrument</span><span class="o">=</span><span class="s1">'x'</span><span class="p">,</span> <span class="n">luma_space</span><span class="o">=</span><span class="s1">'coded_y'</span><span class="p">,</span>
+</span><span id="line-4"><span class="gp">... </span>                     <span class="n">sample_spec</span><span class="o">=</span><span class="s1">'uniform:5'</span><span class="p">,</span> <span class="n">n_frames</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+</span><span id="line-5"><span class="gp">... </span>                     <span class="n">sharpness</span><span class="o">=</span><span class="n">sharpness</span><span class="p">)</span>
+</span><span id="line-6"><span class="gp">&gt;&gt;&gt; </span><span class="n">got</span> <span class="o">=</span> <span class="n">solve_across</span><span class="p">({</span>
+</span><span id="line-7"><span class="gp">... </span>    <span class="s1">'c01'</span><span class="p">:</span> <span class="p">[</span><span class="n">Candidate</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">stats</span><span class="p">(</span><span class="s1">'c01'</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">)),</span>
+</span><span id="line-8"><span class="gp">... </span>            <span class="n">Candidate</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">stats</span><span class="p">(</span><span class="s1">'c01'</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">))],</span>
+</span><span id="line-9"><span class="gp">... </span>    <span class="s1">'c02'</span><span class="p">:</span> <span class="p">[</span><span class="n">Candidate</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">stats</span><span class="p">(</span><span class="s1">'c02'</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">)),</span>
+</span><span id="line-10"><span class="gp">... </span>            <span class="n">Candidate</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">stats</span><span class="p">(</span><span class="s1">'c02'</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">))],</span>
+</span><span id="line-11"><span class="gp">... </span>    <span class="s1">'c03'</span><span class="p">:</span> <span class="p">[</span><span class="n">Candidate</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">stats</span><span class="p">(</span><span class="s1">'c03'</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">)),</span>
+</span><span id="line-12"><span class="gp">... </span>            <span class="n">Candidate</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">stats</span><span class="p">(</span><span class="s1">'c03'</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">))],</span>
+</span><span id="line-13"><span class="gp">... </span><span class="p">})</span>
+</span><span id="line-14"><span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="n">c</span><span class="o">.</span><span class="n">source_id</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">got</span><span class="o">.</span><span class="n">choices</span><span class="p">]</span>
+</span><span id="line-15"><span class="go">[('c01', 0.75), ('c02', 0.5), ('c03', 0.5)]</span>
+</span><span id="line-16"><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">got</span><span class="o">.</span><span class="n">ratio</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</span><span id="line-17"><span class="go">1.105</span>
+</span></code></pre></div>
+</div>
+<p>Choosing the sharpest everywhere would have been far worse:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="mf">100.0</span> <span class="o">/</span> <span class="mf">38.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">2.632</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#looks.across.AcrossError'" class="reference internal" href="#looks.across.AcrossError"><code class="docutils literal notranslate"><span class="pre">AcrossError</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.across.Candidate'" class="reference internal" href="#looks.across.Candidate"><code class="docutils literal notranslate"><span class="pre">Candidate</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.across.Choice'" class="reference internal" href="#looks.across.Choice"><code class="docutils literal notranslate"><span class="pre">Choice</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.across.Dispersion'" class="reference internal" href="#looks.across.Dispersion"><code class="docutils literal notranslate"><span class="pre">Dispersion</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.across.Objective'" class="reference internal" href="#looks.across.Objective"><code class="docutils literal notranslate"><span class="pre">Objective</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.across.Spread'" class="reference internal" href="#looks.across.Spread"><code class="docutils literal notranslate"><span class="pre">Spread</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.across.Spread.outside'" class="reference internal" href="#looks.across.Spread.outside"><code class="docutils literal notranslate"><span class="pre">Spread.outside</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#looks.across.Statistic'" class="reference internal" href="#looks.across.Statistic"><code class="docutils literal notranslate"><span class="pre">Statistic</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.across.probes_for'" class="reference internal" href="#looks.across.probes_for"><code class="docutils literal notranslate"><span class="pre">probes_for()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.across.solve_across'" class="reference internal" href="#looks.across.solve_across"><code class="docutils literal notranslate"><span class="pre">solve_across()</span></code></a></li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left"></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=3294188c"></script>
+<script src="../_static/doctools.js?v=fd6eb6e6"></script>
+<script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=fd10adb8"></script>
+<script defer="defer" src="../_static/theme.js?v=49cc6205"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+looks.cli
+=========
+
+.. automodule:: looks.cli
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      EXIT_REFUSED
+      COMMANDS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      check
+      disclaimer
+      env
+      flicker
+      main
+      measure
+      motion
+      place
+      terms
+      unverified
+   

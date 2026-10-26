@@ -1,0 +1,52 @@
+looks.spec
+==========
+
+.. automodule:: looks.spec
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      LOOK_SCHEMA
+      REF_MARKER
+      EMPTY
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      look_from_dict
+      look_hash
+      look_to_dict
+      output_key
+      plan_from_dict
+      plan_hash
+      plan_to_dict
+      resolve
+      resolve_across
+      select_impl
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ClipSpec
+      Effect
+      ImplRef
+      Look
+      LookPlan
+      Ref
+      Span
+      Step
+      Target
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      SchemaError
+      SpanUnsupported
+      SpecError
+      UnresolvedParameter
+   

@@ -1,4 +1,0 @@
-looks.pipe
-==========
-.. automodule:: looks.pipe
-   :members:

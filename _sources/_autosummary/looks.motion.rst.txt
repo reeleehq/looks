@@ -1,0 +1,44 @@
+looks.motion
+============
+
+.. automodule:: looks.motion
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      EPSILON
+      PRECISION
+      MAX_ZOOM
+      MIN_WINDOW_FRACTION
+      ASPECT_TOLERANCE
+      TIMEBASE_RESET
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      compile_motion
+      crop_fragment
+      is_source_shaped
+      is_static
+      ramp
+      reframe
+      zoompan_fragment
+      zooms
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Keyframe
+      Window
+      WindowLike
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      MotionError
+   

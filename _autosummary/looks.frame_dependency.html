@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+
+<html :class="{ 'dark' : darkMode === true }" data-content_root="../" lang="en" x-data="{ darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches), activeSection: ''}">
+<head>
+<script>
+    (function () {
+      // Set initial color scheme
+      if ((localStorage.getItem("_x_darkMode") === "true") || (window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Watch for media preference changes
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+        localStorage.setItem("_x_darkMode", event.matches);
+        document.documentElement.classList.toggle("dark", event.matches);
+      });
+    })();
+  </script>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="#ffffff" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="#030711" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="looks.frame_dependency.html.md" rel="alternate" type="text/markdown"/>
+<link href="../llms.txt" rel="describedby" type="text/markdown"/>
+<link href="looks.frame_dependency.html.md" rel="alternate" type="text/markdown"/>
+<link href="llms.txt" rel="describedby"/>
+<title>looks.frame_dependency | looks</title>
+<meta content="looks.frame_dependency | looks" property="og:title"/>
+<meta content="looks.frame_dependency | looks" name="twitter:title"/>
+<link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=009055c6" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx_autodoc_typehints.css?v=057ac668" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/epythet.css?v=ecce5bdd" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="looks.geometry.html" rel="next" title="looks.geometry"/>
+<link href="looks.ffmpeg.html" rel="prev" title="looks.ffmpeg"/>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">looks</span>
+</a><nav class="flex items-center gap-6 text-sm font-medium">
+<a class="transition-colors hover:text-foreground/80 text-foreground/60" href="https://github.com/thorwhalen/looks" rel="noopener nofollow">GitHub</a>
+</nav></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 gap-2 sm:gap-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center gap-1">
+<button @click="darkMode = !darkMode" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" title="Toggle color scheme" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="justify-start text-sm md:!hidden bg-background" href="../index.html"><span class="font-bold text-clip whitespace-nowrap">looks</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="flex md:hidden flex-col font-medium mt-4">
+<a href="https://github.com/thorwhalen/looks" rel="nofollow noopener">GitHub</a>
+</nav><nav class="table w-full min-w-full my-6 lg:my-8">
+<ul class="current">
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../api.html">API reference<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="looks.html">looks<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l3"><a class="reference internal" href="looks.across.html">looks.across</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.cache.html">looks.cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.cli.html">looks.cli</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.compile.html">looks.compile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.environment.html">looks.environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.ffmpeg.html">looks.ffmpeg</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">looks.frame_dependency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.geometry.html">looks.geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.licence.html">looks.licence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.lut.html">looks.lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.motion.html">looks.motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.pipe.html">looks.pipe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.registry.html">looks.registry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.spec.html">looks.spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.transition.html">looks.transition</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ai-agents.html">For AI agents</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">looks</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="../api.html">API reference</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="looks.html">looks</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">looks.frame_dependency</span>
+</nav>
+<div id="content" role="main">
+<section id="module-looks.frame_dependency">
+<span id="looks-frame-dependency"></span><h1>looks.frame_dependency<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#module-looks.frame_dependency">¶</a></h1>
+<p>Can this effect flicker? Answered by measurement, not by judgement.</p>
+<p>The flagship look’s central claim is that it is *frame-independent by
+construction* — one fixed LUT, no temporal state — so it <strong>cannot</strong> flicker,
+which is the failure mode of every per-frame palette quantiser and of the
+non-commercial cartoon models. That claim is worth something only if it can be
+checked, and it turns out to reduce to <strong>two ffmpeg probes and a comparison</strong>.</p>
+<p>Two questions, two probes, and each isolates one hazard:</p>
+<ol class="arabic simple">
+<li><p><strong>Does the effect vary with time?</strong> Apply it to a <em>looped still</em> and diff
+consecutive output frames. A constant input can only produce a changing
+output if the effect reads the clock or the frame index. Measured: <code class="code docutils literal notranslate"><span class="pre">noise</span></code>
+with the <code class="code docutils literal notranslate"><span class="pre">t</span></code> flag moves 82–85/255; <code class="code docutils literal notranslate"><span class="pre">lut3d</span></code>, <code class="code docutils literal notranslate"><span class="pre">curves</span></code>, <code class="code docutils literal notranslate"><span class="pre">gblur</span></code>, <code class="code docutils literal notranslate"><span class="pre">deband</span></code> and
+<code class="code docutils literal notranslate"><span class="pre">noise</span></code> <em>without</em> <code class="code docutils literal notranslate"><span class="pre">t</span></code> move 0.</p></li>
+<li><p><strong>Does the effect adapt to frame content?</strong> Apply it to a source whose
+<em>left half is constant</em> while its <em>right half changes</em>, then look only at the
+left half. A content-independent effect leaves it alone; one that adapts to
+global statistics changes it, because the statistics moved. Measured:
+<code class="code docutils literal notranslate"><span class="pre">normalize</span></code> moves the constant half by <strong>219/255</strong>; <code class="code docutils literal notranslate"><span class="pre">lut3d</span></code>, <code class="code docutils literal notranslate"><span class="pre">curves</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">gblur</span></code> move 0.</p></li>
+</ol>
+<p>Question 2 is the one that matters. <strong>A content-adaptive effect flickers</strong> —
+its output for an unchanged pixel depends on what else is in the frame, so a
+pixel that never moves still shimmers as the shot changes around it.</p>
+<p class="rubric">Three things this probe gets wrong if you build it naively</p>
+<p>Each cost a false reading before it was fixed, and each fails <strong>silently</strong>.</p>
+<ul>
+<li><p>**The varying half must actually move the statistic the effect adapts to,
+and no single source moves them all.** This is the deepest limitation here,
+and it is measured rather than theorised. A first version used <code class="code docutils literal notranslate"><span class="pre">testsrc2</span></code>,
+which always spans the full luma range and therefore never moves a min/max —
+<code class="code docutils literal notranslate"><span class="pre">normalize</span></code> read <strong>0</strong>, a false negative saying “cannot flicker” about an
+effect that can. A <em>fading</em> half moves the range and <code class="code docutils literal notranslate"><span class="pre">normalize</span></code> jumps to
+<strong>219</strong>. But the fade leaves the colour histogram nearly alone, so <code class="code docutils literal notranslate"><span class="pre">elbg</span></code> — a
+vector quantiser, adaptive by definition — still read <strong>0</strong>. A <em>hue-cycling</em>
+half moves the histogram and catches <code class="code docutils literal notranslate"><span class="pre">elbg</span></code> at 5–8 — while missing
+<code class="code docutils literal notranslate"><span class="pre">normalize</span></code> entirely, because it does not move the range.</p>
+<p>So <strong>two</strong> content probes run and the verdict is the larger. The pair is not
+provably complete: an effect adapting to a statistic neither probe moves
+reads independent. See <em>What this does not answer</em>.</p>
+</li>
+<li><p><strong>Chroma subsampling bleeds across the seam.</strong> In <code class="code docutils literal notranslate"><span class="pre">yuv420p</span></code> a chroma sample
+is shared between the constant and varying halves, so the boundary column
+changes for reasons that have nothing to do with the effect. <code class="code docutils literal notranslate"><span class="pre">yuv444p</span></code> plus a
+margin removes it.</p></li>
+<li><p><strong>`tblend=difference` of identical frames is not zero in RGB.</strong> Black in
+limited-range YUV is 16, so a difference computed in RGB and then measured by
+<code class="code docutils literal notranslate"><span class="pre">signalstats</span></code> reads 16 everywhere. Filters that need RGB (<code class="code docutils literal notranslate"><span class="pre">lut3d</span></code>, <code class="code docutils literal notranslate"><span class="pre">curves</span></code>)
+force that conversion, so the format is pinned on <strong>both</strong> sides of the
+effect under test.</p></li>
+</ul>
+<p class="rubric">What this does not answer</p>
+<p><strong>Some temporal filters.</strong> A third probe (below) catches the common case by
+running two sequences that differ only <em>before</em> a shared textured tail:
+<code class="code docutils literal notranslate"><span class="pre">tmix=frames=3</span></code> shows <strong>146</strong>/255 in the tail and <code class="code docutils literal notranslate"><span class="pre">hqdn3d</span></code> shows 2. But
+<code class="code docutils literal notranslate"><span class="pre">tblend</span></code> and <code class="code docutils literal notranslate"><span class="pre">atadenoise</span></code> both read <strong>0</strong> and are misreported as independent.
+Measured, and the reason is structural rather than a tuning failure: <code class="code docutils literal notranslate"><span class="pre">tblend</span></code>
+consumes two input frames per output frame, so the trim that skips the
+perturbation for a normal filter lands <em>past</em> it; <code class="code docutils literal notranslate"><span class="pre">atadenoise</span></code> keeps nine
+frames of history, more than a short probe can perturb. Lengthening the
+perturbation from one frame to three changed neither — verified.</p>
+<p>Those two are refused for an unrelated and stronger reason anyway: **every
+temporal filter is out of scope**, because the execution model this package
+serves renders one bounded ffmpeg <em>per cut</em>, so a temporal filter meets a hard
+discontinuity at every cut. Do not read that as making the gap harmless —
+it means the gap is not currently load-bearing, not that it is closed.</p>
+<p>**And an <code class="code docutils literal notranslate"><span class="pre">INDEPENDENT</span></code> verdict is evidence, not proof.** It says: none of three
+probes could make this effect change a pixel it should not have touched. An
+effect adapting to a statistic none of them moves would pass, and so would
+<code class="code docutils literal notranslate"><span class="pre">tblend</span></code>.
+That is why the flagship look’s claim does <strong>not</strong> rest on this module — a
+fixed per-pixel lookup with no state cannot depend on anything else, which is a
+<em>structural</em> argument, and the measurement corroborates it rather than
+substituting for it. Use <a class="reference internal" href="#looks.frame_dependency.classify" title="looks.frame_dependency.classify"><code class="xref py py-func docutils literal notranslate"><span class="pre">classify()</span></code></a> to catch an effect that flickers; do
+not use it to certify one that does not, unless you also have the structural
+argument.</p>
+<p>Every process here goes through <code class="xref py py-mod docutils literal notranslate"><span class="pre">looks._run</span></code>, and every one is an
+<code class="docutils literal notranslate"><span class="pre">ffprobe</span></code> reading filter metadata — no pixel ever leaves ffmpeg, so the
+<code class="docutils literal notranslate"><span class="pre">-f</span> <span class="pre">null</span> <span class="pre">-</span></code> invariant is preserved by construction rather than by care.</p>
+<p class="rubric">Module Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.frame_dependency.PROBE_SIZE" title="looks.frame_dependency.PROBE_SIZE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PROBE_SIZE</span></code></a></p></td>
+<td><p>Probe geometry.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.frame_dependency.SEAM_MARGIN" title="looks.frame_dependency.SEAM_MARGIN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SEAM_MARGIN</span></code></a></p></td>
+<td><p>How far in from the seam the constant half is sampled, in pixels.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.frame_dependency.NOISE_FLOOR" title="looks.frame_dependency.NOISE_FLOOR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NOISE_FLOOR</span></code></a></p></td>
+<td><p>A difference at or below this (out of 255) is treated as no change.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.frame_dependency.UNDETERMINED" title="looks.frame_dependency.UNDETERMINED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UNDETERMINED</span></code></a></p></td>
+<td><p>Convenience alias for the value that means "no answer".</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.frame_dependency.FLICKER_FREE" title="looks.frame_dependency.FLICKER_FREE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FLICKER_FREE</span></code></a></p></td>
+<td><p>The classes that cannot produce flicker.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.frame_dependency.DETERMINISM_PROBE_FRAMES" title="looks.frame_dependency.DETERMINISM_PROBE_FRAMES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DETERMINISM_PROBE_FRAMES</span></code></a></p></td>
+<td><p>How many frames the determinism probe examines.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.frame_dependency.TEMPORAL_PROBE_FRAMES" title="looks.frame_dependency.TEMPORAL_PROBE_FRAMES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEMPORAL_PROBE_FRAMES</span></code></a></p></td>
+<td><p>How many frames of the shared tail the temporal probe examines.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.frame_dependency.assert_flicker_free" title="looks.frame_dependency.assert_flicker_free"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assert_flicker_free</span></code></a>(chain, **kwargs)</p></td>
+<td><p>Raise unless <code class="docutils literal notranslate"><span class="pre">chain</span></code> provably cannot flicker.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.frame_dependency.classify" title="looks.frame_dependency.classify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">classify</span></code></a>(chain, *[, ffprobe, timeout])</p></td>
+<td><p>Measure what <code class="docutils literal notranslate"><span class="pre">chain</span></code> depends on.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.frame_dependency.Dependency" title="looks.frame_dependency.Dependency"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dependency</span></code></a>(*values)</p></td>
+<td><p>What an effect's output depends on, worst case.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.frame_dependency.DependencyReport" title="looks.frame_dependency.DependencyReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DependencyReport</span></code></a>(dependency[, time_delta, ...])</p></td>
+<td><p>What the two probes measured, and what follows from it.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.frame_dependency.DETERMINISM_PROBE_FRAMES">
+<span class="sig-prename descclassname"><span class="pre">looks.frame_dependency.</span></span><span class="sig-name descname"><span class="pre">DETERMINISM_PROBE_FRAMES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.DETERMINISM_PROBE_FRAMES" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.DETERMINISM_PROBE_FRAMES'">¶</a></dt>
+<dd><p>How many frames the determinism probe examines.</p>
+<p><strong>Twenty, and the number is measured rather than chosen.</strong> Detecting
+randomness is itself probabilistic: two runs of a stochastic filter can agree
+by chance, and the more frames you compare the less likely that is across all
+of them. On <code class="code docutils literal notranslate"><span class="pre">elbg</span></code> (a vector quantiser whose default <code class="code docutils literal notranslate"><span class="pre">seed=-1</span></code> re-randomises
+every instantiation), detection rate over eight repeats:</p>
+<blockquote>
+<div><p>3 frames -&gt; 1/6      8 frames -&gt; 7/8      20 frames -&gt; 8/8      40 -&gt; 8/8</p>
+</div></blockquote>
+<p>An earlier six-repeat sample read 6/6 at eight frames and set the constant
+there; a fuller sample found 7/8, and the flake surfaced as an intermittent
+test. <strong>That is the same probabilistic-detection point one level up</strong> — a
+small sample can agree by chance too.</p>
+<p>The consequence, and it is the honest framing of this whole verdict: a
+<code class="code docutils literal notranslate"><span class="pre">NONDETERMINISTIC</span></code> result is a proof, but its <strong>absence is not</strong>. An effect
+random in one pixel per ten thousand would pass at any frame count here.</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.frame_dependency.Dependency">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.frame_dependency.</span></span><span class="sig-name descname"><span class="pre">Dependency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/frame_dependency.html#Dependency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.Dependency" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.Dependency'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>What an effect’s output depends on, worst case.</p>
+<p>Ordered by how badly each behaves across a cut:</p>
+<ul class="simple">
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">INDEPENDENT</span></code> — the same input pixel gives the same output pixel,
+always. Cannot flicker. This is what the flagship look is.</p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">INDEPENDENT</span></code> — no probe could make the effect touch a pixel it
+should not have. <strong>Evidence, not proof</strong> — see the module docstring.
+A pixel-local map and a small spatial filter both land here, and for the
+flicker question that is the right grouping: neither can flicker.</p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIME_VARYING</span></code> — output depends on the frame index or clock.
+Deterministic and reproducible, but it changes: film grain is the wanted
+case.</p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">CONTENT_ADAPTIVE</span></code> — output depends on the frame’s global
+statistics. <strong>This flickers</strong>, and it is the class the whole
+frame-independence argument is about.</p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">TEMPORAL</span></code> — output at frame <em>n</em> depends on frames before it.
+Structurally incompatible with the execution model this package serves:
+the consumer renders one bounded ffmpeg <strong>per cut</strong>, so a temporal filter
+meets a hard discontinuity at every cut and produces an artefact at every
+one of them.</p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">NONDETERMINISTIC</span></code> — two applications of the effect to the SAME
+input disagree. A reproducibility hazard rather than a flicker one: a
+re-render produces a different picture. Detected first, because it
+invalidates every other probe here.</p></li>
+<li><p><a class="reference internal" href="#looks.frame_dependency.UNDETERMINED" title="looks.frame_dependency.UNDETERMINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDETERMINED</span></code></a> — a probe could not run. Never a synonym for
+independent.</p></li>
+</ul>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.frame_dependency.DependencyReport">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.frame_dependency.</span></span><span class="sig-name descname"><span class="pre">DependencyReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temporal_delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">determinism_delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">note</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/frame_dependency.html#DependencyReport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.DependencyReport" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.DependencyReport'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>What the two probes measured, and what follows from it.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.frame_dependency.DependencyReport.dependency">
+<span class="sig-name descname"><span class="pre">dependency</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.DependencyReport.dependency" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.DependencyReport.dependency'">¶</a></dt>
+<dd><p>The verdict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.frame_dependency.Dependency" title="looks.frame_dependency.Dependency"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dependency</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.frame_dependency.DependencyReport.time_delta">
+<span class="sig-name descname"><span class="pre">time_delta</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.DependencyReport.time_delta" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.DependencyReport.time_delta'">¶</a></dt>
+<dd><p>Largest change between consecutive output frames on a
+constant input, out of 255.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.frame_dependency.DependencyReport.content_delta">
+<span class="sig-name descname"><span class="pre">content_delta</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.DependencyReport.content_delta" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.DependencyReport.content_delta'">¶</a></dt>
+<dd><p>Largest change in the constant half when the rest of the
+frame changed, out of 255.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.frame_dependency.DependencyReport.temporal_delta">
+<span class="sig-name descname"><span class="pre">temporal_delta</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.DependencyReport.temporal_delta" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.DependencyReport.temporal_delta'">¶</a></dt>
+<dd><p>Largest change in a shared tail when the frames BEFORE
+it differed, out of 255.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.frame_dependency.DependencyReport.determinism_delta">
+<span class="sig-name descname"><span class="pre">determinism_delta</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.DependencyReport.determinism_delta" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.DependencyReport.determinism_delta'">¶</a></dt>
+<dd><p>Largest disagreement between two applications of the
+effect to the SAME input, out of 255. Nonzero means the effect is
+random, and every other number in this report is then meaningless.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.frame_dependency.DependencyReport.can_flicker">
+<span class="sig-name descname"><span class="pre">can_flicker</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.DependencyReport.can_flicker" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.DependencyReport.can_flicker'">¶</a></dt>
+<dd><p>Whether the verdict admits flicker. <code class="docutils literal notranslate"><span class="pre">None</span></code> when
+undetermined — <strong>not</strong> <code class="docutils literal notranslate"><span class="pre">False</span></code>, because “we could not tell” and
+“it cannot” are different answers and only one of them is a
+guarantee.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.frame_dependency.DependencyReport.note">
+<span class="sig-name descname"><span class="pre">note</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.DependencyReport.note" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.DependencyReport.note'">¶</a></dt>
+<dd><p>Why, when something could not be measured.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.frame_dependency.FLICKER_FREE">
+<span class="sig-prename descclassname"><span class="pre">looks.frame_dependency.</span></span><span class="sig-name descname"><span class="pre">FLICKER_FREE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({Dependency.INDEPENDENT})</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.FLICKER_FREE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.FLICKER_FREE'">¶</a></dt>
+<dd><p>The classes that cannot produce flicker.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.frame_dependency.NOISE_FLOOR">
+<span class="sig-prename descclassname"><span class="pre">looks.frame_dependency.</span></span><span class="sig-name descname"><span class="pre">NOISE_FLOOR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.NOISE_FLOOR" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.NOISE_FLOOR'">¶</a></dt>
+<dd><p>A difference at or below this (out of 255) is treated as no change.
+Not zero: a filter that round-trips through another pixel format can move a
+value by one without depending on anything.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.frame_dependency.PROBE_SIZE">
+<span class="sig-prename descclassname"><span class="pre">looks.frame_dependency.</span></span><span class="sig-name descname"><span class="pre">PROBE_SIZE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(32,</span> <span class="pre">64)</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.PROBE_SIZE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.PROBE_SIZE'">¶</a></dt>
+<dd><p>Probe geometry. Small on purpose — the classification is about <em>whether</em> a
+value changes, not by how much, so resolution buys nothing and costs time.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.frame_dependency.SEAM_MARGIN">
+<span class="sig-prename descclassname"><span class="pre">looks.frame_dependency.</span></span><span class="sig-name descname"><span class="pre">SEAM_MARGIN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.SEAM_MARGIN" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.SEAM_MARGIN'">¶</a></dt>
+<dd><p>How far in from the seam the constant half is sampled, in pixels.</p>
+<p>A spatial effect legitimately reads pixels near the boundary, so without a
+margin every blur reads as content-adaptive. The margin cannot be made large
+enough for <em>every</em> spatial effect — a Gaussian’s support runs to about 3
+sigma, so <code class="code docutils literal notranslate"><span class="pre">gblur=sigma=4</span></code> crosses 8 px and <code class="code docutils literal notranslate"><span class="pre">sigma=10</span></code> would cross any margin
+this probe can afford.</p>
+<p>That residual error is <strong>conservative</strong>: an over-wide spatial filter is
+reported as <code class="code docutils literal notranslate"><span class="pre">CONTENT_ADAPTIVE</span></code>, i.e. “can flicker” about something that
+cannot. For a refusal engine that is the safe direction — the unsafe one is
+calling an adaptive effect independent. Widen the margin (and the probe) if a
+specific broad filter needs a correct verdict.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.frame_dependency.TEMPORAL_PROBE_FRAMES">
+<span class="sig-prename descclassname"><span class="pre">looks.frame_dependency.</span></span><span class="sig-name descname"><span class="pre">TEMPORAL_PROBE_FRAMES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.TEMPORAL_PROBE_FRAMES" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.TEMPORAL_PROBE_FRAMES'">¶</a></dt>
+<dd><p>How many frames of the shared tail the temporal probe examines.</p>
+<p>Small on purpose, and this is the subtle part: the probe only detects a
+temporal effect if the frames it samples still have the perturbation inside
+their memory window. Trimming further in makes every temporal filter read as
+independent — measured, <code class="code docutils literal notranslate"><span class="pre">tmix=frames=3</span></code> read 0 when sampling began 3 frames
+after the perturbation and 146/255 when it began 1 frame after.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.frame_dependency.UNDETERMINED">
+<span class="sig-prename descclassname"><span class="pre">looks.frame_dependency.</span></span><span class="sig-name descname"><span class="pre">UNDETERMINED</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Dependency.UNDETERMINED</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.UNDETERMINED" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.UNDETERMINED'">¶</a></dt>
+<dd><p>Convenience alias for the value that means “no answer”.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.frame_dependency.assert_flicker_free">
+<span class="sig-prename descclassname"><span class="pre">looks.frame_dependency.</span></span><span class="sig-name descname"><span class="pre">assert_flicker_free</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chain</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/frame_dependency.html#assert_flicker_free"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.assert_flicker_free" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.assert_flicker_free'">¶</a></dt>
+<dd><p>Raise unless <code class="docutils literal notranslate"><span class="pre">chain</span></code> provably cannot flicker.</p>
+<p>**What a pass means, precisely: three probes could not make this effect
+depend on anything they varied.** It is not a proof of frame independence —
+<code class="code docutils literal notranslate"><span class="pre">tblend</span></code> and <code class="code docutils literal notranslate"><span class="pre">atadenoise</span></code> pass and are temporal. For an effect whose class
+matters, pair this with the structural argument (a stateless per-pixel
+lookup cannot depend on anything else) or with a declared class this
+function is used to <em>falsify</em>.</p>
+<p>An <code class="docutils literal notranslate"><span class="pre">UNDETERMINED</span></code> verdict <strong>raises</strong>: “we could not tell” must not be
+reported as “it cannot”, which is the same unknown-is-a-refusal rule the
+licence tier follows, applied to the other guarantee this package makes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#AssertionError" rel="nofollow noopener" title="(in Python v3.15)"><strong>AssertionError</strong><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a> – The chain can flicker, or could not be shown not to.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.frame_dependency.DependencyReport" title="looks.frame_dependency.DependencyReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">DependencyReport</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.frame_dependency.classify">
+<span class="sig-prename descclassname"><span class="pre">looks.frame_dependency.</span></span><span class="sig-name descname"><span class="pre">classify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chain</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">ffprobe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ffprobe'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">120.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/frame_dependency.html#classify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.classify" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.classify'">¶</a></dt>
+<dd><p>Measure what <code class="docutils literal notranslate"><span class="pre">chain</span></code> depends on.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chain</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span>) – An ffmpeg filter chain, as it would appear in <code class="docutils literal notranslate"><span class="pre">-vf</span></code>.</p></li>
+<li><p><strong>ffprobe</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span>) – Binary name or path.</p></li>
+<li><p><strong>timeout</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span>) – Seconds per probe.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.frame_dependency.DependencyReport" title="looks.frame_dependency.DependencyReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">DependencyReport</span></code></a></span></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="s1">'lut3d=look.cube'</span><span class="p">)</span><span class="o">.</span><span class="n">dependency</span>
+</span><span id="line-2"><span class="go">&lt;Dependency.INDEPENDENT: 'independent'&gt;</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">classify</span><span class="p">(</span><span class="s1">'normalize'</span><span class="p">)</span><span class="o">.</span><span class="n">can_flicker</span>
+</span><span id="line-4"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#looks.frame_dependency.DETERMINISM_PROBE_FRAMES'" class="reference internal" href="#looks.frame_dependency.DETERMINISM_PROBE_FRAMES"><code class="docutils literal notranslate"><span class="pre">DETERMINISM_PROBE_FRAMES</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.Dependency'" class="reference internal" href="#looks.frame_dependency.Dependency"><code class="docutils literal notranslate"><span class="pre">Dependency</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.DependencyReport'" class="reference internal" href="#looks.frame_dependency.DependencyReport"><code class="docutils literal notranslate"><span class="pre">DependencyReport</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.frame_dependency.DependencyReport.dependency'" class="reference internal" href="#looks.frame_dependency.DependencyReport.dependency"><code class="docutils literal notranslate"><span class="pre">DependencyReport.dependency</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.DependencyReport.time_delta'" class="reference internal" href="#looks.frame_dependency.DependencyReport.time_delta"><code class="docutils literal notranslate"><span class="pre">DependencyReport.time_delta</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.DependencyReport.content_delta'" class="reference internal" href="#looks.frame_dependency.DependencyReport.content_delta"><code class="docutils literal notranslate"><span class="pre">DependencyReport.content_delta</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.DependencyReport.temporal_delta'" class="reference internal" href="#looks.frame_dependency.DependencyReport.temporal_delta"><code class="docutils literal notranslate"><span class="pre">DependencyReport.temporal_delta</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.DependencyReport.determinism_delta'" class="reference internal" href="#looks.frame_dependency.DependencyReport.determinism_delta"><code class="docutils literal notranslate"><span class="pre">DependencyReport.determinism_delta</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.DependencyReport.can_flicker'" class="reference internal" href="#looks.frame_dependency.DependencyReport.can_flicker"><code class="docutils literal notranslate"><span class="pre">DependencyReport.can_flicker</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.DependencyReport.note'" class="reference internal" href="#looks.frame_dependency.DependencyReport.note"><code class="docutils literal notranslate"><span class="pre">DependencyReport.note</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.FLICKER_FREE'" class="reference internal" href="#looks.frame_dependency.FLICKER_FREE"><code class="docutils literal notranslate"><span class="pre">FLICKER_FREE</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.NOISE_FLOOR'" class="reference internal" href="#looks.frame_dependency.NOISE_FLOOR"><code class="docutils literal notranslate"><span class="pre">NOISE_FLOOR</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.PROBE_SIZE'" class="reference internal" href="#looks.frame_dependency.PROBE_SIZE"><code class="docutils literal notranslate"><span class="pre">PROBE_SIZE</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.SEAM_MARGIN'" class="reference internal" href="#looks.frame_dependency.SEAM_MARGIN"><code class="docutils literal notranslate"><span class="pre">SEAM_MARGIN</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.TEMPORAL_PROBE_FRAMES'" class="reference internal" href="#looks.frame_dependency.TEMPORAL_PROBE_FRAMES"><code class="docutils literal notranslate"><span class="pre">TEMPORAL_PROBE_FRAMES</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.UNDETERMINED'" class="reference internal" href="#looks.frame_dependency.UNDETERMINED"><code class="docutils literal notranslate"><span class="pre">UNDETERMINED</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.assert_flicker_free'" class="reference internal" href="#looks.frame_dependency.assert_flicker_free"><code class="docutils literal notranslate"><span class="pre">assert_flicker_free()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.classify'" class="reference internal" href="#looks.frame_dependency.classify"><code class="docutils literal notranslate"><span class="pre">classify()</span></code></a></li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left"></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=3294188c"></script>
+<script src="../_static/doctools.js?v=fd6eb6e6"></script>
+<script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=fd10adb8"></script>
+<script defer="defer" src="../_static/theme.js?v=49cc6205"></script>
+</body>
+</html>

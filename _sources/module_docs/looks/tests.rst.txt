@@ -1,4 +1,0 @@
-looks.tests
-===========
-.. automodule:: looks.tests
-   :members:

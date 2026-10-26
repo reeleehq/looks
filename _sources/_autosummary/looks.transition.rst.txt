@@ -1,0 +1,36 @@
+looks.transition
+================
+
+.. automodule:: looks.transition
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      TRANSITION_CURVES
+      DFLT_CURVE
+      MIN_TRANSITION_S
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      blended_frames
+      check_visible
+      is_hard_cut
+      max_blended_frames
+      xfade_options
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Transition
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      TransitionError
+   

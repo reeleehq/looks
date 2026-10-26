@@ -1,0 +1,68 @@
+looks.licence
+=============
+
+.. automodule:: looks.licence
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      SPDX_LICENSE_LIST_VERSION
+      STALE_AFTER_DAYS
+      LEDGER_PATH
+      LEDGER_SCHEMA
+      SEE_DISCLAIMER
+      RESTRICTED_FIELDS
+      STRONG_COPYLEFT
+      REACH_BY_SPDX
+      EXCLUDED_SPDX
+      DFLT_LADDER
+      DFLT_MAX_TIER
+      DFLT_POLICY
+      SPDX_BY_FFMPEG_LICENCE
+      NONFREE_PROHIBITION
+      KNOWN_COMPONENTS
+      KNOWN_REALISATION_PREFIXES
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      reach_of
+      project_onto_ladder
+      classify
+      assess
+      check
+      ffmpeg_terms
+      assess_ffmpeg_chain
+      ledger
+      terms_for
+      unverified_claims
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Coupling
+      Reach
+      Conveyance
+      FieldOfUse
+      Tier
+      Verdict
+      Patent
+      Evidence
+      Terms
+      Assessment
+      Policy
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      LooksLicenceError
+      LicenceCeilingExceeded
+      LicenceForbidden
+      LicenceFieldRestricted
+      LicenceUnknown
+   

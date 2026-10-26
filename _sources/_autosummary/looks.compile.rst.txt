@@ -1,0 +1,31 @@
+looks.compile
+=============
+
+.. automodule:: looks.compile
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      EFFECT_PARAM_CHECKS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      audit
+      check_effect_params
+      compile_all
+      compile_look
+      describe
+      payloads
+      unmet_filters
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      CompileError
+      PlanRefused
+   

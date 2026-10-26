@@ -1,0 +1,27 @@
+# looks
+
+> A facade over video stylization: named effects with licence tiers
+
+
+## Pages in this subsection
+
+- [looks](looks.html.md): A facade over video stylization: named effects carrying a licence tier.
+- [looks.across](looks.across.html.md): Choosing one parameter per clip so a SET looks consistent — exactly, not by search.
+- [looks.cache](looks.cache.html.md): A &#96;.cube&#96; is a build artifact. This is where it gets built, once.
+- [looks.cli](looks.cli.html.md): The command line: thin adapters over the library, and no logic of its own.
+- [looks.compile](looks.compile.html.md): A Look plus a clip plus a binary, compiled into a plan — and re-checked.
+- [looks.environment](looks.environment.html.md): What the ffmpeg on &#42;this&#42; machine actually is, and what it can actually do.
+- [looks.ffmpeg](looks.ffmpeg.html.md): The ffmpeg backend: filter strings, escaping, and the first effects.
+- [looks.frame_dependency](looks.frame_dependency.html.md): Can this effect flicker? Answered by measurement, not by judgement.
+- [looks.geometry](looks.geometry.html.md): Where a source frame lands inside a target frame. Pure arithmetic.
+- [looks.licence](looks.licence.html.md): What an implementation costs you in obligations, and when to refuse it.
+- [looks.lut](looks.lut.html.md): Gradient-map 3D LUTs: a colour ramp in, an Iridas &#96;.cube&#96; out.
+- [looks.motion](looks.motion.html.md): A camera path, compiled to an ffmpeg fragment — the compile half of RULE G.
+- [looks.pipe](looks.pipe.html.md): A plan that mixes backends, as a pipe — emitted as data, never spawned.
+- [looks.registry](looks.registry.html.md): Which implementations exist, and how to reach the code behind a plan.
+- [looks.spec](looks.spec.html.md): What a stylization &#42;is&#42;, before anything runs. Pure data, no I/O, no registry.
+- [looks.transition](looks.transition.html.md): How one shot gives way to the next — the vocabulary, not the graph.
+
+## Optional
+
+- [Top-level llms.txt](../llms.txt): Complete documentation index.

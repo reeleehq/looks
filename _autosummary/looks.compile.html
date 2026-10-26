@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+
+<html :class="{ 'dark' : darkMode === true }" data-content_root="../" lang="en" x-data="{ darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches), activeSection: ''}">
+<head>
+<script>
+    (function () {
+      // Set initial color scheme
+      if ((localStorage.getItem("_x_darkMode") === "true") || (window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Watch for media preference changes
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+        localStorage.setItem("_x_darkMode", event.matches);
+        document.documentElement.classList.toggle("dark", event.matches);
+      });
+    })();
+  </script>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="#ffffff" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="#030711" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="looks.compile.html.md" rel="alternate" type="text/markdown"/>
+<link href="../llms.txt" rel="describedby" type="text/markdown"/>
+<link href="looks.compile.html.md" rel="alternate" type="text/markdown"/>
+<link href="llms.txt" rel="describedby"/>
+<title>looks.compile | looks</title>
+<meta content="looks.compile | looks" property="og:title"/>
+<meta content="looks.compile | looks" name="twitter:title"/>
+<link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=009055c6" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx_autodoc_typehints.css?v=057ac668" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/epythet.css?v=ecce5bdd" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="looks.environment.html" rel="next" title="looks.environment"/>
+<link href="looks.cli.html" rel="prev" title="looks.cli"/>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">looks</span>
+</a><nav class="flex items-center gap-6 text-sm font-medium">
+<a class="transition-colors hover:text-foreground/80 text-foreground/60" href="https://github.com/thorwhalen/looks" rel="noopener nofollow">GitHub</a>
+</nav></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 gap-2 sm:gap-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center gap-1">
+<button @click="darkMode = !darkMode" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" title="Toggle color scheme" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="justify-start text-sm md:!hidden bg-background" href="../index.html"><span class="font-bold text-clip whitespace-nowrap">looks</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="flex md:hidden flex-col font-medium mt-4">
+<a href="https://github.com/thorwhalen/looks" rel="nofollow noopener">GitHub</a>
+</nav><nav class="table w-full min-w-full my-6 lg:my-8">
+<ul class="current">
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../api.html">API reference<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="looks.html">looks<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l3"><a class="reference internal" href="looks.across.html">looks.across</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.cache.html">looks.cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.cli.html">looks.cli</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">looks.compile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.environment.html">looks.environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.ffmpeg.html">looks.ffmpeg</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.frame_dependency.html">looks.frame_dependency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.geometry.html">looks.geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.licence.html">looks.licence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.lut.html">looks.lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.motion.html">looks.motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.pipe.html">looks.pipe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.registry.html">looks.registry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.spec.html">looks.spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.transition.html">looks.transition</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ai-agents.html">For AI agents</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">looks</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="../api.html">API reference</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="looks.html">looks</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">looks.compile</span>
+</nav>
+<div id="content" role="main">
+<section id="module-looks.compile">
+<span id="looks-compile"></span><h1>looks.compile<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#module-looks.compile">¶</a></h1>
+<p>A Look plus a clip plus a binary, compiled into a plan — and re-checked.</p>
+<p><a class="reference internal" href="#looks.compile.compile_look" title="looks.compile.compile_look"><code class="xref py py-func docutils literal notranslate"><span class="pre">compile_look()</span></code></a> is the join: a portable <code class="docutils literal notranslate"><span class="pre">Look</span></code> (what was asked for) meets
+a <code class="docutils literal notranslate"><span class="pre">ClipSpec</span></code> (what it is being applied to) and an <code class="docutils literal notranslate"><span class="pre">FfmpegEnv</span></code> (what this
+machine can actually do), and the result is a <code class="docutils literal notranslate"><span class="pre">LookPlan</span></code> — a document saying
+what will run, at which tier, against which binary.</p>
+<p class="rubric">An ffmpeg step’s tier belongs to the binary, so the binary is required</p>
+<p>An <code class="docutils literal notranslate"><span class="pre">ImplRef</span></code> declares <code class="docutils literal notranslate"><span class="pre">terms</span></code> — what was observed about the implementation.
+For an <strong>ffmpeg-backed</strong> implementation that declaration cannot be the whole
+answer, because there is not one ffmpeg on a machine: measured here, <code class="docutils literal notranslate"><span class="pre">PATH</span></code>
+is 8.1 / GPL-3 / 481 filters while <code class="docutils literal notranslate"><span class="pre">imageio-ffmpeg</span></code>’s bundled binary is 7.1 /
+GPL-2 / 484, and the filter sets are non-nested. The same registered
+implementation is a different licence position on each.</p>
+<p>So the compiler <strong>substitutes the probed binary’s terms</strong> into every ffmpeg
+candidate before selection, and selection, the step’s tier, and a later
+<a class="reference internal" href="#looks.compile.audit" title="looks.compile.audit"><code class="xref py py-func docutils literal notranslate"><span class="pre">audit()</span></code></a> all read that one substituted value. The consequence is that
+<code class="docutils literal notranslate"><span class="pre">env</span></code> is <strong>required</strong> for an ffmpeg step: without it the tier is unknown, and
+unknown is a refusal rather than a default.</p>
+<p>What this deliberately does <em>not</em> do is raise a step’s tier because it uses a
+GPL-gated filter. <a class="reference internal" href="looks.licence.html#module-looks.licence" title="looks.licence"><code class="xref py py-mod docutils literal notranslate"><span class="pre">looks.licence</span></code></a> settles that — <em>“a GPL-gated filter does
+not raise the tier; the binary already has it”</em> — and the mechanism that keeps
+an <code class="docutils literal notranslate"><span class="pre">eq</span></code> look off an LGPL build is simpler and stronger: on such a build <code class="docutils literal notranslate"><span class="pre">eq</span></code>
+is not compiled in at all, so it is absent from <code class="docutils literal notranslate"><span class="pre">env.filters</span></code> and selection
+drops the candidate. A licence ceiling and a missing capability are different
+refusals, and <a class="reference internal" href="#looks.compile.unmet_filters" title="looks.compile.unmet_filters"><code class="xref py py-func docutils literal notranslate"><span class="pre">unmet_filters()</span></code></a> keeps them apart.</p>
+<p class="rubric">Why <a class="reference internal" href="#looks.compile.audit" title="looks.compile.audit"><code class="xref py py-func docutils literal notranslate"><span class="pre">audit()</span></code></a> exists, and why it re-derives instead of reading</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">LookPlan</span></code> is data, so it travels: written to a file, sent across a process
+boundary, stored in a graph, replayed a week later. Every one of those is a gap
+in which the thing that vouched for it stopped being present.</p>
+<p>So a plan carries both its <a class="reference internal" href="looks.licence.html#looks.licence.Policy" title="looks.licence.Policy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Policy</span></code></a> (the ceiling it was
+compiled under) and, on each step, a <code class="docutils literal notranslate"><span class="pre">tier</span></code>. **The audit trusts neither of
+them about the step’s actual position.** It goes back to the implementation’s
+<code class="docutils literal notranslate"><span class="pre">terms</span></code> — what was <em>observed</em> about the licence — and re-derives the tier from
+those. A plan whose stored tier disagrees with what its terms classify to is not
+a plan with a stale field; it is a plan asserting a position it is not entitled
+to, and it is refused by name.</p>
+<p>That is the same argument that keeps a tier off <code class="docutils literal notranslate"><span class="pre">Effect</span></code> and off <code class="docutils literal notranslate"><span class="pre">ImplRef</span></code>:
+anything that can declare its own tier can declare itself acceptable. A stored
+plan is just the version of that with a filesystem in between.</p>
+<p>The audit also refuses a plan naming an implementation this process does not
+have, or one whose <code class="docutils literal notranslate"><span class="pre">impl_version</span></code> has moved. Both mean the same thing — the
+plan describes behaviour this build does not implement — and guessing a
+substitute is exactly the failure the version lock exists to prevent.</p>
+<p class="rubric">Module Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.compile.EFFECT_PARAM_CHECKS" title="looks.compile.EFFECT_PARAM_CHECKS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EFFECT_PARAM_CHECKS</span></code></a></p></td>
+<td><p>What an effect's parameters must satisfy, keyed by EFFECT — never by implementation.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.compile.audit" title="looks.compile.audit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">audit</span></code></a>(plan, *[, policy, registry])</p></td>
+<td><p>Re-check a plan against its own declared ceiling.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.compile.check_effect_params" title="looks.compile.check_effect_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_effect_params</span></code></a>(effect)</p></td>
+<td><p>Refuse parameters no implementation of this effect could honour.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.compile.compile_all" title="looks.compile.compile_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compile_all</span></code></a>(looks_, **kwargs)</p></td>
+<td><p>Compile several Looks under one set of arguments.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.compile.compile_look" title="looks.compile.compile_look"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compile_look</span></code></a>(look, *[, clip, env, policy, ...])</p></td>
+<td><p>Compile a Look into a plan.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.compile.describe" title="looks.compile.describe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">describe</span></code></a>(plan)</p></td>
+<td><p>A plan as a few lines of text — for a CLI, a log, or a review.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.compile.payloads" title="looks.compile.payloads"><code class="xref py py-obj docutils literal notranslate"><span class="pre">payloads</span></code></a>(plan[, backend])</p></td>
+<td><p>Every step's payload, optionally for one backend.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.compile.unmet_filters" title="looks.compile.unmet_filters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unmet_filters</span></code></a>(plan, env)</p></td>
+<td><p>Filters this plan needs that this binary does not have.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Exceptions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.compile.CompileError" title="looks.compile.CompileError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompileError</span></code></a></p></td>
+<td><p>A Look that cannot be compiled against this clip and this binary.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.compile.PlanRefused" title="looks.compile.PlanRefused"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PlanRefused</span></code></a></p></td>
+<td><p>A stored plan that may not be run as it stands.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py exception">
+<dt class="sig sig-object py" id="looks.compile.CompileError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.compile.</span></span><span class="sig-name descname"><span class="pre">CompileError</span></span><a class="reference internal" href="../_modules/looks/compile.html#CompileError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.compile.CompileError" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.compile.CompileError'">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="looks.spec.html#looks.spec.SpecError" title="looks.spec.SpecError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpecError</span></code></a></p>
+<p>A Look that cannot be compiled against this clip and this binary.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.compile.EFFECT_PARAM_CHECKS">
+<span class="sig-prename descclassname"><span class="pre">looks.compile.</span></span><span class="sig-name descname"><span class="pre">EFFECT_PARAM_CHECKS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'colorbalance':</span> <span class="pre">&lt;function</span> <span class="pre">_check_colorbalance&gt;,</span> <span class="pre">'contrast':</span> <span class="pre">&lt;function</span> <span class="pre">_check_contrast&gt;,</span> <span class="pre">'curves':</span> <span class="pre">&lt;function</span> <span class="pre">_check_curves&gt;,</span> <span class="pre">'gate_weave':</span> <span class="pre">&lt;function</span> <span class="pre">_check_gate_weave&gt;,</span> <span class="pre">'grain':</span> <span class="pre">&lt;function</span> <span class="pre">_check_grain&gt;,</span> <span class="pre">'halation':</span> <span class="pre">&lt;function</span> <span class="pre">_check_halation&gt;,</span> <span class="pre">'vignette':</span> <span class="pre">&lt;function</span> <span class="pre">_check_vignette&gt;}</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.compile.EFFECT_PARAM_CHECKS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.compile.EFFECT_PARAM_CHECKS'">¶</a></dt>
+<dd><p>What an effect’s parameters must satisfy, keyed by EFFECT — never by
+implementation. A check that lives inside one compiler is a check the
+licence tier can switch off: <code class="code docutils literal notranslate"><span class="pre">contrast</span></code> with <code class="code docutils literal notranslate"><span class="pre">amount=-1</span></code> was refused on the
+LGPL path and emitted <code class="code docutils literal notranslate"><span class="pre">eq=contrast=-1.0</span></code> on the GPL one, so the same Look was
+valid or invalid depending on how the binary was built. Rule 29b says the
+tier must not decide what the viewer sees; it must not decide whether the
+document is accepted either.</p>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="looks.compile.PlanRefused">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.compile.</span></span><span class="sig-name descname"><span class="pre">PlanRefused</span></span><a class="reference internal" href="../_modules/looks/compile.html#PlanRefused"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.compile.PlanRefused" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.compile.PlanRefused'">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="looks.spec.html#looks.spec.SpecError" title="looks.spec.SpecError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpecError</span></code></a></p>
+<p>A stored plan that may not be run as it stands. Never a warning.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.compile.audit">
+<span class="sig-prename descclassname"><span class="pre">looks.compile.</span></span><span class="sig-name descname"><span class="pre">audit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/compile.html#audit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.compile.audit" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.compile.audit'">¶</a></dt>
+<dd><p>Re-check a plan against its own declared ceiling. Raises, or returns None.</p>
+<p>Call this on any plan that crossed a boundary — read from a file, received
+over a wire, replayed from a graph. It answers one question: *may this run
+here, now, as it stands?*</p>
+<p>Nothing the plan says about its own position is believed. Each step’s tier
+is re-derived from the implementation’s <code class="docutils literal notranslate"><span class="pre">terms</span></code> and compared to what the
+step claims; a disagreement is a refusal naming the step, not a field to
+refresh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>policy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="looks.licence.html#looks.licence.Policy" title="looks.licence.Policy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Policy</span></code></a>]</span>) – The ceiling to check against. Defaults to the plan’s own —
+which is the right default and the weaker check, since a plan
+carrying a permissive policy vouches for itself. Pass your own to
+ask whether it may run under <em>your</em> ceiling.</p></li>
+<li><p><strong>registry</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="looks.registry.html#looks.registry.EffectRegistry" title="looks.registry.EffectRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">EffectRegistry</span></code></a>]</span>) – Which implementations exist here.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="#looks.compile.PlanRefused" title="looks.compile.PlanRefused"><strong>PlanRefused</strong></a> – If a step names an implementation this process lacks, or
+    one whose <code class="docutils literal notranslate"><span class="pre">impl_version</span></code> has moved, or one whose stored tier
+    disagrees with its terms.</p></li>
+<li><p><a class="reference internal" href="looks.licence.html#looks.licence.LooksLicenceError" title="looks.licence.LooksLicenceError"><strong>LooksLicenceError</strong></a> – If a step exceeds the ceiling.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.compile.check_effect_params">
+<span class="sig-prename descclassname"><span class="pre">looks.compile.</span></span><span class="sig-name descname"><span class="pre">check_effect_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">effect</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/compile.html#check_effect_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.compile.check_effect_params" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.compile.check_effect_params'">¶</a></dt>
+<dd><p>Refuse parameters no implementation of this effect could honour.</p>
+<p>Called before an implementation is chosen, so every implementation of an
+effect accepts exactly the same documents.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.compile.compile_all">
+<span class="sig-prename descclassname"><span class="pre">looks.compile.</span></span><span class="sig-name descname"><span class="pre">compile_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">looks_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/compile.html#compile_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.compile.compile_all" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.compile.compile_all'">¶</a></dt>
+<dd><p>Compile several Looks under one set of arguments.</p>
+<p>A convenience with one real property: it compiles <strong>all or none</strong>. A
+partially-compiled batch invites a caller to run the half that worked,
+which for a set-relative Look is precisely the mistake <code class="docutils literal notranslate"><span class="pre">resolve_across</span></code>
+exists to prevent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="looks.spec.html#looks.spec.LookPlan" title="looks.spec.LookPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookPlan</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#Ellipsis" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.compile.compile_look">
+<span class="sig-prename descclassname"><span class="pre">looks.compile.</span></span><span class="sig-name descname"><span class="pre">compile_look</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">look</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/compile.html#compile_look"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.compile.compile_look" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.compile.compile_look'">¶</a></dt>
+<dd><p>Compile a Look into a plan. No process is started and no file is written.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>look</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="looks.spec.html#looks.spec.Look" title="looks.spec.Look"><code class="xref py py-class docutils literal notranslate"><span class="pre">Look</span></code></a></span>) – What was asked for. Portable data.</p></li>
+<li><p><strong>clip</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="looks.spec.html#looks.spec.ClipSpec" title="looks.spec.ClipSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClipSpec</span></code></a>]</span>) – What it is being applied to. Needed by any effect whose answer
+depends on the frame — its absence is only an error if an effect
+asks for it.</p></li>
+<li><p><strong>env</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="looks.environment.html#looks.environment.FfmpegEnv" title="looks.environment.FfmpegEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">FfmpegEnv</span></code></a>]</span>) – Which binary. When given, an implementation whose filters this
+build lacks is dropped from selection rather than discovered at
+run time.</p></li>
+<li><p><strong>policy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="looks.licence.html#looks.licence.Policy" title="looks.licence.Policy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Policy</span></code></a>]</span>) – The ceiling. Defaults to the Look’s own.</p></li>
+<li><p><strong>probe</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span>) – Measurements that <a class="reference internal" href="looks.spec.html#looks.spec.Ref" title="looks.spec.Ref"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ref</span></code></a> parameters resolve
+against.</p></li>
+<li><p><strong>registry</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="looks.registry.html#looks.registry.EffectRegistry" title="looks.registry.EffectRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">EffectRegistry</span></code></a>]</span>) – Which implementations exist. Defaults to
+<a class="reference internal" href="looks.registry.html#looks.registry.REGISTRY" title="looks.registry.REGISTRY"><code class="xref py py-data docutils literal notranslate"><span class="pre">looks.registry.REGISTRY</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="looks.spec.html#looks.spec.LookPlan" title="looks.spec.LookPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookPlan</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A <a class="reference internal" href="looks.spec.html#looks.spec.LookPlan" title="looks.spec.LookPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookPlan</span></code></a> holding no live callables — the runner
+resolves each step’s code from the registry by key.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="#looks.compile.CompileError" title="looks.compile.CompileError"><strong>CompileError</strong></a> – If an effect has no admissible implementation. The
+    message says which constraint emptied the pool, because “no
+    implementation available” alone is the least useful refusal in the
+    package.</p></li>
+<li><p><a class="reference internal" href="looks.licence.html#looks.licence.LooksLicenceError" title="looks.licence.LooksLicenceError"><strong>LooksLicenceError</strong></a> – If the selected implementation exceeds
+    the ceiling. Selection already filters by policy, so this fires
+    only when nothing admissible existed.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.compile.describe">
+<span class="sig-prename descclassname"><span class="pre">looks.compile.</span></span><span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/compile.html#describe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.compile.describe" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.compile.describe'">¶</a></dt>
+<dd><p>A plan as a few lines of text — for a CLI, a log, or a review.</p>
+<p>Deliberately not a round-trippable format. Serialisation is
+<a class="reference internal" href="looks.spec.html#looks.spec.plan_to_dict" title="looks.spec.plan_to_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">looks.spec.plan_to_dict()</span></code></a>’s job, and a second one would be a second
+thing to keep in sync.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.compile.payloads">
+<span class="sig-prename descclassname"><span class="pre">looks.compile.</span></span><span class="sig-name descname"><span class="pre">payloads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/compile.html#payloads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.compile.payloads" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.compile.payloads'">¶</a></dt>
+<dd><p>Every step’s payload, optionally for one backend.</p>
+<p>The reading surface for a stored plan: an <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> payload is fully
+inspectable, so this is how a caller sees the exact filtergraph a plan
+stands for without running anything.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#Ellipsis" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.compile.unmet_filters">
+<span class="sig-prename descclassname"><span class="pre">looks.compile.</span></span><span class="sig-name descname"><span class="pre">unmet_filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/compile.html#unmet_filters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.compile.unmet_filters" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.compile.unmet_filters'">¶</a></dt>
+<dd><p>Filters this plan needs that this binary does not have.</p>
+<p>Separate from <a class="reference internal" href="#looks.compile.audit" title="looks.compile.audit"><code class="xref py py-func docutils literal notranslate"><span class="pre">audit()</span></code></a> on purpose: a licence refusal is about what a
+caller may do, and a missing filter is about what a machine can do. They
+fail for different reasons, are fixed by different people, and collapsing
+them produces a message that helps neither.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#Ellipsis" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#looks.compile.CompileError'" class="reference internal" href="#looks.compile.CompileError"><code class="docutils literal notranslate"><span class="pre">CompileError</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.compile.EFFECT_PARAM_CHECKS'" class="reference internal" href="#looks.compile.EFFECT_PARAM_CHECKS"><code class="docutils literal notranslate"><span class="pre">EFFECT_PARAM_CHECKS</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.compile.PlanRefused'" class="reference internal" href="#looks.compile.PlanRefused"><code class="docutils literal notranslate"><span class="pre">PlanRefused</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.compile.audit'" class="reference internal" href="#looks.compile.audit"><code class="docutils literal notranslate"><span class="pre">audit()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.compile.check_effect_params'" class="reference internal" href="#looks.compile.check_effect_params"><code class="docutils literal notranslate"><span class="pre">check_effect_params()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.compile.compile_all'" class="reference internal" href="#looks.compile.compile_all"><code class="docutils literal notranslate"><span class="pre">compile_all()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.compile.compile_look'" class="reference internal" href="#looks.compile.compile_look"><code class="docutils literal notranslate"><span class="pre">compile_look()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.compile.describe'" class="reference internal" href="#looks.compile.describe"><code class="docutils literal notranslate"><span class="pre">describe()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.compile.payloads'" class="reference internal" href="#looks.compile.payloads"><code class="docutils literal notranslate"><span class="pre">payloads()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.compile.unmet_filters'" class="reference internal" href="#looks.compile.unmet_filters"><code class="docutils literal notranslate"><span class="pre">unmet_filters()</span></code></a></li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left"></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=3294188c"></script>
+<script src="../_static/doctools.js?v=fd6eb6e6"></script>
+<script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=fd10adb8"></script>
+<script defer="defer" src="../_static/theme.js?v=49cc6205"></script>
+</body>
+</html>

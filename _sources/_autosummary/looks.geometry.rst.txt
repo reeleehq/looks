@@ -1,0 +1,44 @@
+looks.geometry
+==============
+
+.. automodule:: looks.geometry
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DFLT_ROUNDING
+      DFLT_BACKDROP_BLUR_SIGMA
+      SOCIAL_SIZES
+      Backdrop
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      center_box
+      ffmpeg_chain
+      placement
+      reframe
+      scaled_size
+      snap_even
+      social_size
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Blurred
+      Box
+      Placement
+      Reframe
+      Size
+      Solid
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      GeometryError
+   

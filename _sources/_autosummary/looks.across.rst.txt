@@ -1,0 +1,35 @@
+looks.across
+============
+
+.. automodule:: looks.across
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      Objective
+      Statistic
+      Dispersion
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      probes_for
+      solve_across
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Candidate
+      Choice
+      Spread
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      AcrossError
+   

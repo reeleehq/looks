@@ -1,4 +1,0 @@
-looks.tests.test_motion
-=======================
-.. automodule:: looks.tests.test_motion
-   :members:

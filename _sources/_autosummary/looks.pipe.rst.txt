@@ -1,0 +1,36 @@
+looks.pipe
+==========
+
+.. automodule:: looks.pipe
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DFLT_PIPE_PIX_FMT
+      PIPE_BYTES_PER_PIXEL
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      describe
+      pipe_plan
+      piped_size
+      runs
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      FilterSegment
+      FrameSegment
+      PipePlan
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      PipeError
+   

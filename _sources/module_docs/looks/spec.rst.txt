@@ -1,4 +1,0 @@
-looks.spec
-==========
-.. automodule:: looks.spec
-   :members:

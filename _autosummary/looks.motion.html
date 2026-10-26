@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+
+<html :class="{ 'dark' : darkMode === true }" data-content_root="../" lang="en" x-data="{ darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches), activeSection: ''}">
+<head>
+<script>
+    (function () {
+      // Set initial color scheme
+      if ((localStorage.getItem("_x_darkMode") === "true") || (window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Watch for media preference changes
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+        localStorage.setItem("_x_darkMode", event.matches);
+        document.documentElement.classList.toggle("dark", event.matches);
+      });
+    })();
+  </script>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="#ffffff" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="#030711" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="looks.motion.html.md" rel="alternate" type="text/markdown"/>
+<link href="../llms.txt" rel="describedby" type="text/markdown"/>
+<link href="looks.motion.html.md" rel="alternate" type="text/markdown"/>
+<link href="llms.txt" rel="describedby"/>
+<title>looks.motion | looks</title>
+<meta content="looks.motion | looks" property="og:title"/>
+<meta content="looks.motion | looks" name="twitter:title"/>
+<link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=009055c6" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx_autodoc_typehints.css?v=057ac668" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/epythet.css?v=ecce5bdd" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="looks.pipe.html" rel="next" title="looks.pipe"/>
+<link href="looks.lut.html" rel="prev" title="looks.lut"/>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">looks</span>
+</a><nav class="flex items-center gap-6 text-sm font-medium">
+<a class="transition-colors hover:text-foreground/80 text-foreground/60" href="https://github.com/thorwhalen/looks" rel="noopener nofollow">GitHub</a>
+</nav></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 gap-2 sm:gap-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center gap-1">
+<button @click="darkMode = !darkMode" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" title="Toggle color scheme" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="justify-start text-sm md:!hidden bg-background" href="../index.html"><span class="font-bold text-clip whitespace-nowrap">looks</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="flex md:hidden flex-col font-medium mt-4">
+<a href="https://github.com/thorwhalen/looks" rel="nofollow noopener">GitHub</a>
+</nav><nav class="table w-full min-w-full my-6 lg:my-8">
+<ul class="current">
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../api.html">API reference<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="looks.html">looks<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l3"><a class="reference internal" href="looks.across.html">looks.across</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.cache.html">looks.cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.cli.html">looks.cli</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.compile.html">looks.compile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.environment.html">looks.environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.ffmpeg.html">looks.ffmpeg</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.frame_dependency.html">looks.frame_dependency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.geometry.html">looks.geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.licence.html">looks.licence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.lut.html">looks.lut</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">looks.motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.pipe.html">looks.pipe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.registry.html">looks.registry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.spec.html">looks.spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.transition.html">looks.transition</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ai-agents.html">For AI agents</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">looks</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="../api.html">API reference</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="looks.html">looks</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">looks.motion</span>
+</nav>
+<div id="content" role="main">
+<section id="module-looks.motion">
+<span id="looks-motion"></span><h1>looks.motion<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#module-looks.motion">¶</a></h1>
+<p>A camera path, compiled to an ffmpeg fragment — the compile half of RULE G.</p>
+<p>RULE G splits authored geometry from its compilation. <code class="docutils literal notranslate"><span class="pre">burns</span></code> owns the
+<strong>authored</strong> side: a <code class="docutils literal notranslate"><span class="pre">BurnsPath</span></code> with keyframes and easing, which exists
+because someone chose it as the shot. <code class="docutils literal notranslate"><span class="pre">looks</span></code> owns the <strong>compiled</strong> side,
+because a moving window expressed as <code class="docutils literal notranslate"><span class="pre">crop=x='iw*(...)'</span></code> is ffmpeg vocabulary
+and nothing else — the same reason <code class="docutils literal notranslate"><span class="pre">looks</span></code> owns every other filter string.</p>
+<p>So this module takes keyframes and returns a string. It does not ease, does not
+sample a path, does not decide where a camera should go, and **never imports
+burns** — the dependency points <code class="docutils literal notranslate"><span class="pre">burns</span> <span class="pre">-&gt;</span> <span class="pre">looks</span></code>, which is legal because
+<code class="docutils literal notranslate"><span class="pre">looks</span></code> is stdlib-only, and the reverse stays forbidden because <code class="docutils literal notranslate"><span class="pre">burns</span></code>
+pulls <code class="docutils literal notranslate"><span class="pre">moviepy</span></code>, which pulls a GPL ffmpeg binary. A window here is anything
+with <code class="docutils literal notranslate"><span class="pre">.x</span></code>/<code class="docutils literal notranslate"><span class="pre">.y</span></code>/<code class="docutils literal notranslate"><span class="pre">.w</span></code>/<code class="docutils literal notranslate"><span class="pre">.h</span></code> in burns’ normalised, top-left, window-fraction
+convention. Adopting a third rect convention is the mistake <code class="docutils literal notranslate"><span class="pre">muvid.CropWindow</span></code>’s
+docstring already exists to prevent.</p>
+<p>Easing lives on the far side of this boundary on purpose. An eased path is
+sampled by its owner into as many keyframes as it needs, and what arrives here
+is interpolated <strong>linearly</strong> between them. That is not a limitation being
+tolerated; it is what makes the seam a seam: <code class="docutils literal notranslate"><span class="pre">looks</span></code> never has to know what
+<code class="code docutils literal notranslate"><span class="pre">ease_in_out_cubic</span></code> means, and <code class="docutils literal notranslate"><span class="pre">burns</span></code> never has to know what <code class="docutils literal notranslate"><span class="pre">in_time</span></code> is.</p>
+<p class="rubric">Which filter, and why it is not a matter of taste</p>
+<p>Measured on ffmpeg 8.1, 2026-09-02 — the full transcript is
+<code class="docutils literal notranslate"><span class="pre">docs/research/00f_motion_filters_evidence.md</span></code>.</p>
+<p>The third row is the one that decides the module. <code class="docutils literal notranslate"><span class="pre">crop</span></code>’s <code class="docutils literal notranslate"><span class="pre">w</span></code>/<code class="docutils literal notranslate"><span class="pre">h</span></code> do not
+merely evaluate once — <code class="docutils literal notranslate"><span class="pre">t</span></code> is not in scope for them and the filter **refuses
+to configure**, which is structural: a filter link has one fixed frame size. So
+a Ken Burns path, which is a zoom by definition, is not compilable to <code class="docutils literal notranslate"><span class="pre">crop</span></code>
+at all.</p>
+<p>This <strong>overturns a recorded fleet fact.</strong> <code class="docutils literal notranslate"><span class="pre">muvid._crop_filter</span></code>’s docstring —
+propagated by two of this package’s own research notes into a warning aimed at
+the <code class="docutils literal notranslate"><span class="pre">burns</span></code> owner — says <em>“Not zoompan: its expression vocabulary has no t at
+all, and it duplicates frames on video input.”</em> Both premises are true and the
+conclusion is wrong: <code class="docutils literal notranslate"><span class="pre">t</span></code> is undefined but <code class="docutils literal notranslate"><span class="pre">in_time</span></code> is not, and the
+duplication is the default <code class="docutils literal notranslate"><span class="pre">d</span></code> rather than a property of the filter (<code class="docutils literal notranslate"><span class="pre">d=1</span></code>
+gives exactly 1:1, measured 20 frames from 20). <code class="docutils literal notranslate"><span class="pre">muvid</span></code>’s own code is correct
+— it compiles a <em>pan</em>, which is the case where <code class="docutils literal notranslate"><span class="pre">crop</span></code> is right and simpler.</p>
+<p>Three <code class="docutils literal notranslate"><span class="pre">zoompan</span></code> traps are compiled away here so that no caller has to
+remember them:</p>
+<ul class="simple">
+<li><p>its <code class="docutils literal notranslate"><span class="pre">x</span></code>/<code class="docutils literal notranslate"><span class="pre">y</span></code> are in <strong>original input pixels</strong>, not zoomed ones (60.5 dB
+against the reference versus 6.3 dB for the other reading);</p></li>
+<li><p>its <code class="docutils literal notranslate"><span class="pre">fps</span></code> <strong>silently retimes</strong> — at <code class="docutils literal notranslate"><span class="pre">fps=25</span></code> on a 10 fps source the frame
+count is unchanged and the clip is 60% shorter, so it is required here, never
+defaulted;</p></li>
+<li><p>its <code class="docutils literal notranslate"><span class="pre">zoom</span></code> is one scalar, so the visible window is always geometrically
+similar to the source frame, and a window that is not is refused rather than
+distorted on one axis.</p></li>
+</ul>
+<p class="rubric">Module Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.motion.EPSILON" title="looks.motion.EPSILON"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EPSILON</span></code></a></p></td>
+<td><p>Two normalised fractions are the same window edge within this.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.motion.PRECISION" title="looks.motion.PRECISION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PRECISION</span></code></a></p></td>
+<td><p>How many decimals of a normalised fraction reach the filter string.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.motion.MAX_ZOOM" title="looks.motion.MAX_ZOOM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MAX_ZOOM</span></code></a></p></td>
+<td><p>against a reference built with <code class="docutils literal notranslate"><span class="pre">crop``+``scale</span></code>, z=10 scores 54.4 dB and z=12 scores 13.2 dB — the second is not a worse rendering of the window asked for, it is a correct rendering of a different one.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.motion.MIN_WINDOW_FRACTION" title="looks.motion.MIN_WINDOW_FRACTION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MIN_WINDOW_FRACTION</span></code></a></p></td>
+<td><p>The consequence of <a class="reference internal" href="#looks.motion.MAX_ZOOM" title="looks.motion.MAX_ZOOM"><code class="xref py py-data docutils literal notranslate"><span class="pre">MAX_ZOOM</span></code></a>, in the units this module speaks.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.motion.ASPECT_TOLERANCE" title="looks.motion.ASPECT_TOLERANCE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ASPECT_TOLERANCE</span></code></a></p></td>
+<td><p>How far two windows' aspect ratios may differ, relatively, and still count as the same shape.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.motion.TIMEBASE_RESET" title="looks.motion.TIMEBASE_RESET"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TIMEBASE_RESET</span></code></a></p></td>
+<td><p>Prepended to a moving <code class="docutils literal notranslate"><span class="pre">crop</span></code> and never to a static one.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.motion.compile_motion" title="looks.motion.compile_motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compile_motion</span></code></a>(keyframes, *[, output, fps, ...])</p></td>
+<td><p>A camera path to an ffmpeg fragment, filter chosen by what the path does.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.motion.crop_fragment" title="looks.motion.crop_fragment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">crop_fragment</span></code></a>(keyframes)</p></td>
+<td><p>A path of constant window size, compiled to <code class="docutils literal notranslate"><span class="pre">crop</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.motion.is_source_shaped" title="looks.motion.is_source_shaped"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_source_shaped</span></code></a>(keyframes)</p></td>
+<td><p>Is every window geometrically similar to the whole frame?</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.motion.is_static" title="looks.motion.is_static"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_static</span></code></a>(keyframes)</p></td>
+<td><p>Does the window never move? Then no clock is needed at all.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.motion.ramp" title="looks.motion.ramp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ramp</span></code></a>(points, clock)</p></td>
+<td><p>Piecewise-linear interpolation of <code class="docutils literal notranslate"><span class="pre">points</span></code> as one ffmpeg expression.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.motion.reframe" title="looks.motion.reframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reframe</span></code></a>(keyframes, *[, aspect_tolerance])</p></td>
+<td><p>Split a path into a static reframing crop and a path relative to it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.motion.zoompan_fragment" title="looks.motion.zoompan_fragment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zoompan_fragment</span></code></a>(keyframes, *, output, fps)</p></td>
+<td><p>A path whose window size varies, compiled to <code class="docutils literal notranslate"><span class="pre">zoompan</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.motion.zooms" title="looks.motion.zooms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zooms</span></code></a>(keyframes)</p></td>
+<td><p>Does the window's SIZE change? That is the question that picks a filter.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.motion.Keyframe" title="looks.motion.Keyframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Keyframe</span></code></a>(t, window)</p></td>
+<td><p>A window, at a time in seconds from the start of the clip.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.motion.Window" title="looks.motion.Window"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Window</span></code></a>(x, y, w, h)</p></td>
+<td><p>A concrete <a class="reference internal" href="#looks.motion.WindowLike" title="looks.motion.WindowLike"><code class="xref py py-class docutils literal notranslate"><span class="pre">WindowLike</span></code></a>, for callers who do not already have one.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.motion.WindowLike" title="looks.motion.WindowLike"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WindowLike</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Burns' convention: normalised, top-left origin, window fractions.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Exceptions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.motion.MotionError" title="looks.motion.MotionError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MotionError</span></code></a></p></td>
+<td><p>A path that cannot be compiled, or that would compile to a lie.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.motion.ASPECT_TOLERANCE">
+<span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">ASPECT_TOLERANCE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-06</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.ASPECT_TOLERANCE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.ASPECT_TOLERANCE'">¶</a></dt>
+<dd><p>How far two windows’ aspect ratios may differ, relatively, and still count as
+the same shape. Float noise only — this is NOT a place to absorb quantisation.
+A caller reading windows out of integer pixel boxes (burns’ <code class="code docutils literal notranslate"><span class="pre">sample_box</span></code> does)
+gets ratios spread by up to a pixel’s worth, and the fix is for that caller to
+normalise the aspect it intended, not for this to look the other way: widening
+it here would silently render a shape nobody asked for.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.motion.EPSILON">
+<span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">EPSILON</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-09</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.EPSILON" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.EPSILON'">¶</a></dt>
+<dd><p>Two normalised fractions are the same window edge within this. Tighter than
+any authoring tool’s precision and looser than float noise from easing
+arithmetic, which is where these numbers come from.</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.motion.Keyframe">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">Keyframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/motion.html#Keyframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.Keyframe" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.Keyframe'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A window, at a time in seconds from the start of the clip.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Keyframe</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">Window</span><span class="o">.</span><span class="n">full</span><span class="p">())</span>
+</span><span id="line-2"><span class="go">Keyframe(t=0.0, window=Window(x=0.0, y=0.0, w=1.0, h=1.0))</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.motion.MAX_ZOOM">
+<span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">MAX_ZOOM</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.MAX_ZOOM" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.MAX_ZOOM'">¶</a></dt>
+<dd><p>against a
+reference built with <code class="docutils literal notranslate"><span class="pre">crop``+``scale</span></code>, z=10 scores 54.4 dB and z=12 scores
+13.2 dB — the second is not a worse rendering of the window asked for, it is
+a correct rendering of a different one. So the smallest window <code class="docutils literal notranslate"><span class="pre">zoompan</span></code>
+can show is 1/10 of the frame, and asking for less is refused here rather
+than honoured as something else.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">zoompan</span></code> clamps its <code class="docutils literal notranslate"><span class="pre">zoom</span></code> here, <strong>silently</strong>. Measured</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.motion.MIN_WINDOW_FRACTION">
+<span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">MIN_WINDOW_FRACTION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.1</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.MIN_WINDOW_FRACTION" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.MIN_WINDOW_FRACTION'">¶</a></dt>
+<dd><p>The consequence of <a class="reference internal" href="#looks.motion.MAX_ZOOM" title="looks.motion.MAX_ZOOM"><code class="xref py py-data docutils literal notranslate"><span class="pre">MAX_ZOOM</span></code></a>, in the units this module speaks.</p>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="looks.motion.MotionError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">MotionError</span></span><a class="reference internal" href="../_modules/looks/motion.html#MotionError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.MotionError" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.MotionError'">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="looks.geometry.html#looks.geometry.GeometryError" title="looks.geometry.GeometryError"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeometryError</span></code></a></p>
+<p>A path that cannot be compiled, or that would compile to a lie.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.motion.PRECISION">
+<span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">PRECISION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.PRECISION" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.PRECISION'">¶</a></dt>
+<dd><p>How many decimals of a normalised fraction reach the filter string. At 1e-6
+of a 3840-pixel frame that is 0.004 px — far below the integer rounding both
+filters do anyway, and it keeps the emitted string readable.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.motion.TIMEBASE_RESET">
+<span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">TIMEBASE_RESET</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'setpts=PTS-STARTPTS'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.TIMEBASE_RESET" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.TIMEBASE_RESET'">¶</a></dt>
+<dd><p>Prepended to a moving <code class="docutils literal notranslate"><span class="pre">crop</span></code> and never to a static one. <code class="docutils literal notranslate"><span class="pre">t</span></code> must start at
+0 for a ramp to mean anything; adding it unconditionally would change a path
+that already works. Inherited verbatim, reason included, from
+<code class="docutils literal notranslate"><span class="pre">muvid.footage.assemble._crop_filter</span></code>.</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.motion.Window">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">Window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/motion.html#Window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.Window" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.Window'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A concrete <a class="reference internal" href="#looks.motion.WindowLike" title="looks.motion.WindowLike"><code class="xref py py-class docutils literal notranslate"><span class="pre">WindowLike</span></code></a>, for callers who do not already have one.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Window</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">Window(x=0.25, y=0.25, w=0.5, h=0.5)</span>
+</span></code></pre></div>
+</div>
+<p>The whole frame is the identity window:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Window</span><span class="o">.</span><span class="n">full</span><span class="p">()</span>
+</span><span id="line-2"><span class="go">Window(x=0.0, y=0.0, w=1.0, h=1.0)</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.motion.WindowLike">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">WindowLike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/motion.html#WindowLike"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.WindowLike" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.WindowLike'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Protocol" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>Burns’ convention: normalised, top-left origin, window fractions.</p>
+<p>Structural on purpose — <code class="docutils literal notranslate"><span class="pre">burns.Rect</span></code> satisfies it without <code class="docutils literal notranslate"><span class="pre">looks</span></code>
+importing <code class="docutils literal notranslate"><span class="pre">burns</span></code>, and so does anything else a caller already has.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.motion.compile_motion">
+<span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">compile_motion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyframes</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/motion.html#compile_motion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.compile_motion" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.compile_motion'">¶</a></dt>
+<dd><p>A camera path to an ffmpeg fragment, filter chosen by what the path does.</p>
+<p>The one entry point. Which filter is not a caller’s decision, because it is
+not a matter of taste — it follows from whether the window’s size varies,
+and getting it wrong is a configure-time error or a silent retime.</p>
+<p>A static window needs no clock:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">compile_motion</span><span class="p">([</span><span class="n">Keyframe</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))])</span>
+</span><span id="line-2"><span class="go">"crop=w='iw*0.5':h='ih*0.5':x='iw*0':y='ih*0'"</span>
+</span></code></pre></div>
+</div>
+<p>A pan compiles to <code class="docutils literal notranslate"><span class="pre">crop</span></code> and needs nothing else:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">compile_motion</span><span class="p">([</span>
+</span><span id="line-2"><span class="gp">... </span>    <span class="n">Keyframe</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)),</span>
+</span><span id="line-3"><span class="gp">... </span>    <span class="n">Keyframe</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)),</span>
+</span><span id="line-4"><span class="gp">... </span><span class="p">]))</span>
+</span><span id="line-5"><span class="go">setpts=PTS-STARTPTS,crop=w='iw*0.5':h='ih*1':x='iw*(0+(0.5)*min(max((t-0)/2,0),1))':y='ih*0'</span>
+</span></code></pre></div>
+</div>
+<p>A pan given a delivery size is scaled to it, because <code class="docutils literal notranslate"><span class="pre">crop</span></code> otherwise
+emits the window’s own odd-numbered pixel size and the encoder refuses:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">compile_motion</span><span class="p">(</span>
+</span><span id="line-2"><span class="gp">... </span>    <span class="p">[</span><span class="n">Keyframe</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)),</span>
+</span><span id="line-3"><span class="gp">... </span>     <span class="n">Keyframe</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))],</span>
+</span><span id="line-4"><span class="gp">... </span>    <span class="n">output</span><span class="o">=</span><span class="n">Size</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">),</span>
+</span><span id="line-5"><span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">",scale=1280:720"</span><span class="p">)</span>
+</span><span id="line-6"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+<p>A zoom compiles to <code class="docutils literal notranslate"><span class="pre">zoompan</span></code>, and must be told the delivery size and the
+source’s rate:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">fragment</span> <span class="o">=</span> <span class="n">compile_motion</span><span class="p">(</span>
+</span><span id="line-2"><span class="gp">... </span>    <span class="p">[</span><span class="n">Keyframe</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Window</span><span class="o">.</span><span class="n">full</span><span class="p">()),</span> <span class="n">Keyframe</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">))],</span>
+</span><span id="line-3"><span class="gp">... </span>    <span class="n">output</span><span class="o">=</span><span class="n">Size</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+</span><span id="line-4"><span class="gp">... </span><span class="p">)</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="n">fragment</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"zoompan=d=1:s=1280x720:fps=25:"</span><span class="p">)</span>
+</span><span id="line-6"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+<p>A zooming path whose windows are not the source’s shape — the Ken Burns
+case, a 4:3 still delivered at 16:9 — is <strong>reframed</strong> rather than refused:
+a static crop to the windows’ aspect is emitted first, and the motion runs
+inside it. See <a class="reference internal" href="#looks.motion.reframe" title="looks.motion.reframe"><code class="xref py py-func docutils literal notranslate"><span class="pre">reframe()</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">compile_motion</span><span class="p">(</span>
+</span><span id="line-2"><span class="gp">... </span>    <span class="p">[</span><span class="n">Keyframe</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)),</span>
+</span><span id="line-3"><span class="gp">... </span>     <span class="n">Keyframe</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">))],</span>
+</span><span id="line-4"><span class="gp">... </span>    <span class="n">output</span><span class="o">=</span><span class="n">Size</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+</span><span id="line-5"><span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"crop="</span><span class="p">)</span>
+</span><span id="line-6"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#looks.motion.MotionError" title="looks.motion.MotionError"><strong>MotionError</strong></a> – If a zoom is asked for without <code class="docutils literal notranslate"><span class="pre">output</span></code> and <code class="docutils literal notranslate"><span class="pre">fps</span></code>.
+    They are not defaultable: <code class="docutils literal notranslate"><span class="pre">zoompan</span></code>’s own <code class="docutils literal notranslate"><span class="pre">fps</span></code> default retimes
+    the clip, and there is no honest guess for a delivery size.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.motion.crop_fragment">
+<span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">crop_fragment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyframes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/motion.html#crop_fragment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.crop_fragment" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.crop_fragment'">¶</a></dt>
+<dd><p>A path of constant window size, compiled to <code class="docutils literal notranslate"><span class="pre">crop</span></code>.</p>
+<p>Normalised fractions become pixels only once the source dimensions are
+known, and the only thing that knows them is ffmpeg — hence <code class="docutils literal notranslate"><span class="pre">iw</span></code>/<code class="docutils literal notranslate"><span class="pre">ih</span></code>
+rather than arithmetic here. That is what makes the fragment
+resolution-independent and input-index-free, which is what lets a consumer
+splice it into a filter string it already owns.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">crop_fragment</span><span class="p">([</span><span class="n">Keyframe</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))])</span>
+</span><span id="line-2"><span class="go">"crop=w='iw*0.5':h='ih*0.5':x='iw*0.25':y='ih*0.1'"</span>
+</span></code></pre></div>
+</div>
+<p>A moving window gets its clock reset, and only then:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">crop_fragment</span><span class="p">([</span>
+</span><span id="line-2"><span class="gp">... </span>    <span class="n">Keyframe</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
+</span><span id="line-3"><span class="gp">... </span>    <span class="n">Keyframe</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
+</span><span id="line-4"><span class="gp">... </span><span class="p">]))</span>
+</span><span id="line-5"><span class="go">setpts=PTS-STARTPTS,crop=w='iw*0.5':h='ih*1':x='iw*(0+(0.5)*min(max((t-0)/2,0),1))':y='ih*0'</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#looks.motion.MotionError" title="looks.motion.MotionError"><strong>MotionError</strong></a> – If the window’s size varies. <code class="docutils literal notranslate"><span class="pre">crop</span></code>’s <code class="docutils literal notranslate"><span class="pre">w</span></code>/<code class="docutils literal notranslate"><span class="pre">h</span></code> do not
+    accept <code class="docutils literal notranslate"><span class="pre">t</span></code> — the filter refuses to configure — so this is not a
+    missing feature that could be added later.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.motion.is_source_shaped">
+<span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">is_source_shaped</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyframes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/motion.html#is_source_shaped"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.is_source_shaped" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.is_source_shaped'">¶</a></dt>
+<dd><p>Is every window geometrically similar to the whole frame?</p>
+<p>The condition <code class="docutils literal notranslate"><span class="pre">zoompan</span></code> needs, in the units this module speaks. A window’s
+pixel aspect is <code class="docutils literal notranslate"><span class="pre">(w*iw)/(h*ih)</span></code> and the source’s is <code class="docutils literal notranslate"><span class="pre">iw/ih</span></code>, so the two
+are similar exactly when the normalised <code class="docutils literal notranslate"><span class="pre">w</span></code> and <code class="docutils literal notranslate"><span class="pre">h</span></code> are equal — which is
+why this reads as a suspiciously simple comparison.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">is_source_shaped</span><span class="p">([</span><span class="n">Keyframe</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))])</span>
+</span><span id="line-2"><span class="go">True</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">is_source_shaped</span><span class="p">([</span><span class="n">Keyframe</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))])</span>
+</span><span id="line-4"><span class="go">False</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.motion.is_static">
+<span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">is_static</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyframes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/motion.html#is_static"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.is_static" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.is_static'">¶</a></dt>
+<dd><p>Does the window never move? Then no clock is needed at all.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">Window</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">Window</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">is_static</span><span class="p">([</span><span class="n">Keyframe</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">a</span><span class="p">),</span> <span class="n">Keyframe</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="p">)])</span>
+</span><span id="line-3"><span class="go">True</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">is_static</span><span class="p">([</span><span class="n">Keyframe</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">a</span><span class="p">),</span> <span class="n">Keyframe</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))])</span>
+</span><span id="line-5"><span class="go">False</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.motion.ramp">
+<span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">ramp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clock</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/motion.html#ramp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.ramp" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.ramp'">¶</a></dt>
+<dd><p>Piecewise-linear interpolation of <code class="docutils literal notranslate"><span class="pre">points</span></code> as one ffmpeg expression.</p>
+<p>A sum of clamped ramps rather than nested <code class="docutils literal notranslate"><span class="pre">if()</span></code>: it is exact at every
+knot, linear between them, and — the property that matters — **flat outside
+the path on both sides**, because every term saturates. That is the clamping
+<code class="docutils literal notranslate"><span class="pre">muvid._crop_filter</span></code> does at two keyframes, generalised to N without
+growing a branch.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">ramp</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)],</span> <span class="s2">"t"</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">'10'</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">ramp</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)],</span> <span class="s2">"t"</span><span class="p">)</span>
+</span><span id="line-4"><span class="go">'(0+(1)*min(max((t-0)/2,0),1))'</span>
+</span></code></pre></div>
+</div>
+<p>Held before the first keyframe and after the last, which is what stops a
+clip that outlives its path from drifting off the end:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">ramp</span><span class="p">([(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">)],</span> <span class="s2">"in_time"</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">'(5+(4)*min(max((in_time-1)/2,0),1))'</span>
+</span></code></pre></div>
+</div>
+<p>A segment that does not move contributes <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">*</span> <span class="pre">something</span></code>, so it is not
+emitted; an axis that never moves collapses to the constant it is. This is
+not cosmetic — it is the difference between ffmpeg evaluating an expression
+per frame and reading a number once:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">ramp</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">),</span> <span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">),</span> <span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">)],</span> <span class="s2">"t"</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">'(0.4+(0.5)*min(max((t-2)/3,0),1))'</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">ramp</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">),</span> <span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)],</span> <span class="s2">"t"</span><span class="p">)</span>
+</span><span id="line-4"><span class="go">'0.25'</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.motion.reframe">
+<span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">reframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyframes</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/motion.html#reframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.reframe" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.reframe'">¶</a></dt>
+<dd><p>Split a path into a static reframing crop and a path relative to it.</p>
+<p><code class="docutils literal notranslate"><span class="pre">zoompan</span></code>’s <code class="docutils literal notranslate"><span class="pre">zoom</span></code> is one scalar, so it can only ever show a window
+similar to its input. A Ken Burns path over a 4:3 still delivered at 16:9 is
+therefore not directly compilable — and that is the headline case, not an
+edge one.</p>
+<p>The fix is derived geometry, which is why it lives here rather than with
+whoever authored the path: nobody <em>chooses</em> the reframe, it falls out of the
+mismatch between the source’s shape and the delivery’s. Crop the source once
+to the windows’ own aspect, then move within that — and the windows, being
+that aspect, are similar to it.</p>
+<p>The crop is the <strong>bounding box of every window</strong>, grown on one axis to reach
+the required aspect and nudged to stay inside the frame. Bounding box rather
+than a centred crop because a centred one can exclude a window the path
+actually visits, which would silently reframe the shot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#looks.motion.Window" title="looks.motion.Window"><code class="xref py py-class docutils literal notranslate"><span class="pre">Window</span></code></a>], <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#looks.motion.Keyframe" title="looks.motion.Keyframe"><code class="xref py py-class docutils literal notranslate"><span class="pre">Keyframe</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#Ellipsis" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(None,</span> <span class="pre">keyframes)</span></code> when no reframe is needed — so a path that already
+worked compiles to the identical fragment it did before. Otherwise the
+crop and the path re-expressed against it.</p>
+</dd>
+</dl>
+<p>A path already shaped like its source needs nothing:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">reframe</span><span class="p">([</span><span class="n">Keyframe</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))])[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span>
+</span><span id="line-2"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+<p>A 16:9-shaped window over a square-normalised frame is reframed, and the
+re-expressed window comes out square — which is what <code class="docutils literal notranslate"><span class="pre">zoompan</span></code> requires:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">crop</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">reframe</span><span class="p">([</span><span class="n">Keyframe</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))])</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">crop</span>
+</span><span id="line-3"><span class="go">Window(x=0.0, y=0.25, w=1.0, h=0.5)</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">window</span>
+</span><span id="line-5"><span class="go">Window(x=0.0, y=0.0, w=1.0, h=1.0)</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#looks.motion.MotionError" title="looks.motion.MotionError"><strong>MotionError</strong></a> – If the windows are not all the same shape (an anisotropic
+    zoom, which <code class="docutils literal notranslate"><span class="pre">zoompan</span></code> cannot express at all), or if the source
+    cannot supply a frame of the needed aspect containing the whole path.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><em>tuple</em><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#looks.motion.Window" title="looks.motion.Window"><em>Window</em></a> | <em>None</em>, <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><em>tuple</em><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#looks.motion.Keyframe" title="looks.motion.Keyframe"><em>Keyframe</em></a>, …]]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.motion.zoompan_fragment">
+<span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">zoompan_fragment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyframes</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/motion.html#zoompan_fragment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.zoompan_fragment" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.zoompan_fragment'">¶</a></dt>
+<dd><p>A path whose window size varies, compiled to <code class="docutils literal notranslate"><span class="pre">zoompan</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="looks.geometry.html#looks.geometry.Size" title="looks.geometry.Size"><code class="xref py py-class docutils literal notranslate"><span class="pre">Size</span></code></a></span>) – The delivery size. <code class="docutils literal notranslate"><span class="pre">zoompan</span></code> must be told one — it resamples
+the window to a fixed output rather than emitting the window’s own
+pixels.</p></li>
+<li><p><strong>fps</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span>) – <strong>The source’s frame rate</strong>, required rather than defaulted.
+<code class="docutils literal notranslate"><span class="pre">zoompan</span></code>’s own default is 25, and passing the wrong one preserves
+the frame <em>count</em> while restamping it: 20 frames at 10 fps became 20
+frames at 25 fps, i.e. a 2.0 s clip silently became 0.8 s. A frame
+count check — the obvious check — passes in both cases.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">zoompan_fragment</span><span class="p">(</span>
+</span><span id="line-2"><span class="gp">... </span>    <span class="p">[</span><span class="n">Keyframe</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Window</span><span class="o">.</span><span class="n">full</span><span class="p">()),</span> <span class="n">Keyframe</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))],</span>
+</span><span id="line-3"><span class="gp">... </span>    <span class="n">output</span><span class="o">=</span><span class="n">Size</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+</span><span id="line-4"><span class="gp">... </span><span class="p">)</span>
+</span><span id="line-5"><span class="go">"zoompan=d=1:s=1920x1080:fps=30:z='1/(1+(-0.5)*min(max((in_time-0)/2,0),1))':x='iw*(0+(0.25)*min(max((in_time-0)/2,0),1))':y='ih*(0+(0.25)*min(max((in_time-0)/2,0),1))'"</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#looks.motion.MotionError" title="looks.motion.MotionError"><strong>MotionError</strong></a> – If any window is not geometrically similar to the source
+    frame. <code class="docutils literal notranslate"><span class="pre">zoom</span></code> is a single scalar, so the visible region is always
+    <code class="docutils literal notranslate"><span class="pre">(iw/zoom,</span> <span class="pre">ih/zoom)</span></code> — one axis cannot be zoomed differently from
+    the other, and honouring one while distorting the other silently is
+    the failure this refuses.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><em>str</em><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.motion.zooms">
+<span class="sig-prename descclassname"><span class="pre">looks.motion.</span></span><span class="sig-name descname"><span class="pre">zooms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyframes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/motion.html#zooms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.motion.zooms" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.motion.zooms'">¶</a></dt>
+<dd><p>Does the window’s SIZE change? That is the question that picks a filter.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">full</span><span class="p">,</span> <span class="n">half</span> <span class="o">=</span> <span class="n">Window</span><span class="o">.</span><span class="n">full</span><span class="p">(),</span> <span class="n">Window</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">zooms</span><span class="p">([</span><span class="n">Keyframe</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">full</span><span class="p">),</span> <span class="n">Keyframe</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">half</span><span class="p">)])</span>
+</span><span id="line-3"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+<p>A pan is a move at constant size, and does not zoom:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">zooms</span><span class="p">([</span><span class="n">Keyframe</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">Keyframe</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">Window</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">))])</span>
+</span><span id="line-2"><span class="go">False</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#looks.motion.ASPECT_TOLERANCE'" class="reference internal" href="#looks.motion.ASPECT_TOLERANCE"><code class="docutils literal notranslate"><span class="pre">ASPECT_TOLERANCE</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.EPSILON'" class="reference internal" href="#looks.motion.EPSILON"><code class="docutils literal notranslate"><span class="pre">EPSILON</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.Keyframe'" class="reference internal" href="#looks.motion.Keyframe"><code class="docutils literal notranslate"><span class="pre">Keyframe</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.MAX_ZOOM'" class="reference internal" href="#looks.motion.MAX_ZOOM"><code class="docutils literal notranslate"><span class="pre">MAX_ZOOM</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.MIN_WINDOW_FRACTION'" class="reference internal" href="#looks.motion.MIN_WINDOW_FRACTION"><code class="docutils literal notranslate"><span class="pre">MIN_WINDOW_FRACTION</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.MotionError'" class="reference internal" href="#looks.motion.MotionError"><code class="docutils literal notranslate"><span class="pre">MotionError</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.PRECISION'" class="reference internal" href="#looks.motion.PRECISION"><code class="docutils literal notranslate"><span class="pre">PRECISION</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.TIMEBASE_RESET'" class="reference internal" href="#looks.motion.TIMEBASE_RESET"><code class="docutils literal notranslate"><span class="pre">TIMEBASE_RESET</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.Window'" class="reference internal" href="#looks.motion.Window"><code class="docutils literal notranslate"><span class="pre">Window</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.WindowLike'" class="reference internal" href="#looks.motion.WindowLike"><code class="docutils literal notranslate"><span class="pre">WindowLike</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.compile_motion'" class="reference internal" href="#looks.motion.compile_motion"><code class="docutils literal notranslate"><span class="pre">compile_motion()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.crop_fragment'" class="reference internal" href="#looks.motion.crop_fragment"><code class="docutils literal notranslate"><span class="pre">crop_fragment()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.is_source_shaped'" class="reference internal" href="#looks.motion.is_source_shaped"><code class="docutils literal notranslate"><span class="pre">is_source_shaped()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.is_static'" class="reference internal" href="#looks.motion.is_static"><code class="docutils literal notranslate"><span class="pre">is_static()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.ramp'" class="reference internal" href="#looks.motion.ramp"><code class="docutils literal notranslate"><span class="pre">ramp()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.reframe'" class="reference internal" href="#looks.motion.reframe"><code class="docutils literal notranslate"><span class="pre">reframe()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.zoompan_fragment'" class="reference internal" href="#looks.motion.zoompan_fragment"><code class="docutils literal notranslate"><span class="pre">zoompan_fragment()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.motion.zooms'" class="reference internal" href="#looks.motion.zooms"><code class="docutils literal notranslate"><span class="pre">zooms()</span></code></a></li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left"></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=3294188c"></script>
+<script src="../_static/doctools.js?v=fd6eb6e6"></script>
+<script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=fd10adb8"></script>
+<script defer="defer" src="../_static/theme.js?v=49cc6205"></script>
+</body>
+</html>

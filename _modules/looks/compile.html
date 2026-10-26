@@ -1,562 +1,1166 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../../">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>looks.compile &mdash; looks 0.0.21 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+<html lang="en" data-content_root="../../"
+  x-data="{ darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches), activeSection: ''}"
+  :class="{ 'dark' : darkMode === true }">
 
+<head>
+  <script>
+    (function () {
+      // Set initial color scheme
+      if ((localStorage.getItem("_x_darkMode") === "true") || (window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Watch for media preference changes
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+        localStorage.setItem("_x_darkMode", event.matches);
+        document.documentElement.classList.toggle("dark", event.matches);
+      });
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#030711" />
   
-      <script src="../../_static/jquery.js?v=5d32c60e"></script>
-      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=a11416ff"></script>
-      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
-      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
-      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
-      <script src="../../_static/copybutton.js?v=f281be69"></script>
-    <script src="../../_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+<link rel="alternate" type="text/markdown" href="compile.html.md">
+<link rel="describedby" href="../../llms.txt" type="text/markdown">
+  <title>looks.compile | looks</title>
+  <meta property="og:title" content="looks.compile | looks" />
+  <meta name="twitter:title" content="looks.compile | looks" />
+  <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+  <link rel="stylesheet" type="text/css" href="../../_static/theme.css?v=009055c6" />
+  <link rel="stylesheet" type="text/css" href="../../_static/sphinx_autodoc_typehints.css?v=057ac668" />
+  <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+  <link rel="stylesheet" type="text/css" href="../../_static/epythet.css?v=ecce5bdd" />
+  <link rel="search" title="Search" href="../../search.html" />
+  <link rel="index" title="Index" href="../../genindex.html" />
 </head>
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+<body x-data="{ showSidebar: false, showScrollTop: false }"
+  class="min-h-screen font-sans antialiased bg-background text-foreground" :class="{ 'overflow-hidden': showSidebar }">
+  <div x-cloak x-show="showSidebar"
+    class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden"
+    @click.self="showSidebar = false"></div><div id="page" class="relative flex flex-col min-h-screen"><a href="#content"
+      class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
+    <div class="hidden mr-4 md:flex">
+      <a href="../../index.html" class="flex items-center mr-6"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">looks</span>
+      </a><nav class="flex items-center gap-6 text-sm font-medium">
+        <a href="https://github.com/thorwhalen/looks" class="transition-colors hover:text-foreground/80 text-foreground/60" rel="noopener nofollow">GitHub</a>
+      </nav></div><button
+      class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden"
+      type="button" @click="showSidebar = true">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" aria-hidden="true"
+        fill="currentColor">
+        <path
+          d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z" />
+      </svg>
+      <span class="sr-only">Toggle navigation menu</span>
+    </button>
+    <div class="flex items-center justify-between flex-1 gap-2 sm:gap-4 md:justify-end">
+      <div class="flex-1 w-full md:w-auto md:flex-none"><form id="searchbox"
+      action="../../search.html"
+      method="get"
+      class="relative flex items-center group"
+      @keydown.k.window.meta="$refs.search.focus()">
+  <input x-ref="search"
+          name="q"
+          id="search-input"
+          type="search"
+          aria-label="Search the docs"
+          placeholder="Search ..."
+          class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" />
+  <kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+    <span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+      </div>
+      <nav class="flex items-center gap-1">
+        <button @click="darkMode = !darkMode"
+          class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9"
+          type="button"
+          title="Toggle color scheme">
+          <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 96 960 960" fill="currentColor"
+            class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0">
+            <path
+              d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z" />
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 96 960 960" fill="currentColor"
+            class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100">
+            <path
+              d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z" />
+          </svg>
+        </button>
+      </nav>
+    </div>
+  </div>
+</header>
 
-          
-          
-          <a href="../../index.html" class="icon icon-home">
-            looks
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks.html">looks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/__main__.html">looks.__main__</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/_run.html">looks._run</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/across.html">looks.across</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/cache.html">looks.cache</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/cli.html">looks.cli</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/compile.html">looks.compile</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/environment.html">looks.environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/ffmpeg.html">looks.ffmpeg</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/frame_dependency.html">looks.frame_dependency</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/geometry.html">looks.geometry</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/licence.html">looks.licence</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/lut.html">looks.lut</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/measure.html">looks.measure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/motion.html">looks.motion</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/pipe.html">looks.pipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/registry.html">looks.registry</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/spec.html">looks.spec</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests.html">looks.tests</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/_pyproject.html">looks.tests._pyproject</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_across.html">looks.tests.test_across</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_cache.html">looks.tests.test_cache</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_cli.html">looks.tests.test_cli</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_compile.html">looks.tests.test_compile</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_contrast.html">looks.tests.test_contrast</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_environment.html">looks.tests.test_environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_ffmpeg.html">looks.tests.test_ffmpeg</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_frame_dependency.html">looks.tests.test_frame_dependency</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_geometry.html">looks.tests.test_geometry</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_integration.html">looks.tests.test_integration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_invariant.html">looks.tests.test_invariant</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_licence.html">looks.tests.test_licence</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_lut.html">looks.tests.test_lut</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_measure.html">looks.tests.test_measure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_motion.html">looks.tests.test_motion</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_pipe.html">looks.tests.test_pipe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_pyproject_reader.html">looks.tests.test_pyproject_reader</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_smoke.html">looks.tests.test_smoke</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_spec.html">looks.tests.test_spec</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_time_varying.html">looks.tests.test_time_varying</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/tests/test_transition.html">looks.tests.test_transition</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/looks/transition.html">looks.transition</a></li>
+    <div class="flex-1"><div
+        class="container md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside id="left-sidebar"
+  class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky"
+  :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }">
+
+    <a href="../../index.html" class="justify-start text-sm md:!hidden bg-background"><span class="font-bold text-clip whitespace-nowrap">looks</span>
+    </a>
+
+    <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
+      <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="flex md:hidden flex-col font-medium mt-4">
+  <a href="https://github.com/thorwhalen/looks" rel="nofollow noopener">GitHub</a>
+</nav><nav class="table w-full min-w-full my-6 lg:my-8">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../_autosummary/looks.html">looks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/looks.across.html">looks.across</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/looks.cache.html">looks.cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/looks.cli.html">looks.cli</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/looks.compile.html">looks.compile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/looks.environment.html">looks.environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/looks.ffmpeg.html">looks.ffmpeg</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/looks.frame_dependency.html">looks.frame_dependency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/looks.geometry.html">looks.geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/looks.licence.html">looks.licence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/looks.lut.html">looks.lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/looks.motion.html">looks.motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/looks.pipe.html">looks.pipe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/looks.registry.html">looks.registry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/looks.spec.html">looks.spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/looks.transition.html">looks.transition</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../ai-agents.html">For AI agents</a></li>
 </ul>
 
-        </div>
+</nav>
       </div>
-    </nav>
+    </div>
+    <button type="button" @click="showSidebar = false"
+      class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor"
+        stroke="none" class="h-4 w-4">
+        <path
+          d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z" />
+      </svg>
+    </button>
+  </aside>
+          <main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs"
+     class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+  <a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground"
+     href="../../index.html">
+    <span class="hidden md:inline">looks</span>
+    <svg xmlns="http://www.w3.org/2000/svg"
+         height="18"
+         width="18"
+         viewBox="0 96 960 960"
+         aria-label="Home"
+         fill="currentColor"
+         stroke="none"
+         class="md:hidden">
+      <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z" />
+    </svg>
+  </a>
+  
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap"
+       href="../index.html">Module code</a>
+    
+<div class="mr-1">/</div><span aria-current="page"
+        class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">looks.compile</span>
+</nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">looks</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">looks.compile</li>
-      <li class="wy-breadcrumbs-aside">
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
-  <h1>Source code for looks.compile</h1><div class="highlight"><pre>
-<span></span><span class="sd">"""A Look plus a clip plus a binary, compiled into a plan — and re-checked.</span>
-
-<span class="sd">:func:`compile_look` is the join: a portable ``Look`` (what was asked for) meets</span>
-<span class="sd">a ``ClipSpec`` (what it is being applied to) and an ``FfmpegEnv`` (what this</span>
-<span class="sd">machine can actually do), and the result is a ``LookPlan`` — a document saying</span>
-<span class="sd">what will run, at which tier, against which binary.</span>
-
-<span class="sd">## An ffmpeg step's tier belongs to the binary, so the binary is required</span>
-
-<span class="sd">An ``ImplRef`` declares ``terms`` — what was observed about the implementation.</span>
-<span class="sd">For an **ffmpeg-backed** implementation that declaration cannot be the whole</span>
-<span class="sd">answer, because there is not one ffmpeg on a machine: measured here, ``PATH``</span>
-<span class="sd">is 8.1 / GPL-3 / 481 filters while ``imageio-ffmpeg``'s bundled binary is 7.1 /</span>
-<span class="sd">GPL-2 / 484, and the filter sets are non-nested. The same registered</span>
-<span class="sd">implementation is a different licence position on each.</span>
-
-<span class="sd">So the compiler **substitutes the probed binary's terms** into every ffmpeg</span>
-<span class="sd">candidate before selection, and selection, the step's tier, and a later</span>
-<span class="sd">:func:`audit` all read that one substituted value. The consequence is that</span>
-<span class="sd">``env`` is **required** for an ffmpeg step: without it the tier is unknown, and</span>
-<span class="sd">unknown is a refusal rather than a default.</span>
-
-<span class="sd">What this deliberately does *not* do is raise a step's tier because it uses a</span>
-<span class="sd">GPL-gated filter. :mod:`looks.licence` settles that — *"a GPL-gated filter does</span>
-<span class="sd">not raise the tier; the binary already has it"* — and the mechanism that keeps</span>
-<span class="sd">an ``eq`` look off an LGPL build is simpler and stronger: on such a build ``eq``</span>
-<span class="sd">is not compiled in at all, so it is absent from ``env.filters`` and selection</span>
-<span class="sd">drops the candidate. A licence ceiling and a missing capability are different</span>
-<span class="sd">refusals, and :func:`unmet_filters` keeps them apart.</span>
-
-<span class="sd">## Why :func:`audit` exists, and why it re-derives instead of reading</span>
-
-<span class="sd">A ``LookPlan`` is data, so it travels: written to a file, sent across a process</span>
-<span class="sd">boundary, stored in a graph, replayed a week later. Every one of those is a gap</span>
-<span class="sd">in which the thing that vouched for it stopped being present.</span>
-
-<span class="sd">So a plan carries both its :class:`~looks.licence.Policy` (the ceiling it was</span>
-<span class="sd">compiled under) and, on each step, a ``tier``. **The audit trusts neither of</span>
-<span class="sd">them about the step's actual position.** It goes back to the implementation's</span>
-<span class="sd">``terms`` — what was *observed* about the licence — and re-derives the tier from</span>
-<span class="sd">those. A plan whose stored tier disagrees with what its terms classify to is not</span>
-<span class="sd">a plan with a stale field; it is a plan asserting a position it is not entitled</span>
-<span class="sd">to, and it is refused by name.</span>
-
-<span class="sd">That is the same argument that keeps a tier off ``Effect`` and off ``ImplRef``:</span>
-<span class="sd">anything that can declare its own tier can declare itself acceptable. A stored</span>
-<span class="sd">plan is just the version of that with a filesystem in between.</span>
-
-<span class="sd">The audit also refuses a plan naming an implementation this process does not</span>
-<span class="sd">have, or one whose ``impl_version`` has moved. Both mean the same thing — the</span>
-<span class="sd">plan describes behaviour this build does not implement — and guessing a</span>
-<span class="sd">substitute is exactly the failure the version lock exists to prevent.</span>
-<span class="sd">"""</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">looks.environment</span><span class="w"> </span><span class="kn">import</span> <span class="n">FfmpegEnv</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">looks.licence</span><span class="w"> </span><span class="kn">import</span> <span class="n">Policy</span><span class="p">,</span> <span class="n">classify</span><span class="p">,</span> <span class="n">check</span><span class="p">,</span> <span class="n">ffmpeg_terms</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">looks.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">REGISTRY</span><span class="p">,</span> <span class="n">EffectRegistry</span><span class="p">,</span> <span class="n">UnknownImpl</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">looks.spec</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ClipSpec</span><span class="p">,</span>
-    <span class="n">Effect</span><span class="p">,</span>
-    <span class="n">EMPTY</span><span class="p">,</span>
-    <span class="n">Look</span><span class="p">,</span>
-    <span class="n">LookPlan</span><span class="p">,</span>
-    <span class="n">SpecError</span><span class="p">,</span>
-    <span class="n">Step</span><span class="p">,</span>
-    <span class="n">resolve</span><span class="p">,</span>
-    <span class="n">select_impl</span><span class="p">,</span>
-<span class="p">)</span>
-
-
+    <div id="content" role="main">
+      <h1>Source code for looks.compile</h1><div class="highlight"><pre>
+<span></span><code><span id="line-1"><span class="sd">"""A Look plus a clip plus a binary, compiled into a plan — and re-checked.</span>
+</span><span id="line-2">
+</span><span id="line-3"><span class="sd">:func:`compile_look` is the join: a portable ``Look`` (what was asked for) meets</span>
+</span><span id="line-4"><span class="sd">a ``ClipSpec`` (what it is being applied to) and an ``FfmpegEnv`` (what this</span>
+</span><span id="line-5"><span class="sd">machine can actually do), and the result is a ``LookPlan`` — a document saying</span>
+</span><span id="line-6"><span class="sd">what will run, at which tier, against which binary.</span>
+</span><span id="line-7">
+</span><span id="line-8"><span class="sd">## An ffmpeg step's tier belongs to the binary, so the binary is required</span>
+</span><span id="line-9">
+</span><span id="line-10"><span class="sd">An ``ImplRef`` declares ``terms`` — what was observed about the implementation.</span>
+</span><span id="line-11"><span class="sd">For an **ffmpeg-backed** implementation that declaration cannot be the whole</span>
+</span><span id="line-12"><span class="sd">answer, because there is not one ffmpeg on a machine: measured here, ``PATH``</span>
+</span><span id="line-13"><span class="sd">is 8.1 / GPL-3 / 481 filters while ``imageio-ffmpeg``'s bundled binary is 7.1 /</span>
+</span><span id="line-14"><span class="sd">GPL-2 / 484, and the filter sets are non-nested. The same registered</span>
+</span><span id="line-15"><span class="sd">implementation is a different licence position on each.</span>
+</span><span id="line-16">
+</span><span id="line-17"><span class="sd">So the compiler **substitutes the probed binary's terms** into every ffmpeg</span>
+</span><span id="line-18"><span class="sd">candidate before selection, and selection, the step's tier, and a later</span>
+</span><span id="line-19"><span class="sd">:func:`audit` all read that one substituted value. The consequence is that</span>
+</span><span id="line-20"><span class="sd">``env`` is **required** for an ffmpeg step: without it the tier is unknown, and</span>
+</span><span id="line-21"><span class="sd">unknown is a refusal rather than a default.</span>
+</span><span id="line-22">
+</span><span id="line-23"><span class="sd">What this deliberately does *not* do is raise a step's tier because it uses a</span>
+</span><span id="line-24"><span class="sd">GPL-gated filter. :mod:`looks.licence` settles that — *"a GPL-gated filter does</span>
+</span><span id="line-25"><span class="sd">not raise the tier; the binary already has it"* — and the mechanism that keeps</span>
+</span><span id="line-26"><span class="sd">an ``eq`` look off an LGPL build is simpler and stronger: on such a build ``eq``</span>
+</span><span id="line-27"><span class="sd">is not compiled in at all, so it is absent from ``env.filters`` and selection</span>
+</span><span id="line-28"><span class="sd">drops the candidate. A licence ceiling and a missing capability are different</span>
+</span><span id="line-29"><span class="sd">refusals, and :func:`unmet_filters` keeps them apart.</span>
+</span><span id="line-30">
+</span><span id="line-31"><span class="sd">## Why :func:`audit` exists, and why it re-derives instead of reading</span>
+</span><span id="line-32">
+</span><span id="line-33"><span class="sd">A ``LookPlan`` is data, so it travels: written to a file, sent across a process</span>
+</span><span id="line-34"><span class="sd">boundary, stored in a graph, replayed a week later. Every one of those is a gap</span>
+</span><span id="line-35"><span class="sd">in which the thing that vouched for it stopped being present.</span>
+</span><span id="line-36">
+</span><span id="line-37"><span class="sd">So a plan carries both its :class:`~looks.licence.Policy` (the ceiling it was</span>
+</span><span id="line-38"><span class="sd">compiled under) and, on each step, a ``tier``. **The audit trusts neither of</span>
+</span><span id="line-39"><span class="sd">them about the step's actual position.** It goes back to the implementation's</span>
+</span><span id="line-40"><span class="sd">``terms`` — what was *observed* about the licence — and re-derives the tier from</span>
+</span><span id="line-41"><span class="sd">those. A plan whose stored tier disagrees with what its terms classify to is not</span>
+</span><span id="line-42"><span class="sd">a plan with a stale field; it is a plan asserting a position it is not entitled</span>
+</span><span id="line-43"><span class="sd">to, and it is refused by name.</span>
+</span><span id="line-44">
+</span><span id="line-45"><span class="sd">That is the same argument that keeps a tier off ``Effect`` and off ``ImplRef``:</span>
+</span><span id="line-46"><span class="sd">anything that can declare its own tier can declare itself acceptable. A stored</span>
+</span><span id="line-47"><span class="sd">plan is just the version of that with a filesystem in between.</span>
+</span><span id="line-48">
+</span><span id="line-49"><span class="sd">The audit also refuses a plan naming an implementation this process does not</span>
+</span><span id="line-50"><span class="sd">have, or one whose ``impl_version`` has moved. Both mean the same thing — the</span>
+</span><span id="line-51"><span class="sd">plan describes behaviour this build does not implement — and guessing a</span>
+</span><span id="line-52"><span class="sd">substitute is exactly the failure the version lock exists to prevent.</span>
+</span><span id="line-53"><span class="sd">"""</span>
+</span><span id="line-54">
+</span><span id="line-55"><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+</span><span id="line-56">
+</span><span id="line-57"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span>
+</span><span id="line-58">
+</span><span id="line-59"><span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
+</span><span id="line-60"><span class="kn">import</span><span class="w"> </span><span class="nn">numbers</span>
+</span><span id="line-61">
+</span><span id="line-62"><span class="kn">from</span><span class="w"> </span><span class="nn">looks.environment</span><span class="w"> </span><span class="kn">import</span> <span class="n">FfmpegEnv</span>
+</span><span id="line-63"><span class="kn">from</span><span class="w"> </span><span class="nn">looks.ffmpeg</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="line-64">    <span class="n">COLORBALANCE_ZONES</span><span class="p">,</span>
+</span><span id="line-65">    <span class="n">CURVES_CHANNELS</span><span class="p">,</span>
+</span><span id="line-66">    <span class="n">MAX_GRAIN_SEED</span><span class="p">,</span>
+</span><span id="line-67">    <span class="n">MAX_GRAIN_STRENGTH</span><span class="p">,</span>
+</span><span id="line-68">    <span class="n">MAX_HALATION_SIGMA</span><span class="p">,</span>
+</span><span id="line-69">    <span class="n">MAX_VIGNETTE_ANGLE</span><span class="p">,</span>
+</span><span id="line-70">    <span class="n">as_emitted</span><span class="p">,</span>
+</span><span id="line-71"><span class="p">)</span>
+</span><span id="line-72"><span class="kn">from</span><span class="w"> </span><span class="nn">looks.licence</span><span class="w"> </span><span class="kn">import</span> <span class="n">Policy</span><span class="p">,</span> <span class="n">classify</span><span class="p">,</span> <span class="n">check</span><span class="p">,</span> <span class="n">ffmpeg_terms</span>
+</span><span id="line-73"><span class="kn">from</span><span class="w"> </span><span class="nn">looks.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">REGISTRY</span><span class="p">,</span> <span class="n">EffectRegistry</span><span class="p">,</span> <span class="n">UnknownImpl</span>
+</span><span id="line-74"><span class="kn">from</span><span class="w"> </span><span class="nn">looks.spec</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="line-75">    <span class="n">ClipSpec</span><span class="p">,</span>
+</span><span id="line-76">    <span class="n">Effect</span><span class="p">,</span>
+</span><span id="line-77">    <span class="n">EMPTY</span><span class="p">,</span>
+</span><span id="line-78">    <span class="n">Look</span><span class="p">,</span>
+</span><span id="line-79">    <span class="n">LookPlan</span><span class="p">,</span>
+</span><span id="line-80">    <span class="n">SpecError</span><span class="p">,</span>
+</span><span id="line-81">    <span class="n">Step</span><span class="p">,</span>
+</span><span id="line-82">    <span class="n">resolve</span><span class="p">,</span>
+</span><span id="line-83">    <span class="n">select_impl</span><span class="p">,</span>
+</span><span id="line-84"><span class="p">)</span>
+</span><span id="line-85">
+</span><span id="line-86">
 <div class="viewcode-block" id="CompileError">
-<a class="viewcode-back" href="../../module_docs/looks/compile.html#looks.CompileError">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">CompileError</span><span class="p">(</span><span class="n">SpecError</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""A Look that cannot be compiled against this clip and this binary."""</span></div>
+<a class="viewcode-back" href="../../_autosummary/looks.compile.html#looks.CompileError">[docs]</a>
+</span><span id="line-87"><span class="k">class</span><span class="w"> </span><span class="nc">CompileError</span><span class="p">(</span><span class="n">SpecError</span><span class="p">):</span>
+</span><span id="line-88"><span class="w">    </span><span class="sd">"""A Look that cannot be compiled against this clip and this binary."""</span></div>
 
-
-
+</span><span id="line-89">
+</span><span id="line-90">
 <div class="viewcode-block" id="PlanRefused">
-<a class="viewcode-back" href="../../module_docs/looks/compile.html#looks.PlanRefused">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">PlanRefused</span><span class="p">(</span><span class="n">SpecError</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""A stored plan that may not be run as it stands. Never a warning."""</span></div>
+<a class="viewcode-back" href="../../_autosummary/looks.compile.html#looks.PlanRefused">[docs]</a>
+</span><span id="line-91"><span class="k">class</span><span class="w"> </span><span class="nc">PlanRefused</span><span class="p">(</span><span class="n">SpecError</span><span class="p">):</span>
+</span><span id="line-92"><span class="w">    </span><span class="sd">"""A stored plan that may not be run as it stands. Never a warning."""</span></div>
 
-
-
+</span><span id="line-93">
+</span><span id="line-94">
 <div class="viewcode-block" id="compile_look">
-<a class="viewcode-back" href="../../module_docs/looks/compile.html#looks.compile_look">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">compile_look</span><span class="p">(</span>
-    <span class="n">look</span><span class="p">:</span> <span class="n">Look</span><span class="p">,</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">clip</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ClipSpec</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FfmpegEnv</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">policy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Policy</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">probe</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">EMPTY</span><span class="p">,</span>
-    <span class="n">registry</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EffectRegistry</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LookPlan</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Compile a Look into a plan. No process is started and no file is written.</span>
+<a class="viewcode-back" href="../../_autosummary/looks.compile.html#looks.compile_look">[docs]</a>
+</span><span id="line-95"><span class="k">def</span><span class="w"> </span><span class="nf">compile_look</span><span class="p">(</span>
+</span><span id="line-96">    <span class="n">look</span><span class="p">:</span> <span class="n">Look</span><span class="p">,</span>
+</span><span id="line-97">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-98">    <span class="n">clip</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ClipSpec</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-99">    <span class="n">env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FfmpegEnv</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-100">    <span class="n">policy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Policy</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-101">    <span class="n">probe</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">EMPTY</span><span class="p">,</span>
+</span><span id="line-102">    <span class="n">registry</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EffectRegistry</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-103"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LookPlan</span><span class="p">:</span>
+</span><span id="line-104"><span class="w">    </span><span class="sd">"""Compile a Look into a plan. No process is started and no file is written.</span>
+</span><span id="line-105">
+</span><span id="line-106"><span class="sd">    Args:</span>
+</span><span id="line-107"><span class="sd">        look: What was asked for. Portable data.</span>
+</span><span id="line-108"><span class="sd">        clip: What it is being applied to. Needed by any effect whose answer</span>
+</span><span id="line-109"><span class="sd">            depends on the frame — its absence is only an error if an effect</span>
+</span><span id="line-110"><span class="sd">            asks for it.</span>
+</span><span id="line-111"><span class="sd">        env: Which binary. When given, an implementation whose filters this</span>
+</span><span id="line-112"><span class="sd">            build lacks is dropped from selection rather than discovered at</span>
+</span><span id="line-113"><span class="sd">            run time.</span>
+</span><span id="line-114"><span class="sd">        policy: The ceiling. Defaults to the Look's own.</span>
+</span><span id="line-115"><span class="sd">        probe: Measurements that :class:`~looks.spec.Ref` parameters resolve</span>
+</span><span id="line-116"><span class="sd">            against.</span>
+</span><span id="line-117"><span class="sd">        registry: Which implementations exist. Defaults to</span>
+</span><span id="line-118"><span class="sd">            :data:`looks.registry.REGISTRY`.</span>
+</span><span id="line-119">
+</span><span id="line-120"><span class="sd">    Returns:</span>
+</span><span id="line-121"><span class="sd">        A :class:`~looks.spec.LookPlan` holding no live callables — the runner</span>
+</span><span id="line-122"><span class="sd">        resolves each step's code from the registry by key.</span>
+</span><span id="line-123">
+</span><span id="line-124"><span class="sd">    Raises:</span>
+</span><span id="line-125"><span class="sd">        CompileError: If an effect has no admissible implementation. The</span>
+</span><span id="line-126"><span class="sd">            message says which constraint emptied the pool, because "no</span>
+</span><span id="line-127"><span class="sd">            implementation available" alone is the least useful refusal in the</span>
+</span><span id="line-128"><span class="sd">            package.</span>
+</span><span id="line-129"><span class="sd">        looks.licence.LooksLicenceError: If the selected implementation exceeds</span>
+</span><span id="line-130"><span class="sd">            the ceiling. Selection already filters by policy, so this fires</span>
+</span><span id="line-131"><span class="sd">            only when nothing admissible existed.</span>
+</span><span id="line-132"><span class="sd">    """</span>
+</span><span id="line-133">    <span class="n">reg</span> <span class="o">=</span> <span class="n">REGISTRY</span> <span class="k">if</span> <span class="n">registry</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">registry</span>
+</span><span id="line-134">    <span class="n">ceiling</span> <span class="o">=</span> <span class="n">look</span><span class="o">.</span><span class="n">policy</span> <span class="k">if</span> <span class="n">policy</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">policy</span>
+</span><span id="line-135">    <span class="n">concrete</span> <span class="o">=</span> <span class="n">resolve</span><span class="p">(</span><span class="n">look</span><span class="p">,</span> <span class="n">probe</span><span class="p">)</span> <span class="k">if</span> <span class="n">probe</span> <span class="k">else</span> <span class="n">look</span>
+</span><span id="line-136">    <span class="n">available</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">env</span><span class="o">.</span><span class="n">available</span> <span class="k">else</span> <span class="n">env</span><span class="o">.</span><span class="n">filters</span>
+</span><span id="line-137">
+</span><span id="line-138">    <span class="n">steps</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-139">    <span class="k">for</span> <span class="n">effect</span> <span class="ow">in</span> <span class="n">concrete</span><span class="o">.</span><span class="n">steps</span><span class="p">:</span>
+</span><span id="line-140">        <span class="n">impl</span> <span class="o">=</span> <span class="n">_select</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">policy</span><span class="o">=</span><span class="n">ceiling</span><span class="p">,</span> <span class="n">available</span><span class="o">=</span><span class="n">available</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span>
+</span><span id="line-141">        <span class="n">payload</span> <span class="o">=</span> <span class="n">_payload</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span> <span class="n">impl</span><span class="p">,</span> <span class="n">effect</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span>
+</span><span id="line-142">        <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-143">            <span class="n">Step</span><span class="p">(</span>
+</span><span id="line-144">                <span class="n">effect</span><span class="o">=</span><span class="n">effect</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+</span><span id="line-145">                <span class="n">impl</span><span class="o">=</span><span class="n">impl</span><span class="p">,</span>
+</span><span id="line-146">                <span class="n">tier</span><span class="o">=</span><span class="n">_tier</span><span class="p">(</span><span class="n">impl</span><span class="p">),</span>
+</span><span id="line-147">                <span class="n">params</span><span class="o">=</span><span class="n">effect</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
+</span><span id="line-148">                <span class="n">at</span><span class="o">=</span><span class="n">effect</span><span class="o">.</span><span class="n">at</span><span class="p">,</span>
+</span><span id="line-149">                <span class="n">payload</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+</span><span id="line-150">                <span class="n">cpu_seconds</span><span class="o">=</span><span class="n">_cost</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span> <span class="n">impl</span><span class="p">,</span> <span class="n">effect</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">),</span>
+</span><span id="line-151">                <span class="n">metadata</span><span class="o">=</span><span class="n">effect</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+</span><span id="line-152">            <span class="p">)</span>
+</span><span id="line-153">        <span class="p">)</span>
+</span><span id="line-154">    <span class="k">return</span> <span class="n">LookPlan</span><span class="p">(</span>
+</span><span id="line-155">        <span class="n">steps</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">steps</span><span class="p">),</span>
+</span><span id="line-156">        <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="p">,</span>
+</span><span id="line-157">        <span class="n">env</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">env</span><span class="o">.</span><span class="n">fingerprint</span><span class="p">(),</span>
+</span><span id="line-158">        <span class="n">look_name</span><span class="o">=</span><span class="n">concrete</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+</span><span id="line-159">        <span class="n">policy</span><span class="o">=</span><span class="n">ceiling</span><span class="p">,</span>
+</span><span id="line-160">        <span class="n">probe</span><span class="o">=</span><span class="n">probe</span><span class="p">,</span>
+</span><span id="line-161">    <span class="p">)</span></div>
 
-<span class="sd">    Args:</span>
-<span class="sd">        look: What was asked for. Portable data.</span>
-<span class="sd">        clip: What it is being applied to. Needed by any effect whose answer</span>
-<span class="sd">            depends on the frame — its absence is only an error if an effect</span>
-<span class="sd">            asks for it.</span>
-<span class="sd">        env: Which binary. When given, an implementation whose filters this</span>
-<span class="sd">            build lacks is dropped from selection rather than discovered at</span>
-<span class="sd">            run time.</span>
-<span class="sd">        policy: The ceiling. Defaults to the Look's own.</span>
-<span class="sd">        probe: Measurements that :class:`~looks.spec.Ref` parameters resolve</span>
-<span class="sd">            against.</span>
-<span class="sd">        registry: Which implementations exist. Defaults to</span>
-<span class="sd">            :data:`looks.registry.REGISTRY`.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        A :class:`~looks.spec.LookPlan` holding no live callables — the runner</span>
-<span class="sd">        resolves each step's code from the registry by key.</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        CompileError: If an effect has no admissible implementation. The</span>
-<span class="sd">            message says which constraint emptied the pool, because "no</span>
-<span class="sd">            implementation available" alone is the least useful refusal in the</span>
-<span class="sd">            package.</span>
-<span class="sd">        looks.licence.LooksLicenceError: If the selected implementation exceeds</span>
-<span class="sd">            the ceiling. Selection already filters by policy, so this fires</span>
-<span class="sd">            only when nothing admissible existed.</span>
-<span class="sd">    """</span>
-    <span class="n">reg</span> <span class="o">=</span> <span class="n">REGISTRY</span> <span class="k">if</span> <span class="n">registry</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">registry</span>
-    <span class="n">ceiling</span> <span class="o">=</span> <span class="n">look</span><span class="o">.</span><span class="n">policy</span> <span class="k">if</span> <span class="n">policy</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">policy</span>
-    <span class="n">concrete</span> <span class="o">=</span> <span class="n">resolve</span><span class="p">(</span><span class="n">look</span><span class="p">,</span> <span class="n">probe</span><span class="p">)</span> <span class="k">if</span> <span class="n">probe</span> <span class="k">else</span> <span class="n">look</span>
-    <span class="n">available</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">env</span><span class="o">.</span><span class="n">available</span> <span class="k">else</span> <span class="n">env</span><span class="o">.</span><span class="n">filters</span>
-
-    <span class="n">steps</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">effect</span> <span class="ow">in</span> <span class="n">concrete</span><span class="o">.</span><span class="n">steps</span><span class="p">:</span>
-        <span class="n">impl</span> <span class="o">=</span> <span class="n">_select</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">policy</span><span class="o">=</span><span class="n">ceiling</span><span class="p">,</span> <span class="n">available</span><span class="o">=</span><span class="n">available</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span>
-        <span class="n">payload</span> <span class="o">=</span> <span class="n">_payload</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span> <span class="n">impl</span><span class="p">,</span> <span class="n">effect</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span>
-        <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">Step</span><span class="p">(</span>
-                <span class="n">effect</span><span class="o">=</span><span class="n">effect</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="n">impl</span><span class="o">=</span><span class="n">impl</span><span class="p">,</span>
-                <span class="n">tier</span><span class="o">=</span><span class="n">_tier</span><span class="p">(</span><span class="n">impl</span><span class="p">),</span>
-                <span class="n">params</span><span class="o">=</span><span class="n">effect</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
-                <span class="n">at</span><span class="o">=</span><span class="n">effect</span><span class="o">.</span><span class="n">at</span><span class="p">,</span>
-                <span class="n">payload</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
-                <span class="n">cpu_seconds</span><span class="o">=</span><span class="n">_cost</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span> <span class="n">impl</span><span class="p">,</span> <span class="n">effect</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">),</span>
-                <span class="n">metadata</span><span class="o">=</span><span class="n">effect</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="n">LookPlan</span><span class="p">(</span>
-        <span class="n">steps</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">steps</span><span class="p">),</span>
-        <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="p">,</span>
-        <span class="n">env</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">env</span><span class="o">.</span><span class="n">fingerprint</span><span class="p">(),</span>
-        <span class="n">look_name</span><span class="o">=</span><span class="n">concrete</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-        <span class="n">policy</span><span class="o">=</span><span class="n">ceiling</span><span class="p">,</span>
-        <span class="n">probe</span><span class="o">=</span><span class="n">probe</span><span class="p">,</span>
-    <span class="p">)</span></div>
-
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_check_contrast</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">amount</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"amount"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">amount</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">CompileError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"contrast amount must not be negative; got </span><span class="si">{</span><span class="n">amount</span><span class="si">!r}</span><span class="s2">. A negative "</span>
-            <span class="s2">"amount would invert the picture, which is a different effect than "</span>
-            <span class="s2">"the one being asked for."</span>
-        <span class="p">)</span>
-
-
-<span class="c1">#: What an effect's parameters must satisfy, keyed by EFFECT — never by</span>
-<span class="c1">#: implementation. A check that lives inside one compiler is a check the</span>
-<span class="c1">#: licence tier can switch off: `contrast` with `amount=-1` was refused on the</span>
-<span class="c1">#: LGPL path and emitted `eq=contrast=-1.0` on the GPL one, so the same Look was</span>
-<span class="c1">#: valid or invalid depending on how the binary was built. Rule 29b says the</span>
-<span class="c1">#: tier must not decide what the viewer sees; it must not decide whether the</span>
-<span class="c1">#: document is accepted either.</span>
-<span class="n">EFFECT_PARAM_CHECKS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"contrast"</span><span class="p">:</span> <span class="n">_check_contrast</span><span class="p">,</span>
-<span class="p">}</span>
-
-
+</span><span id="line-162">
+</span><span id="line-163">
+</span><span id="line-164"><span class="k">def</span><span class="w"> </span><span class="nf">_check_contrast</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-165">    <span class="n">amount</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"amount"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+</span><span id="line-166">    <span class="k">if</span> <span class="n">amount</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="line-167">        <span class="k">raise</span> <span class="n">CompileError</span><span class="p">(</span>
+</span><span id="line-168">            <span class="sa">f</span><span class="s2">"contrast amount must not be negative; got </span><span class="si">{</span><span class="n">amount</span><span class="si">!r}</span><span class="s2">. A negative "</span>
+</span><span id="line-169">            <span class="s2">"amount would invert the picture, which is a different effect than "</span>
+</span><span id="line-170">            <span class="s2">"the one being asked for."</span>
+</span><span id="line-171">        <span class="p">)</span>
+</span><span id="line-172">
+</span><span id="line-173">
+</span><span id="line-174"><span class="k">def</span><span class="w"> </span><span class="nf">_require</span><span class="p">(</span><span class="n">ok</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-175">    <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+</span><span id="line-176">        <span class="k">raise</span> <span class="n">CompileError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">effect</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-177">
+</span><span id="line-178">
+</span><span id="line-179"><span class="k">def</span><span class="w"> </span><span class="nf">_check_present</span><span class="p">(</span><span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">rules</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-180"><span class="w">    </span><span class="sd">"""Check each rule's parameter only if it is PRESENT.</span>
+</span><span id="line-181">
+</span><span id="line-182"><span class="sd">    An absent parameter takes its compiler's default, so a check that supplied</span>
+</span><span id="line-183"><span class="sd">    one of its own would be a second copy of it, free to disagree (the first</span>
+</span><span id="line-184"><span class="sd">    copies did: halation sigma 1 against 24, grain strength 0 against 8).</span>
+</span><span id="line-185"><span class="sd">    """</span>
+</span><span id="line-186">    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">ok</span><span class="p">,</span> <span class="n">requirement</span><span class="p">)</span> <span class="ow">in</span> <span class="n">rules</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="line-187">        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+</span><span id="line-188">            <span class="n">value</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+</span><span id="line-189">            <span class="n">_require</span><span class="p">(</span><span class="n">ok</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">effect</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">requirement</span><span class="si">}</span><span class="s2">; got </span><span class="si">{</span><span class="n">value</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-190">
+</span><span id="line-191">
+</span><span id="line-192"><span class="k">def</span><span class="w"> </span><span class="nf">_in_range</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-193">    <span class="k">return</span> <span class="n">low</span> <span class="o">&lt;=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">high</span>
+</span><span id="line-194">
+</span><span id="line-195">
+</span><span id="line-196"><span class="k">def</span><span class="w"> </span><span class="nf">_is_sequence</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-197"><span class="w">    </span><span class="sd">"""A tuple-like value. A string is a sequence too, and ``"12"`` is not ``(1, 2)``."""</span>
+</span><span id="line-198">    <span class="k">return</span> <span class="p">(</span>
+</span><span id="line-199">        <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span>
+</span><span id="line-200">        <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">))</span>
+</span><span id="line-201">        <span class="ow">and</span> <span class="p">(</span><span class="n">length</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="n">length</span><span class="p">)</span>
+</span><span id="line-202">    <span class="p">)</span>
+</span><span id="line-203">
+</span><span id="line-204">
+</span><span id="line-205"><span class="k">def</span><span class="w"> </span><span class="nf">_is_whole</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-206"><span class="w">    </span><span class="sd">"""A number ffmpeg can take as an integer option without it being changed.</span>
+</span><span id="line-207">
+</span><span id="line-208"><span class="sd">    ``8.0`` is accepted, deliberately: it is emitted as ``8``, the picture asked</span>
+</span><span id="line-209"><span class="sd">    for. ``7.9`` (emitted ``7``), ``True`` (emitted ``1``) and ``"8"`` are not.</span>
+</span><span id="line-210"><span class="sd">    """</span>
+</span><span id="line-211">    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">):</span>
+</span><span id="line-212">        <span class="k">return</span> <span class="kc">False</span>
+</span><span id="line-213">    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span>
+</span><span id="line-214">
+</span><span id="line-215">
+</span><span id="line-216"><span class="k">def</span><span class="w"> </span><span class="nf">_whole_in</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-217">    <span class="k">return</span> <span class="n">_is_whole</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="n">low</span> <span class="o">&lt;=</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="n">high</span>
+</span><span id="line-218">
+</span><span id="line-219">
+</span><span id="line-220"><span class="k">def</span><span class="w"> </span><span class="nf">_check_curves</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-221">    <span class="k">def</span><span class="w"> </span><span class="nf">is_curve</span><span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-222">        <span class="c1"># Checked as emitted: x-points closer than the six decimals the</span>
+</span><span id="line-223">        <span class="c1"># compiler writes become one point, and `curves` refuses the curve.</span>
+</span><span id="line-224">        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">_is_sequence</span><span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">):</span>
+</span><span id="line-225">            <span class="k">return</span> <span class="kc">False</span>
+</span><span id="line-226">        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">_is_sequence</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">points</span><span class="p">):</span>
+</span><span id="line-227">            <span class="k">return</span> <span class="kc">False</span>
+</span><span id="line-228">        <span class="n">emitted</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">as_emitted</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">point</span><span class="p">)</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">points</span><span class="p">]</span>
+</span><span id="line-229">        <span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">_y</span> <span class="ow">in</span> <span class="n">emitted</span><span class="p">]</span>
+</span><span id="line-230">        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">emitted</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">point</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
+</span><span id="line-231">            <span class="n">a</span> <span class="o">&lt;</span> <span class="n">b</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+</span><span id="line-232">        <span class="p">)</span>
+</span><span id="line-233">
+</span><span id="line-234">    <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">CURVES_CHANNELS</span><span class="p">:</span>
+</span><span id="line-235">        <span class="n">points</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
+</span><span id="line-236">        <span class="k">if</span> <span class="ow">not</span> <span class="n">points</span><span class="p">:</span>  <span class="c1"># the compiler skips an empty channel too</span>
+</span><span id="line-237">            <span class="k">continue</span>
+</span><span id="line-238">        <span class="n">_require</span><span class="p">(</span>
+</span><span id="line-239">            <span class="n">is_curve</span><span class="p">(</span><span class="n">points</span><span class="p">),</span>
+</span><span id="line-240">            <span class="s2">"curves"</span><span class="p">,</span>
+</span><span id="line-241">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">channel</span><span class="si">!r}</span><span class="s2"> must be at least two (x, y) points in 0..1 with x "</span>
+</span><span id="line-242">            <span class="sa">f</span><span class="s2">"strictly increasing at six decimals; got </span><span class="si">{</span><span class="n">points</span><span class="si">!r}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-243">        <span class="p">)</span>
+</span><span id="line-244">
+</span><span id="line-245">
+</span><span id="line-246"><span class="k">def</span><span class="w"> </span><span class="nf">_check_colorbalance</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-247">    <span class="n">_check_present</span><span class="p">(</span>
+</span><span id="line-248">        <span class="s2">"colorbalance"</span><span class="p">,</span>
+</span><span id="line-249">        <span class="n">params</span><span class="p">,</span>
+</span><span id="line-250">        <span class="p">{</span>
+</span><span id="line-251">            <span class="n">zone</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="line-252">                <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">_is_sequence</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">_in_range</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">v</span><span class="p">),</span>
+</span><span id="line-253">                <span class="s2">"must be an (r, g, b) shift, each in -1..1"</span><span class="p">,</span>
+</span><span id="line-254">            <span class="p">)</span>
+</span><span id="line-255">            <span class="k">for</span> <span class="n">zone</span> <span class="ow">in</span> <span class="n">COLORBALANCE_ZONES</span>
+</span><span id="line-256">        <span class="p">}</span>
+</span><span id="line-257">        <span class="o">|</span> <span class="p">{</span>
+</span><span id="line-258">            <span class="c1"># A bool, not truthiness: "false" would otherwise compile to pl=1.</span>
+</span><span id="line-259">            <span class="s2">"preserve_lightness"</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="line-260">                <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span>
+</span><span id="line-261">                <span class="s2">"must be True or False"</span><span class="p">,</span>
+</span><span id="line-262">            <span class="p">),</span>
+</span><span id="line-263">        <span class="p">},</span>
+</span><span id="line-264">    <span class="p">)</span>
+</span><span id="line-265">
+</span><span id="line-266">
+</span><span id="line-267"><span class="k">def</span><span class="w"> </span><span class="nf">_check_vignette</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-268">    <span class="n">_check_present</span><span class="p">(</span>
+</span><span id="line-269">        <span class="s2">"vignette"</span><span class="p">,</span>
+</span><span id="line-270">        <span class="n">params</span><span class="p">,</span>
+</span><span id="line-271">        <span class="p">{</span>
+</span><span id="line-272">            <span class="s2">"angle"</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="line-273">                <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">as_emitted</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">MAX_VIGNETTE_ANGLE</span><span class="p">,</span>
+</span><span id="line-274">                <span class="s2">"must be in (0, pi/2] radians, as written to six decimals"</span><span class="p">,</span>
+</span><span id="line-275">            <span class="p">),</span>
+</span><span id="line-276">        <span class="p">},</span>
+</span><span id="line-277">    <span class="p">)</span>
+</span><span id="line-278">
+</span><span id="line-279">
+</span><span id="line-280"><span class="k">def</span><span class="w"> </span><span class="nf">_check_halation</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-281">    <span class="n">_check_present</span><span class="p">(</span>
+</span><span id="line-282">        <span class="s2">"halation"</span><span class="p">,</span>
+</span><span id="line-283">        <span class="n">params</span><span class="p">,</span>
+</span><span id="line-284">        <span class="p">{</span>
+</span><span id="line-285">            <span class="s2">"threshold"</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="line-286">                <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">_in_range</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+</span><span id="line-287">                <span class="s2">"is a fraction of full scale, 0..1"</span><span class="p">,</span>
+</span><span id="line-288">            <span class="p">),</span>
+</span><span id="line-289">            <span class="s2">"sigma"</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="line-290">                <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">as_emitted</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">MAX_HALATION_SIGMA</span><span class="p">,</span>
+</span><span id="line-291">                <span class="sa">f</span><span class="s2">"must be in (0, </span><span class="si">{</span><span class="n">MAX_HALATION_SIGMA</span><span class="si">}</span><span class="s2">], gblur's range"</span><span class="p">,</span>
+</span><span id="line-292">            <span class="p">),</span>
+</span><span id="line-293">            <span class="s2">"amount"</span><span class="p">:</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">_in_range</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">"is a blend opacity, 0..1"</span><span class="p">),</span>
+</span><span id="line-294">            <span class="s2">"tint"</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="line-295">                <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">_is_sequence</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">v</span><span class="p">),</span>
+</span><span id="line-296">                <span class="s2">"must be three non-negative gains (r, g, b)"</span><span class="p">,</span>
+</span><span id="line-297">            <span class="p">),</span>
+</span><span id="line-298">        <span class="p">},</span>
+</span><span id="line-299">    <span class="p">)</span>
+</span><span id="line-300">
+</span><span id="line-301">
+</span><span id="line-302"><span class="k">def</span><span class="w"> </span><span class="nf">_check_grain</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-303">    <span class="n">_require</span><span class="p">(</span>
+</span><span id="line-304">        <span class="s2">"temporal"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">,</span>
+</span><span id="line-305">        <span class="s2">"grain"</span><span class="p">,</span>
+</span><span id="line-306">        <span class="s2">"there is no 'temporal' switch: grain is always re-drawn per frame, "</span>
+</span><span id="line-307">        <span class="s2">"because static noise reads as dirt on the lens, not as grain"</span><span class="p">,</span>
+</span><span id="line-308">    <span class="p">)</span>
+</span><span id="line-309">    <span class="n">_check_present</span><span class="p">(</span>
+</span><span id="line-310">        <span class="s2">"grain"</span><span class="p">,</span>
+</span><span id="line-311">        <span class="n">params</span><span class="p">,</span>
+</span><span id="line-312">        <span class="p">{</span>
+</span><span id="line-313">            <span class="s2">"strength"</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="line-314">                <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">_whole_in</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">MAX_GRAIN_STRENGTH</span><span class="p">),</span>
+</span><span id="line-315">                <span class="sa">f</span><span class="s2">"must be a whole number in 0..</span><span class="si">{</span><span class="n">MAX_GRAIN_STRENGTH</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-316">            <span class="p">),</span>
+</span><span id="line-317">            <span class="s2">"seed"</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="line-318">                <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">_whole_in</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">MAX_GRAIN_SEED</span><span class="p">),</span>
+</span><span id="line-319">                <span class="sa">f</span><span class="s2">"must be a whole number in 0..</span><span class="si">{</span><span class="n">MAX_GRAIN_SEED</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="line-320">            <span class="p">),</span>
+</span><span id="line-321">        <span class="p">},</span>
+</span><span id="line-322">    <span class="p">)</span>
+</span><span id="line-323">
+</span><span id="line-324">
+</span><span id="line-325"><span class="k">def</span><span class="w"> </span><span class="nf">_check_gate_weave</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-326">    <span class="n">_check_present</span><span class="p">(</span>
+</span><span id="line-327">        <span class="s2">"gate_weave"</span><span class="p">,</span>
+</span><span id="line-328">        <span class="n">params</span><span class="p">,</span>
+</span><span id="line-329">        <span class="p">{</span>
+</span><span id="line-330">            <span class="s2">"amplitude"</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="line-331">                <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">_is_whole</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span>
+</span><span id="line-332">                <span class="s2">"must be a whole number of pixels, &gt;= 0"</span><span class="p">,</span>
+</span><span id="line-333">            <span class="p">),</span>
+</span><span id="line-334">            <span class="s2">"frequency"</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="line-335">                <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">_is_sequence</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">v</span><span class="p">),</span>
+</span><span id="line-336">                <span class="s2">"must be two non-negative values, Hz"</span><span class="p">,</span>
+</span><span id="line-337">            <span class="p">),</span>
+</span><span id="line-338">        <span class="p">},</span>
+</span><span id="line-339">    <span class="p">)</span>
+</span><span id="line-340">
+</span><span id="line-341">
+</span><span id="line-342"><span class="c1">#: What an effect's parameters must satisfy, keyed by EFFECT — never by</span>
+</span><span id="line-343"><span class="c1">#: implementation. A check that lives inside one compiler is a check the</span>
+</span><span id="line-344"><span class="c1">#: licence tier can switch off: `contrast` with `amount=-1` was refused on the</span>
+</span><span id="line-345"><span class="c1">#: LGPL path and emitted `eq=contrast=-1.0` on the GPL one, so the same Look was</span>
+</span><span id="line-346"><span class="c1">#: valid or invalid depending on how the binary was built. Rule 29b says the</span>
+</span><span id="line-347"><span class="c1">#: tier must not decide what the viewer sees; it must not decide whether the</span>
+</span><span id="line-348"><span class="c1">#: document is accepted either.</span>
+</span><span id="line-349"><span class="n">EFFECT_PARAM_CHECKS</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="line-350">    <span class="s2">"contrast"</span><span class="p">:</span> <span class="n">_check_contrast</span><span class="p">,</span>
+</span><span id="line-351">    <span class="s2">"curves"</span><span class="p">:</span> <span class="n">_check_curves</span><span class="p">,</span>
+</span><span id="line-352">    <span class="s2">"colorbalance"</span><span class="p">:</span> <span class="n">_check_colorbalance</span><span class="p">,</span>
+</span><span id="line-353">    <span class="s2">"vignette"</span><span class="p">:</span> <span class="n">_check_vignette</span><span class="p">,</span>
+</span><span id="line-354">    <span class="s2">"halation"</span><span class="p">:</span> <span class="n">_check_halation</span><span class="p">,</span>
+</span><span id="line-355">    <span class="s2">"grain"</span><span class="p">:</span> <span class="n">_check_grain</span><span class="p">,</span>
+</span><span id="line-356">    <span class="s2">"gate_weave"</span><span class="p">:</span> <span class="n">_check_gate_weave</span><span class="p">,</span>
+</span><span id="line-357"><span class="p">}</span>
+</span><span id="line-358">
+</span><span id="line-359">
 <div class="viewcode-block" id="check_effect_params">
-<a class="viewcode-back" href="../../module_docs/looks/compile.html#looks.check_effect_params">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">check_effect_params</span><span class="p">(</span><span class="n">effect</span><span class="p">:</span> <span class="n">Effect</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Refuse parameters no implementation of this effect could honour.</span>
+<a class="viewcode-back" href="../../_autosummary/looks.compile.html#looks.check_effect_params">[docs]</a>
+</span><span id="line-360"><span class="k">def</span><span class="w"> </span><span class="nf">check_effect_params</span><span class="p">(</span><span class="n">effect</span><span class="p">:</span> <span class="n">Effect</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-361"><span class="w">    </span><span class="sd">"""Refuse parameters no implementation of this effect could honour.</span>
+</span><span id="line-362">
+</span><span id="line-363"><span class="sd">    Called before an implementation is chosen, so every implementation of an</span>
+</span><span id="line-364"><span class="sd">    effect accepts exactly the same documents.</span>
+</span><span id="line-365"><span class="sd">    """</span>
+</span><span id="line-366">    <span class="n">check</span> <span class="o">=</span> <span class="n">EFFECT_PARAM_CHECKS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">effect</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span id="line-367">    <span class="k">if</span> <span class="n">check</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-368">        <span class="k">return</span>
+</span><span id="line-369">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-370">        <span class="n">check</span><span class="p">(</span><span class="n">effect</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+</span><span id="line-371">    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+</span><span id="line-372">        <span class="c1"># A parameter of the wrong type (`float(None)`, `len(3)`) is a refusal</span>
+</span><span id="line-373">        <span class="c1"># of the document, said once here rather than guarded in every check.</span>
+</span><span id="line-374">        <span class="k">raise</span> <span class="n">CompileError</span><span class="p">(</span>
+</span><span id="line-375">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">effect</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: malformed parameters </span><span class="si">{</span><span class="nb">dict</span><span class="p">(</span><span class="n">effect</span><span class="o">.</span><span class="n">params</span><span class="p">)</span><span class="si">!r}</span><span class="s2"> (</span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">)"</span>
+</span><span id="line-376">        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span></div>
 
-<span class="sd">    Called before an implementation is chosen, so every implementation of an</span>
-<span class="sd">    effect accepts exactly the same documents.</span>
-<span class="sd">    """</span>
-    <span class="n">check</span> <span class="o">=</span> <span class="n">EFFECT_PARAM_CHECKS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">effect</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">check</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">check</span><span class="p">(</span><span class="n">effect</span><span class="o">.</span><span class="n">params</span><span class="p">)</span></div>
-
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_select</span><span class="p">(</span>
-    <span class="n">effect</span><span class="p">:</span> <span class="n">Effect</span><span class="p">,</span>
-    <span class="n">registry</span><span class="p">:</span> <span class="n">EffectRegistry</span><span class="p">,</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">policy</span><span class="p">:</span> <span class="n">Policy</span><span class="p">,</span>
-    <span class="n">available</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">frozenset</span><span class="p">],</span>
-    <span class="n">env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FfmpegEnv</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-    <span class="n">check_effect_params</span><span class="p">(</span><span class="n">effect</span><span class="p">)</span>
-    <span class="n">candidates</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">implementations</span><span class="p">(</span><span class="n">effect</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">candidates</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">CompileError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"no implementation is registered for </span><span class="si">{</span><span class="n">effect</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">. This "</span>
-            <span class="sa">f</span><span class="s2">"process has </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">registry</span><span class="o">.</span><span class="n">effects</span><span class="p">())</span><span class="si">}</span><span class="s2">. An effect nobody "</span>
-            <span class="s2">"implements is a refusal, not a no-op."</span>
-        <span class="p">)</span>
-    <span class="n">grounded</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">_ground</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">env</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">select_impl</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="n">grounded</span><span class="p">,</span> <span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">,</span> <span class="n">available_filters</span><span class="o">=</span><span class="n">available</span><span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_ground</span><span class="p">(</span><span class="n">impl</span><span class="p">,</span> <span class="n">env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FfmpegEnv</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">"""An ffmpeg implementation, re-stated in terms of the binary that will run it.</span>
-
-<span class="sd">    The substitution is the point. An ``ImplRef``'s declared terms are what a</span>
-<span class="sd">    registrant observed; which ffmpeg is present is what actually determines</span>
-<span class="sd">    the licence position, and the two are not the same fact. Selection, the</span>
-<span class="sd">    step's tier and a later audit then all read one value — the probed one.</span>
-<span class="sd">    """</span>
-    <span class="k">if</span> <span class="n">impl</span><span class="o">.</span><span class="n">backend</span> <span class="o">!=</span> <span class="s2">"ffmpeg"</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">impl</span>
-    <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">CompileError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> runs on ffmpeg, and an ffmpeg step's licence "</span>
-            <span class="s2">"position is a property of the binary, not of the effect — this "</span>
-            <span class="s2">"machine has more than one. Pass env=looks.probe(). An unknown "</span>
-            <span class="s2">"binary is a refusal, not a default."</span>
-        <span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">env</span><span class="o">.</span><span class="n">available</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">CompileError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> runs on ffmpeg and the probed binary is not usable"</span>
-            <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">": </span><span class="si">{</span><span class="s1">'; '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">notes</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">env</span><span class="o">.</span><span class="n">notes</span> <span class="k">else</span> <span class="s2">"."</span><span class="p">)</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">impl</span><span class="p">,</span> <span class="n">terms</span><span class="o">=</span><span class="n">ffmpeg_terms</span><span class="p">(</span><span class="n">env</span><span class="p">))</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_tier</span><span class="p">(</span><span class="n">impl</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""The step's tier, **derived** from terms — never read off anything."""</span>
-    <span class="n">assessment</span> <span class="o">=</span> <span class="n">classify</span><span class="p">(</span><span class="n">impl</span><span class="o">.</span><span class="n">terms</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">assessment</span><span class="o">.</span><span class="n">tier</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">CompileError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> classifies to no tier (</span><span class="si">{</span><span class="n">assessment</span><span class="o">.</span><span class="n">verdict</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">). "</span>
-            <span class="s2">"Three regions sit off the ladder on purpose and no ceiling "</span>
-            <span class="s2">"reaches them, so there is nothing to compile against."</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="n">assessment</span><span class="o">.</span><span class="n">tier</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_payload</span><span class="p">(</span>
-    <span class="n">registry</span><span class="p">:</span> <span class="n">EffectRegistry</span><span class="p">,</span> <span class="n">impl</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="n">Effect</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">clip</span><span class="p">,</span> <span class="n">env</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-    <span class="n">payload</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">compiler</span><span class="p">(</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="p">)(</span><span class="n">effect</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">CompileError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> returned </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, not a mapping. "</span>
-            <span class="s2">"A payload is about to be hashed and serialised, so it is plain "</span>
-            <span class="s2">"data by definition."</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="n">payload</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_cost</span><span class="p">(</span><span class="n">registry</span><span class="p">:</span> <span class="n">EffectRegistry</span><span class="p">,</span> <span class="n">impl</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="n">Effect</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">clip</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""CPU-seconds, or ``None`` for unknown — which is never zero."""</span>
-    <span class="n">estimator</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">cost</span><span class="p">(</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">estimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
-    <span class="k">return</span> <span class="n">estimator</span><span class="p">(</span><span class="n">effect</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span>
-
-
+</span><span id="line-377">
+</span><span id="line-378">
+</span><span id="line-379"><span class="k">def</span><span class="w"> </span><span class="nf">_select</span><span class="p">(</span>
+</span><span id="line-380">    <span class="n">effect</span><span class="p">:</span> <span class="n">Effect</span><span class="p">,</span>
+</span><span id="line-381">    <span class="n">registry</span><span class="p">:</span> <span class="n">EffectRegistry</span><span class="p">,</span>
+</span><span id="line-382">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-383">    <span class="n">policy</span><span class="p">:</span> <span class="n">Policy</span><span class="p">,</span>
+</span><span id="line-384">    <span class="n">available</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">frozenset</span><span class="p">],</span>
+</span><span id="line-385">    <span class="n">env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FfmpegEnv</span><span class="p">],</span>
+</span><span id="line-386"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+</span><span id="line-387">    <span class="n">check_effect_params</span><span class="p">(</span><span class="n">effect</span><span class="p">)</span>
+</span><span id="line-388">    <span class="n">candidates</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">implementations</span><span class="p">(</span><span class="n">effect</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span id="line-389">    <span class="k">if</span> <span class="ow">not</span> <span class="n">candidates</span><span class="p">:</span>
+</span><span id="line-390">        <span class="k">raise</span> <span class="n">CompileError</span><span class="p">(</span>
+</span><span id="line-391">            <span class="sa">f</span><span class="s2">"no implementation is registered for </span><span class="si">{</span><span class="n">effect</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">. This "</span>
+</span><span id="line-392">            <span class="sa">f</span><span class="s2">"process has </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">registry</span><span class="o">.</span><span class="n">effects</span><span class="p">())</span><span class="si">}</span><span class="s2">. An effect nobody "</span>
+</span><span id="line-393">            <span class="s2">"implements is a refusal, not a no-op."</span>
+</span><span id="line-394">        <span class="p">)</span>
+</span><span id="line-395">    <span class="n">grounded</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">_ground</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">env</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">)</span>
+</span><span id="line-396">    <span class="k">return</span> <span class="n">select_impl</span><span class="p">(</span><span class="n">effect</span><span class="p">,</span> <span class="n">grounded</span><span class="p">,</span> <span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">,</span> <span class="n">available_filters</span><span class="o">=</span><span class="n">available</span><span class="p">)</span>
+</span><span id="line-397">
+</span><span id="line-398">
+</span><span id="line-399"><span class="k">def</span><span class="w"> </span><span class="nf">_ground</span><span class="p">(</span><span class="n">impl</span><span class="p">,</span> <span class="n">env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FfmpegEnv</span><span class="p">]):</span>
+</span><span id="line-400"><span class="w">    </span><span class="sd">"""An ffmpeg implementation, re-stated in terms of the binary that will run it.</span>
+</span><span id="line-401">
+</span><span id="line-402"><span class="sd">    The substitution is the point. An ``ImplRef``'s declared terms are what a</span>
+</span><span id="line-403"><span class="sd">    registrant observed; which ffmpeg is present is what actually determines</span>
+</span><span id="line-404"><span class="sd">    the licence position, and the two are not the same fact. Selection, the</span>
+</span><span id="line-405"><span class="sd">    step's tier and a later audit then all read one value — the probed one.</span>
+</span><span id="line-406"><span class="sd">    """</span>
+</span><span id="line-407">    <span class="k">if</span> <span class="n">impl</span><span class="o">.</span><span class="n">backend</span> <span class="o">!=</span> <span class="s2">"ffmpeg"</span><span class="p">:</span>
+</span><span id="line-408">        <span class="k">return</span> <span class="n">impl</span>
+</span><span id="line-409">    <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-410">        <span class="k">raise</span> <span class="n">CompileError</span><span class="p">(</span>
+</span><span id="line-411">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> runs on ffmpeg, and an ffmpeg step's licence "</span>
+</span><span id="line-412">            <span class="s2">"position is a property of the binary, not of the effect — this "</span>
+</span><span id="line-413">            <span class="s2">"machine has more than one. Pass env=looks.probe(). An unknown "</span>
+</span><span id="line-414">            <span class="s2">"binary is a refusal, not a default."</span>
+</span><span id="line-415">        <span class="p">)</span>
+</span><span id="line-416">    <span class="k">if</span> <span class="ow">not</span> <span class="n">env</span><span class="o">.</span><span class="n">available</span><span class="p">:</span>
+</span><span id="line-417">        <span class="k">raise</span> <span class="n">CompileError</span><span class="p">(</span>
+</span><span id="line-418">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> runs on ffmpeg and the probed binary is not usable"</span>
+</span><span id="line-419">            <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">": </span><span class="si">{</span><span class="s1">'; '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">notes</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">env</span><span class="o">.</span><span class="n">notes</span> <span class="k">else</span> <span class="s2">"."</span><span class="p">)</span>
+</span><span id="line-420">        <span class="p">)</span>
+</span><span id="line-421">    <span class="k">return</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">impl</span><span class="p">,</span> <span class="n">terms</span><span class="o">=</span><span class="n">ffmpeg_terms</span><span class="p">(</span><span class="n">env</span><span class="p">))</span>
+</span><span id="line-422">
+</span><span id="line-423">
+</span><span id="line-424"><span class="k">def</span><span class="w"> </span><span class="nf">_tier</span><span class="p">(</span><span class="n">impl</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+</span><span id="line-425"><span class="w">    </span><span class="sd">"""The step's tier, **derived** from terms — never read off anything."""</span>
+</span><span id="line-426">    <span class="n">assessment</span> <span class="o">=</span> <span class="n">classify</span><span class="p">(</span><span class="n">impl</span><span class="o">.</span><span class="n">terms</span><span class="p">)</span>
+</span><span id="line-427">    <span class="k">if</span> <span class="n">assessment</span><span class="o">.</span><span class="n">tier</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-428">        <span class="k">raise</span> <span class="n">CompileError</span><span class="p">(</span>
+</span><span id="line-429">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> classifies to no tier (</span><span class="si">{</span><span class="n">assessment</span><span class="o">.</span><span class="n">verdict</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">). "</span>
+</span><span id="line-430">            <span class="s2">"Three regions sit off the ladder on purpose and no ceiling "</span>
+</span><span id="line-431">            <span class="s2">"reaches them, so there is nothing to compile against."</span>
+</span><span id="line-432">        <span class="p">)</span>
+</span><span id="line-433">    <span class="k">return</span> <span class="n">assessment</span><span class="o">.</span><span class="n">tier</span>
+</span><span id="line-434">
+</span><span id="line-435">
+</span><span id="line-436"><span class="k">def</span><span class="w"> </span><span class="nf">_payload</span><span class="p">(</span>
+</span><span id="line-437">    <span class="n">registry</span><span class="p">:</span> <span class="n">EffectRegistry</span><span class="p">,</span> <span class="n">impl</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="n">Effect</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">clip</span><span class="p">,</span> <span class="n">env</span>
+</span><span id="line-438"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="line-439">    <span class="n">payload</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">compiler</span><span class="p">(</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="p">)(</span><span class="n">effect</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span>
+</span><span id="line-440">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+</span><span id="line-441">        <span class="k">raise</span> <span class="n">CompileError</span><span class="p">(</span>
+</span><span id="line-442">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2"> returned </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, not a mapping. "</span>
+</span><span id="line-443">            <span class="s2">"A payload is about to be hashed and serialised, so it is plain "</span>
+</span><span id="line-444">            <span class="s2">"data by definition."</span>
+</span><span id="line-445">        <span class="p">)</span>
+</span><span id="line-446">    <span class="k">return</span> <span class="n">payload</span>
+</span><span id="line-447">
+</span><span id="line-448">
+</span><span id="line-449"><span class="k">def</span><span class="w"> </span><span class="nf">_cost</span><span class="p">(</span><span class="n">registry</span><span class="p">:</span> <span class="n">EffectRegistry</span><span class="p">,</span> <span class="n">impl</span><span class="p">,</span> <span class="n">effect</span><span class="p">:</span> <span class="n">Effect</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">clip</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
+</span><span id="line-450"><span class="w">    </span><span class="sd">"""CPU-seconds, or ``None`` for unknown — which is never zero."""</span>
+</span><span id="line-451">    <span class="n">estimator</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">cost</span><span class="p">(</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
+</span><span id="line-452">    <span class="k">if</span> <span class="n">estimator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-453">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-454">    <span class="k">return</span> <span class="n">estimator</span><span class="p">(</span><span class="n">effect</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span>
+</span><span id="line-455">
+</span><span id="line-456">
 <div class="viewcode-block" id="audit">
-<a class="viewcode-back" href="../../module_docs/looks/compile.html#looks.audit">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">audit</span><span class="p">(</span>
-    <span class="n">plan</span><span class="p">:</span> <span class="n">LookPlan</span><span class="p">,</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">policy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Policy</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">registry</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EffectRegistry</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Re-check a plan against its own declared ceiling. Raises, or returns None.</span>
+<a class="viewcode-back" href="../../_autosummary/looks.compile.html#looks.audit">[docs]</a>
+</span><span id="line-457"><span class="k">def</span><span class="w"> </span><span class="nf">audit</span><span class="p">(</span>
+</span><span id="line-458">    <span class="n">plan</span><span class="p">:</span> <span class="n">LookPlan</span><span class="p">,</span>
+</span><span id="line-459">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-460">    <span class="n">policy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Policy</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-461">    <span class="n">registry</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EffectRegistry</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-462"><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-463"><span class="w">    </span><span class="sd">"""Re-check a plan against its own declared ceiling. Raises, or returns None.</span>
+</span><span id="line-464">
+</span><span id="line-465"><span class="sd">    Call this on any plan that crossed a boundary — read from a file, received</span>
+</span><span id="line-466"><span class="sd">    over a wire, replayed from a graph. It answers one question: *may this run</span>
+</span><span id="line-467"><span class="sd">    here, now, as it stands?*</span>
+</span><span id="line-468">
+</span><span id="line-469"><span class="sd">    Nothing the plan says about its own position is believed. Each step's tier</span>
+</span><span id="line-470"><span class="sd">    is re-derived from the implementation's ``terms`` and compared to what the</span>
+</span><span id="line-471"><span class="sd">    step claims; a disagreement is a refusal naming the step, not a field to</span>
+</span><span id="line-472"><span class="sd">    refresh.</span>
+</span><span id="line-473">
+</span><span id="line-474"><span class="sd">    Args:</span>
+</span><span id="line-475"><span class="sd">        policy: The ceiling to check against. Defaults to the plan's own —</span>
+</span><span id="line-476"><span class="sd">            which is the right default and the weaker check, since a plan</span>
+</span><span id="line-477"><span class="sd">            carrying a permissive policy vouches for itself. Pass your own to</span>
+</span><span id="line-478"><span class="sd">            ask whether it may run under *your* ceiling.</span>
+</span><span id="line-479"><span class="sd">        registry: Which implementations exist here.</span>
+</span><span id="line-480">
+</span><span id="line-481"><span class="sd">    Raises:</span>
+</span><span id="line-482"><span class="sd">        PlanRefused: If a step names an implementation this process lacks, or</span>
+</span><span id="line-483"><span class="sd">            one whose ``impl_version`` has moved, or one whose stored tier</span>
+</span><span id="line-484"><span class="sd">            disagrees with its terms.</span>
+</span><span id="line-485"><span class="sd">        looks.licence.LooksLicenceError: If a step exceeds the ceiling.</span>
+</span><span id="line-486"><span class="sd">    """</span>
+</span><span id="line-487">    <span class="n">reg</span> <span class="o">=</span> <span class="n">REGISTRY</span> <span class="k">if</span> <span class="n">registry</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">registry</span>
+</span><span id="line-488">    <span class="n">ceiling</span> <span class="o">=</span> <span class="n">plan</span><span class="o">.</span><span class="n">policy</span> <span class="k">if</span> <span class="n">policy</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">policy</span>
+</span><span id="line-489">
+</span><span id="line-490">    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">steps</span><span class="p">):</span>
+</span><span id="line-491">        <span class="n">where</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"step </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">effect</span><span class="si">!r}</span><span class="s2"> via </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2">)"</span>
+</span><span id="line-492">        <span class="k">try</span><span class="p">:</span>
+</span><span id="line-493">            <span class="n">known</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">impl</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
+</span><span id="line-494">        <span class="k">except</span> <span class="n">UnknownImpl</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="line-495">            <span class="k">raise</span> <span class="n">PlanRefused</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+</span><span id="line-496">        <span class="k">if</span> <span class="n">known</span><span class="o">.</span><span class="n">impl_version</span> <span class="o">!=</span> <span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">impl_version</span><span class="p">:</span>
+</span><span id="line-497">            <span class="k">raise</span> <span class="n">PlanRefused</span><span class="p">(</span>
+</span><span id="line-498">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2"> was compiled against impl_version "</span>
+</span><span id="line-499">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">impl_version</span><span class="si">!r}</span><span class="s2">; this process has "</span>
+</span><span id="line-500">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">known</span><span class="o">.</span><span class="n">impl_version</span><span class="si">!r}</span><span class="s2">. A version lock moves when behaviour "</span>
+</span><span id="line-501">                <span class="s2">"changes, so running it here would produce different pixels "</span>
+</span><span id="line-502">                <span class="s2">"under the same plan hash."</span>
+</span><span id="line-503">            <span class="p">)</span>
+</span><span id="line-504">        <span class="n">derived</span> <span class="o">=</span> <span class="n">classify</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">terms</span><span class="p">)</span>
+</span><span id="line-505">        <span class="k">if</span> <span class="n">derived</span><span class="o">.</span><span class="n">tier</span> <span class="o">!=</span> <span class="n">step</span><span class="o">.</span><span class="n">tier</span><span class="p">:</span>
+</span><span id="line-506">            <span class="k">raise</span> <span class="n">PlanRefused</span><span class="p">(</span>
+</span><span id="line-507">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2"> claims tier </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">tier</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2">, but its own terms "</span>
+</span><span id="line-508">                <span class="sa">f</span><span class="s2">"classify to "</span>
+</span><span id="line-509">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">derived</span><span class="o">.</span><span class="n">tier</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">derived</span><span class="o">.</span><span class="n">tier</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="n">derived</span><span class="o">.</span><span class="n">verdict</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2">"</span>
+</span><span id="line-510">                <span class="s2">". A plan that could assert its position could assert itself "</span>
+</span><span id="line-511">                <span class="s2">"acceptable."</span>
+</span><span id="line-512">            <span class="p">)</span>
+</span><span id="line-513">        <span class="n">check</span><span class="p">(</span><span class="n">derived</span><span class="p">,</span> <span class="n">ceiling</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2"> in plan </span><span class="si">{</span><span class="n">plan</span><span class="o">.</span><span class="n">look_name</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'&lt;unnamed&gt;'</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
-<span class="sd">    Call this on any plan that crossed a boundary — read from a file, received</span>
-<span class="sd">    over a wire, replayed from a graph. It answers one question: *may this run</span>
-<span class="sd">    here, now, as it stands?*</span>
-
-<span class="sd">    Nothing the plan says about its own position is believed. Each step's tier</span>
-<span class="sd">    is re-derived from the implementation's ``terms`` and compared to what the</span>
-<span class="sd">    step claims; a disagreement is a refusal naming the step, not a field to</span>
-<span class="sd">    refresh.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        policy: The ceiling to check against. Defaults to the plan's own —</span>
-<span class="sd">            which is the right default and the weaker check, since a plan</span>
-<span class="sd">            carrying a permissive policy vouches for itself. Pass your own to</span>
-<span class="sd">            ask whether it may run under *your* ceiling.</span>
-<span class="sd">        registry: Which implementations exist here.</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        PlanRefused: If a step names an implementation this process lacks, or</span>
-<span class="sd">            one whose ``impl_version`` has moved, or one whose stored tier</span>
-<span class="sd">            disagrees with its terms.</span>
-<span class="sd">        looks.licence.LooksLicenceError: If a step exceeds the ceiling.</span>
-<span class="sd">    """</span>
-    <span class="n">reg</span> <span class="o">=</span> <span class="n">REGISTRY</span> <span class="k">if</span> <span class="n">registry</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">registry</span>
-    <span class="n">ceiling</span> <span class="o">=</span> <span class="n">plan</span><span class="o">.</span><span class="n">policy</span> <span class="k">if</span> <span class="n">policy</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">policy</span>
-
-    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">steps</span><span class="p">):</span>
-        <span class="n">where</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"step </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">effect</span><span class="si">!r}</span><span class="s2"> via </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">!r}</span><span class="s2">)"</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">known</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">impl</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
-        <span class="k">except</span> <span class="n">UnknownImpl</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">PlanRefused</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
-        <span class="k">if</span> <span class="n">known</span><span class="o">.</span><span class="n">impl_version</span> <span class="o">!=</span> <span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">impl_version</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">PlanRefused</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2"> was compiled against impl_version "</span>
-                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">impl_version</span><span class="si">!r}</span><span class="s2">; this process has "</span>
-                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">known</span><span class="o">.</span><span class="n">impl_version</span><span class="si">!r}</span><span class="s2">. A version lock moves when behaviour "</span>
-                <span class="s2">"changes, so running it here would produce different pixels "</span>
-                <span class="s2">"under the same plan hash."</span>
-            <span class="p">)</span>
-        <span class="n">derived</span> <span class="o">=</span> <span class="n">classify</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">terms</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">derived</span><span class="o">.</span><span class="n">tier</span> <span class="o">!=</span> <span class="n">step</span><span class="o">.</span><span class="n">tier</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">PlanRefused</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2"> claims tier </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">tier</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2">, but its own terms "</span>
-                <span class="sa">f</span><span class="s2">"classify to "</span>
-                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">derived</span><span class="o">.</span><span class="n">tier</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">derived</span><span class="o">.</span><span class="n">tier</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="n">derived</span><span class="o">.</span><span class="n">verdict</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2">"</span>
-                <span class="s2">". A plan that could assert its position could assert itself "</span>
-                <span class="s2">"acceptable."</span>
-            <span class="p">)</span>
-        <span class="n">check</span><span class="p">(</span><span class="n">derived</span><span class="p">,</span> <span class="n">ceiling</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2"> in plan </span><span class="si">{</span><span class="n">plan</span><span class="o">.</span><span class="n">look_name</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'&lt;unnamed&gt;'</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
-
-
-
+</span><span id="line-514">
+</span><span id="line-515">
 <div class="viewcode-block" id="unmet_filters">
-<a class="viewcode-back" href="../../module_docs/looks/compile.html#looks.unmet_filters">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">unmet_filters</span><span class="p">(</span><span class="n">plan</span><span class="p">:</span> <span class="n">LookPlan</span><span class="p">,</span> <span class="n">env</span><span class="p">:</span> <span class="n">FfmpegEnv</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""Filters this plan needs that this binary does not have.</span>
+<a class="viewcode-back" href="../../_autosummary/looks.compile.html#looks.unmet_filters">[docs]</a>
+</span><span id="line-516"><span class="k">def</span><span class="w"> </span><span class="nf">unmet_filters</span><span class="p">(</span><span class="n">plan</span><span class="p">:</span> <span class="n">LookPlan</span><span class="p">,</span> <span class="n">env</span><span class="p">:</span> <span class="n">FfmpegEnv</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+</span><span id="line-517"><span class="w">    </span><span class="sd">"""Filters this plan needs that this binary does not have.</span>
+</span><span id="line-518">
+</span><span id="line-519"><span class="sd">    Separate from :func:`audit` on purpose: a licence refusal is about what a</span>
+</span><span id="line-520"><span class="sd">    caller may do, and a missing filter is about what a machine can do. They</span>
+</span><span id="line-521"><span class="sd">    fail for different reasons, are fixed by different people, and collapsing</span>
+</span><span id="line-522"><span class="sd">    them produces a message that helps neither.</span>
+</span><span id="line-523"><span class="sd">    """</span>
+</span><span id="line-524">    <span class="k">if</span> <span class="ow">not</span> <span class="n">env</span><span class="o">.</span><span class="n">available</span><span class="p">:</span>
+</span><span id="line-525">        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
+</span><span id="line-526">            <span class="nb">sorted</span><span class="p">({</span><span class="n">f</span> <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">steps</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">requires_filters</span><span class="p">})</span>
+</span><span id="line-527">        <span class="p">)</span>
+</span><span id="line-528">    <span class="n">needed</span> <span class="o">=</span> <span class="p">{</span><span class="n">f</span> <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">steps</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">requires_filters</span><span class="p">}</span>
+</span><span id="line-529">    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">needed</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">filters</span><span class="p">)))</span></div>
 
-<span class="sd">    Separate from :func:`audit` on purpose: a licence refusal is about what a</span>
-<span class="sd">    caller may do, and a missing filter is about what a machine can do. They</span>
-<span class="sd">    fail for different reasons, are fixed by different people, and collapsing</span>
-<span class="sd">    them produces a message that helps neither.</span>
-<span class="sd">    """</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">env</span><span class="o">.</span><span class="n">available</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
-            <span class="nb">sorted</span><span class="p">({</span><span class="n">f</span> <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">steps</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">requires_filters</span><span class="p">})</span>
-        <span class="p">)</span>
-    <span class="n">needed</span> <span class="o">=</span> <span class="p">{</span><span class="n">f</span> <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">steps</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">requires_filters</span><span class="p">}</span>
-    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">needed</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">filters</span><span class="p">)))</span></div>
-
-
-
+</span><span id="line-530">
+</span><span id="line-531">
 <div class="viewcode-block" id="payloads">
-<a class="viewcode-back" href="../../module_docs/looks/compile.html#looks.payloads">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">payloads</span><span class="p">(</span><span class="n">plan</span><span class="p">:</span> <span class="n">LookPlan</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Mapping</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""Every step's payload, optionally for one backend.</span>
+<a class="viewcode-back" href="../../_autosummary/looks.compile.html#looks.payloads">[docs]</a>
+</span><span id="line-532"><span class="k">def</span><span class="w"> </span><span class="nf">payloads</span><span class="p">(</span><span class="n">plan</span><span class="p">:</span> <span class="n">LookPlan</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Mapping</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+</span><span id="line-533"><span class="w">    </span><span class="sd">"""Every step's payload, optionally for one backend.</span>
+</span><span id="line-534">
+</span><span id="line-535"><span class="sd">    The reading surface for a stored plan: an ``ffmpeg`` payload is fully</span>
+</span><span id="line-536"><span class="sd">    inspectable, so this is how a caller sees the exact filtergraph a plan</span>
+</span><span id="line-537"><span class="sd">    stands for without running anything.</span>
+</span><span id="line-538"><span class="sd">    """</span>
+</span><span id="line-539">    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
+</span><span id="line-540">        <span class="n">step</span><span class="o">.</span><span class="n">payload</span>
+</span><span id="line-541">        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">steps</span>
+</span><span id="line-542">        <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="n">backend</span>
+</span><span id="line-543">    <span class="p">)</span></div>
 
-<span class="sd">    The reading surface for a stored plan: an ``ffmpeg`` payload is fully</span>
-<span class="sd">    inspectable, so this is how a caller sees the exact filtergraph a plan</span>
-<span class="sd">    stands for without running anything.</span>
-<span class="sd">    """</span>
-    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
-        <span class="n">step</span><span class="o">.</span><span class="n">payload</span>
-        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">steps</span>
-        <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="n">backend</span>
-    <span class="p">)</span></div>
-
-
-
+</span><span id="line-544">
+</span><span id="line-545">
 <div class="viewcode-block" id="describe">
-<a class="viewcode-back" href="../../module_docs/looks/compile.html#looks.describe">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">describe</span><span class="p">(</span><span class="n">plan</span><span class="p">:</span> <span class="n">LookPlan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""A plan as a few lines of text — for a CLI, a log, or a review.</span>
+<a class="viewcode-back" href="../../_autosummary/looks.compile.html#looks.describe">[docs]</a>
+</span><span id="line-546"><span class="k">def</span><span class="w"> </span><span class="nf">describe</span><span class="p">(</span><span class="n">plan</span><span class="p">:</span> <span class="n">LookPlan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="line-547"><span class="w">    </span><span class="sd">"""A plan as a few lines of text — for a CLI, a log, or a review.</span>
+</span><span id="line-548">
+</span><span id="line-549"><span class="sd">    Deliberately not a round-trippable format. Serialisation is</span>
+</span><span id="line-550"><span class="sd">    :func:`looks.spec.plan_to_dict`'s job, and a second one would be a second</span>
+</span><span id="line-551"><span class="sd">    thing to keep in sync.</span>
+</span><span id="line-552"><span class="sd">    """</span>
+</span><span id="line-553">    <span class="k">if</span> <span class="ow">not</span> <span class="n">plan</span><span class="o">.</span><span class="n">steps</span><span class="p">:</span>
+</span><span id="line-554">        <span class="k">return</span> <span class="s2">"(empty plan)"</span>
+</span><span id="line-555">    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-556">    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">steps</span><span class="p">):</span>
+</span><span id="line-557">        <span class="n">cost</span> <span class="o">=</span> <span class="s2">"unknown"</span> <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">cpu_seconds</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">cpu_seconds</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s"</span>
+</span><span id="line-558">        <span class="n">span</span> <span class="o">=</span> <span class="s2">""</span> <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">at</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"  at=</span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">at</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-559">        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-560">            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">effect</span><span class="si">}</span><span class="s2"> via </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">}</span><span class="s2"> "</span>
+</span><span id="line-561">            <span class="sa">f</span><span class="s2">"[</span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">tier</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">] cpu=</span><span class="si">{</span><span class="n">cost</span><span class="si">}{</span><span class="n">span</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-562">        <span class="p">)</span>
+</span><span id="line-563">    <span class="n">total</span> <span class="o">=</span> <span class="n">plan</span><span class="o">.</span><span class="n">total_cpu_seconds</span>
+</span><span id="line-564">    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-565">        <span class="s2">"total cpu: unknown (some steps do not estimate)"</span>
+</span><span id="line-566">        <span class="k">if</span> <span class="n">plan</span><span class="o">.</span><span class="n">has_unknown_costs</span>
+</span><span id="line-567">        <span class="k">else</span> <span class="sa">f</span><span class="s2">"total cpu: </span><span class="si">{</span><span class="n">total</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s"</span>
+</span><span id="line-568">    <span class="p">)</span>
+</span><span id="line-569">    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
 
-<span class="sd">    Deliberately not a round-trippable format. Serialisation is</span>
-<span class="sd">    :func:`looks.spec.plan_to_dict`'s job, and a second one would be a second</span>
-<span class="sd">    thing to keep in sync.</span>
-<span class="sd">    """</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">plan</span><span class="o">.</span><span class="n">steps</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">"(empty plan)"</span>
-    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">steps</span><span class="p">):</span>
-        <span class="n">cost</span> <span class="o">=</span> <span class="s2">"unknown"</span> <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">cpu_seconds</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">cpu_seconds</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s"</span>
-        <span class="n">span</span> <span class="o">=</span> <span class="s2">""</span> <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">at</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"  at=</span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">at</span><span class="si">}</span><span class="s2">"</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">effect</span><span class="si">}</span><span class="s2"> via </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">impl</span><span class="si">}</span><span class="s2"> "</span>
-            <span class="sa">f</span><span class="s2">"[</span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">tier</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">] cpu=</span><span class="si">{</span><span class="n">cost</span><span class="si">}{</span><span class="n">span</span><span class="si">}</span><span class="s2">"</span>
-        <span class="p">)</span>
-    <span class="n">total</span> <span class="o">=</span> <span class="n">plan</span><span class="o">.</span><span class="n">total_cpu_seconds</span>
-    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-        <span class="s2">"total cpu: unknown (some steps do not estimate)"</span>
-        <span class="k">if</span> <span class="n">plan</span><span class="o">.</span><span class="n">has_unknown_costs</span>
-        <span class="k">else</span> <span class="sa">f</span><span class="s2">"total cpu: </span><span class="si">{</span><span class="n">total</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s"</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
-
-
-
+</span><span id="line-570">
+</span><span id="line-571">
 <div class="viewcode-block" id="compile_all">
-<a class="viewcode-back" href="../../module_docs/looks/compile.html#looks.compile_all">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">compile_all</span><span class="p">(</span><span class="n">looks_</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Look</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">LookPlan</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""Compile several Looks under one set of arguments.</span>
+<a class="viewcode-back" href="../../_autosummary/looks.compile.html#looks.compile_all">[docs]</a>
+</span><span id="line-572"><span class="k">def</span><span class="w"> </span><span class="nf">compile_all</span><span class="p">(</span><span class="n">looks_</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Look</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">LookPlan</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+</span><span id="line-573"><span class="w">    </span><span class="sd">"""Compile several Looks under one set of arguments.</span>
+</span><span id="line-574">
+</span><span id="line-575"><span class="sd">    A convenience with one real property: it compiles **all or none**. A</span>
+</span><span id="line-576"><span class="sd">    partially-compiled batch invites a caller to run the half that worked,</span>
+</span><span id="line-577"><span class="sd">    which for a set-relative Look is precisely the mistake ``resolve_across``</span>
+</span><span id="line-578"><span class="sd">    exists to prevent.</span>
+</span><span id="line-579"><span class="sd">    """</span>
+</span><span id="line-580">    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">compile_look</span><span class="p">(</span><span class="n">look</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">look</span> <span class="ow">in</span> <span class="n">looks_</span><span class="p">)</span></div>
 
-<span class="sd">    A convenience with one real property: it compiles **all or none**. A</span>
-<span class="sd">    partially-compiled batch invites a caller to run the half that worked,</span>
-<span class="sd">    which for a set-relative Look is precisely the mistake ``resolve_across``</span>
-<span class="sd">    exists to prevent.</span>
-<span class="sd">    """</span>
-    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">compile_look</span><span class="p">(</span><span class="n">look</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">look</span> <span class="ow">in</span> <span class="n">looks_</span><span class="p">)</span></div>
-
-</pre></div>
-
-           </div>
-          </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p></p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
+</span></code></pre></div>
+    </div></div>
+          </main>
         </div>
-      </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
+      </div><footer class="py-6 border-t border-border md:py-0">
+    <div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+      <div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+        <p class="text-sm leading-loose text-center text-muted-foreground md:text-left"></p>
+</div>
+</div>
+</footer>
+    </div>
+    
+    <script src="../../_static/documentation_options.js?v=3294188c"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=fd10adb8"></script>
+    <script defer="defer" src="../../_static/theme.js?v=49cc6205"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
 
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = "pre.mermaid {\n    /* Same as .mermaid-container > pre */\n    display: block;\n    width: 100%;\n}\n\npre.mermaid > svg {\n    /* Same as .mermaid-container > pre > svg */\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}";
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = ".mermaid-container {\n    position: relative;\n    display: flex;\n    flex-direction: row;\n    width: 100%;\n}\n\n.mermaid-container > pre {\n    display: block;\n    width: 100%;\n}\n\n.mermaid-container > pre > svg {\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}\n\n.mermaid-fullscreen-btn {\n    position: absolute;\n    width: 28px;\n    height: 28px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.3);\n    border-radius: 4px;\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    transition: all 0.2s;\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n    font-size: 14px;\n    line-height: 1;\n    padding: 0;\n    color: #333;\n}\n\n.mermaid-fullscreen-btn:hover {\n    opacity: 100% !important;\n    background: rgba(255, 255, 255, 1);\n    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-btn.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.3);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-btn.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal {\n    display: none;\n    position: fixed !important;\n    top: 0 !important;\n    left: 0 !important;\n    width: 95vw;\n    height: 100vh;\n    background: rgba(255, 255, 255, 0.98);\n    z-index: 9999;\n    padding: 20px;\n    overflow: auto;\n}\n\n.mermaid-fullscreen-modal.dark-theme {\n    background: rgba(0, 0, 0, 0.98);\n}\n\n.mermaid-fullscreen-modal.active {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen {\n    position: relative;\n    width: 95vw;\n    height: 90vh;\n    max-width: 95vw;\n    max-height: 90vh;\n    background: white;\n    border-radius: 8px;\n    padding: 20px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);\n    overflow: auto;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen.dark-theme {\n    background: #1a1a1a;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);\n}\n\n.mermaid-container-fullscreen pre.mermaid {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen .mermaid svg {\n    height: 100% !important;\n    width: 100% !important;\n    cursor: grab;\n}\n\n.mermaid-fullscreen-close {\n    position: fixed !important;\n    top: 20px !important;\n    right: 20px !important;\n    width: 40px;\n    height: 40px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-radius: 50%;\n    cursor: pointer;\n    z-index: 10000;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n    transition: all 0.2s;\n    font-size: 24px;\n    line-height: 1;\n    color: #333;\n}\n\n.mermaid-fullscreen-close:hover {\n    background: white;\n    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-close.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-close.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal .mermaid-fullscreen-btn {\n    display: none !important;\n}";
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+let _lazyObserver = null;
+let _renderQueue = Promise.resolve();
+let closeModal = () => {};
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('active')) {
+        closeModal();
+    }
+});
+
+// Apply d3 zoom to each SVG. Idempotent: an SVG already wrapped is skipped,
+// so this is safe to call both for the initial batch and for diagrams that
+// render lazily once they become visible.
+const addZoomToSvgs = (svgs) => {
+    svgs.each(function() {
+        if (this.getAttribute('data-zoom-applied') === 'true') return;
+        var svg = d3.select(this);
+        svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+        var inner = svg.select("g");
+        var zoom = d3.zoom().on("zoom", function(event) {
+            inner.attr("transform", event.transform);
+        });
+        svg.call(zoom);
+        this.setAttribute('data-zoom-applied', 'true');
+    });
+};
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        // Disconnect any previous lazy rendering observer
+        if (_lazyObserver) {
+            _lazyObserver.disconnect();
+            _lazyObserver = null;
+        }
+
+        all_mermaids.forEach((el) => {
+            el.removeAttribute('data-mermaid-deferred');
+            el.removeAttribute('data-mermaid-render-failed');
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+
+        // Separate visible and hidden elements. Mermaid's layout engine measures
+        // text dimensions via the DOM, which fails for elements hidden by a parent
+        // (e.g., Reveal.js non-active slides, sphinx-design unopened tabs),
+        // producing broken SVGs. Render visible elements now, defer hidden ones.
+        const visible = [];
+        const hidden = [];
+        all_mermaids.forEach((el) => {
+            // offsetParent is null for display:none ancestors.
+            // getClientRects().length > 0 catches position:fixed elements
+            // (which also have null offsetParent but are still visible).
+            if (el.offsetParent !== null || el.getClientRects().length > 0) {
+                visible.push(el);
+            } else {
+                hidden.push(el);
+                el.setAttribute('data-mermaid-deferred', 'true');
+            }
+        });
+
+        if (visible.length > 0) {
+            try {
+                await mermaid.run({ nodes: visible });
+            } catch (e) {
+                console.error("Mermaid rendering failed:", e);
+            }
+        }
+
+        // Lazily render hidden elements when they become visible.
+        // Uses a promise chain (_renderQueue) to serialize rendering,
+        // since IntersectionObserver may report multiple entries at once
+        // and mermaid.run() is not safe to call concurrently.
+        if (hidden.length > 0) {
+            if (typeof IntersectionObserver === 'undefined') {
+                console.warn("IntersectionObserver not available; hidden mermaid diagrams will not render.");
+            } else {
+                _renderQueue = Promise.resolve();
+                _lazyObserver = new IntersectionObserver((entries) => {
+                    for (const entry of entries) {
+                        if (entry.isIntersecting && entry.target.getAttribute("data-processed") !== "true") {
+                            _lazyObserver.unobserve(entry.target);
+                            const el = entry.target;
+                            _renderQueue = _renderQueue.then(async () => {
+                                try {
+                                    await mermaid.run({ nodes: [el] });
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    // Apply zoom to the now-rendered diagram, matching
+                                    // the decoration visible diagrams receive.
+                                    if (false) {
+                                        addZoomToSvgs(d3.selectAll("").select(function() {
+                                            return this.querySelector("svg");
+                                        }));
+                                    }
+                                } catch (e) {
+                                    console.error("Mermaid deferred rendering failed:", e);
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    el.setAttribute('data-mermaid-render-failed', 'true');
+                                }
+                            });
+                        }
+                    }
+                });
+                hidden.forEach((el) => _lazyObserver.observe(el));
+            }
+        }
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    // Exclude deferred (hidden) and render-failed elements from completion checks
+    const mermaids_active = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])");
+    const mermaids_processed = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])[data-processed='true']");
+
+    if (false) {
+        const mermaids_to_add_zoom = 0 === -1 ? mermaids_active.length : 0;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("").select(function() {
+                return this.querySelector("svg");
+            });
+            // Wait until every active (visible) diagram has rendered. Deferred
+            // diagrams are excluded, so a fixed d3_node_count that counts a
+            // hidden diagram no longer loops forever waiting for its SVG.
+            if(mermaids_active.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            }
+            addZoomToSvgs(svgs);
+        }
+    } else if(mermaids_active.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if (!true) return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = "\u26f6";
+        fullscreenBtn.style.opacity = "50%";
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scrollX, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.display = 'block';
+
+                if (false) {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+
+
+const load = async () => {
+    initStyles();
+
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...{"startOnLoad": false},
+                ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...{"startOnLoad": false},
+    ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+    }
+);
+
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
+    
 </body>
+
 </html>

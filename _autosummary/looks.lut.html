@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+
+<html :class="{ 'dark' : darkMode === true }" data-content_root="../" lang="en" x-data="{ darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches), activeSection: ''}">
+<head>
+<script>
+    (function () {
+      // Set initial color scheme
+      if ((localStorage.getItem("_x_darkMode") === "true") || (window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Watch for media preference changes
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+        localStorage.setItem("_x_darkMode", event.matches);
+        document.documentElement.classList.toggle("dark", event.matches);
+      });
+    })();
+  </script>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="#ffffff" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="#030711" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="looks.lut.html.md" rel="alternate" type="text/markdown"/>
+<link href="../llms.txt" rel="describedby" type="text/markdown"/>
+<link href="looks.lut.html.md" rel="alternate" type="text/markdown"/>
+<link href="llms.txt" rel="describedby"/>
+<title>looks.lut | looks</title>
+<meta content="looks.lut | looks" property="og:title"/>
+<meta content="looks.lut | looks" name="twitter:title"/>
+<link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=009055c6" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx_autodoc_typehints.css?v=057ac668" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/epythet.css?v=ecce5bdd" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="looks.motion.html" rel="next" title="looks.motion"/>
+<link href="looks.licence.html" rel="prev" title="looks.licence"/>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">looks</span>
+</a><nav class="flex items-center gap-6 text-sm font-medium">
+<a class="transition-colors hover:text-foreground/80 text-foreground/60" href="https://github.com/thorwhalen/looks" rel="noopener nofollow">GitHub</a>
+</nav></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 gap-2 sm:gap-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center gap-1">
+<button @click="darkMode = !darkMode" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" title="Toggle color scheme" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="justify-start text-sm md:!hidden bg-background" href="../index.html"><span class="font-bold text-clip whitespace-nowrap">looks</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="flex md:hidden flex-col font-medium mt-4">
+<a href="https://github.com/thorwhalen/looks" rel="nofollow noopener">GitHub</a>
+</nav><nav class="table w-full min-w-full my-6 lg:my-8">
+<ul class="current">
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../api.html">API reference<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="looks.html">looks<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l3"><a class="reference internal" href="looks.across.html">looks.across</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.cache.html">looks.cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.cli.html">looks.cli</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.compile.html">looks.compile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.environment.html">looks.environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.ffmpeg.html">looks.ffmpeg</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.frame_dependency.html">looks.frame_dependency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.geometry.html">looks.geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.licence.html">looks.licence</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">looks.lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.motion.html">looks.motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.pipe.html">looks.pipe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.registry.html">looks.registry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.spec.html">looks.spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.transition.html">looks.transition</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ai-agents.html">For AI agents</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">looks</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="../api.html">API reference</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="looks.html">looks</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">looks.lut</span>
+</nav>
+<div id="content" role="main">
+<section id="module-looks.lut">
+<span id="looks-lut"></span><h1>looks.lut<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#module-looks.lut">¶</a></h1>
+<p>Gradient-map 3D LUTs: a colour ramp in, an Iridas <code class="docutils literal notranslate"><span class="pre">.cube</span></code> out.</p>
+<p>A <strong>gradient map</strong> replaces a pixel’s colour with a colour looked up by its
+<em>lightness</em> alone. It is the right vehicle when a reference’s hue tracks its
+lightness — dark to oxblood, mid to crimson, light to coral — and it is the
+wrong one otherwise, which is why the first step is always to measure the
+reference rather than assume a filter.</p>
+<p>Two properties make it the tool for video specifically:</p>
+<ul class="simple">
+<li><p><strong>It cannot flicker.</strong> The mapping is per-pixel and stateless, so frame <em>n</em>
+and frame <em>n+1</em> are transformed by the identical function. That is the
+failure mode of every per-frame palette quantiser and of the non-commercial
+cartoon GANs, and it is bought here for free rather than defended against.
+Measured on the first real look, frame-to-frame change came out at
+0.89–1.12x the <em>source’s own</em>, i.e. the chain adds none.</p></li>
+<li><p>**It is <code class="code docutils literal notranslate"><span class="pre">lut3d</span></code>, which is LGPL.** The obvious alternative for a
+colour-shaping pass is <code class="code docutils literal notranslate"><span class="pre">eq</span></code>, and <code class="code docutils literal notranslate"><span class="pre">eq</span></code> exists only in a GPL build. So the look
+that ships is also the one that is portable.</p></li>
+</ul>
+<p>Two lessons from building the first real look are baked into the defaults and
+the validation here, because both cost real work to learn:</p>
+<ul class="simple">
+<li><p><strong>Do not end the ramp at black.</strong> A first version crushed 16.2% of pixels to
+L* 0–5 where the measured reference had 0.3%; the reference’s floor was an
+oxblood at L* 8.22, never black. Setting the dark anchor to the reference’s
+own measured value took the histogram distance from 46.7 to 32.0 pp. So
+<a class="reference internal" href="#looks.lut.gradient_map" title="looks.lut.gradient_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">gradient_map()</span></code></a> warns when a ramp’s darkest stop sits below
+<a class="reference internal" href="#looks.lut.SHADOW_FLOOR_WARN_L" title="looks.lut.SHADOW_FLOOR_WARN_L"><code class="xref py py-data docutils literal notranslate"><span class="pre">SHADOW_FLOOR_WARN_L</span></code></a>, and the default ramps do not go near it.</p></li>
+<li><p><strong>Accents must survive.</strong> A pure ramp erases every hue distinction, including
+ones the reference keeps. The first look kept warm accents (9.35% of pixels,
+every one warm) through a second, hue-keyed ramp blended in by saturation and
+hue proximity — <a class="reference internal" href="#looks.lut.Accent" title="looks.lut.Accent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Accent</span></code></a> here.</p></li>
+</ul>
+<p>Everything is stdlib. The full 33³ lattice takes ~22 ms in pure Python, so the
+headline capability needs no numpy and lives in the zero-dependency tier. The
+resulting file is ~950 KB, which is why a <code class="code docutils literal notranslate"><span class="pre">.cube</span></code> is **generated into a cache
+keyed by the ramp’s content**, never committed: the ramp is the spec, the file
+is a build artifact.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">ramp</span> <span class="o">=</span> <span class="n">Ramp</span><span class="o">.</span><span class="n">from_hex</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">'#1B0610'</span><span class="p">),</span> <span class="p">(</span><span class="mf">50.0</span><span class="p">,</span> <span class="s1">'#D5254A'</span><span class="p">),</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="s1">'#FEF0DC'</span><span class="p">)])</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">text</span> <span class="o">=</span> <span class="n">cube_text</span><span class="p">(</span><span class="n">ramp</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+</span><span id="line-4"><span class="go">'LUT_3D_SIZE 2'</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span> <span class="o">-</span> <span class="mi">5</span>          <span class="c1"># header lines are 5</span>
+</span><span id="line-6"><span class="go">8</span>
+</span></code></pre></div>
+</div>
+<p class="rubric">Module Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.lut.SHADOW_FLOOR_WARN_L" title="looks.lut.SHADOW_FLOOR_WARN_L"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SHADOW_FLOOR_WARN_L</span></code></a></p></td>
+<td><p>Lightness of the darkest stop below which <a class="reference internal" href="#looks.lut.gradient_map" title="looks.lut.gradient_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">gradient_map()</span></code></a> warns.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.lut.DFLT_CUBE_SIZE" title="looks.lut.DFLT_CUBE_SIZE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_CUBE_SIZE</span></code></a></p></td>
+<td><p>Default lattice edge length.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.lut.NEGLIGIBLE_WEIGHT" title="looks.lut.NEGLIGIBLE_WEIGHT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NEGLIGIBLE_WEIGHT</span></code></a></p></td>
+<td><p>Accent weights below this are snapped to exactly 0.0.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.lut.Rgb" title="looks.lut.Rgb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Rgb</span></code></a></p></td>
+<td><p>A colour as three floats in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>, sRGB-encoded (not linear).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.lut.DFLT_CUBE_TITLE" title="looks.lut.DFLT_CUBE_TITLE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_CUBE_TITLE</span></code></a></p></td>
+<td><p>The one place the default LUT title is written.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.lut.GENERATOR_VERSION" title="looks.lut.GENERATOR_VERSION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GENERATOR_VERSION</span></code></a></p></td>
+<td><p>Bumped when the generation algorithm changes in a way that moves a byte.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.lut.cube_key" title="looks.lut.cube_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cube_key</span></code></a>(spec, *[, size, title])</p></td>
+<td><p>A content hash of everything that determines the file's bytes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.lut.cube_text" title="looks.lut.cube_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cube_text</span></code></a>(spec, *[, size, title])</p></td>
+<td><p>Render an Iridas <code class="docutils literal notranslate"><span class="pre">.cube</span></code> for <code class="docutils literal notranslate"><span class="pre">spec</span></code>, as text.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.lut.gradient_map" title="looks.lut.gradient_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient_map</span></code></a>(ramp, *[, accent, contrast, lift])</p></td>
+<td><p>Build a <a class="reference internal" href="#looks.lut.GradientMap" title="looks.lut.GradientMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">GradientMap</span></code></a>, warning about a ramp that reaches black.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.lut.grey_at" title="looks.lut.grey_at"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grey_at</span></code></a>(level)</p></td>
+<td><p>The sRGB grey whose CIE <code class="docutils literal notranslate"><span class="pre">L*</span></code> is <code class="docutils literal notranslate"><span class="pre">level</span></code> — the inverse of <a class="reference internal" href="#looks.lut.lightness" title="looks.lut.lightness"><code class="xref py py-func docutils literal notranslate"><span class="pre">lightness()</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.lut.hex_to_rgb" title="looks.lut.hex_to_rgb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hex_to_rgb</span></code></a>(value)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">'#RRGGBB'</span></code> (or <code class="docutils literal notranslate"><span class="pre">'RRGGBB'</span></code>) to three floats in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.lut.lightness" title="looks.lut.lightness"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightness</span></code></a>(rgb)</p></td>
+<td><p>CIE <code class="docutils literal notranslate"><span class="pre">L*</span></code> in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">100]</span></code> for an sRGB colour.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.lut.linear_to_srgb" title="looks.lut.linear_to_srgb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linear_to_srgb</span></code></a>(c)</p></td>
+<td><p>Inverse of <a class="reference internal" href="#looks.lut.srgb_to_linear" title="looks.lut.srgb_to_linear"><code class="xref py py-func docutils literal notranslate"><span class="pre">srgb_to_linear()</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.lut.rgb_to_hex" title="looks.lut.rgb_to_hex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rgb_to_hex</span></code></a>(rgb)</p></td>
+<td><p>Three floats in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code> back to <code class="docutils literal notranslate"><span class="pre">'#RRGGBB'</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.lut.srgb_to_linear" title="looks.lut.srgb_to_linear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">srgb_to_linear</span></code></a>(c)</p></td>
+<td><p>The sRGB electro-optical transfer function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.lut.write_cube" title="looks.lut.write_cube"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_cube</span></code></a>(spec, path, *[, size, title])</p></td>
+<td><p>Write the <code class="docutils literal notranslate"><span class="pre">.cube</span></code> for <code class="docutils literal notranslate"><span class="pre">spec</span></code> to <code class="docutils literal notranslate"><span class="pre">path</span></code> and return it.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.lut.Accent" title="looks.lut.Accent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Accent</span></code></a>(ramp[, hue, hue_width, ...])</p></td>
+<td><p>A second ramp for colours the main ramp should not flatten.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.lut.GradientMap" title="looks.lut.GradientMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GradientMap</span></code></a>(ramp[, accent, contrast, lift])</p></td>
+<td><p>A ramp, an optional accent, and the tone adjustment applied before both.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.lut.Ramp" title="looks.lut.Ramp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ramp</span></code></a>(stops)</p></td>
+<td><p>Colours ordered by lightness — the whole specification of a gradient map.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Exceptions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.lut.LutError" title="looks.lut.LutError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LutError</span></code></a></p></td>
+<td><p>A ramp or lattice that cannot produce a usable LUT.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.lut.Accent">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">Accent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ramp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">52.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hue_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_saturation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">saturation_soft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#Accent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.Accent" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.Accent'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A second ramp for colours the main ramp should not flatten.</p>
+<p>A pure gradient map erases every hue distinction. When the reference keeps
+one — the first real look kept warm accents, 9.35% of pixels and every one
+warm — a second ramp is blended in, weighted by how saturated the source
+pixel is and how close its hue sits to <a class="reference internal" href="#looks.lut.Accent.hue" title="looks.lut.Accent.hue"><code class="xref py py-attr docutils literal notranslate"><span class="pre">hue</span></code></a>.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.lut.Accent.ramp">
+<span class="sig-name descname"><span class="pre">ramp</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.Accent.ramp" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.Accent.ramp'">¶</a></dt>
+<dd><p>The colours this accent maps to, indexed by lightness exactly as
+the main ramp is.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.lut.Ramp" title="looks.lut.Ramp"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ramp</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.lut.Accent.hue">
+<span class="sig-name descname"><span class="pre">hue</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.Accent.hue" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.Accent.hue'">¶</a></dt>
+<dd><p>Centre of the hue band to rescue, in degrees.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.lut.Accent.hue_width">
+<span class="sig-name descname"><span class="pre">hue_width</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.Accent.hue_width" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.Accent.hue_width'">¶</a></dt>
+<dd><p>Gaussian sigma of the hue window, in degrees.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.lut.Accent.min_saturation">
+<span class="sig-name descname"><span class="pre">min_saturation</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.Accent.min_saturation" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.Accent.min_saturation'">¶</a></dt>
+<dd><p>Below this saturation, weight is zero — an accent keyed
+on hue alone would recolour every near-grey pixel whose hue is
+numerically nearby but perceptually meaningless.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.lut.Accent.saturation_soft">
+<span class="sig-name descname"><span class="pre">saturation_soft</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.Accent.saturation_soft" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.Accent.saturation_soft'">¶</a></dt>
+<dd><p>Saturation range over which weight ramps from 0 to 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.lut.Accent.strength">
+<span class="sig-name descname"><span class="pre">strength</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.Accent.strength" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.Accent.strength'">¶</a></dt>
+<dd><p>Maximum blend weight, in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.lut.Accent.weight">
+<span class="sig-name descname"><span class="pre">weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#Accent.weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.Accent.weight" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.Accent.weight'">¶</a></dt>
+<dd><p>Blend weight for one source colour, in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">strength]</span></code>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">gold</span> <span class="o">=</span> <span class="n">Ramp</span><span class="o">.</span><span class="n">from_hex</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">'#2A1206'</span><span class="p">),</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="s1">'#FEF6DF'</span><span class="p">)])</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Accent</span><span class="p">(</span><span class="n">ramp</span><span class="o">=</span><span class="n">gold</span><span class="p">)</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">weight</span><span class="p">((</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.82</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">)),</span> <span class="mi">3</span><span class="p">)</span>      <span class="c1"># a saturated amber</span>
+</span><span id="line-4"><span class="go">0.695</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">weight</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>                   <span class="c1"># grey: no hue to rescue</span>
+</span><span id="line-6"><span class="go">0.0</span>
+</span><span id="line-7"><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">weight</span><span class="p">((</span><span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.30</span><span class="p">,</span> <span class="mf">0.65</span><span class="p">))</span>                <span class="c1"># blue: outside the band</span>
+</span><span id="line-8"><span class="go">0.0</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.lut.DFLT_CUBE_SIZE">
+<span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">DFLT_CUBE_SIZE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">33</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.DFLT_CUBE_SIZE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.DFLT_CUBE_SIZE'">¶</a></dt>
+<dd><p>Default lattice edge length. 33 is what Resolve, Premiere and ffmpeg’s
+<code class="code docutils literal notranslate"><span class="pre">lut3d</span></code> all handle natively and is the de-facto interchange size; 17 is
+visibly banded on a smooth ramp, 65 is 8x the file for no visible gain.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.lut.DFLT_CUBE_TITLE">
+<span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">DFLT_CUBE_TITLE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'looks_gradient_map'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.DFLT_CUBE_TITLE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.DFLT_CUBE_TITLE'">¶</a></dt>
+<dd><p>The one place the default LUT title is written. It reaches the file’s BYTES
+(an Iridas <code class="docutils literal notranslate"><span class="pre">.cube</span></code> opens with <code class="docutils literal notranslate"><span class="pre">TITLE</span> <span class="pre">"..."</span></code>), so it must also reach
+<a class="reference internal" href="#looks.lut.cube_key" title="looks.lut.cube_key"><code class="xref py py-func docutils literal notranslate"><span class="pre">cube_key()</span></code></a> — see that function’s note on the collision this closes.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.lut.GENERATOR_VERSION">
+<span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">GENERATOR_VERSION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'2'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.GENERATOR_VERSION" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.GENERATOR_VERSION'">¶</a></dt>
+<dd><p>Bumped when the generation algorithm changes in a way that moves a byte.
+Without it a cache serves artifacts built by an older generator forever, and
+nothing anywhere notices: the spec is unchanged, so the address is unchanged,
+so the stale file is a hit. This is the “pin everything that affects output”
+rule applied to this package’s own code rather than to a dependency.</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.lut.GradientMap">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">GradientMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ramp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contrast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#GradientMap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.GradientMap" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.GradientMap'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A ramp, an optional accent, and the tone adjustment applied before both.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.lut.GradientMap.ramp">
+<span class="sig-name descname"><span class="pre">ramp</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.GradientMap.ramp" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.GradientMap.ramp'">¶</a></dt>
+<dd><p>The main lightness-indexed ramp.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.lut.Ramp" title="looks.lut.Ramp"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ramp</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.lut.GradientMap.accent">
+<span class="sig-name descname"><span class="pre">accent</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.GradientMap.accent" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.GradientMap.accent'">¶</a></dt>
+<dd><p>An optional second ramp for a hue band the main ramp would
+flatten.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#looks.lut.Accent" title="looks.lut.Accent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Accent</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.lut.GradientMap.contrast">
+<span class="sig-name descname"><span class="pre">contrast</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.GradientMap.contrast" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.GradientMap.contrast'">¶</a></dt>
+<dd><p>Multiplier applied to <code class="docutils literal notranslate"><span class="pre">L*</span></code> around mid-grey before lookup.
+<code class="docutils literal notranslate"><span class="pre">&gt;1</span></code> deepens; the first real look used 1.15.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.lut.GradientMap.lift">
+<span class="sig-name descname"><span class="pre">lift</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.GradientMap.lift" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.GradientMap.lift'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">L*</span></code> offset applied after <code class="docutils literal notranslate"><span class="pre">contrast</span></code>. Negative darkens.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">gm</span> <span class="o">=</span> <span class="n">GradientMap</span><span class="p">(</span><span class="n">ramp</span><span class="o">=</span><span class="n">Ramp</span><span class="o">.</span><span class="n">from_hex</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">'#1B0610'</span><span class="p">),</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="s1">'#FEF0DC'</span><span class="p">)]))</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">rgb_to_hex</span><span class="p">(</span><span class="n">gm</span><span class="p">((</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)))</span>
+</span><span id="line-3"><span class="go">'#1B0610'</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">rgb_to_hex</span><span class="p">(</span><span class="n">gm</span><span class="p">((</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)))</span>
+</span><span id="line-5"><span class="go">'#FEF0DC'</span>
+</span></code></pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.lut.GradientMap.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#GradientMap.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.GradientMap.to_dict" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.GradientMap.to_dict'">¶</a></dt>
+<dd><p>A JSON-able form — the thing that is hashed for the cache key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="looks.lut.LutError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">LutError</span></span><a class="reference internal" href="../_modules/looks/lut.html#LutError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.LutError" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.LutError'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A ramp or lattice that cannot produce a usable LUT.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.lut.NEGLIGIBLE_WEIGHT">
+<span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">NEGLIGIBLE_WEIGHT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-09</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.NEGLIGIBLE_WEIGHT" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.NEGLIGIBLE_WEIGHT'">¶</a></dt>
+<dd><p>Accent weights below this are snapped to exactly 0.0. The hue window is a
+Gaussian, so it never truly reaches zero — a blue pixel against a warm accent
+scores ~7e-33, which is float noise rather than a blend. Snapping matters
+because <code class="code docutils literal notranslate"><span class="pre">weight()</span> <span class="pre">==</span> <span class="pre">0.0</span></code> is the predicate <a class="reference internal" href="#looks.lut.GradientMap" title="looks.lut.GradientMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">GradientMap</span></code></a> uses to skip
+the accent lookup entirely, and a predicate that is never true costs a second
+ramp evaluation on every one of 35,937 lattice points.</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.lut.Ramp">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">Ramp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stops</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#Ramp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.Ramp" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.Ramp'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>Colours ordered by lightness — the whole specification of a gradient map.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.lut.Ramp.stops">
+<span class="sig-name descname"><span class="pre">stops</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.Ramp.stops" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.Ramp.stops'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">(L*,</span> <span class="pre">rgb)</span></code> pairs, strictly increasing in <code class="docutils literal notranslate"><span class="pre">L*</span></code>, at least two.
+<code class="docutils literal notranslate"><span class="pre">L*</span></code> outside a stop’s range clamps to the nearest end.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]], <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#Ellipsis" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">Ramp</span><span class="o">.</span><span class="n">from_hex</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">'#000000'</span><span class="p">),</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="s1">'#FFFFFF'</span><span class="p">)])</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">rgb_to_hex</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mf">50.0</span><span class="p">))</span>
+</span><span id="line-3"><span class="go">'#808080'</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">rgb_to_hex</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="o">-</span><span class="mf">10.0</span><span class="p">))</span>     <span class="c1"># clamps</span>
+</span><span id="line-5"><span class="go">'#000000'</span>
+</span></code></pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.lut.Ramp.at">
+<span class="sig-name descname"><span class="pre">at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#Ramp.at"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.Ramp.at" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.Ramp.at'">¶</a></dt>
+<dd><p>The ramp colour at <code class="docutils literal notranslate"><span class="pre">L*</span></code>, linearly interpolated, clamped at the ends.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">Ramp</span><span class="o">.</span><span class="n">from_hex</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">'#000000'</span><span class="p">),</span> <span class="p">(</span><span class="mf">50.0</span><span class="p">,</span> <span class="s1">'#FF0000'</span><span class="p">),</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="s1">'#FFFFFF'</span><span class="p">)])</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">rgb_to_hex</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mf">25.0</span><span class="p">))</span>
+</span><span id="line-3"><span class="go">'#800000'</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">rgb_to_hex</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mf">75.0</span><span class="p">))</span>
+</span><span id="line-5"><span class="go">'#FF8080'</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="looks.lut.Ramp.darkest">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">darkest</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.Ramp.darkest" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.Ramp.darkest'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">L*</span></code> of the darkest stop.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Ramp</span><span class="o">.</span><span class="n">from_hex</span><span class="p">([(</span><span class="mf">8.2</span><span class="p">,</span> <span class="s1">'#2E0C18'</span><span class="p">),</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="s1">'#FEF0DC'</span><span class="p">)])</span><span class="o">.</span><span class="n">darkest</span>
+</span><span id="line-2"><span class="go">8.2</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.lut.Ramp.from_hex">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_hex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stops</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#Ramp.from_hex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.Ramp.from_hex" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.Ramp.from_hex'">¶</a></dt>
+<dd><p>Build from <code class="docutils literal notranslate"><span class="pre">(L*,</span> <span class="pre">'#RRGGBB')</span></code> pairs.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Ramp</span><span class="o">.</span><span class="n">from_hex</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">'#000000'</span><span class="p">),</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="s1">'#FFFFFF'</span><span class="p">)])</span><span class="o">.</span><span class="n">stops</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+</span><span id="line-2"><span class="go">(1.0, 1.0, 1.0)</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.lut.Ramp" title="looks.lut.Ramp"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ramp</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.lut.Ramp.neutral">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">neutral</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">stops</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#Ramp.neutral"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.Ramp.neutral" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.Ramp.neutral'">¶</a></dt>
+<dd><p>A ramp that is a true identity on greys.</p>
+<p>**A two-stop black-to-white ramp is NOT an identity, and that surprises
+people.** A ramp interpolates its stop colours in <em>sRGB</em> while indexing
+on <em>L*</em>, and those two curves are not the same one: mid-grey sRGB 0.5
+is L* 53.39, so a naive <code class="docutils literal notranslate"><span class="pre">[(0,</span> <span class="pre">black),</span> <span class="pre">(100,</span> <span class="pre">white)]</span></code> ramp returns
+sRGB 0.5339 for it. Measured through ffmpeg, that is an **8/255 shift at
+every lattice size** — 17, 33 and 65 alike, which is how you know it is
+systematic rather than interpolation error, and it peaks in the
+midtones rather than the shadows.</p>
+<p>This samples the inverse transfer instead, so greys survive. Use it as
+the smoke test for any LUT pipeline: an identity that is not an identity
+means the transfer or the lattice order is wrong.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">Ramp</span><span class="o">.</span><span class="n">neutral</span><span class="p">()</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">rgb_to_hex</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="n">lightness</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))))</span>
+</span><span id="line-3"><span class="go">'#808080'</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">rgb_to_hex</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)),</span> <span class="n">rgb_to_hex</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="mf">100.0</span><span class="p">))</span>
+</span><span id="line-5"><span class="go">('#000000', '#FFFFFF')</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.lut.Ramp" title="looks.lut.Ramp"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ramp</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.lut.Ramp.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#Ramp.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.Ramp.to_dict" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.Ramp.to_dict'">¶</a></dt>
+<dd><p>A JSON-able form, for the cache key and for persisting a Look.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.lut.Rgb">
+<span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">Rgb</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.Rgb" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.Rgb'">¶</a></dt>
+<dd><p>A colour as three floats in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>, sRGB-encoded (not linear).</p>
+<p>alias of <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.lut.SHADOW_FLOOR_WARN_L">
+<span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">SHADOW_FLOOR_WARN_L</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.SHADOW_FLOOR_WARN_L" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.SHADOW_FLOOR_WARN_L'">¶</a></dt>
+<dd><p>Lightness of the darkest stop below which <a class="reference internal" href="#looks.lut.gradient_map" title="looks.lut.gradient_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">gradient_map()</span></code></a> warns. The
+measured reference’s own floor was L* 8.22; a ramp reaching L* 3.6 crushed
+16.2% of pixels into the bottom bin where the reference had 0.3%.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.lut.cube_key">
+<span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">cube_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">33</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'looks_gradient_map'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#cube_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.cube_key" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.cube_key'">¶</a></dt>
+<dd><p>A content hash of everything that determines the file’s bytes.</p>
+<p>A 33-cube is ~950 KB, so a <code class="code docutils literal notranslate"><span class="pre">.cube</span></code> is a **build artifact generated into a
+cache**, never committed and never carried inside a Look. The ramp is the
+spec; this is its address. Two Looks with the same ramp share one file, and
+a changed ramp cannot reuse a stale one.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">Ramp</span><span class="o">.</span><span class="n">from_hex</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">'#000000'</span><span class="p">),</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="s1">'#FFFFFF'</span><span class="p">)])</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">cube_key</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">cube_key</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">==</span> <span class="n">b</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">==</span> <span class="mi">64</span>
+</span><span id="line-4"><span class="go">True</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="n">cube_key</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">17</span><span class="p">)</span> <span class="o">==</span> <span class="n">cube_key</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">33</span><span class="p">)</span>   <span class="c1"># size is identity</span>
+</span><span id="line-6"><span class="go">False</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.lut.cube_text">
+<span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">cube_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">33</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'looks_gradient_map'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#cube_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.cube_text" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.cube_text'">¶</a></dt>
+<dd><p>Render an Iridas <code class="docutils literal notranslate"><span class="pre">.cube</span></code> for <code class="docutils literal notranslate"><span class="pre">spec</span></code>, as text.</p>
+<p>The lattice order is the format’s own: <strong>red varies fastest</strong>, then green,
+then blue. Getting that backwards produces a file that loads without
+complaint and swaps the red and blue axes of every colour, which is the
+single easiest way to be wrong here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spec</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Union</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#looks.lut.Ramp" title="looks.lut.Ramp"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ramp</span></code></a>, <a class="reference internal" href="#looks.lut.GradientMap" title="looks.lut.GradientMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">GradientMap</span></code></a>]</span>) – A <a class="reference internal" href="#looks.lut.Ramp" title="looks.lut.Ramp"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ramp</span></code></a> (used with default tone) or a <a class="reference internal" href="#looks.lut.GradientMap" title="looks.lut.GradientMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">GradientMap</span></code></a>.</p></li>
+<li><p><strong>size</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span>) – Lattice edge length. 2 is legal and useful for tests.</p></li>
+<li><p><strong>title</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span>) – Written into the file’s <code class="docutils literal notranslate"><span class="pre">TITLE</span></code> line.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">ramp</span> <span class="o">=</span> <span class="n">Ramp</span><span class="o">.</span><span class="n">from_hex</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">'#000000'</span><span class="p">),</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="s1">'#FFFFFF'</span><span class="p">)])</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">text</span> <span class="o">=</span> <span class="n">cube_text</span><span class="p">(</span><span class="n">ramp</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+</span><span id="line-4"><span class="go">TITLE "looks_gradient_map"</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+</span><span id="line-6"><span class="go">LUT_3D_SIZE 2</span>
+</span></code></pre></div>
+</div>
+<p>Red fastest: entry 1 is (r=1, g=0, b=0), which for a neutral ramp is a
+dark grey rather than a bright one, because red carries only 21% of
+luminance.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">first</span><span class="p">,</span> <span class="n">second</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">5</span><span class="p">],</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">6</span><span class="p">]</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">first</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span>
+</span><span id="line-3"><span class="go">[0.0, 0.0, 0.0]</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">second</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">3</span><span class="p">)</span>
+</span><span id="line-5"><span class="go">0.532</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.lut.gradient_map">
+<span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">gradient_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ramp</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">accent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contrast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#gradient_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.gradient_map" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.gradient_map'">¶</a></dt>
+<dd><p>Build a <a class="reference internal" href="#looks.lut.GradientMap" title="looks.lut.GradientMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">GradientMap</span></code></a>, warning about a ramp that reaches black.</p>
+<p>The warning is the encoded form of a measured mistake: a ramp whose dark end
+sat at L* 3.6 crushed 16.2% of pixels into the bottom bin, where the
+reference it was matching had 0.3%. The reference’s own floor was an
+oxblood at L* 8.22 — it had <strong>no true black at all</strong>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">ok</span> <span class="o">=</span> <span class="n">gradient_map</span><span class="p">(</span><span class="n">Ramp</span><span class="o">.</span><span class="n">from_hex</span><span class="p">([(</span><span class="mf">8.2</span><span class="p">,</span> <span class="s1">'#2E0C18'</span><span class="p">),</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="s1">'#FEF0DC'</span><span class="p">)]))</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">ok</span><span class="o">.</span><span class="n">ramp</span><span class="o">.</span><span class="n">darkest</span>
+</span><span id="line-4"><span class="go">8.2</span>
+</span></code></pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">w</span><span class="p">:</span>
+</span><span id="line-2"><span class="gp">... </span>    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">'always'</span><span class="p">)</span>
+</span><span id="line-3"><span class="gp">... </span>    <span class="n">_</span> <span class="o">=</span> <span class="n">gradient_map</span><span class="p">(</span><span class="n">Ramp</span><span class="o">.</span><span class="n">from_hex</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s1">'#000000'</span><span class="p">),</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="s1">'#FFFFFF'</span><span class="p">)]))</span>
+</span><span id="line-4"><span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="p">)[:</span><span class="mi">43</span><span class="p">])</span>
+</span><span id="line-5"><span class="go">ramp reaches L* 0.0, below the L* 5.0 floor</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.lut.GradientMap" title="looks.lut.GradientMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">GradientMap</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.lut.grey_at">
+<span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">grey_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#grey_at"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.grey_at" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.grey_at'">¶</a></dt>
+<dd><p>The sRGB grey whose CIE <code class="docutils literal notranslate"><span class="pre">L*</span></code> is <code class="docutils literal notranslate"><span class="pre">level</span></code> — the inverse of <a class="reference internal" href="#looks.lut.lightness" title="looks.lut.lightness"><code class="xref py py-func docutils literal notranslate"><span class="pre">lightness()</span></code></a>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">grey_at</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="mi">6</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">0.0</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">grey_at</span><span class="p">(</span><span class="mf">100.0</span><span class="p">),</span> <span class="mi">6</span><span class="p">)</span>
+</span><span id="line-4"><span class="go">1.0</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">lightness</span><span class="p">((</span><span class="n">grey_at</span><span class="p">(</span><span class="mf">53.39</span><span class="p">),)</span> <span class="o">*</span> <span class="mi">3</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+</span><span id="line-6"><span class="go">53.39</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.lut.hex_to_rgb">
+<span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">hex_to_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#hex_to_rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.hex_to_rgb" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.hex_to_rgb'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">'#RRGGBB'</span></code> (or <code class="docutils literal notranslate"><span class="pre">'RRGGBB'</span></code>) to three floats in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">hex_to_rgb</span><span class="p">(</span><span class="s1">'#FFFFFF'</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">(1.0, 1.0, 1.0)</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">hex_to_rgb</span><span class="p">(</span><span class="s1">'000000'</span><span class="p">)</span>
+</span><span id="line-4"><span class="go">(0.0, 0.0, 0.0)</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="nb">tuple</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">hex_to_rgb</span><span class="p">(</span><span class="s1">'#D5254A'</span><span class="p">))</span>
+</span><span id="line-6"><span class="go">(0.8353, 0.1451, 0.2902)</span>
+</span><span id="line-7"><span class="gp">&gt;&gt;&gt; </span><span class="n">hex_to_rgb</span><span class="p">(</span><span class="s1">'#12345'</span><span class="p">)</span>
+</span><span id="line-8"><span class="gt">Traceback (most recent call last):</span>
+</span><span id="line-9"><span class="c">...</span>
+</span><span id="line-10"><span class="gr">looks.lut.LutError</span>: <span class="n">not a 6-digit hex colour: '#12345'</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.lut.lightness">
+<span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">lightness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#lightness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.lightness" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.lightness'">¶</a></dt>
+<dd><p>CIE <code class="docutils literal notranslate"><span class="pre">L*</span></code> in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">100]</span></code> for an sRGB colour.</p>
+<p>This is the axis a gradient map indexes on, and it is deliberately
+<em>perceptual</em> rather than a naive <code class="docutils literal notranslate"><span class="pre">(r+g+b)/3</span></code> or a coded-Y average: the
+whole point of the map is that the output’s lightness ordering matches what
+a viewer sees, and the two disagree most on saturated colour, which is
+exactly where an extreme look lives.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">lightness</span><span class="p">((</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)),</span> <span class="mi">4</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">0.0</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">lightness</span><span class="p">((</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)),</span> <span class="mi">4</span><span class="p">)</span>
+</span><span id="line-4"><span class="go">100.0</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">lightness</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)),</span> <span class="mi">2</span><span class="p">)</span>
+</span><span id="line-6"><span class="go">53.39</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.lut.linear_to_srgb">
+<span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">linear_to_srgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#linear_to_srgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.linear_to_srgb" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.linear_to_srgb'">¶</a></dt>
+<dd><p>Inverse of <a class="reference internal" href="#looks.lut.srgb_to_linear" title="looks.lut.srgb_to_linear"><code class="xref py py-func docutils literal notranslate"><span class="pre">srgb_to_linear()</span></code></a>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">linear_to_srgb</span><span class="p">(</span><span class="n">srgb_to_linear</span><span class="p">(</span><span class="mf">0.37</span><span class="p">)),</span> <span class="mi">6</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">0.37</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.lut.rgb_to_hex">
+<span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">rgb_to_hex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#rgb_to_hex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.rgb_to_hex" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.rgb_to_hex'">¶</a></dt>
+<dd><p>Three floats in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code> back to <code class="docutils literal notranslate"><span class="pre">'#RRGGBB'</span></code>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">rgb_to_hex</span><span class="p">((</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+</span><span id="line-2"><span class="go">'#FFFFFF'</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">rgb_to_hex</span><span class="p">((</span><span class="mf">0.8353</span><span class="p">,</span> <span class="mf">0.1451</span><span class="p">,</span> <span class="mf">0.2902</span><span class="p">))</span>
+</span><span id="line-4"><span class="go">'#D5254A'</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.lut.srgb_to_linear">
+<span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">srgb_to_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#srgb_to_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.srgb_to_linear" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.srgb_to_linear'">¶</a></dt>
+<dd><p>The sRGB electro-optical transfer function.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">srgb_to_linear</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">0.0</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">srgb_to_linear</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+</span><span id="line-4"><span class="go">1.0</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">srgb_to_linear</span><span class="p">(</span><span class="mf">0.5</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+</span><span id="line-6"><span class="go">0.214</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.lut.write_cube">
+<span class="sig-prename descclassname"><span class="pre">looks.lut.</span></span><span class="sig-name descname"><span class="pre">write_cube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">33</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'looks_gradient_map'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/lut.html#write_cube"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.lut.write_cube" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.lut.write_cube'">¶</a></dt>
+<dd><p>Write the <code class="docutils literal notranslate"><span class="pre">.cube</span></code> for <code class="docutils literal notranslate"><span class="pre">spec</span></code> to <code class="docutils literal notranslate"><span class="pre">path</span></code> and return it.</p>
+<p>Creates parent directories. Writing is not conditional on the file’s
+absence — the caller owns the cache policy, and this owns the bytes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#looks.lut.Accent'" class="reference internal" href="#looks.lut.Accent"><code class="docutils literal notranslate"><span class="pre">Accent</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.lut.Accent.ramp'" class="reference internal" href="#looks.lut.Accent.ramp"><code class="docutils literal notranslate"><span class="pre">Accent.ramp</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.Accent.hue'" class="reference internal" href="#looks.lut.Accent.hue"><code class="docutils literal notranslate"><span class="pre">Accent.hue</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.Accent.hue_width'" class="reference internal" href="#looks.lut.Accent.hue_width"><code class="docutils literal notranslate"><span class="pre">Accent.hue_width</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.Accent.min_saturation'" class="reference internal" href="#looks.lut.Accent.min_saturation"><code class="docutils literal notranslate"><span class="pre">Accent.min_saturation</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.Accent.saturation_soft'" class="reference internal" href="#looks.lut.Accent.saturation_soft"><code class="docutils literal notranslate"><span class="pre">Accent.saturation_soft</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.Accent.strength'" class="reference internal" href="#looks.lut.Accent.strength"><code class="docutils literal notranslate"><span class="pre">Accent.strength</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.Accent.weight'" class="reference internal" href="#looks.lut.Accent.weight"><code class="docutils literal notranslate"><span class="pre">Accent.weight()</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#looks.lut.DFLT_CUBE_SIZE'" class="reference internal" href="#looks.lut.DFLT_CUBE_SIZE"><code class="docutils literal notranslate"><span class="pre">DFLT_CUBE_SIZE</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.DFLT_CUBE_TITLE'" class="reference internal" href="#looks.lut.DFLT_CUBE_TITLE"><code class="docutils literal notranslate"><span class="pre">DFLT_CUBE_TITLE</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.GENERATOR_VERSION'" class="reference internal" href="#looks.lut.GENERATOR_VERSION"><code class="docutils literal notranslate"><span class="pre">GENERATOR_VERSION</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.GradientMap'" class="reference internal" href="#looks.lut.GradientMap"><code class="docutils literal notranslate"><span class="pre">GradientMap</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.lut.GradientMap.ramp'" class="reference internal" href="#looks.lut.GradientMap.ramp"><code class="docutils literal notranslate"><span class="pre">GradientMap.ramp</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.GradientMap.accent'" class="reference internal" href="#looks.lut.GradientMap.accent"><code class="docutils literal notranslate"><span class="pre">GradientMap.accent</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.GradientMap.contrast'" class="reference internal" href="#looks.lut.GradientMap.contrast"><code class="docutils literal notranslate"><span class="pre">GradientMap.contrast</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.GradientMap.lift'" class="reference internal" href="#looks.lut.GradientMap.lift"><code class="docutils literal notranslate"><span class="pre">GradientMap.lift</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.GradientMap.to_dict'" class="reference internal" href="#looks.lut.GradientMap.to_dict"><code class="docutils literal notranslate"><span class="pre">GradientMap.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#looks.lut.LutError'" class="reference internal" href="#looks.lut.LutError"><code class="docutils literal notranslate"><span class="pre">LutError</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.NEGLIGIBLE_WEIGHT'" class="reference internal" href="#looks.lut.NEGLIGIBLE_WEIGHT"><code class="docutils literal notranslate"><span class="pre">NEGLIGIBLE_WEIGHT</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.Ramp'" class="reference internal" href="#looks.lut.Ramp"><code class="docutils literal notranslate"><span class="pre">Ramp</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.lut.Ramp.stops'" class="reference internal" href="#looks.lut.Ramp.stops"><code class="docutils literal notranslate"><span class="pre">Ramp.stops</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.Ramp.at'" class="reference internal" href="#looks.lut.Ramp.at"><code class="docutils literal notranslate"><span class="pre">Ramp.at()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.Ramp.darkest'" class="reference internal" href="#looks.lut.Ramp.darkest"><code class="docutils literal notranslate"><span class="pre">Ramp.darkest</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.Ramp.from_hex'" class="reference internal" href="#looks.lut.Ramp.from_hex"><code class="docutils literal notranslate"><span class="pre">Ramp.from_hex()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.Ramp.neutral'" class="reference internal" href="#looks.lut.Ramp.neutral"><code class="docutils literal notranslate"><span class="pre">Ramp.neutral()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.Ramp.to_dict'" class="reference internal" href="#looks.lut.Ramp.to_dict"><code class="docutils literal notranslate"><span class="pre">Ramp.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#looks.lut.Rgb'" class="reference internal" href="#looks.lut.Rgb"><code class="docutils literal notranslate"><span class="pre">Rgb</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.SHADOW_FLOOR_WARN_L'" class="reference internal" href="#looks.lut.SHADOW_FLOOR_WARN_L"><code class="docutils literal notranslate"><span class="pre">SHADOW_FLOOR_WARN_L</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.cube_key'" class="reference internal" href="#looks.lut.cube_key"><code class="docutils literal notranslate"><span class="pre">cube_key()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.cube_text'" class="reference internal" href="#looks.lut.cube_text"><code class="docutils literal notranslate"><span class="pre">cube_text()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.gradient_map'" class="reference internal" href="#looks.lut.gradient_map"><code class="docutils literal notranslate"><span class="pre">gradient_map()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.grey_at'" class="reference internal" href="#looks.lut.grey_at"><code class="docutils literal notranslate"><span class="pre">grey_at()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.hex_to_rgb'" class="reference internal" href="#looks.lut.hex_to_rgb"><code class="docutils literal notranslate"><span class="pre">hex_to_rgb()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.lightness'" class="reference internal" href="#looks.lut.lightness"><code class="docutils literal notranslate"><span class="pre">lightness()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.linear_to_srgb'" class="reference internal" href="#looks.lut.linear_to_srgb"><code class="docutils literal notranslate"><span class="pre">linear_to_srgb()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.rgb_to_hex'" class="reference internal" href="#looks.lut.rgb_to_hex"><code class="docutils literal notranslate"><span class="pre">rgb_to_hex()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.srgb_to_linear'" class="reference internal" href="#looks.lut.srgb_to_linear"><code class="docutils literal notranslate"><span class="pre">srgb_to_linear()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.lut.write_cube'" class="reference internal" href="#looks.lut.write_cube"><code class="docutils literal notranslate"><span class="pre">write_cube()</span></code></a></li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left"></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=3294188c"></script>
+<script src="../_static/doctools.js?v=fd6eb6e6"></script>
+<script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=fd10adb8"></script>
+<script defer="defer" src="../_static/theme.js?v=49cc6205"></script>
+</body>
+</html>

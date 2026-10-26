@@ -1,0 +1,32 @@
+looks.frame\_dependency
+=======================
+
+.. automodule:: looks.frame_dependency
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      PROBE_SIZE
+      SEAM_MARGIN
+      NOISE_FLOOR
+      UNDETERMINED
+      FLICKER_FREE
+      DETERMINISM_PROBE_FRAMES
+      TEMPORAL_PROBE_FRAMES
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      assert_flicker_free
+      classify
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Dependency
+      DependencyReport
+   

@@ -1,4 +1,0 @@
-looks.licence
-=============
-.. automodule:: looks.licence
-   :members:

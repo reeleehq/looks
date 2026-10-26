@@ -1,4 +1,0 @@
-looks.ffmpeg
-============
-.. automodule:: looks.ffmpeg
-   :members:

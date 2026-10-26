@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+
+<html :class="{ 'dark' : darkMode === true }" data-content_root="../" lang="en" x-data="{ darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches), activeSection: ''}">
+<head>
+<script>
+    (function () {
+      // Set initial color scheme
+      if ((localStorage.getItem("_x_darkMode") === "true") || (window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Watch for media preference changes
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+        localStorage.setItem("_x_darkMode", event.matches);
+        document.documentElement.classList.toggle("dark", event.matches);
+      });
+    })();
+  </script>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="#ffffff" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="#030711" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="looks.geometry.html.md" rel="alternate" type="text/markdown"/>
+<link href="../llms.txt" rel="describedby" type="text/markdown"/>
+<link href="looks.geometry.html.md" rel="alternate" type="text/markdown"/>
+<link href="llms.txt" rel="describedby"/>
+<title>looks.geometry | looks</title>
+<meta content="looks.geometry | looks" property="og:title"/>
+<meta content="looks.geometry | looks" name="twitter:title"/>
+<link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=009055c6" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx_autodoc_typehints.css?v=057ac668" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/epythet.css?v=ecce5bdd" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="looks.licence.html" rel="next" title="looks.licence"/>
+<link href="looks.frame_dependency.html" rel="prev" title="looks.frame_dependency"/>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">looks</span>
+</a><nav class="flex items-center gap-6 text-sm font-medium">
+<a class="transition-colors hover:text-foreground/80 text-foreground/60" href="https://github.com/thorwhalen/looks" rel="noopener nofollow">GitHub</a>
+</nav></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 gap-2 sm:gap-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center gap-1">
+<button @click="darkMode = !darkMode" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" title="Toggle color scheme" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="justify-start text-sm md:!hidden bg-background" href="../index.html"><span class="font-bold text-clip whitespace-nowrap">looks</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="flex md:hidden flex-col font-medium mt-4">
+<a href="https://github.com/thorwhalen/looks" rel="nofollow noopener">GitHub</a>
+</nav><nav class="table w-full min-w-full my-6 lg:my-8">
+<ul class="current">
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../api.html">API reference<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="looks.html">looks<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l3"><a class="reference internal" href="looks.across.html">looks.across</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.cache.html">looks.cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.cli.html">looks.cli</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.compile.html">looks.compile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.environment.html">looks.environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.ffmpeg.html">looks.ffmpeg</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.frame_dependency.html">looks.frame_dependency</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">looks.geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.licence.html">looks.licence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.lut.html">looks.lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.motion.html">looks.motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.pipe.html">looks.pipe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.registry.html">looks.registry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.spec.html">looks.spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.transition.html">looks.transition</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ai-agents.html">For AI agents</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">looks</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="../api.html">API reference</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="looks.html">looks</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">looks.geometry</span>
+</nav>
+<div id="content" role="main">
+<section id="module-looks.geometry">
+<span id="looks-geometry"></span><h1>looks.geometry<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#module-looks.geometry">¶</a></h1>
+<p>Where a source frame lands inside a target frame. Pure arithmetic.</p>
+<p>No I/O, no media library, no ffmpeg, no numpy. Every function here is total:
+give it two sizes and a mode and it answers, with no file open and nothing
+decoded. That is what lets one answer drive an ffmpeg filter chain, a moviepy
+composite, a CSS <code class="docutils literal notranslate"><span class="pre">object-fit</span></code> preview, or a cost estimate — and it is why the
+geometry tier can be a <em>spec</em> rather than a call.</p>
+<p><strong>The rounding rule is part of the answer, not an implementation detail.</strong>
+<code class="code docutils literal notranslate"><span class="pre">mixing</span></code> and moviepy truncate; ffmpeg’s <code class="docutils literal notranslate"><span class="pre">force_original_aspect_ratio</span></code> rounds.
+On real inputs they disagree: 1920x1080 into 1080x1920 gives <code class="docutils literal notranslate"><span class="pre">1080/(16/9)</span> <span class="pre">=</span>
+<span class="pre">607.5</span></code>, which truncates to <strong>607</strong> and rounds to <strong>608</strong>. One pixel row, and a
+total black-to-white difference at the seam. A spec whose rendered result
+depends on which backend read it is not a spec, so the rule travels inside the
+<a class="reference internal" href="#looks.geometry.Placement" title="looks.geometry.Placement"><code class="xref py py-class docutils literal notranslate"><span class="pre">Placement</span></code></a>.</p>
+<p>The three modes are the ones <code class="code docutils literal notranslate"><span class="pre">mixing</span></code> already had, and they answer three
+different questions:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">stretch</span></code> — fill the target exactly, distorting. The only mode that changes
+the aspect ratio.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fit</span></code> — the whole source is visible; the target is padded. Nothing is lost.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fill</span></code> — the target is covered; the source is cropped. Nothing is padded.</p></li>
+</ul>
+<p><code class="code docutils literal notranslate"><span class="pre">mixing</span></code>’s fourth, <code class="docutils literal notranslate"><span class="pre">social</span></code>, is not a fourth mode: it is <code class="docutils literal notranslate"><span class="pre">fit</span></code> with a
+blurred, dimmed copy of the source behind it instead of a solid colour. That is
+a <a class="reference internal" href="#looks.geometry.Backdrop" title="looks.geometry.Backdrop"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backdrop</span></code></a>, and separating the two is what lets a caller put a blurred
+backdrop behind a <code class="docutils literal notranslate"><span class="pre">fill</span></code> or a solid colour behind a <code class="docutils literal notranslate"><span class="pre">social</span></code> layout without
+a fifth mode appearing.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">placement</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">1080</span><span class="p">,</span> <span class="mi">1920</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"fit"</span><span class="p">)</span><span class="o">.</span><span class="n">scale</span>
+</span><span id="line-2"><span class="go">Size(width=1080, height=607)</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">placement</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">1080</span><span class="p">,</span> <span class="mi">1920</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"fit"</span><span class="p">,</span>
+</span><span id="line-4"><span class="gp">... </span>          <span class="n">rounding</span><span class="o">=</span><span class="s2">"exact_half_away"</span><span class="p">)</span><span class="o">.</span><span class="n">scale</span>
+</span><span id="line-5"><span class="go">Size(width=1080, height=608)</span>
+</span></code></pre></div>
+</div>
+<p class="rubric">Module Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.geometry.DFLT_ROUNDING" title="looks.geometry.DFLT_ROUNDING"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_ROUNDING</span></code></a></p></td>
+<td><p>How a non-integer size is resolved.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.geometry.DFLT_BACKDROP_BLUR_SIGMA" title="looks.geometry.DFLT_BACKDROP_BLUR_SIGMA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_BACKDROP_BLUR_SIGMA</span></code></a></p></td>
+<td><p>Backdrop defaults, transcribed from <code class="docutils literal notranslate"><span class="pre">mixing.resize_to_dimensions</span></code>'s <code class="docutils literal notranslate"><span class="pre">method="social"</span></code> branch so the extracted version reproduces it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.geometry.SOCIAL_SIZES" title="looks.geometry.SOCIAL_SIZES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SOCIAL_SIZES</span></code></a></p></td>
+<td><p>Named target sizes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.geometry.Backdrop" title="looks.geometry.Backdrop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Backdrop</span></code></a></p></td>
+<td><p>What fills the part of the target the placed frame does not cover.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.geometry.center_box" title="looks.geometry.center_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">center_box</span></code></a>(inner, outer)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">inner</span></code> centred in <code class="docutils literal notranslate"><span class="pre">outer</span></code>, halving with the floor <code class="code docutils literal notranslate"><span class="pre">mixing</span></code> used.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.geometry.ffmpeg_chain" title="looks.geometry.ffmpeg_chain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ffmpeg_chain</span></code></a>(placement, *[, backdrop])</p></td>
+<td><p>The resolved <code class="docutils literal notranslate"><span class="pre">scale,crop,pad</span></code> chain for one placement.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.geometry.placement" title="looks.geometry.placement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">placement</span></code></a>(source, target, *[, mode, rounding])</p></td>
+<td><p>The full geometric answer for one clip.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.geometry.reframe" title="looks.geometry.reframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reframe</span></code></a>(source, target, *[, mode, backdrop, ...])</p></td>
+<td><p><a class="reference internal" href="#looks.geometry.placement" title="looks.geometry.placement"><code class="xref py py-func docutils literal notranslate"><span class="pre">placement()</span></code></a> plus a backdrop.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.geometry.scaled_size" title="looks.geometry.scaled_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scaled_size</span></code></a>(source, target, *[, mode, rounding])</p></td>
+<td><p>The size the source is scaled to, before any crop or pad.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.geometry.snap_even" title="looks.geometry.snap_even"><code class="xref py py-obj docutils literal notranslate"><span class="pre">snap_even</span></code></a>(size)</p></td>
+<td><p>Both axes rounded <strong>down</strong> to even — the yuv420p requirement.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.geometry.social_size" title="looks.geometry.social_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">social_size</span></code></a>(name)</p></td>
+<td><p>Resolve a <a class="reference internal" href="#looks.geometry.SOCIAL_SIZES" title="looks.geometry.SOCIAL_SIZES"><code class="xref py py-data docutils literal notranslate"><span class="pre">SOCIAL_SIZES</span></code></a> preset name.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.geometry.Blurred" title="looks.geometry.Blurred"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Blurred</span></code></a>([sigma, dim])</p></td>
+<td><p>A blurred, dimmed copy of the source, scaled to cover — the "social" look.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.geometry.Box" title="looks.geometry.Box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Box</span></code></a>(x, y, width, height)</p></td>
+<td><p>An axis-aligned pixel box, top-left origin, y downwards.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.geometry.Placement" title="looks.geometry.Placement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Placement</span></code></a>(source, target, scale[, crop, ...])</p></td>
+<td><p>Scale the source to <code class="xref py py-attr docutils literal notranslate"><span class="pre">scale</span></code>, take <code class="xref py py-attr docutils literal notranslate"><span class="pre">crop</span></code> out, put it at <code class="xref py py-attr docutils literal notranslate"><span class="pre">offset</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.geometry.Reframe" title="looks.geometry.Reframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Reframe</span></code></a>(placement[, backdrop])</p></td>
+<td><p>A placement plus what fills the part of the target it does not cover.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.geometry.Size" title="looks.geometry.Size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Size</span></code></a>(width, height)</p></td>
+<td><p>A pixel size.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.geometry.Solid" title="looks.geometry.Solid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Solid</span></code></a>([rgb])</p></td>
+<td><p>A flat colour behind the placed frame.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Exceptions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.geometry.GeometryError" title="looks.geometry.GeometryError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GeometryError</span></code></a></p></td>
+<td><p>A size or mode that cannot produce a placement.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.geometry.Backdrop">
+<span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">Backdrop</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.Backdrop" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.Backdrop'">¶</a></dt>
+<dd><p>What fills the part of the target the placed frame does not cover.</p>
+<p>alias of <a class="reference internal" href="#looks.geometry.Solid" title="looks.geometry.Solid"><code class="xref py py-class docutils literal notranslate"><span class="pre">Solid</span></code></a> | <a class="reference internal" href="#looks.geometry.Blurred" title="looks.geometry.Blurred"><code class="xref py py-class docutils literal notranslate"><span class="pre">Blurred</span></code></a></p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.geometry.Blurred">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">Blurred</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/geometry.html#Blurred"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.Blurred" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.Blurred'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A blurred, dimmed copy of the source, scaled to cover — the “social” look.</p>
+<p>This is <code class="code docutils literal notranslate"><span class="pre">mixing</span></code>’s <code class="docutils literal notranslate"><span class="pre">method="social"</span></code>, separated from the fit mode so that
+the two compose. Its defaults reproduce that branch.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Blurred</span><span class="p">()</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="n">Blurred</span><span class="p">()</span><span class="o">.</span><span class="n">dim</span>
+</span><span id="line-2"><span class="go">(15.0, 0.7)</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.geometry.Box">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">Box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/geometry.html#Box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.Box" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.Box'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>An axis-aligned pixel box, top-left origin, y downwards.</p>
+<p>Deliberately <strong>not</strong> <code class="docutils literal notranslate"><span class="pre">burns.Rect</span></code>: that one is normalised to <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>
+over a source image and interpolates over time. This one is integer pixels
+in one frame and does not move. The distinction is the same one that keeps
+the two packages apart — <code class="docutils literal notranslate"><span class="pre">burns</span></code> owns <em>authored</em> geometry over time,
+<code class="docutils literal notranslate"><span class="pre">looks</span></code> owns geometry <em>derived</em> from a pair of sizes.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Box</span><span class="p">(</span><span class="mi">240</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1439</span><span class="p">,</span> <span class="mi">1080</span><span class="p">)</span><span class="o">.</span><span class="n">size</span>
+</span><span id="line-2"><span class="go">Size(width=1439, height=1080)</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.geometry.DFLT_BACKDROP_BLUR_SIGMA">
+<span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">DFLT_BACKDROP_BLUR_SIGMA</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">15.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.DFLT_BACKDROP_BLUR_SIGMA" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.DFLT_BACKDROP_BLUR_SIGMA'">¶</a></dt>
+<dd><p>Backdrop defaults, transcribed from <code class="docutils literal notranslate"><span class="pre">mixing.resize_to_dimensions</span></code>’s
+<code class="docutils literal notranslate"><span class="pre">method="social"</span></code> branch so the extracted version reproduces it.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.geometry.DFLT_ROUNDING">
+<span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">DFLT_ROUNDING</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">Literal</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'exact_floor'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'exact_half_away'</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'exact_floor'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.DFLT_ROUNDING" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.DFLT_ROUNDING'">¶</a></dt>
+<dd><p>How a non-integer size is resolved. **Both names carry the arithmetic domain,
+not just the tie-break**, because the ambiguous word is what produced a bug.</p>
+<p><code class="docutils literal notranslate"><span class="pre">"exact_floor"</span></code> reproduces <code class="docutils literal notranslate"><span class="pre">mixing.resize_to_dimensions</span></code>: the floor of an
+exact rational. <code class="docutils literal notranslate"><span class="pre">"exact_half_away"</span></code> reproduces ffmpeg’s
+<code class="docutils literal notranslate"><span class="pre">force_original_aspect_ratio</span></code>, which is <code class="docutils literal notranslate"><span class="pre">av_rescale</span></code> with
+<code class="docutils literal notranslate"><span class="pre">AV_ROUND_NEAR_INF</span></code> — half <strong>away from zero</strong>, on exact int64 rationals.</p>
+<p>Both are computed with integer arithmetic. An earlier version used
+<code class="docutils literal notranslate"><span class="pre">int(round(value))</span></code> on a float, which is Python’s half-to-<strong>even</strong> — a
+different rule that disagrees with ffmpeg on <strong>6 of 4000</strong> ordinary
+source/target pairs, and the one doctest that had been chosen
+(1920x1080 -&gt; 1080x1920, 607 against 608) is precisely a case where the
+divergence is invisible because 608 happens to be even. Float truncation had
+the same latent problem for <code class="docutils literal notranslate"><span class="pre">floor</span></code>: a <code class="code docutils literal notranslate"><span class="pre">Placement</span></code> that renders differently
+depending on who reads it is exactly what carrying the rule was meant to
+prevent.</p>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="looks.geometry.GeometryError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">GeometryError</span></span><a class="reference internal" href="../_modules/looks/geometry.html#GeometryError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.GeometryError" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.GeometryError'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A size or mode that cannot produce a placement.</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.geometry.Placement">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">Placement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rounding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exact_floor'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/geometry.html#Placement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.Placement" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.Placement'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>Scale the source to <code class="xref py py-attr docutils literal notranslate"><span class="pre">scale</span></code>, take <code class="xref py py-attr docutils literal notranslate"><span class="pre">crop</span></code> out, put it at <code class="xref py py-attr docutils literal notranslate"><span class="pre">offset</span></code>.</p>
+<p><code class="xref py py-attr docutils literal notranslate"><span class="pre">crop</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">offset</span></code> are <code class="docutils literal notranslate"><span class="pre">None</span></code> when that pass is a no-op, so a
+backend emits nothing for it rather than an identity filter. That matters
+for more than tidiness: an identity <code class="docutils literal notranslate"><span class="pre">scale</span></code> still resamples, and a chain
+that resamples when it did not need to loses detail for free.</p>
+<p><code class="xref py py-attr docutils literal notranslate"><span class="pre">rounding</span></code> is carried, not assumed — see the module docstring.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">placement</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">641</span><span class="p">,</span> <span class="mi">481</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"fill"</span><span class="p">)</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">scale</span>
+</span><span id="line-3"><span class="go">Size(width=1920, height=1440)</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">crop</span>
+</span><span id="line-5"><span class="go">Box(x=0, y=180, width=1920, height=1080)</span>
+</span><span id="line-6"><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">offset</span> <span class="ow">is</span> <span class="kc">None</span>
+</span><span id="line-7"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="looks.geometry.Placement.resamples">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">resamples</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">bool</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.Placement.resamples" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.Placement.resamples'">¶</a></dt>
+<dd><p>Whether this placement actually changes the pixel grid.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">placement</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">36</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">36</span><span class="p">))</span><span class="o">.</span><span class="n">resamples</span>
+</span><span id="line-2"><span class="go">False</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">placement</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">36</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">72</span><span class="p">))</span><span class="o">.</span><span class="n">resamples</span>
+</span><span id="line-4"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.geometry.Reframe">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">Reframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">placement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backdrop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Solid()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/geometry.html#Reframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.Reframe" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.Reframe'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A placement plus what fills the part of the target it does not cover.</p>
+<p>This is the shape a <code class="docutils literal notranslate"><span class="pre">Look</span></code> stores: geometry is a spec, and a spec has to
+say what the empty region contains, or two backends will disagree about it.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">reframe</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">480</span><span class="p">,</span> <span class="mi">850</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">))</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">placement</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">backdrop</span>
+</span><span id="line-3"><span class="go">((437, 0), Solid(rgb=(0, 0, 0)))</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">reframe</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">480</span><span class="p">,</span> <span class="mi">850</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">),</span> <span class="n">backdrop</span><span class="o">=</span><span class="n">Blurred</span><span class="p">())</span><span class="o">.</span><span class="n">backdrop</span>
+</span><span id="line-5"><span class="go">Blurred(sigma=15.0, dim=0.7)</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.geometry.SOCIAL_SIZES">
+<span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">SOCIAL_SIZES</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">dict</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">tuple</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">int</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">int</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'shorts':</span> <span class="pre">(1080,</span> <span class="pre">1920),</span> <span class="pre">'square':</span> <span class="pre">(1080,</span> <span class="pre">1080),</span> <span class="pre">'story':</span> <span class="pre">(1080,</span> <span class="pre">1920),</span> <span class="pre">'tiktok':</span> <span class="pre">(1080,</span> <span class="pre">1920),</span> <span class="pre">'youtube':</span> <span class="pre">(1920,</span> <span class="pre">1080)}</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.SOCIAL_SIZES" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.SOCIAL_SIZES'">¶</a></dt>
+<dd><p>Named target sizes. Kept because callers ask for “a YouTube Short”, not for
+1080x1920 — but see <a class="reference internal" href="#looks.geometry.social_size" title="looks.geometry.social_size"><code class="xref py py-func docutils literal notranslate"><span class="pre">social_size()</span></code></a>: these are a <em>convenience over</em>
+<a class="reference internal" href="#looks.geometry.Size" title="looks.geometry.Size"><code class="xref py py-class docutils literal notranslate"><span class="pre">Size</span></code></a>, never a parallel vocabulary. Nothing in this module takes a
+preset name; they resolve to a <code class="code docutils literal notranslate"><span class="pre">Size</span></code> at the boundary.</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.geometry.Size">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">Size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/geometry.html#Size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.Size" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.Size'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A pixel size. <code class="xref py py-attr docutils literal notranslate"><span class="pre">aspect</span></code> is width/height, never the other way round.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Size</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">)</span><span class="o">.</span><span class="n">aspect</span>
+</span><span id="line-2"><span class="go">1.7777777777777777</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">Size</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</span><span id="line-4"><span class="gt">Traceback (most recent call last):</span>
+</span><span id="line-5"><span class="c">...</span>
+</span><span id="line-6"><span class="gr">looks.geometry.GeometryError</span>: <span class="n">a Size must be positive, got 0x10</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.geometry.Solid">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">Solid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/geometry.html#Solid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.Solid" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.Solid'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A flat colour behind the placed frame.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Solid</span><span class="p">()</span><span class="o">.</span><span class="n">rgb</span>
+</span><span id="line-2"><span class="go">(0, 0, 0)</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.geometry.center_box">
+<span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">center_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/geometry.html#center_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.center_box" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.center_box'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">inner</span></code> centred in <code class="docutils literal notranslate"><span class="pre">outer</span></code>, halving with the floor <code class="code docutils literal notranslate"><span class="pre">mixing</span></code> used.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">center_box</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">1439</span><span class="p">,</span> <span class="mi">1080</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">))</span>
+</span><span id="line-2"><span class="go">Box(x=240, y=0, width=1439, height=1080)</span>
+</span></code></pre></div>
+</div>
+<p>An odd leftover goes to the right/bottom, because the offset floors:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">center_box</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</span><span id="line-2"><span class="go">Box(x=0, y=0, width=3, height=1)</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.geometry.Box" title="looks.geometry.Box"><code class="xref py py-class docutils literal notranslate"><span class="pre">Box</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.geometry.ffmpeg_chain">
+<span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">ffmpeg_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">placement</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">backdrop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/geometry.html#ffmpeg_chain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.ffmpeg_chain" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.ffmpeg_chain'">¶</a></dt>
+<dd><p>The resolved <code class="docutils literal notranslate"><span class="pre">scale,crop,pad</span></code> chain for one placement.</p>
+<p><strong>Resolved, not deferred.</strong> ffmpeg can express fit and fill without knowing
+the source size, via <code class="docutils literal notranslate"><span class="pre">scale=W:H:force_original_aspect_ratio=decrease</span></code>, and
+that form is nearly identical — but <em>nearly</em> is the problem: it rounds where
+this floors, so 1920x1080 into 1080x1920 differs by one row and the seam
+goes black-to-white. More fundamentally, a placement that does not know its
+source size cannot be inspected or diffed, which is the premise of the whole
+package. Resolve against the clip, then emit.</p>
+<p>Only a solid backdrop is emitted here; a <a class="reference internal" href="#looks.geometry.Blurred" title="looks.geometry.Blurred"><code class="xref py py-class docutils literal notranslate"><span class="pre">Blurred</span></code></a> backdrop needs a
+second copy of the input and therefore a two-branch graph, which is the
+compiler’s business rather than this function’s.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">placement</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">480</span><span class="p">,</span> <span class="mi">850</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">))</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">ffmpeg_chain</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</span><span id="line-3"><span class="go">'scale=406:720,pad=1280:720:437:0:color=0x000000'</span>
+</span></code></pre></div>
+</div>
+<p>Filling crops instead of padding:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">placement</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">480</span><span class="p">,</span> <span class="mi">850</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"fill"</span><span class="p">)</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">ffmpeg_chain</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</span><span id="line-3"><span class="go">'scale=1280:2266,crop=1280:720:0:773'</span>
+</span></code></pre></div>
+</div>
+<p>A no-op placement emits a no-op chain, not an identity scale:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">ffmpeg_chain</span><span class="p">(</span><span class="n">placement</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">)))</span>
+</span><span id="line-2"><span class="go">''</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.geometry.placement">
+<span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">placement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fit'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rounding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exact_floor'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/geometry.html#placement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.placement" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.placement'">¶</a></dt>
+<dd><p>The full geometric answer for one clip.</p>
+<p><code class="docutils literal notranslate"><span class="pre">fit</span></code> pads and never crops; <code class="docutils literal notranslate"><span class="pre">fill</span></code> crops and never pads; <code class="docutils literal notranslate"><span class="pre">stretch</span></code>
+does neither.</p>
+<p class="rubric">Examples</p>
+<p>A portrait source into a landscape frame, fitted — padded left/right:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">placement</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">480</span><span class="p">,</span> <span class="mi">850</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">))</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">crop</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">offset</span>
+</span><span id="line-3"><span class="go">(Size(width=406, height=720), None, (437, 0))</span>
+</span></code></pre></div>
+</div>
+<p>The same pair, filled — cropped top/bottom, nothing padded:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">placement</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">480</span><span class="p">,</span> <span class="mi">850</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"fill"</span><span class="p">)</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">crop</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">offset</span>
+</span><span id="line-3"><span class="go">(Size(width=1280, height=2266), Box(x=0, y=773, width=1280, height=720), None)</span>
+</span></code></pre></div>
+</div>
+<p>Same size in and out: nothing happens at all.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">placement</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">))</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">crop</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">resamples</span>
+</span><span id="line-3"><span class="go">(Size(width=1280, height=720), None, None, False)</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.geometry.Placement" title="looks.geometry.Placement"><code class="xref py py-class docutils literal notranslate"><span class="pre">Placement</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.geometry.reframe">
+<span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">reframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fit'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backdrop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rounding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exact_floor'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/geometry.html#reframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.reframe" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.reframe'">¶</a></dt>
+<dd><p><a class="reference internal" href="#looks.geometry.placement" title="looks.geometry.placement"><code class="xref py py-func docutils literal notranslate"><span class="pre">placement()</span></code></a> plus a backdrop.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.geometry.Reframe" title="looks.geometry.Reframe"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reframe</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.geometry.scaled_size">
+<span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">scaled_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fit'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rounding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exact_floor'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/geometry.html#scaled_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.scaled_size" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.scaled_size'">¶</a></dt>
+<dd><p>The size the source is scaled to, before any crop or pad.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">scaled_size</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">1080</span><span class="p">,</span> <span class="mi">1920</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"fit"</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">Size(width=1080, height=607)</span>
+</span></code></pre></div>
+</div>
+<p>The rounding rule is visible right here, on an ordinary input — this is
+the 607-versus-608 disagreement, not a contrived case:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">scaled_size</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">1080</span><span class="p">,</span> <span class="mi">1920</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"fit"</span><span class="p">,</span>
+</span><span id="line-2"><span class="gp">... </span>            <span class="n">rounding</span><span class="o">=</span><span class="s2">"exact_half_away"</span><span class="p">)</span>
+</span><span id="line-3"><span class="go">Size(width=1080, height=608)</span>
+</span></code></pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">fill</span></code> covers instead of fitting, so it goes the other way:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">scaled_size</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">1080</span><span class="p">,</span> <span class="mi">1920</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"fill"</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">Size(width=3413, height=1920)</span>
+</span></code></pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">stretch</span></code> is the target, by definition:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">scaled_size</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">),</span> <span class="n">Size</span><span class="p">(</span><span class="mi">1080</span><span class="p">,</span> <span class="mi">1920</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"stretch"</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">Size(width=1080, height=1920)</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.geometry.Size" title="looks.geometry.Size"><code class="xref py py-class docutils literal notranslate"><span class="pre">Size</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.geometry.snap_even">
+<span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">snap_even</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/geometry.html#snap_even"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.snap_even" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.snap_even'">¶</a></dt>
+<dd><p>Both axes rounded <strong>down</strong> to even — the yuv420p requirement.</p>
+<p>H.264 in yuv420p subsamples chroma 2x2, so an odd dimension is not
+encodable. Down rather than up, so the result never exceeds a target the
+caller asked for.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">snap_even</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">1439</span><span class="p">,</span> <span class="mi">1081</span><span class="p">))</span>
+</span><span id="line-2"><span class="go">Size(width=1438, height=1080)</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">snap_even</span><span class="p">(</span><span class="n">Size</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">))</span>
+</span><span id="line-4"><span class="go">Size(width=1920, height=1080)</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.geometry.Size" title="looks.geometry.Size"><code class="xref py py-class docutils literal notranslate"><span class="pre">Size</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.geometry.social_size">
+<span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">social_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/geometry.html#social_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.social_size" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.social_size'">¶</a></dt>
+<dd><p>Resolve a <a class="reference internal" href="#looks.geometry.SOCIAL_SIZES" title="looks.geometry.SOCIAL_SIZES"><code class="xref py py-data docutils literal notranslate"><span class="pre">SOCIAL_SIZES</span></code></a> preset name.</p>
+<p>A convenience over <a class="reference internal" href="#looks.geometry.Size" title="looks.geometry.Size"><code class="xref py py-class docutils literal notranslate"><span class="pre">Size</span></code></a>, never a parallel vocabulary — nothing else
+in this module accepts a preset name, so a preset cannot acquire behaviour
+of its own.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">social_size</span><span class="p">(</span><span class="s1">'shorts'</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">Size(width=1080, height=1920)</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">social_size</span><span class="p">(</span><span class="s1">'myspace'</span><span class="p">)</span>
+</span><span id="line-4"><span class="gt">Traceback (most recent call last):</span>
+</span><span id="line-5"><span class="c">...</span>
+</span><span id="line-6"><span class="gr">looks.geometry.GeometryError</span>: <span class="n">unknown size preset 'myspace'; known: ...</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.geometry.Size" title="looks.geometry.Size"><code class="xref py py-class docutils literal notranslate"><span class="pre">Size</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#looks.geometry.Backdrop'" class="reference internal" href="#looks.geometry.Backdrop"><code class="docutils literal notranslate"><span class="pre">Backdrop</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.Blurred'" class="reference internal" href="#looks.geometry.Blurred"><code class="docutils literal notranslate"><span class="pre">Blurred</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.Box'" class="reference internal" href="#looks.geometry.Box"><code class="docutils literal notranslate"><span class="pre">Box</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.DFLT_BACKDROP_BLUR_SIGMA'" class="reference internal" href="#looks.geometry.DFLT_BACKDROP_BLUR_SIGMA"><code class="docutils literal notranslate"><span class="pre">DFLT_BACKDROP_BLUR_SIGMA</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.DFLT_ROUNDING'" class="reference internal" href="#looks.geometry.DFLT_ROUNDING"><code class="docutils literal notranslate"><span class="pre">DFLT_ROUNDING</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.GeometryError'" class="reference internal" href="#looks.geometry.GeometryError"><code class="docutils literal notranslate"><span class="pre">GeometryError</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.Placement'" class="reference internal" href="#looks.geometry.Placement"><code class="docutils literal notranslate"><span class="pre">Placement</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.geometry.Placement.resamples'" class="reference internal" href="#looks.geometry.Placement.resamples"><code class="docutils literal notranslate"><span class="pre">Placement.resamples</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#looks.geometry.Reframe'" class="reference internal" href="#looks.geometry.Reframe"><code class="docutils literal notranslate"><span class="pre">Reframe</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.SOCIAL_SIZES'" class="reference internal" href="#looks.geometry.SOCIAL_SIZES"><code class="docutils literal notranslate"><span class="pre">SOCIAL_SIZES</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.Size'" class="reference internal" href="#looks.geometry.Size"><code class="docutils literal notranslate"><span class="pre">Size</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.Solid'" class="reference internal" href="#looks.geometry.Solid"><code class="docutils literal notranslate"><span class="pre">Solid</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.center_box'" class="reference internal" href="#looks.geometry.center_box"><code class="docutils literal notranslate"><span class="pre">center_box()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.ffmpeg_chain'" class="reference internal" href="#looks.geometry.ffmpeg_chain"><code class="docutils literal notranslate"><span class="pre">ffmpeg_chain()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.placement'" class="reference internal" href="#looks.geometry.placement"><code class="docutils literal notranslate"><span class="pre">placement()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.reframe'" class="reference internal" href="#looks.geometry.reframe"><code class="docutils literal notranslate"><span class="pre">reframe()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.scaled_size'" class="reference internal" href="#looks.geometry.scaled_size"><code class="docutils literal notranslate"><span class="pre">scaled_size()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.snap_even'" class="reference internal" href="#looks.geometry.snap_even"><code class="docutils literal notranslate"><span class="pre">snap_even()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.social_size'" class="reference internal" href="#looks.geometry.social_size"><code class="docutils literal notranslate"><span class="pre">social_size()</span></code></a></li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left"></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=3294188c"></script>
+<script src="../_static/doctools.js?v=fd6eb6e6"></script>
+<script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=fd10adb8"></script>
+<script defer="defer" src="../_static/theme.js?v=49cc6205"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+looks.registry
+==============
+
+.. automodule:: looks.registry
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      Compiler
+      CostFn
+      KEY_SHAPE
+      REGISTRY
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      effects
+      get_compiler
+      get_impl
+      implementations
+      register_effect
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      EffectRegistry
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      ImplConflict
+      RegistryError
+      UnknownImpl
+   

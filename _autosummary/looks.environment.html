@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+
+<html :class="{ 'dark' : darkMode === true }" data-content_root="../" lang="en" x-data="{ darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches), activeSection: ''}">
+<head>
+<script>
+    (function () {
+      // Set initial color scheme
+      if ((localStorage.getItem("_x_darkMode") === "true") || (window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Watch for media preference changes
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+        localStorage.setItem("_x_darkMode", event.matches);
+        document.documentElement.classList.toggle("dark", event.matches);
+      });
+    })();
+  </script>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="#ffffff" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="#030711" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="looks.environment.html.md" rel="alternate" type="text/markdown"/>
+<link href="../llms.txt" rel="describedby" type="text/markdown"/>
+<link href="looks.environment.html.md" rel="alternate" type="text/markdown"/>
+<link href="llms.txt" rel="describedby"/>
+<title>looks.environment | looks</title>
+<meta content="looks.environment | looks" property="og:title"/>
+<meta content="looks.environment | looks" name="twitter:title"/>
+<link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=009055c6" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx_autodoc_typehints.css?v=057ac668" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/epythet.css?v=ecce5bdd" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="looks.ffmpeg.html" rel="next" title="looks.ffmpeg"/>
+<link href="looks.compile.html" rel="prev" title="looks.compile"/>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">looks</span>
+</a><nav class="flex items-center gap-6 text-sm font-medium">
+<a class="transition-colors hover:text-foreground/80 text-foreground/60" href="https://github.com/thorwhalen/looks" rel="noopener nofollow">GitHub</a>
+</nav></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 gap-2 sm:gap-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center gap-1">
+<button @click="darkMode = !darkMode" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" title="Toggle color scheme" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="justify-start text-sm md:!hidden bg-background" href="../index.html"><span class="font-bold text-clip whitespace-nowrap">looks</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="flex md:hidden flex-col font-medium mt-4">
+<a href="https://github.com/thorwhalen/looks" rel="nofollow noopener">GitHub</a>
+</nav><nav class="table w-full min-w-full my-6 lg:my-8">
+<ul class="current">
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../api.html">API reference<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="looks.html">looks<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l3"><a class="reference internal" href="looks.across.html">looks.across</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.cache.html">looks.cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.cli.html">looks.cli</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.compile.html">looks.compile</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">looks.environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.ffmpeg.html">looks.ffmpeg</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.frame_dependency.html">looks.frame_dependency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.geometry.html">looks.geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.licence.html">looks.licence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.lut.html">looks.lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.motion.html">looks.motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.pipe.html">looks.pipe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.registry.html">looks.registry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.spec.html">looks.spec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="looks.transition.html">looks.transition</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ai-agents.html">For AI agents</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">looks</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="../api.html">API reference</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="looks.html">looks</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">looks.environment</span>
+</nav>
+<div id="content" role="main">
+<section id="module-looks.environment">
+<span id="looks-environment"></span><h1>looks.environment<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#module-looks.environment">¶</a></h1>
+<p>What the ffmpeg on <em>this</em> machine actually is, and what it can actually do.</p>
+<p>Two questions, two authorities, and they are not interchangeable:</p>
+<ul class="simple">
+<li><p><strong>What licence does this binary carry?</strong> <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-L</span></code>. Nothing else.</p></li>
+<li><p><strong>Which filters does it have?</strong> <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-filters</span></code>. Nothing else.</p></li>
+</ul>
+<p>Both of those sentences are load-bearing, and both were established by
+measurement rather than by reading documentation.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-L</span></code> prints a licence statement produced by a compile-time <code class="docutils literal notranslate"><span class="pre">#if</span></code>
+cascade in <code class="docutils literal notranslate"><span class="pre">fftools/opt_common.c</span></code>. That matters because the more obvious
+source — the <code class="docutils literal notranslate"><span class="pre">configuration:</span></code> line in <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-version</span></code> — is *editable by
+whoever built the binary*, and at least one widely-installed wheel does edit
+the licence conclusion out of it. PyAV’s bundled FFmpeg patches <code class="docutils literal notranslate"><span class="pre">configure</span></code>
+to move <code class="docutils literal notranslate"><span class="pre">libx264</span></code>/<code class="docutils literal notranslate"><span class="pre">libx265</span></code> out of <code class="docutils literal notranslate"><span class="pre">EXTERNAL_LIBRARY_GPL_LIST</span></code>, so its
+<code class="docutils literal notranslate"><span class="pre">avutil_license()</span></code> reports “LGPL version 3 or later” while <code class="docutils literal notranslate"><span class="pre">otool</span> <span class="pre">-L</span></code> shows
+GPL <code class="docutils literal notranslate"><span class="pre">libx264</span></code> and <code class="docutils literal notranslate"><span class="pre">libx265</span></code> actually linked. A licence check that trusts a
+self-report is not a check; <code class="docutils literal notranslate"><span class="pre">-L</span></code>’s cascade is the least-editable statement a
+binary makes about itself, and even it is only evidence, not proof.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-h</span> <span class="pre">filter=NAME</span></code> looks like a capability probe and is not one: on
+ffmpeg 8.1 an unknown filter prints <code class="docutils literal notranslate"><span class="pre">Unknown</span> <span class="pre">filter</span> <span class="pre">'x'.</span></code> and then, verbatim,
+<code class="docutils literal notranslate"><span class="pre">Exiting</span> <span class="pre">with</span> <span class="pre">exit</span> <span class="pre">code</span> <span class="pre">0</span></code>. Every filter would test as present. So
+availability comes from parsing the <code class="docutils literal notranslate"><span class="pre">-filters</span></code> table.</p>
+<p>And the rule that ties them together: **anything this module cannot determine
+is reported as unknown, and unknown is a refusal upstream.** A build whose
+licence line matches nothing known is not “probably LGPL”; it is unknown. The
+functions here never guess and never raise on a merely-absent ffmpeg — they
+return a <a class="reference internal" href="#looks.environment.FfmpegEnv" title="looks.environment.FfmpegEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">FfmpegEnv</span></code></a> that says so, because a caller diagnosing a missing
+binary needs a value it can inspect, not a traceback.</p>
+<p>**There is not one ffmpeg on a machine, and the difference is not a version
+number.** Measured on this one: <code class="docutils literal notranslate"><span class="pre">PATH</span></code> carries ffmpeg 8.1, GPL-<strong>3</strong>, 481
+filters; the binary <code class="code docutils literal notranslate"><span class="pre">imageio-ffmpeg</span></code> ships inside site-packages is ffmpeg 7.1,
+GPL-<strong>2</strong>, 484 filters — and the two filter sets are <strong>non-nested</strong>. Only PATH
+has <code class="docutils literal notranslate"><span class="pre">colordetect</span></code>, <code class="docutils literal notranslate"><span class="pre">premultiply_dynamic</span></code>, <code class="docutils literal notranslate"><span class="pre">transpose_vt</span></code>,
+<code class="docutils literal notranslate"><span class="pre">yadif_videotoolbox</span></code>; only the bundled one has <code class="docutils literal notranslate"><span class="pre">ass</span></code>, <code class="docutils literal notranslate"><span class="pre">drawtext</span></code>, <code class="docutils literal notranslate"><span class="pre">pp</span></code>,
+<code class="docutils literal notranslate"><span class="pre">subtitles</span></code>, <code class="docutils literal notranslate"><span class="pre">vidstabdetect</span></code>, <code class="docutils literal notranslate"><span class="pre">vidstabtransform</span></code>, <code class="docutils literal notranslate"><span class="pre">zscale</span></code>. So neither
+“the ffmpeg version” nor “the ffmpeg licence” is a single fact about a machine.</p>
+<p>The rule that follows is the important one: **a caller passes the environment
+in; nothing downstream may call** <a class="reference internal" href="#looks.environment.probe" title="looks.environment.probe"><code class="xref py py-func docutils literal notranslate"><span class="pre">probe()</span></code></a> <strong>for itself.</strong> A compiled Look
+is valid against <em>one</em> <a class="reference internal" href="#looks.environment.FfmpegEnv" title="looks.environment.FfmpegEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">FfmpegEnv</span></code></a>, not against a machine, and a
+component that probes on its own behalf silently binds to whichever binary
+happened to be first on <code class="docutils literal notranslate"><span class="pre">PATH</span></code> — which, for anything invoked through moviepy,
+is not the one the user is looking at.</p>
+<p>Nothing here executes a filter, decodes a frame, or writes a file. It runs
+<code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> three times with no input and parses text.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">probe</span><span class="p">()</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">licence</span>
+</span><span id="line-3"><span class="go">&lt;Licence.GPL3: 'gpl3'&gt;</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">has_filter</span><span class="p">(</span><span class="s1">'lut3d'</span><span class="p">)</span>
+</span><span id="line-5"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+<p class="rubric">Module Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.environment.DFLT_PROBE_TIMEOUT_S" title="looks.environment.DFLT_PROBE_TIMEOUT_S"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_PROBE_TIMEOUT_S</span></code></a></p></td>
+<td><p>these are trivial commands, so exceeding it means something is wrong (a network filesystem, a binary that hangs on a missing dylib) and we would rather say "unknown" than block a caller forever.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.environment.DFLT_FFMPEG" title="looks.environment.DFLT_FFMPEG"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_FFMPEG</span></code></a></p></td>
+<td><p>The default binary name, looked up on <code class="docutils literal notranslate"><span class="pre">PATH</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.environment.GATES_PATH" title="looks.environment.GATES_PATH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GATES_PATH</span></code></a></p></td>
+<td><p>Where the committed gate table lives, relative to this package.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.environment.LICENCE_ORDER" title="looks.environment.LICENCE_ORDER"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LICENCE_ORDER</span></code></a></p></td>
+<td><p>Permissiveness order, most permissive first.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.environment.gates" title="looks.environment.gates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gates</span></code></a>()</p></td>
+<td><p>The committed table of FFmpeg's own licence gates, extracted from source.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.environment.gpl_only_filters" title="looks.environment.gpl_only_filters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gpl_only_filters</span></code></a>()</p></td>
+<td><p>Filter names FFmpeg gates behind <code class="docutils literal notranslate"><span class="pre">--enable-gpl</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.environment.known_filters" title="looks.environment.known_filters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">known_filters</span></code></a>()</p></td>
+<td><p>Every filter name FFmpeg n8.1 declares — the universe <a class="reference internal" href="#looks.environment.needs_gpl" title="looks.environment.needs_gpl"><code class="xref py py-func docutils literal notranslate"><span class="pre">needs_gpl()</span></code></a> checks against.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.environment.needs_gpl" title="looks.environment.needs_gpl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">needs_gpl</span></code></a>(filters, *[, known])</p></td>
+<td><p>Which of <code class="docutils literal notranslate"><span class="pre">filters</span></code> exist only in a GPL build, in the order given.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.environment.parse_configuration" title="looks.environment.parse_configuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_configuration</span></code></a>(text)</p></td>
+<td><p>Pull the <code class="docutils literal notranslate"><span class="pre">configuration:</span></code> line out of <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-version</span></code> output.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.environment.parse_filters" title="looks.environment.parse_filters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_filters</span></code></a>(text)</p></td>
+<td><p>Extract filter names from <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-filters</span></code> output.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.environment.parse_licence" title="looks.environment.parse_licence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_licence</span></code></a>(text)</p></td>
+<td><p>Classify <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-L</span></code> output.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.environment.probe" title="looks.environment.probe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">probe</span></code></a>([ffmpeg, timeout])</p></td>
+<td><p>Interrogate one ffmpeg binary.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.environment.EnvFingerprint" title="looks.environment.EnvFingerprint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnvFingerprint</span></code></a>(path, version, licence, ...)</p></td>
+<td><p>The part of an environment that determines pixels, as comparable data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.environment.FfmpegEnv" title="looks.environment.FfmpegEnv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FfmpegEnv</span></code></a>([path, version, licence, filters, ...])</p></td>
+<td><p>One machine's ffmpeg, as far as it can be determined without running it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.environment.Licence" title="looks.environment.Licence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Licence</span></code></a>(*values)</p></td>
+<td><p>What licence an ffmpeg build carries, as <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-L</span></code> reports it.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Exceptions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.environment.UnknownFilter" title="looks.environment.UnknownFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnknownFilter</span></code></a></p></td>
+<td><p>A filter name that is not in any known universe.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.environment.DFLT_FFMPEG">
+<span class="sig-prename descclassname"><span class="pre">looks.environment.</span></span><span class="sig-name descname"><span class="pre">DFLT_FFMPEG</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ffmpeg'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.DFLT_FFMPEG" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.DFLT_FFMPEG'">¶</a></dt>
+<dd><p>The default binary name, looked up on <code class="docutils literal notranslate"><span class="pre">PATH</span></code>.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.environment.DFLT_PROBE_TIMEOUT_S">
+<span class="sig-prename descclassname"><span class="pre">looks.environment.</span></span><span class="sig-name descname"><span class="pre">DFLT_PROBE_TIMEOUT_S</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.DFLT_PROBE_TIMEOUT_S" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.DFLT_PROBE_TIMEOUT_S'">¶</a></dt>
+<dd><p>these are trivial
+commands, so exceeding it means something is wrong (a network filesystem, a
+binary that hangs on a missing dylib) and we would rather say “unknown” than
+block a caller forever.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>How long any single probe subprocess may take. Generous</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.environment.EnvFingerprint">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.environment.</span></span><span class="sig-name descname"><span class="pre">EnvFingerprint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">licence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters_digest</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/environment.html#EnvFingerprint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.EnvFingerprint" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.EnvFingerprint'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>The part of an environment that determines pixels, as comparable data.</p>
+<p>A <a class="reference internal" href="looks.spec.html#looks.spec.LookPlan" title="looks.spec.LookPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookPlan</span></code></a> is compiled against <strong>one binary</strong>, whose
+filter set and licence are part of what decides the output — so a plan says
+which one, and this enters its hash. The portable artifact is the <code class="docutils literal notranslate"><span class="pre">Look</span></code>;
+the plan is deliberately not portable, and this is the field that says so.</p>
+<p><a class="reference internal" href="#looks.environment.EnvFingerprint.filters_digest" title="looks.environment.EnvFingerprint.filters_digest"><code class="xref py py-attr docutils literal notranslate"><span class="pre">filters_digest</span></code></a> is a hash rather than the set itself: the set is ~481
+names, a plan is a document, and “which filters existed” only ever needs to
+be compared, never read.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.environment.EnvFingerprint.path">
+<span class="sig-name descname"><span class="pre">path</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.EnvFingerprint.path" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.EnvFingerprint.path'">¶</a></dt>
+<dd><p>The resolved binary. Two ffmpegs on one machine is the normal
+case, not the exotic one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.environment.EnvFingerprint.version">
+<span class="sig-name descname"><span class="pre">version</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.EnvFingerprint.version" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.EnvFingerprint.version'">¶</a></dt>
+<dd><p>Its version line.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.environment.EnvFingerprint.licence">
+<span class="sig-name descname"><span class="pre">licence</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.EnvFingerprint.licence" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.EnvFingerprint.licence'">¶</a></dt>
+<dd><p>What <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-L</span></code> said.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.environment.EnvFingerprint.filters_digest">
+<span class="sig-name descname"><span class="pre">filters_digest</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.EnvFingerprint.filters_digest" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.EnvFingerprint.filters_digest'">¶</a></dt>
+<dd><p>SHA-256 over the sorted filter names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">EnvFingerprint</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s1">'/usr/bin/ffmpeg'</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">'8.1'</span><span class="p">,</span>
+</span><span id="line-2"><span class="gp">... </span>                   <span class="n">licence</span><span class="o">=</span><span class="s1">'gpl3'</span><span class="p">,</span> <span class="n">filters_digest</span><span class="o">=</span><span class="s1">'abc'</span><span class="p">)</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">==</span> <span class="n">EnvFingerprint</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s1">'/usr/bin/ffmpeg'</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">'8.1'</span><span class="p">,</span>
+</span><span id="line-4"><span class="gp">... </span>                    <span class="n">licence</span><span class="o">=</span><span class="s1">'gpl3'</span><span class="p">,</span> <span class="n">filters_digest</span><span class="o">=</span><span class="s1">'abc'</span><span class="p">)</span>
+</span><span id="line-5"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.environment.EnvFingerprint.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/environment.html#EnvFingerprint.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.EnvFingerprint.to_dict" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.EnvFingerprint.to_dict'">¶</a></dt>
+<dd><p>A JSON-able form, for a plan’s serialisation and its hash.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.environment.FfmpegEnv">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.environment.</span></span><span class="sig-name descname"><span class="pre">FfmpegEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">licence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Licence.UNKNOWN</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">frozenset({})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/environment.html#FfmpegEnv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.FfmpegEnv" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.FfmpegEnv'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>One machine’s ffmpeg, as far as it can be determined without running it.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.environment.FfmpegEnv.path">
+<span class="sig-name descname"><span class="pre">path</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.FfmpegEnv.path" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.FfmpegEnv.path'">¶</a></dt>
+<dd><p>Resolved path to the binary, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if none was found.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.environment.FfmpegEnv.version">
+<span class="sig-name descname"><span class="pre">version</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.FfmpegEnv.version" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.FfmpegEnv.version'">¶</a></dt>
+<dd><p>The version string from <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-version</span></code>’s first line, or
+<code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.environment.FfmpegEnv.licence">
+<span class="sig-name descname"><span class="pre">licence</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.FfmpegEnv.licence" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.FfmpegEnv.licence'">¶</a></dt>
+<dd><p>What <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-L</span></code> says. <code class="xref py py-attr docutils literal notranslate"><span class="pre">Licence.UNKNOWN</span></code> whenever the
+output matched nothing known, the binary was absent, or the probe
+failed — three different reasons, one honest answer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.environment.Licence" title="looks.environment.Licence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Licence</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.environment.FfmpegEnv.filters">
+<span class="sig-name descname"><span class="pre">filters</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.FfmpegEnv.filters" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.FfmpegEnv.filters'">¶</a></dt>
+<dd><p>Every filter name <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-filters</span></code> listed. Empty when the
+probe failed, which is why <a class="reference internal" href="#looks.environment.FfmpegEnv.available" title="looks.environment.FfmpegEnv.available"><code class="xref py py-attr docutils literal notranslate"><span class="pre">available</span></code></a> exists to tell “no
+filters” apart from “did not look”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">frozenset</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.environment.FfmpegEnv.configuration">
+<span class="sig-name descname"><span class="pre">configuration</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.FfmpegEnv.configuration" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.FfmpegEnv.configuration'">¶</a></dt>
+<dd><p>The raw <code class="docutils literal notranslate"><span class="pre">configuration:</span></code> line, kept for diagnostics
+only. <strong>Never</strong> read it to decide a licence — it is editable by the
+builder, which is the whole reason <a class="reference internal" href="#looks.environment.FfmpegEnv.licence" title="looks.environment.FfmpegEnv.licence"><code class="xref py py-attr docutils literal notranslate"><span class="pre">licence</span></code></a> comes from
+<code class="docutils literal notranslate"><span class="pre">-L</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="looks.environment.FfmpegEnv.notes">
+<span class="sig-name descname"><span class="pre">notes</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.FfmpegEnv.notes" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.FfmpegEnv.notes'">¶</a></dt>
+<dd><p>Human-readable reasons anything above is missing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#Ellipsis" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="looks.environment.FfmpegEnv.available">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">available</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">bool</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.FfmpegEnv.available" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.FfmpegEnv.available'">¶</a></dt>
+<dd><p>Whether an ffmpeg binary was found and answered at all.</p>
+<p>Distinct from “has no filters”: a probe that could not run leaves
+<a class="reference internal" href="#looks.environment.FfmpegEnv.filters" title="looks.environment.FfmpegEnv.filters"><code class="xref py py-attr docutils literal notranslate"><span class="pre">filters</span></code></a> empty too, and a caller must be able to tell those
+apart before concluding anything.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.environment.FfmpegEnv.fingerprint">
+<span class="sig-name descname"><span class="pre">fingerprint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/environment.html#FfmpegEnv.fingerprint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.FfmpegEnv.fingerprint" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.FfmpegEnv.fingerprint'">¶</a></dt>
+<dd><p>The comparable summary a compiled plan records.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" rel="nofollow noopener" title="(in Python v3.15)"><strong>RuntimeError</strong><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a> – The probe did not run. A fingerprint of an
+    environment nobody looked at would make two plans compiled
+    against unknown binaries compare equal, which is the false
+    direction.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.environment.EnvFingerprint" title="looks.environment.EnvFingerprint"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvFingerprint</span></code></a></span></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">FfmpegEnv</span><span class="p">()</span><span class="o">.</span><span class="n">fingerprint</span><span class="p">()</span>
+</span><span id="line-2"><span class="gt">Traceback (most recent call last):</span>
+</span><span id="line-3"><span class="c">...</span>
+</span><span id="line-4"><span class="gr">RuntimeError</span>: <span class="n">cannot fingerprint an ffmpeg that did not answer...</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.environment.FfmpegEnv.has_filter">
+<span class="sig-name descname"><span class="pre">has_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/environment.html#FfmpegEnv.has_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.FfmpegEnv.has_filter" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.FfmpegEnv.has_filter'">¶</a></dt>
+<dd><p>Whether <code class="docutils literal notranslate"><span class="pre">name</span></code> is in this build’s filter table.</p>
+<p>Always <code class="docutils literal notranslate"><span class="pre">False</span></code> when the probe did not run — check <a class="reference internal" href="#looks.environment.FfmpegEnv.available" title="looks.environment.FfmpegEnv.available"><code class="xref py py-attr docutils literal notranslate"><span class="pre">available</span></code></a>
+first if the difference matters to you.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">FfmpegEnv</span><span class="p">(</span><span class="n">filters</span><span class="o">=</span><span class="nb">frozenset</span><span class="p">({</span><span class="s1">'lut3d'</span><span class="p">}))</span><span class="o">.</span><span class="n">has_filter</span><span class="p">(</span><span class="s1">'lut3d'</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">True</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">FfmpegEnv</span><span class="p">(</span><span class="n">filters</span><span class="o">=</span><span class="nb">frozenset</span><span class="p">({</span><span class="s1">'lut3d'</span><span class="p">}))</span><span class="o">.</span><span class="n">has_filter</span><span class="p">(</span><span class="s1">'eq'</span><span class="p">)</span>
+</span><span id="line-4"><span class="go">False</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.environment.FfmpegEnv.missing">
+<span class="sig-name descname"><span class="pre">missing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/environment.html#FfmpegEnv.missing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.FfmpegEnv.missing" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.FfmpegEnv.missing'">¶</a></dt>
+<dd><p>Which of <code class="docutils literal notranslate"><span class="pre">names</span></code> this build does not have, in the order given.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">FfmpegEnv</span><span class="p">(</span><span class="n">filters</span><span class="o">=</span><span class="nb">frozenset</span><span class="p">({</span><span class="s1">'lut3d'</span><span class="p">,</span> <span class="s1">'curves'</span><span class="p">}))</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">missing</span><span class="p">([</span><span class="s1">'lut3d'</span><span class="p">,</span> <span class="s1">'eq'</span><span class="p">,</span> <span class="s1">'boxblur'</span><span class="p">])</span>
+</span><span id="line-3"><span class="go">('eq', 'boxblur')</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#Ellipsis" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.environment.GATES_PATH">
+<span class="sig-prename descclassname"><span class="pre">looks.environment.</span></span><span class="sig-name descname"><span class="pre">GATES_PATH</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('/home/runner/work/looks/looks/looks/data/ffmpeg_gates.json')</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.GATES_PATH" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.GATES_PATH'">¶</a></dt>
+<dd><p>Where the committed gate table lives, relative to this package.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.environment.LICENCE_ORDER">
+<span class="sig-prename descclassname"><span class="pre">looks.environment.</span></span><span class="sig-name descname"><span class="pre">LICENCE_ORDER</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">tuple</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#looks.environment.Licence" title="looks.environment.Licence"><span class="pre">Licence</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(Licence.LGPL21,</span> <span class="pre">Licence.LGPL3,</span> <span class="pre">Licence.GPL2,</span> <span class="pre">Licence.GPL3,</span> <span class="pre">Licence.NONFREE)</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.LICENCE_ORDER" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.LICENCE_ORDER'">¶</a></dt>
+<dd><p>Permissiveness order, most permissive first. <code class="xref py py-attr docutils literal notranslate"><span class="pre">Licence.UNKNOWN</span></code> is
+absent on purpose — see <a class="reference internal" href="#looks.environment.Licence" title="looks.environment.Licence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Licence</span></code></a>.</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.environment.Licence">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.environment.</span></span><span class="sig-name descname"><span class="pre">Licence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/environment.html#Licence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.Licence" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.Licence'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>What licence an ffmpeg build carries, as <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-L</span></code> reports it.</p>
+<p>Ordered from most to least permissive by <a class="reference internal" href="#looks.environment.LICENCE_ORDER" title="looks.environment.LICENCE_ORDER"><code class="xref py py-data docutils literal notranslate"><span class="pre">LICENCE_ORDER</span></code></a>. <code class="docutils literal notranslate"><span class="pre">UNKNOWN</span></code>
+is deliberately <em>not</em> on that ladder: it is not a position between two
+others, it is the absence of a position, and it must refuse rather than
+compare.</p>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="looks.environment.UnknownFilter">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.environment.</span></span><span class="sig-name descname"><span class="pre">UnknownFilter</span></span><a class="reference internal" href="../_modules/looks/environment.html#UnknownFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.UnknownFilter" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.UnknownFilter'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A filter name that is not in any known universe.</p>
+<p>Raised rather than ignored, because <a class="reference internal" href="#looks.environment.needs_gpl" title="looks.environment.needs_gpl"><code class="xref py py-func docutils literal notranslate"><span class="pre">needs_gpl()</span></code></a> is an
+<strong>allowlist-by-absence</strong>: a name it does not recognise carries no gate, so
+silently returning “not GPL” for a typo, a wrong case, a filter from a newer
+ffmpeg, or one an extraction never enumerated is a <em>computed</em> false
+permission — at exactly the point the licence tier enters. That is the one
+direction this package may never fail in.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.environment.gates">
+<span class="sig-prename descclassname"><span class="pre">looks.environment.</span></span><span class="sig-name descname"><span class="pre">gates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/environment.html#gates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.gates" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.gates'">¶</a></dt>
+<dd><p>The committed table of FFmpeg’s own licence gates, extracted from source.</p>
+<p><strong>A filter is GPL-gated two ways, and a grep finds only one of them.</strong>
+<em>Directly</em>, when its <code class="docutils literal notranslate"><span class="pre">_filter_deps</span></code> line contains the literal <code class="docutils literal notranslate"><span class="pre">gpl</span></code>
+(33 filters, <code class="docutils literal notranslate"><span class="pre">eq</span></code> among them). <em>Indirectly</em>, when its deps name an
+external library that is itself in <code class="docutils literal notranslate"><span class="pre">EXTERNAL_LIBRARY_GPL_LIST</span></code> — enabling
+the filter then forces <code class="docutils literal notranslate"><span class="pre">--enable-gpl</span></code> transitively, with no <code class="docutils literal notranslate"><span class="pre">gpl</span></code> token
+anywhere on its own line. Five filters are in that second class:
+<code class="docutils literal notranslate"><span class="pre">frei0r</span></code>, <code class="docutils literal notranslate"><span class="pre">frei0r_src</span></code>, <code class="docutils literal notranslate"><span class="pre">rubberband</span></code>, <code class="docutils literal notranslate"><span class="pre">vidstabdetect</span></code>,
+<code class="docutils literal notranslate"><span class="pre">vidstabtransform</span></code>.</p>
+<p>Missing them is a <strong>false permission</strong>, which is the dangerous direction:
+<code class="docutils literal notranslate"><span class="pre">vidstabtransform</span></code> is stabilisation, i.e. a perfectly plausible
+normalisation effect for this package, and the naive extraction tiers it
+permissive. The first version of this table did exactly that; it was caught
+by an adversarial review rather than by any test, which is why the two
+classes are now stored separately and asserted separately.</p>
+<p>This is what FFmpeg’s <code class="docutils literal notranslate"><span class="pre">configure</span></code> <em>declares</em>, not what the local binary
+<em>has</em> — the two answer different questions, and both are needed. The table
+says an effect written with <code class="docutils literal notranslate"><span class="pre">eq</span></code> could never run on a clean-room LGPL
+build; <a class="reference internal" href="#looks.environment.probe" title="looks.environment.probe"><code class="xref py py-func docutils literal notranslate"><span class="pre">probe()</span></code></a> says whether the binary in front of you happens to have
+it. Collapsing them makes every purely-LGPL Look unrunnable on every
+Homebrew ffmpeg on earth, since those are all GPL builds.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">gates</span><span class="p">()</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="s1">'eq'</span> <span class="ow">in</span> <span class="n">g</span><span class="p">[</span><span class="s1">'gpl_filters'</span><span class="p">]</span>
+</span><span id="line-3"><span class="go">True</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="s1">'geq'</span> <span class="ow">in</span> <span class="n">g</span><span class="p">[</span><span class="s1">'gpl_filters'</span><span class="p">]</span>      <span class="c1"># relicensed in FFmpeg 4.3</span>
+</span><span id="line-5"><span class="go">False</span>
+</span><span id="line-6"><span class="gp">&gt;&gt;&gt; </span><span class="s1">'lut3d'</span> <span class="ow">in</span> <span class="n">g</span><span class="p">[</span><span class="s1">'gpl_filters'</span><span class="p">]</span>
+</span><span id="line-7"><span class="go">False</span>
+</span><span id="line-8"><span class="gp">&gt;&gt;&gt; </span><span class="s1">'libx264'</span> <span class="ow">in</span> <span class="n">g</span><span class="p">[</span><span class="s1">'external_gpl'</span><span class="p">]</span>
+</span><span id="line-9"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.environment.gpl_only_filters">
+<span class="sig-prename descclassname"><span class="pre">looks.environment.</span></span><span class="sig-name descname"><span class="pre">gpl_only_filters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/environment.html#gpl_only_filters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.gpl_only_filters" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.gpl_only_filters'">¶</a></dt>
+<dd><p>Filter names FFmpeg gates behind <code class="docutils literal notranslate"><span class="pre">--enable-gpl</span></code>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">gpl_only_filters</span><span class="p">()</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="p">{</span><span class="s1">'eq'</span><span class="p">,</span> <span class="s1">'boxblur'</span><span class="p">,</span> <span class="s1">'cropdetect'</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="n">f</span>
+</span><span id="line-3"><span class="go">True</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">&amp;</span> <span class="p">{</span><span class="s1">'lut3d'</span><span class="p">,</span> <span class="s1">'curves'</span><span class="p">,</span> <span class="s1">'colorlevels'</span><span class="p">,</span> <span class="s1">'geq'</span><span class="p">}</span>
+</span><span id="line-5"><span class="go">frozenset()</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">frozenset</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.environment.known_filters">
+<span class="sig-prename descclassname"><span class="pre">looks.environment.</span></span><span class="sig-name descname"><span class="pre">known_filters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/environment.html#known_filters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.known_filters" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.known_filters'">¶</a></dt>
+<dd><p>Every filter name FFmpeg n8.1 declares — the universe <a class="reference internal" href="#looks.environment.needs_gpl" title="looks.environment.needs_gpl"><code class="xref py py-func docutils literal notranslate"><span class="pre">needs_gpl()</span></code></a> checks against.</p>
+<p>Extracted from <code class="docutils literal notranslate"><span class="pre">libavfilter/allfilters.c</span></code>, which declares one <code class="docutils literal notranslate"><span class="pre">extern</span></code>
+per filter regardless of build flags, so it covers filters the local binary
+does not have. That is the right universe: a name absent from <em>this</em> build
+is still a real filter with a real gate, and refusing it would be a false
+alarm, while a name absent from <em>FFmpeg</em> is a typo and must raise.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">u</span> <span class="o">=</span> <span class="n">known_filters</span><span class="p">()</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="p">{</span><span class="s1">'eq'</span><span class="p">,</span> <span class="s1">'lut3d'</span><span class="p">,</span> <span class="s1">'vidstabtransform'</span><span class="p">,</span> <span class="s1">'geq'</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="n">u</span>
+</span><span id="line-3"><span class="go">True</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="s1">'nosuchfilter'</span> <span class="ow">in</span> <span class="n">u</span>
+</span><span id="line-5"><span class="go">False</span>
+</span><span id="line-6"><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">500</span>
+</span><span id="line-7"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">frozenset</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.environment.needs_gpl">
+<span class="sig-prename descclassname"><span class="pre">looks.environment.</span></span><span class="sig-name descname"><span class="pre">needs_gpl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filters</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">known</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/environment.html#needs_gpl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.needs_gpl" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.needs_gpl'">¶</a></dt>
+<dd><p>Which of <code class="docutils literal notranslate"><span class="pre">filters</span></code> exist only in a GPL build, in the order given.</p>
+<p>The point of the package in one function: a chain that reaches for the
+obvious grade filter is not portable to an LGPL build, and nothing in the
+ffmpeg CLI will tell you, because the binary you are holding runs it fine.</p>
+<p><strong>Every name is validated first, and an unrecognised one raises.</strong> This
+function is an allowlist-by-absence — a name carrying no gate is reported
+GPL-free — so without the check a typo, a wrong case, or a filter from a
+newer ffmpeg is a <em>computed false permission</em>. That is not a hypothetical:
+before the check, <code class="docutils literal notranslate"><span class="pre">needs_gpl(['nosuchfilter'])</span></code> and <code class="docutils literal notranslate"><span class="pre">needs_gpl(['EQ'])</span></code>
+both returned <code class="docutils literal notranslate"><span class="pre">()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filters</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span>) – Filter names, in the order they appear in a chain.</p></li>
+<li><p><strong>known</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">frozenset</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]]</span>) – The universe to validate against. Pass
+<a class="reference internal" href="#looks.environment.FfmpegEnv.filters" title="looks.environment.FfmpegEnv.filters"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FfmpegEnv.filters</span></code></a> to also catch a name this build does not
+have; the default is <a class="reference internal" href="#looks.environment.known_filters" title="looks.environment.known_filters"><code class="xref py py-func docutils literal notranslate"><span class="pre">known_filters()</span></code></a>, every filter FFmpeg
+n8.1 declares.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#looks.environment.UnknownFilter" title="looks.environment.UnknownFilter"><strong>UnknownFilter</strong></a> – A name is not in <code class="docutils literal notranslate"><span class="pre">known</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>, <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#Ellipsis" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">needs_gpl</span><span class="p">([</span><span class="s1">'scale'</span><span class="p">,</span> <span class="s1">'eq'</span><span class="p">,</span> <span class="s1">'lut3d'</span><span class="p">,</span> <span class="s1">'boxblur'</span><span class="p">])</span>
+</span><span id="line-2"><span class="go">('eq', 'boxblur')</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">needs_gpl</span><span class="p">([</span><span class="s1">'curves'</span><span class="p">,</span> <span class="s1">'colorlevels'</span><span class="p">,</span> <span class="s1">'lut3d'</span><span class="p">])</span>
+</span><span id="line-4"><span class="go">()</span>
+</span></code></pre></div>
+</div>
+<p>A name that is not a filter raises rather than reporting GPL-free:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">needs_gpl</span><span class="p">([</span><span class="s1">'nosuchfilter'</span><span class="p">])</span>
+</span><span id="line-2"><span class="gt">Traceback (most recent call last):</span>
+</span><span id="line-3"><span class="c">...</span>
+</span><span id="line-4"><span class="gr">looks.environment.UnknownFilter</span>: <span class="n">not known ffmpeg filters: ['nosuchfilter']...</span>
+</span></code></pre></div>
+</div>
+<p>Case matters, because it matters to ffmpeg:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">needs_gpl</span><span class="p">([</span><span class="s1">'EQ'</span><span class="p">])</span>
+</span><span id="line-2"><span class="gt">Traceback (most recent call last):</span>
+</span><span id="line-3"><span class="c">...</span>
+</span><span id="line-4"><span class="gr">looks.environment.UnknownFilter</span>: <span class="n">not known ffmpeg filters: ['EQ']...</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.environment.parse_configuration">
+<span class="sig-prename descclassname"><span class="pre">looks.environment.</span></span><span class="sig-name descname"><span class="pre">parse_configuration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/environment.html#parse_configuration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.parse_configuration" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.parse_configuration'">¶</a></dt>
+<dd><p>Pull the <code class="docutils literal notranslate"><span class="pre">configuration:</span></code> line out of <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-version</span></code> output.</p>
+<p>Diagnostics only. See <a class="reference internal" href="#looks.environment.FfmpegEnv.configuration" title="looks.environment.FfmpegEnv.configuration"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FfmpegEnv.configuration</span></code></a> for why this must
+never decide a licence.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_configuration</span><span class="p">(</span><span class="s2">"ffmpeg version 8.1</span><span class="se">\n</span><span class="s2">configuration: --enable-gpl</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">'--enable-gpl'</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_configuration</span><span class="p">(</span><span class="s2">"ffmpeg version 8.1</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
+</span><span id="line-4"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.environment.parse_filters">
+<span class="sig-prename descclassname"><span class="pre">looks.environment.</span></span><span class="sig-name descname"><span class="pre">parse_filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/environment.html#parse_filters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.parse_filters" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.parse_filters'">¶</a></dt>
+<dd><p>Extract filter names from <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-filters</span></code> output.</p>
+<p>The samples below are <strong>verbatim</strong> ffmpeg output, not hand-written — an
+invented sample is a test of the regex against itself, which is how the
+first version of this parser passed its doctests while returning zero
+filters from the real binary.</p>
+<p class="rubric">Examples</p>
+<p>Two-character flags, as ffmpeg 8.1 emits them:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">eight</span> <span class="o">=</span> <span class="s1">'''Filters:</span>
+</span><span id="line-2"><span class="gp">... </span><span class="s1">  T.. = Timeline support</span>
+</span><span id="line-3"><span class="gp">... </span><span class="s1">  .S. = Slice threading</span>
+</span><span id="line-4"><span class="gp">... </span><span class="s1">  ------</span>
+</span><span id="line-5"><span class="gp">... </span><span class="s1"> TS aap               AA-&gt;A      Apply Affine Projection algorithm.</span>
+</span><span id="line-6"><span class="gp">... </span><span class="s1"> .. abench            A-&gt;A       Benchmark part of a filtergraph.</span>
+</span><span id="line-7"><span class="gp">... </span><span class="s1"> TS lut3d             V-&gt;V       Adjust colors using a 3D LUT.</span>
+</span><span id="line-8"><span class="gp">... </span><span class="s1">'''</span>
+</span><span id="line-9"><span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">parse_filters</span><span class="p">(</span><span class="n">eight</span><span class="p">))</span>
+</span><span id="line-10"><span class="go">['aap', 'abench', 'lut3d']</span>
+</span></code></pre></div>
+</div>
+<p>Three-character flags, as older builds emit them:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">six</span> <span class="o">=</span> <span class="s1">' TSC lut3d            V-&gt;V       Adjust colors using a 3D LUT.'</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">parse_filters</span><span class="p">(</span><span class="n">six</span><span class="p">))</span>
+</span><span id="line-3"><span class="go">['lut3d']</span>
+</span></code></pre></div>
+</div>
+<p>The legend lines are rejected because they carry no io signature:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_filters</span><span class="p">(</span><span class="s1">'  T.. = Timeline support'</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">frozenset()</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">frozenset</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.environment.parse_licence">
+<span class="sig-prename descclassname"><span class="pre">looks.environment.</span></span><span class="sig-name descname"><span class="pre">parse_licence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/environment.html#parse_licence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.parse_licence" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.parse_licence'">¶</a></dt>
+<dd><p>Classify <code class="docutils literal notranslate"><span class="pre">ffmpeg</span> <span class="pre">-L</span></code> output.</p>
+<p>Most-restrictive-first, because the licence names are prefixes of one
+another: a permissive-first scan matches “GNU General Public License” inside
+the GPLv3 text and reports GPLv2. Anything unmatched is
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">Licence.UNKNOWN</span></code> — never a default, never a guess.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_licence</span><span class="p">(</span><span class="s2">"ffmpeg is free software; ... GNU General Public "</span>
+</span><span id="line-2"><span class="gp">... </span>              <span class="s2">"License as published by ... either version 3"</span><span class="p">)</span>
+</span><span id="line-3"><span class="go">&lt;Licence.GPL3: 'gpl3'&gt;</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_licence</span><span class="p">(</span><span class="s2">"... GNU Lesser General Public License ... version 2.1"</span><span class="p">)</span>
+</span><span id="line-5"><span class="go">&lt;Licence.LGPL21: 'lgpl2.1'&gt;</span>
+</span><span id="line-6"><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_licence</span><span class="p">(</span><span class="s2">"this build is nonfree and unredistributable"</span><span class="p">)</span>
+</span><span id="line-7"><span class="go">&lt;Licence.NONFREE: 'nonfree'&gt;</span>
+</span><span id="line-8"><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_licence</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+</span><span id="line-9"><span class="go">&lt;Licence.UNKNOWN: 'unknown'&gt;</span>
+</span><span id="line-10"><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_licence</span><span class="p">(</span><span class="s2">"Copyright (c) somebody, all rights reserved"</span><span class="p">)</span>
+</span><span id="line-11"><span class="go">&lt;Licence.UNKNOWN: 'unknown'&gt;</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.environment.Licence" title="looks.environment.Licence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Licence</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.environment.probe">
+<span class="sig-prename descclassname"><span class="pre">looks.environment.</span></span><span class="sig-name descname"><span class="pre">probe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ffmpeg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ffmpeg'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/environment.html#probe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.environment.probe" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.environment.probe'">¶</a></dt>
+<dd><p>Interrogate one ffmpeg binary. Three subprocess calls, no input, no output.</p>
+<p>Returns a <a class="reference internal" href="#looks.environment.FfmpegEnv" title="looks.environment.FfmpegEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">FfmpegEnv</span></code></a> in every case, including when <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> is not
+installed — the absence of a binary is a fact about the machine, and a
+caller diagnosing it needs a value rather than an exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ffmpeg</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span>) – Binary name (looked up on <code class="docutils literal notranslate"><span class="pre">PATH</span></code>) or an explicit path.</p></li>
+<li><p><strong>timeout</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span>) – Seconds allowed per probe call.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.environment.FfmpegEnv" title="looks.environment.FfmpegEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">FfmpegEnv</span></code></a></span></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">probe</span><span class="p">(</span><span class="s1">'a-binary-that-does-not-exist'</span><span class="p">)</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">available</span>
+</span><span id="line-3"><span class="go">False</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">licence</span>
+</span><span id="line-5"><span class="go">&lt;Licence.UNKNOWN: 'unknown'&gt;</span>
+</span><span id="line-6"><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">notes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="line-7"><span class="go">"no 'a-binary-that-does-not-exist' on PATH"</span>
+</span></code></pre></div>
+</div>
+</dd></dl>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#looks.environment.DFLT_FFMPEG'" class="reference internal" href="#looks.environment.DFLT_FFMPEG"><code class="docutils literal notranslate"><span class="pre">DFLT_FFMPEG</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.DFLT_PROBE_TIMEOUT_S'" class="reference internal" href="#looks.environment.DFLT_PROBE_TIMEOUT_S"><code class="docutils literal notranslate"><span class="pre">DFLT_PROBE_TIMEOUT_S</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.EnvFingerprint'" class="reference internal" href="#looks.environment.EnvFingerprint"><code class="docutils literal notranslate"><span class="pre">EnvFingerprint</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.environment.EnvFingerprint.path'" class="reference internal" href="#looks.environment.EnvFingerprint.path"><code class="docutils literal notranslate"><span class="pre">EnvFingerprint.path</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.EnvFingerprint.version'" class="reference internal" href="#looks.environment.EnvFingerprint.version"><code class="docutils literal notranslate"><span class="pre">EnvFingerprint.version</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.EnvFingerprint.licence'" class="reference internal" href="#looks.environment.EnvFingerprint.licence"><code class="docutils literal notranslate"><span class="pre">EnvFingerprint.licence</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.EnvFingerprint.filters_digest'" class="reference internal" href="#looks.environment.EnvFingerprint.filters_digest"><code class="docutils literal notranslate"><span class="pre">EnvFingerprint.filters_digest</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.EnvFingerprint.to_dict'" class="reference internal" href="#looks.environment.EnvFingerprint.to_dict"><code class="docutils literal notranslate"><span class="pre">EnvFingerprint.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#looks.environment.FfmpegEnv'" class="reference internal" href="#looks.environment.FfmpegEnv"><code class="docutils literal notranslate"><span class="pre">FfmpegEnv</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.environment.FfmpegEnv.path'" class="reference internal" href="#looks.environment.FfmpegEnv.path"><code class="docutils literal notranslate"><span class="pre">FfmpegEnv.path</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.FfmpegEnv.version'" class="reference internal" href="#looks.environment.FfmpegEnv.version"><code class="docutils literal notranslate"><span class="pre">FfmpegEnv.version</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.FfmpegEnv.licence'" class="reference internal" href="#looks.environment.FfmpegEnv.licence"><code class="docutils literal notranslate"><span class="pre">FfmpegEnv.licence</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.FfmpegEnv.filters'" class="reference internal" href="#looks.environment.FfmpegEnv.filters"><code class="docutils literal notranslate"><span class="pre">FfmpegEnv.filters</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.FfmpegEnv.configuration'" class="reference internal" href="#looks.environment.FfmpegEnv.configuration"><code class="docutils literal notranslate"><span class="pre">FfmpegEnv.configuration</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.FfmpegEnv.notes'" class="reference internal" href="#looks.environment.FfmpegEnv.notes"><code class="docutils literal notranslate"><span class="pre">FfmpegEnv.notes</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.FfmpegEnv.available'" class="reference internal" href="#looks.environment.FfmpegEnv.available"><code class="docutils literal notranslate"><span class="pre">FfmpegEnv.available</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.FfmpegEnv.fingerprint'" class="reference internal" href="#looks.environment.FfmpegEnv.fingerprint"><code class="docutils literal notranslate"><span class="pre">FfmpegEnv.fingerprint()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.FfmpegEnv.has_filter'" class="reference internal" href="#looks.environment.FfmpegEnv.has_filter"><code class="docutils literal notranslate"><span class="pre">FfmpegEnv.has_filter()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.FfmpegEnv.missing'" class="reference internal" href="#looks.environment.FfmpegEnv.missing"><code class="docutils literal notranslate"><span class="pre">FfmpegEnv.missing()</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#looks.environment.GATES_PATH'" class="reference internal" href="#looks.environment.GATES_PATH"><code class="docutils literal notranslate"><span class="pre">GATES_PATH</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.LICENCE_ORDER'" class="reference internal" href="#looks.environment.LICENCE_ORDER"><code class="docutils literal notranslate"><span class="pre">LICENCE_ORDER</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.Licence'" class="reference internal" href="#looks.environment.Licence"><code class="docutils literal notranslate"><span class="pre">Licence</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.UnknownFilter'" class="reference internal" href="#looks.environment.UnknownFilter"><code class="docutils literal notranslate"><span class="pre">UnknownFilter</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.gates'" class="reference internal" href="#looks.environment.gates"><code class="docutils literal notranslate"><span class="pre">gates()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.gpl_only_filters'" class="reference internal" href="#looks.environment.gpl_only_filters"><code class="docutils literal notranslate"><span class="pre">gpl_only_filters()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.known_filters'" class="reference internal" href="#looks.environment.known_filters"><code class="docutils literal notranslate"><span class="pre">known_filters()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.needs_gpl'" class="reference internal" href="#looks.environment.needs_gpl"><code class="docutils literal notranslate"><span class="pre">needs_gpl()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.parse_configuration'" class="reference internal" href="#looks.environment.parse_configuration"><code class="docutils literal notranslate"><span class="pre">parse_configuration()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.parse_filters'" class="reference internal" href="#looks.environment.parse_filters"><code class="docutils literal notranslate"><span class="pre">parse_filters()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.parse_licence'" class="reference internal" href="#looks.environment.parse_licence"><code class="docutils literal notranslate"><span class="pre">parse_licence()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.environment.probe'" class="reference internal" href="#looks.environment.probe"><code class="docutils literal notranslate"><span class="pre">probe()</span></code></a></li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left"></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=3294188c"></script>
+<script src="../_static/doctools.js?v=fd6eb6e6"></script>
+<script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=fd10adb8"></script>
+<script defer="defer" src="../_static/theme.js?v=49cc6205"></script>
+</body>
+</html>

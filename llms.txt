@@ -1,0 +1,35 @@
+# looks
+
+> A facade over video stylization: named effects with licence tiers
+
+
+## Pages
+
+- [looks](index.html.md): Named video effects that compile to a backend command, each carrying a &#42;&#42;licence tier&#42;&#42; — so you can...
+- [API reference](api.html.md): | &#96;looks&#96;   | A facade over video stylization: named effects carrying a licence tier.   |
+- [looks](_autosummary/looks.html.md): A facade over video stylization: named effects carrying a licence tier.
+- [looks.across](_autosummary/looks.across.html.md): Choosing one parameter per clip so a SET looks consistent — exactly, not by search.
+- [looks.cache](_autosummary/looks.cache.html.md): A &#96;.cube&#96; is a build artifact. This is where it gets built, once.
+- [looks.cli](_autosummary/looks.cli.html.md): The command line: thin adapters over the library, and no logic of its own.
+- [looks.compile](_autosummary/looks.compile.html.md): A Look plus a clip plus a binary, compiled into a plan — and re-checked.
+- [looks.environment](_autosummary/looks.environment.html.md): What the ffmpeg on &#42;this&#42; machine actually is, and what it can actually do.
+- [looks.ffmpeg](_autosummary/looks.ffmpeg.html.md): The ffmpeg backend: filter strings, escaping, and the first effects.
+- [looks.frame_dependency](_autosummary/looks.frame_dependency.html.md): Can this effect flicker? Answered by measurement, not by judgement.
+- [looks.geometry](_autosummary/looks.geometry.html.md): Where a source frame lands inside a target frame. Pure arithmetic.
+- [looks.licence](_autosummary/looks.licence.html.md): What an implementation costs you in obligations, and when to refuse it.
+- [looks.lut](_autosummary/looks.lut.html.md): Gradient-map 3D LUTs: a colour ramp in, an Iridas &#96;.cube&#96; out.
+- [looks.motion](_autosummary/looks.motion.html.md): A camera path, compiled to an ffmpeg fragment — the compile half of RULE G.
+- [looks.pipe](_autosummary/looks.pipe.html.md): A plan that mixes backends, as a pipe — emitted as data, never spawned.
+- [looks.registry](_autosummary/looks.registry.html.md): Which implementations exist, and how to reach the code behind a plan.
+- [looks.spec](_autosummary/looks.spec.html.md): What a stylization &#42;is&#42;, before anything runs. Pure data, no I/O, no registry.
+- [looks.transition](_autosummary/looks.transition.html.md): How one shot gives way to the next — the vocabulary, not the graph.
+- [For AI agents](ai-agents.html.md): &#96;looks&#96; ships artifacts for coding agents alongside its code. This page lists
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 15:05 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+
+## Optional
+
+- [looks.md](looks.md): Complete documentation in a single file.
+
+## Build
+
+- [build_info.json](build_info.json): build provenance (commit, version, tool versions, whether the docs match the package)
