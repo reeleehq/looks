@@ -42,8 +42,8 @@ from looks.pipe import (
 from looks.registry import EffectRegistry
 from looks.spec import ImplRef, Span
 
-CLIP = ClipSpec(width=64, height=48, fps=10)
-SEEKED = ClipSpec(width=64, height=48, fps=10, origin_s=3.0)
+CLIP = ClipSpec(width=64, height=48, fps=10, color_space="bt709")
+SEEKED = ClipSpec(width=64, height=48, fps=10, origin_s=3.0, color_space="bt709")
 
 
 def _ffmpeg_or_skip():
@@ -88,7 +88,6 @@ def plan_of(steps, *, registry, env, clip=CLIP):
         clip=clip,
         env=env,
         registry=registry,
-        assume_color_space="bt709",
     )
 
 

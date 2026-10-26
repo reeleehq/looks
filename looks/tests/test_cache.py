@@ -330,9 +330,8 @@ class TestThePlanLevelVerb:
         )
         return compile_look(
             look,
-            clip=ClipSpec(width=480, height=850, fps=30),
+            clip=ClipSpec(width=480, height=850, fps=30, color_space="bt709"),
             env=env,
-            assume_color_space="bt709",
         )
 
     def test_compiling_writes_no_file(self, cache):
@@ -381,9 +380,8 @@ class TestThePlanLevelVerb:
             pytest.skip("ffmpeg not usable")
         plan = compile_look(
             Look(steps=(Effect(name="blur", params={"sigma": 2}),)),
-            clip=ClipSpec(width=64, height=48, fps=10),
+            clip=ClipSpec(width=64, height=48, fps=10, color_space="bt709"),
             env=env,
-            assume_color_space="bt709",
         )
         assert materialize(plan) is plan
 
