@@ -26,7 +26,7 @@
 - [looks.stages](_autosummary/looks.stages.html.md): The canonical stage order, and a check that warns when a Look departs from it.
 - [looks.transition](_autosummary/looks.transition.html.md): How one shot gives way to the next — the vocabulary, not the graph.
 - [For AI agents](ai-agents.html.md): &#96;looks&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-26 22:37 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-30 13:31 UTC&#42;&#42; from commit &lt;a href="https://github.com/ree...
 
 ## Optional
 

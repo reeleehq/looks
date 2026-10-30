@@ -1,4 +1,4 @@
-> built 2026-10-26 22:37 UTC from dc25b9a (main) · looks 0.0.29. Details: build_info.json
+> built 2026-10-30 13:31 UTC from 4f69cc3 (main) · looks 0.0.30. Details: build_info.json
 
 # index.html.md
 
@@ -10933,7 +10933,7 @@ frames...
 
 # About this build
 
-This documentation was built on **2026-10-26 22:37 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/dc25b9aff2bd4d83bd1c4410cab632fd0a4a87fa"><code>dc25b9a</code></a> on branch <code>main</code>, for **looks 0.0.29** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-30 13:31 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/4f69cc35352b326c409cff81843fa0e04149ea16"><code>4f69cc3</code></a> on branch <code>main</code>, for **looks 0.0.30** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -10942,9 +10942,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/looks/commit/dc25b9aff2bd4d83bd1c4410cab632fd0a4a87fa"><code>dc25b9aff2bd4d83bd1c4410cab632fd0a4a87fa</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/looks/commit/4f69cc35352b326c409cff81843fa0e04149ea16"><code>4f69cc35352b326c409cff81843fa0e04149ea16</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | <code>0.0.29</code>                                                                                                                                   |
+| Tags at this commit | <code>0.0.30</code>                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/looks</code>                                                                                                        |
 
@@ -10953,9 +10953,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/looks</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/40407992498">40407992498</a>       |
+| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/41063342678">41063342678</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>e4dbdfa00ec688b54fef89c66acc717883130950</code> (in the history of the built commit) |
+| Event commit | <code>22f7c77a8c753f7552d8abcab157381a137c4a00</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -10980,13 +10980,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/looks/0.0.29/">0.0.29</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/looks/0.0.30/">0.0.30</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout dc25b9aff2bd4d83bd1c4410cab632fd0a4a87fa
+git checkout 4f69cc35352b326c409cff81843fa0e04149ea16
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
