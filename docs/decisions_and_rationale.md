@@ -441,7 +441,7 @@ Verified: `needs_gpl(['nosuchfilter'])` -> `()`, and `needs_gpl(['EQ'])` -> `()`
 
 > **RULE G. If the geometry is AUTHORED — a person or a model chose it as the shot, and changing it changes what the viewer is looking at — it is a camera, and it belongs to `burns`. If the geometry is DERIVED — it falls out of a delivery contract, such that any two implementations given the same inputs must compute the same rectangle — it is conformance, and it belongs to `looks`.**
 
-Rule G predicts every case already in the code, including the one that breaks the naive split: `muvid`'s moving `CropWindow` is a camera move over *video*, and muvid already stores it in `burns.Rect`'s convention explicitly so no rename table is needed.
+Rule G predicts every case already in the code, including the one that breaks the naive split: `muvid`'s moving `CropWindow` is a camera move over *video*, and muvid already stores it in `burns.Rect`'s convention explicitly so no rename table is needed. Geometry that models an optical or mechanical artefact of the medium (gate weave, later lens breathing or shake-as-texture) is a *look*, not a camera: it expresses no framing intent. The evidence is [PR #27](https://github.com/reeleehq/looks/pull/27), which registered `gate_weave` in `looks`.
 
 | Case | Owner | Why |
 |---|---|---|
