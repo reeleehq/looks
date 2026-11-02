@@ -38,9 +38,13 @@ INVOCATIONS = {
 #: `showpalette` auto-scales rgb24 to YUV on 9.0.1, not on 6.1.6. The list is
 #: the union, so on the other build it is only checked to run.
 BUILD_DEPENDENT = frozenset({"showpalette"})
-_PROCESS_TIMEOUT_S = 30
+#: Short: a filter that does not finish one tiny frame in this long is
+#: reported as a timeout, and a timeout fails the sweep rather than reading
+#: as "does not convert" (on 6.1 `atadenoise` hung on a one-frame source).
+_PROCESS_TIMEOUT_S = 10
 _SWEEP_WORKERS = 8
-_SOURCE = "testsrc2=s=64x48:r=1:d=1,format=rgb24"
+#: Ten frames, so a filter that needs a few frames of history finishes.
+_SOURCE = "testsrc2=s=64x48:r=10:d=1,format=rgb24"
 _CONVERSION = re.compile(
     r"\[auto_scale_\d+ @ \w+\] w:\d+ h:\d+ fmt:(\w+) .*-> .*fmt:(\w+) "
 )
@@ -97,13 +101,15 @@ def test_no_filter_of_this_binary_converts_rgb_to_yuv_unlisted(env):
         try:
             result = _run(name)
         except subprocess.TimeoutExpired:
-            return False
+            return None
         return result.returncode == 0 and _converts_to_yuv(result.stderr)
 
     names = _video_filters()
     assert len(names) > 100, "the filter listing did not parse"
     with ThreadPoolExecutor(_SWEEP_WORKERS) as pool:
         flags = list(pool.map(converts, names))
+    timed_out = [n for n, hit in zip(names, flags) if hit is None]
+    assert not timed_out, f"{timed_out} did not finish: the sweep cannot see them"
     unlisted = {n for n, hit in zip(names, flags) if hit} - YUV_DOMAIN_FILTERS
     assert not unlisted, (
         f"{sorted(unlisted)} auto-scale RGB to YUV but are not in "
@@ -112,9 +118,9 @@ def test_no_filter_of_this_binary_converts_rgb_to_yuv_unlisted(env):
     )
 
 
-def _clip(color_space):
+def _clip(color_space, **kw):
     return ClipSpec(
-        width=64, height=48, fps=1, pix_fmt="rgb24", color_space=color_space
+        width=64, height=48, fps=1, pix_fmt="rgb24", color_space=color_space, **kw
     )
 
 
@@ -166,3 +172,58 @@ def test_an_rgb_clip_s_rgb_step_keeps_its_wrap(env):
     look = Look(steps=(Effect(name="curves", params={"all": [(0, 0), (1, 1)]}),))
     chain = vf(compile_look(look, clip=_clip("bt709"), env=env))
     assert chain.startswith(matrix_wrap(_clip("bt709")))
+
+
+def _moved(env, steps, *, clip, source=_SOURCE):
+    """Max |change| in rgb24 pixels of an all-identity Look on an RGB clip."""
+    chain = vf(compile_look(Look(steps=steps), clip=clip, env=env))
+    return max(
+        abs(a - b)
+        for a, b in zip(_rgb(chain, source=source), _rgb("null", source=source))
+    )
+
+
+_IDENTITY = {
+    "curves": Effect(name="curves", params={"all": [(0, 0), (1, 1)]}),
+    "contrast": Effect(name="contrast", params={"amount": 1.0}),
+    "grain": Effect(name="grain", params={"strength": 0}),
+}
+
+
+@pytest.mark.filterwarnings("ignore::looks.stages.StageOrderWarning")
+@pytest.mark.parametrize(
+    "names",
+    [
+        ("contrast",),
+        # A filter taking both formats after a YUV run stays in YUV, so the
+        # run is closed by the wrap: without it, 22/255 on 6.1.
+        ("contrast", "grain"),
+        # RGB run, YUV run, a neutral step, YUV again: 39/255 on 6.1 when
+        # the wrap between the RGB and the YUV run was missing.
+        ("curves", "contrast", "grain", "contrast"),
+    ],
+)
+def test_identity_steps_on_an_rgb_clip_move_nothing(env, names):
+    steps = tuple(_IDENTITY[n] for n in names)
+    assert _moved(env, steps, clip=_clip("bt709")) <= 1
+
+
+def test_a_full_range_rgb_clip_s_yuv_run_is_limited_range(env):
+    """The range tag describes the RGB. Declared full in between, `lutyuv`'s
+    chroma clamp to 16..240 moved an identity contrast by 29/255."""
+    clip = _clip("bt709", color_range="pc")
+    assert "range" not in matrix_wrap(clip)
+    assert _moved(env, (_IDENTITY["contrast"],), clip=clip) <= 1
+
+
+def test_an_alpha_rgb_clip_is_wrapped_and_keeps_its_alpha(env):
+    clip = ClipSpec(width=64, height=48, fps=1, pix_fmt="rgba", color_space="bt709")
+    chain = vf(compile_look(Look(steps=(_IDENTITY["contrast"],)), clip=clip, env=env))
+    assert chain.startswith(matrix_wrap(clip)), chain
+    source = "testsrc2=s=64x48:r=1:d=1,format=rgba,geq=r=r(X\\,Y):g=g(X\\,Y):b=b(X\\,Y):a=X*4"
+    out = ("-f", "rawvideo", "-pix_fmt", "rgba", "-")
+    run = lambda c: subprocess.run(  # noqa: E731
+        ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", source, "-vf", c, "-frames:v", "1", *out],
+        capture_output=True, check=True,
+    ).stdout  # fmt: skip
+    assert run(chain)[3::4] == run("null")[3::4]
