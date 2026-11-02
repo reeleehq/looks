@@ -105,7 +105,8 @@ def compile_look(
             asks for it. Its ``pix_fmt`` is what the first step receives, and
             what each later one receives as far as bit depth goes while every
             step before it keeps depth (``EffectRegistry.register``'s
-            ``keeps_depth``). Those steps' parameters are checked against it:
+            ``keeps_depth``) and the format is one measured to survive that
+            (:data:`looks.params.DEPTH_CARRIED_FORMATS`). Those steps' parameters are checked against it:
             a ``curves`` whose x-points share one code value is refused
             (issues #33, #52).
         env: Which binary. When given, an implementation whose filters this
