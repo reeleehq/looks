@@ -4,6 +4,7 @@ Offline and free: every source is a pinned ``lavfi`` pattern, every process ends
 in rawvideo on a pipe or ``-f null -``.
 """
 
+import cmath
 import shutil
 import subprocess
 
@@ -13,7 +14,7 @@ from looks import ClipSpec, Effect, Look, Ripple, Transition, compile_look, vf
 from looks.environment import probe
 from looks.ffmpeg import FfmpegBackendError, _ripple_compiler
 from looks.params import with_defaults
-from looks.transition import TransitionError
+from looks.transition import TransitionError, xfade_options
 
 FPS = 10
 #: The window: frames 10..20 at 10 fps, peaking at frame 15.
@@ -45,22 +46,44 @@ def _clip(width, height, pix_fmt="yuv420p"):
     )
 
 
-def _chain(env, clip, **ripple):
-    effect = Ripple(DURATION, **ripple).effect(offset=START)
+def _chain(env, clip, *, offset=START, duration=DURATION, **ripple):
+    effect = Ripple(duration, **ripple).effect(offset=offset)
     return vf(compile_look(Look(steps=(effect,)), clip=clip, env=env))
 
 
-def _source(width, height, pix_fmt, *, planes=("lum",)):
+def _source(width, height, pix_fmt, *, planes=("lum",), pattern=PATTERN, frames=FRAMES):
     """The pattern in ``planes``, neutral elsewhere, converted to ``pix_fmt``."""
-    exprs = {p: PATTERN for p in planes}
+    exprs = {p: pattern for p in planes}
     exprs.setdefault("cb", "128")
     exprs.setdefault("cr", "128")
     base = "yuva444p" if "a" in planes else "yuv444p"
     options = ":".join(f"{k}='{v}'" for k, v in exprs.items())
     return (
-        f"nullsrc=size={width}x{height}:rate={FPS}:duration={FRAMES / FPS},"
+        f"nullsrc=size={width}x{height}:rate={FPS}:duration={frames / FPS},"
         f"format={base},geq={options},format={pix_fmt}"
     )
+
+
+def _flat(width, height, pix_fmt, luma, *, color_range=None):
+    """A flat picture at ``luma`` (in ``pix_fmt``'s own codes), optionally tagged."""
+    tag = f",setrange={color_range}" if color_range else ""
+    neutral = 512 if "10" in pix_fmt else 128
+    return (
+        f"nullsrc=size={width}x{height}:rate={FPS}:duration={FRAMES / FPS},"
+        f"format={pix_fmt},geq=lum={luma}:cb={neutral}:cr={neutral}{tag}"
+    )
+
+
+def _luma_codes(frame, width, height, *, bytes_per_sample=1):
+    """The luma plane of one raw frame, as integer codes."""
+    n = width * height * bytes_per_sample
+    if bytes_per_sample == 1:
+        return list(frame[:n])
+    return [int.from_bytes(frame[i : i + 2], "little") for i in range(0, n, 2)]
+
+
+def _mean(values):
+    return sum(values) / len(values)
 
 
 def _frames(source, chain, *, out_pix_fmt):
@@ -111,6 +134,34 @@ def test_a_round_trip_through_a_document_keeps_the_record():
     r = Ripple(0.7, amplitude=0.02, wavelengths=[0.1, 0.05], bloom=0.3)
     assert Ripple.from_dict(r.to_dict()) == r
     assert r.wavelengths == (0.1, 0.05)
+
+
+def test_a_document_is_coerced_and_filtered_like_a_transitions():
+    """As JSON would bring it back: ints, a list, and a key it does not know."""
+    r = Ripple.from_dict(
+        {"kind": "ripple", "duration_s": 1, "wavelengths": [0.1, 0.05], "note": "x"}
+    )
+    assert r == Ripple(1.0, wavelengths=(0.1, 0.05))
+    assert isinstance(r.duration_s, float) and isinstance(r.wavelengths, tuple)
+
+
+def test_a_stored_ripple_and_a_stored_fade_are_never_confused():
+    ripple = Ripple(1.0).to_dict()
+    assert ripple["kind"] == "ripple"
+    with pytest.raises(TransitionError, match="not a Transition document"):
+        Transition.from_dict(ripple)
+    with pytest.raises(TransitionError, match="not a Ripple document"):
+        Ripple.from_dict(Transition(1.0).to_dict())
+    with pytest.raises(TransitionError, match="not a Ripple document"):
+        Ripple.from_dict({**ripple, "kind": "fade"})
+    assert Transition.from_dict({"kind": "xfade", "duration_s": 1}) == Transition(1.0)
+
+
+def test_the_effect_carries_no_kind():
+    """The schema refuses an unknown key, so the record's kind must stay out."""
+    params = Ripple(1.0).effect(offset=0).params
+    assert "kind" not in params
+    assert set(params) == {"start_s", "duration_s", "amplitude", "wavelengths", "bloom"}
 
 
 def test_the_bloom_needs_the_clip_and_no_bloom_does_not():
@@ -222,18 +273,23 @@ def test_ten_bits_stay_ten_bits(env):
     assert len(codes) > 256
 
 
-def test_the_look_is_the_same_at_any_size(env):
-    """Sizes are fractions of the frame: twice the pixels, the same picture."""
+@pytest.mark.parametrize("bloom", [0, Ripple(1).bloom])
+def test_the_look_is_the_same_at_any_size(env, bloom):
+    """Sizes are fractions of the frame: twice the pixels, the same picture.
+
+    With the bloom on too, whose blur is sized from the clip at compile time.
+    """
     small = _split(
         _frames(
             _source(160, 90, "yuv444p"),
-            _chain(env, _clip(160, 90, "yuv444p"), bloom=0),
+            _chain(env, _clip(160, 90, "yuv444p"), bloom=bloom),
             out_pix_fmt="gray",
         ),
         FRAMES,
     )[PEAK]
     large_chain = (
-        _chain(env, _clip(320, 180, "yuv444p"), bloom=0) + ",scale=160:90:flags=area"
+        _chain(env, _clip(320, 180, "yuv444p"), bloom=bloom)
+        + ",scale=160:90:flags=area"
     )
     large = _split(
         _frames(_source(320, 180, "yuv444p"), large_chain, out_pix_fmt="gray"), FRAMES
@@ -302,3 +358,205 @@ def test_the_vertical_wander_is_scaled_per_plane_at_4_2_2(env):
     )
     assert _mean_abs(luma, original[: width * height]) > 5, "the stripes did not move"
     assert _mean_abs(sampled, chroma) < 2
+
+
+def test_the_bloom_is_sized_by_the_height_not_the_width(env):
+    """Same height, twice the width: the glow along a column must not change.
+
+    Stripes vary along Y only and the warp is off, so a column sees only the
+    blur's vertical extent. Proportional sizes cannot tell height from width;
+    this aspect change can.
+    """
+    stripes = "128+90*cos(2*PI*4*Y/H)"
+
+    def column(width, bloom):
+        source = _source(width, 90, "yuv444p", pattern=stripes)
+        chain = _chain(env, _clip(width, 90, "yuv444p"), amplitude=0, bloom=bloom)
+        peak = _split(_frames(source, chain, out_pix_fmt="gray"), FRAMES)[PEAK]
+        return [peak[y * width + width // 2] for y in range(90)]
+
+    narrow, wide = column(160, Ripple(1).bloom), column(320, Ripple(1).bloom)
+    assert _mean_abs(narrow, column(160, 0)) > 2, "no glow to compare"
+    assert _mean_abs(narrow, wide) < 0.5
+
+
+def test_the_motion_is_the_same_wherever_the_window_lands(env):
+    """Phases count from the window's start: one record, one picture.
+
+    Measured before the fix (phases in absolute ``T``): mean |diff| 13.7
+    between the two peaks, against an effect of 15.5.
+    """
+    frames = 40
+    source = _source(160, 90, "yuv420p", frames=frames)
+    plain = _split(_frames(source, "", out_pix_fmt="gray"), frames)
+
+    def peak(offset):
+        chain = _chain(env, _clip(160, 90), offset=offset)
+        k = round((offset + DURATION / 2) * FPS)
+        return k, _split(_frames(source, chain, out_pix_fmt="gray"), frames)[k]
+
+    (k1, early), (k2, late) = peak(1.0), peak(2.3)
+    assert _mean_abs(early, plain[k1]) > 5, "the peak did not move"
+    assert _mean_abs(early, late) < 0.5
+
+
+def test_the_strongest_frame_is_the_dissolves_midpoint(env):
+    """The warp peaks where ``xfade``, given the same window, is at 50%.
+
+    Both measured: ``xfade``'s mix on two flat sources, and the ripple's mean
+    displacement from the source. A short window at a frame-unaligned start,
+    so the frames either side of the peak sit well below it (sin² of 0.75).
+    """
+    offset, duration = 1.2, 0.6
+    ripple = Ripple(duration, bloom=0)
+    lo, hi = 40, 200
+    options = xfade_options(ripple.dissolve, offset=offset, fps=FPS)
+    xfade = "xfade=" + ":".join(f"{k}={v}" for k, v in options.items())
+    flat = [_flat(64, 36, "yuv420p", value) for value in (lo, hi)]
+    argv = ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", flat[0], "-f", "lavfi"]
+    argv += ["-i", flat[1], "-filter_complex", f"[0][1]{xfade},format=gray"]
+    raw = subprocess.run(
+        argv + ["-f", "rawvideo", "-"], capture_output=True, check=True
+    )
+    mixes = [
+        (_mean(f) - lo) / (hi - lo)
+        for f in _split(raw.stdout, len(raw.stdout) // (64 * 36))
+    ]
+    halfway = min(range(len(mixes)), key=lambda k: abs(mixes[k] - 0.5))
+    assert abs(mixes[halfway] - 0.5) < 0.02
+
+    source = _source(160, 90, "yuv420p")
+    plain = _split(_frames(source, "", out_pix_fmt="gray"), FRAMES)
+    rippled = _split(
+        _frames(
+            source,
+            _chain(env, _clip(160, 90), offset=offset, duration=duration, bloom=0),
+            out_pix_fmt="gray",
+        ),
+        FRAMES,
+    )
+    moved = [_mean_abs(a, b) for a, b in zip(rippled, plain)]
+    assert max(range(FRAMES), key=moved.__getitem__) == halfway
+
+
+def test_the_bloom_swells_to_the_peak_and_settles_symmetrically(env):
+    """Per frame, the bloom's brightening follows the envelope: up, then down."""
+    source = _source(160, 90, "yuv420p")
+    plain = _split(
+        _frames(source, _chain(env, _clip(160, 90), bloom=0), out_pix_fmt="gray"),
+        FRAMES,
+    )
+    bloomed = _split(
+        _frames(source, _chain(env, _clip(160, 90)), out_pix_fmt="gray"), FRAMES
+    )
+    window = range(int(START * FPS) + 1, round((START + DURATION) * FPS))
+    lift = {k: _mean(bloomed[k]) - _mean(plain[k]) for k in window}
+    rising = [lift[k] for k in window if k <= PEAK]
+    falling = [lift[k] for k in window if k >= PEAK]
+    assert all(a < b for a, b in zip(rising, rising[1:])), rising
+    assert all(a > b for a, b in zip(falling, falling[1:])), falling
+    for k in range(1, PEAK - window.start + 1):
+        assert abs(lift[PEAK - k] - lift[PEAK + k]) < 0.5, (k, lift)
+
+
+def test_the_bloom_lift_is_the_same_proportion_at_any_depth(env):
+    """A flat mid-grey at 8 and 10 bits brightens by the same fraction of scale."""
+
+    def lift(pix_fmt, luma, scale):
+        chain = _chain(env, _clip(64, 36, pix_fmt), amplitude=0)
+        raw = _frames(_flat(64, 36, pix_fmt, luma), chain, out_pix_fmt=pix_fmt)
+        peak = _split(raw, FRAMES)[PEAK]
+        codes = _luma_codes(peak, 64, 36, bytes_per_sample=scale)
+        return (_mean(codes) - luma) / (255 if scale == 1 else 1023)
+
+    eight, ten = lift("yuv420p", 128, 1), lift("yuv420p10le", 512, 2)
+    assert eight > 10 / 255, "no bloom to compare"
+    assert abs(eight - ten) < 1 / 255
+
+
+@pytest.mark.parametrize(
+    "color_range, luma, check",
+    [
+        # Full range: a highlight the bloom brightens must not come out darker.
+        # Clipped at lutyuv's limited maxval it did: 250 became 241.
+        ("pc", 250, lambda peak: peak > 250),
+        # Limited, and untagged (which ffmpeg treats as limited): nominal white
+        # stays nominal white; unclipped it would rise to 246.
+        ("tv", 235, lambda peak: peak == 235),
+        (None, 235, lambda peak: peak == 235),
+    ],
+)
+def test_the_bloom_respects_the_clips_range(env, color_range, luma, check):
+    clip = ClipSpec(
+        width=64,
+        height=36,
+        fps=FPS,
+        pix_fmt="yuv420p",
+        color_space="bt709",
+        color_range=color_range,
+    )
+    effect = Ripple(DURATION, amplitude=0).effect(offset=START)
+    chain = vf(compile_look(Look(steps=(effect,)), clip=clip, env=env))
+    source = _flat(64, 36, "yuv420p", luma, color_range=color_range)
+    peak = _split(_frames(source, chain, out_pix_fmt="yuv420p"), FRAMES)[PEAK]
+    mean = _mean(_luma_codes(peak, 64, 36))
+    assert check(mean), mean
+
+
+def _displacement_profiles(env, frames_wanted, *, width=256, height=400):
+    """The horizontal displacement ``dx(Y)``, in pixels, read off a luma ramp.
+
+    The source is ``4*X`` at 10 bits, so a bilinear read at ``X+dx`` returns
+    ``4*(X+dx)`` exactly (to a quarter pixel), and a pattern constant in Y
+    hides the vertical wander. Averaged over the middle columns, clear of any
+    edge.
+    """
+    pix_fmt = "yuv420p10le"
+    source = (
+        f"nullsrc=size={width}x{height}:rate={FPS}:duration={FRAMES / FPS},"
+        f"format=yuv444p10le,geq=lum=4*X:cb=512:cr=512,format={pix_fmt}"
+    )
+    # Whole cycles over the height (4 and 10), so the two harmonics are
+    # orthogonal and a plain Fourier projection separates them.
+    chain = _chain(
+        env, _clip(width, height, pix_fmt), wavelengths=(1 / 4, 1 / 10), bloom=0
+    )
+    frames = _split(_frames(source, chain, out_pix_fmt=pix_fmt), FRAMES)
+    columns = range(width * 3 // 8, width * 5 // 8)
+    profiles = {}
+    for k in frames_wanted:
+        codes = _luma_codes(frames[k], width, height, bytes_per_sample=2)
+        profiles[k] = [
+            _mean([codes[y * width + x] / 4 - x for x in columns])
+            for y in range(height)
+        ]
+    return profiles
+
+
+def _harmonic(profile, cycles):
+    """The amplitude of ``profile``'s component at ``cycles`` per length."""
+    n = len(profile)
+    c = sum(
+        v * cmath.exp(-2j * cmath.pi * cycles * y / n) for y, v in enumerate(profile)
+    )
+    return 2 * abs(c) / n
+
+
+def test_the_displacement_has_both_harmonics_at_their_sizes(env):
+    """At the peak, ``dx(Y)`` is the amplitude at the first wavelength and
+    ``RIPPLE_HARMONIC`` of it at the second: measured, not read off the string."""
+    from looks.ffmpeg import RIPPLE_HARMONIC
+
+    width = 256
+    profile = _displacement_profiles(env, [PEAK], width=width)[PEAK]
+    expected = Ripple(1).amplitude * width
+    assert abs(_harmonic(profile, 4) - expected) < 0.25
+    assert abs(_harmonic(profile, 10) - RIPPLE_HARMONIC * expected) < 0.25
+
+
+def test_the_ripple_moves_rather_than_breathes(env):
+    """Two frames at the same envelope value, either side of the peak, differ:
+    the phases advance with time, so the pattern travels."""
+    before, after = PEAK - 1, PEAK + 1
+    profiles = _displacement_profiles(env, [before, after])
+    assert _mean_abs(profiles[before], profiles[after]) > 0.5
