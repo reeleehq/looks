@@ -4733,6 +4733,12 @@ will otherwise assume were checked.</p>
 <p>The seam every consumer asked for is one string — <code class="docutils literal notranslate"><span class="pre">muvid</span></code> splices it into
 the filter chain <code class="docutils literal notranslate"><span class="pre">_render_part</span></code> already builds, and that only works if
 nothing here names a stream.</p>
+<p>Every YUV&lt;-&gt;RGB conversion the chain needs is declared in the clip’s matrix
+(<code class="xref py py-func docutils literal notranslate"><span class="pre">matrix_wrap()</span></code>): around RGB-only steps on any clip, and around
+YUV-only ones on an RGB clip (issue #56). An RGB clip that declares no
+YUV matrix (<code class="docutils literal notranslate"><span class="pre">gbr</span></code> is the honest tag for one) is not refused for a YUV-only
+step, unlike rule 22: ffmpeg then makes both conversions with one guess,
+and an identity round trip measured 1/255.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#looks.FfmpegBackendError" title="looks.FfmpegBackendError"><strong>FfmpegBackendError</strong></a> – If a step is not ffmpeg-backed, or is gated to a
@@ -5204,7 +5210,7 @@ count check — the obvious check — passes in both cases.</p></li>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=39aadc1c"></script>
+<script src="../_static/documentation_options.js?v=0e525676"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

@@ -11,7 +11,11 @@ looks.ffmpeg
       OPTION_LEVEL_SPECIALS
       GRAPH_LEVEL_SPECIALS
       RGB_DOMAIN_FILTERS
+      YUV_DOMAIN_FILTERS
+      RGB_RUN
+      YUV_RUN
       RGB_ONLY_IMPL_VERSION
+      YUV_ONLY_IMPL_VERSION
       SETSAR_MAX
       LABEL_NAMESPACE
       RIPPLE_HARMONIC
@@ -32,6 +36,8 @@ looks.ffmpeg
       gated
       has_scale_matrix
       is_rgb_domain
+      is_rgb_pix_fmt
+      is_yuv_domain
       matrix_wrap
       register_defaults
       split_filters

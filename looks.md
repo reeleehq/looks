@@ -1,4 +1,4 @@
-> built 2026-11-02 17:47 UTC from 4eb5dd8 (main) · looks 0.0.35. Details: build_info.json
+> built 2026-11-02 18:22 UTC from d97537a (main) · looks 0.0.36. Details: build_info.json
 
 # index.html.md
 
@@ -1669,21 +1669,25 @@ keeps the package honest would have nothing left to protect.
 
 ### Module Attributes
 
-| [`OPTION_LEVEL_SPECIALS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.OPTION_LEVEL_SPECIALS)      | Characters the **option** parser gives meaning to, within one filter's arguments.                                                                                   |
-|-----------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`GRAPH_LEVEL_SPECIALS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.GRAPH_LEVEL_SPECIALS)       | Characters the **filtergraph** parser gives meaning to across the graph: `,` chains, `;` separates, `[]` delimit pad labels, `\\` and `'` do that parser's quoting. |
-| [`RGB_DOMAIN_FILTERS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RGB_DOMAIN_FILTERS)         | Filters that only take RGB, so ffmpeg converts YUV to RGB and back around them.                                                                                     |
-| [`RGB_ONLY_IMPL_VERSION`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RGB_ONLY_IMPL_VERSION)      | The version of an implementation that sits in an RGB-only run.                                                                                                      |
-| [`SETSAR_MAX`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.SETSAR_MAX)                 | `setsar`'s largest allowed rational term.                                                                                                                           |
-| [`LABEL_NAMESPACE`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.LABEL_NAMESPACE)            | Prefix of the pad labels a branching effect uses internally, so they stay clear of a host's own (`[a]`, `[bg]`: note 05, label rule 2).                             |
-| [`RIPPLE_HARMONIC`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_HARMONIC)            | Weight of the second horizontal harmonic against the first.                                                                                                         |
-| [`RIPPLE_SPEEDS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_SPEEDS)              | Phase speeds of the two horizontal harmonics, radians per second.                                                                                                   |
-| [`RIPPLE_VERTICAL`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_VERTICAL)            | Vertical wander, as a fraction of the horizontal amplitude.                                                                                                         |
-| [`RIPPLE_VERTICAL_WAVELENGTH`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_VERTICAL_WAVELENGTH) | Wavelength of the vertical wander along x, as a fraction of the width.                                                                                              |
-| [`RIPPLE_VERTICAL_SPEED`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_VERTICAL_SPEED)      | Phase speed of the vertical wander, radians per second.                                                                                                             |
-| [`RIPPLE_BLOOM_SIGMA`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_BLOOM_SIGMA)         | The bloom's blur, as a fraction of the frame's height (14 px at 576).                                                                                               |
-| [`RIPPLE_BLOOM_GAIN`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_BLOOM_GAIN)          | a luma gain, and a lift as a fraction of `lutyuv`'s `maxval`.                                                                                                       |
-| [`RIPPLE_BLOOM_PLANES`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_BLOOM_PLANES)        | luma and both chroma, never alpha, so a transparent edge is not softened by the glow.                                                                               |
+| [`OPTION_LEVEL_SPECIALS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.OPTION_LEVEL_SPECIALS)      | Characters the **option** parser gives meaning to, within one filter's arguments.                                                                                                                                                |
+|-----------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`GRAPH_LEVEL_SPECIALS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.GRAPH_LEVEL_SPECIALS)       | Characters the **filtergraph** parser gives meaning to across the graph: `,` chains, `;` separates, `[]` delimit pad labels, `\\` and `'` do that parser's quoting.                                                              |
+| [`RGB_DOMAIN_FILTERS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RGB_DOMAIN_FILTERS)         | Filters that only take RGB, so ffmpeg converts YUV to RGB and back around them.                                                                                                                                                  |
+| [`YUV_DOMAIN_FILTERS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.YUV_DOMAIN_FILTERS)         | Filters that only take YUV (or gray), so ffmpeg converts an RGB input to YUV and back around them, with a matrix nothing declares: the mirror of [`RGB_DOMAIN_FILTERS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RGB_DOMAIN_FILTERS), issue #56. |
+| [`RGB_RUN`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RGB_RUN)                    | The two kinds of run `vf` wraps in the clip's colour matrix.                                                                                                                                                                     |
+| [`YUV_RUN`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.YUV_RUN)                    | The two kinds of run `vf` wraps in the clip's colour matrix.                                                                                                                                                                     |
+| [`RGB_ONLY_IMPL_VERSION`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RGB_ONLY_IMPL_VERSION)      | The version of an implementation that sits in an RGB-only run.                                                                                                                                                                   |
+| [`YUV_ONLY_IMPL_VERSION`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.YUV_ONLY_IMPL_VERSION)      | The version of a YUV-only implementation, since `vf` declares the matrix around it on an RGB clip (issue #56), which moves that clip's pixels.                                                                                   |
+| [`SETSAR_MAX`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.SETSAR_MAX)                 | `setsar`'s largest allowed rational term.                                                                                                                                                                                        |
+| [`LABEL_NAMESPACE`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.LABEL_NAMESPACE)            | Prefix of the pad labels a branching effect uses internally, so they stay clear of a host's own (`[a]`, `[bg]`: note 05, label rule 2).                                                                                          |
+| [`RIPPLE_HARMONIC`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_HARMONIC)            | Weight of the second horizontal harmonic against the first.                                                                                                                                                                      |
+| [`RIPPLE_SPEEDS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_SPEEDS)              | Phase speeds of the two horizontal harmonics, radians per second.                                                                                                                                                                |
+| [`RIPPLE_VERTICAL`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_VERTICAL)            | Vertical wander, as a fraction of the horizontal amplitude.                                                                                                                                                                      |
+| [`RIPPLE_VERTICAL_WAVELENGTH`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_VERTICAL_WAVELENGTH) | Wavelength of the vertical wander along x, as a fraction of the width.                                                                                                                                                           |
+| [`RIPPLE_VERTICAL_SPEED`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_VERTICAL_SPEED)      | Phase speed of the vertical wander, radians per second.                                                                                                                                                                          |
+| [`RIPPLE_BLOOM_SIGMA`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_BLOOM_SIGMA)         | The bloom's blur, as a fraction of the frame's height (14 px at 576).                                                                                                                                                            |
+| [`RIPPLE_BLOOM_GAIN`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_BLOOM_GAIN)          | a luma gain, and a lift as a fraction of `lutyuv`'s `maxval`.                                                                                                                                                                    |
+| [`RIPPLE_BLOOM_PLANES`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_BLOOM_PLANES)        | luma and both chroma, never alpha, so a transparent edge is not softened by the glow.                                                                                                                                            |
 
 ### Functions
 
@@ -1693,6 +1697,8 @@ keeps the package honest would have nothing left to protect.
 | [`gated`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.gated)(fragment, at)            | Restrict a fragment to a span, using ffmpeg's own timeline support.      |
 | [`has_scale_matrix`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.has_scale_matrix)(color_space)  | Whether a declared colour space names a matrix `scale` knows.            |
 | [`is_rgb_domain`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.is_rgb_domain)(filters)         | Whether any of these ffmpeg filters only takes RGB.                      |
+| [`is_rgb_pix_fmt`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.is_rgb_pix_fmt)(pix_fmt)        | Whether a pixel format is RGB; an undeclared one reads as not.           |
+| [`is_yuv_domain`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.is_yuv_domain)(filters)         | Whether any of these ffmpeg filters only takes YUV.                      |
 | [`matrix_wrap`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.matrix_wrap)(clip)              | The `scale` that makes a YUV<->RGB conversion use the clip's own matrix. |
 | [`register_defaults`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.register_defaults)([registry])  | Register the built-in ffmpeg effects.                                    |
 | [`split_filters`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.split_filters)(fragment)        | A chain into its filters, splitting on UNESCAPED commas only.            |
@@ -1737,6 +1743,10 @@ filter (`lutyuv`, `gblur`) is untouched by it and so is not listed.
 ### looks.ffmpeg.RGB_ONLY_IMPL_VERSION *= '2'*
 
 The version of an implementation that sits in an RGB-only run.
+
+### looks.ffmpeg.RGB_RUN *= 'rgb'*
+
+The two kinds of run `vf` wraps in the clip’s colour matrix.
 
 ### looks.ffmpeg.RIPPLE_BLOOM_GAIN *= 1.15*
 
@@ -1785,6 +1795,29 @@ Wavelength of the vertical wander along x, as a fraction of the width.
 
 `setsar`’s largest allowed rational term. Its default of 100 rewrites any
 SAR with a bigger term (118/81 -> 67/46, 1001/1000 -> 1/1).
+
+### looks.ffmpeg.YUV_DOMAIN_FILTERS *= frozenset({'bbox', 'blackdetect', 'blackframe', 'chromahold', 'chromakey', 'chromanr', 'chromashift', 'codecview', 'colorcorrect', 'colorize', 'cover_rect', 'dedot', 'deflicker', 'deshake', 'eq', 'fftfilt', 'framerate', 'geq', 'hqdn3d', 'hsvhold', 'hsvkey', 'hue', 'idet', 'interlace', 'lumakey', 'lutyuv', 'mcdeint', 'mestimate', 'minterpolate', 'monochrome', 'ocr', 'owdenoise', 'pullup', 'readeia608', 'readvitc', 'repeatfields', 'sab', 'showpalette', 'signalstats', 'siti', 'smartblur', 'swapuv', 'tiltandshift', 'tinterlace', 'unsharp', 'uspp', 'vmafmotion'})*
+
+Filters that only take YUV (or gray), so ffmpeg converts an RGB input to
+YUV and back around them, with a matrix nothing declares: the mirror of
+[`RGB_DOMAIN_FILTERS`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RGB_DOMAIN_FILTERS), issue #56. Measured on 6.1 and 9.0 by sweeping
+every V->V filter with default arguments on an rgb24 source and reading its
+`auto_scale` line (`test_yuv_domain_filters.py` repeats the sweep). The cost
+of the undeclared matrix is small, an identity round trip moved 1/255, but a
+luma operation then acts on BT.601 luma whatever the clip says. Listed for
+the union of both builds.
+`geq` is listed because it takes YUV when given lum=/cb=/cr= expressions,
+which is the form an implementation here emits (`ripple`); one that emits
+r=/g=/b= declares `rgb_only=True`, which wins.
+
+### looks.ffmpeg.YUV_ONLY_IMPL_VERSION *= '2'*
+
+The version of a YUV-only implementation, since `vf` declares the matrix
+around it on an RGB clip (issue #56), which moves that clip’s pixels.
+
+### looks.ffmpeg.YUV_RUN *= 'yuv'*
+
+The two kinds of run `vf` wraps in the clip’s colour matrix.
 
 ### looks.ffmpeg.escape_filter_value(value)
 
@@ -1895,14 +1928,46 @@ False
 * **Return type:**
   [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
+### looks.ffmpeg.is_rgb_pix_fmt(pix_fmt)
+
+Whether a pixel format is RGB; an undeclared one reads as not.
+
+```pycon
+>>> is_rgb_pix_fmt("gbrp10le"), is_rgb_pix_fmt("yuv420p"), is_rgb_pix_fmt(None)
+(True, False, False)
+>>> [is_rgb_pix_fmt(f) for f in ("rgba", "bgr0", "x2rgb10le", "gray", "ya8")]
+[True, True, True, False, False]
+```
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+### looks.ffmpeg.is_yuv_domain(filters)
+
+Whether any of these ffmpeg filters only takes YUV.
+
+```pycon
+>>> is_yuv_domain(("lutyuv",)), is_yuv_domain(("gblur",))
+(True, False)
+```
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
 ### looks.ffmpeg.matrix_wrap(clip)
 
 The `scale` that makes a YUV<->RGB conversion use the clip’s own matrix.
 
 Rule 24’s mechanism: declare the matrix instead of trusting ffmpeg to read
-the tag. Placed on either side of each run of RGB-only steps, it is where
-that conversion happens (ffmpeg’s negotiation moves it into the `scale`),
-and costs nothing where the two sides already agree. **Absent** when the
+the tag. Placed on either side of each run of RGB-only steps, and on an RGB
+clip of each run of YUV-only ones (issue #56), it is where that conversion
+happens (ffmpeg’s negotiation moves it into the `scale`), and costs
+nothing where the two sides already agree.
+
+An RGB clip’s range tag is not passed on: it describes the RGB, and the
+YUV in between is limited range, as ffmpeg’s own conversion makes it.
+Declared full, `lutyuv` (which clamps chroma to 16..240 whatever the
+range) moved an identity contrast by up to 29/255. **Absent** when the
 clip does not say its colour space: the conversion is then left to ffmpeg,
 which is what it always was. [`looks.compile.compile_look()`](_autosummary/looks.compile.html.md#looks.compile.compile_look) refuses
 before this is reached (rule 22), unless the colour was explicitly assumed.
@@ -1984,6 +2049,13 @@ A whole plan as one `-vf` fragment: input-index-free, splice-ready.
 The seam every consumer asked for is one string — `muvid` splices it into
 the filter chain `_render_part` already builds, and that only works if
 nothing here names a stream.
+
+Every YUV<->RGB conversion the chain needs is declared in the clip’s matrix
+([`matrix_wrap()`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.matrix_wrap)): around RGB-only steps on any clip, and around
+YUV-only ones on an RGB clip (issue #56). An RGB clip that declares no
+YUV matrix (`gbr` is the honest tag for one) is not refused for a YUV-only
+step, unlike rule 22: ffmpeg then makes both conversions with one guess,
+and an identity round trip measured 1/255.
 
 * **Raises:**
   [**FfmpegBackendError**](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.FfmpegBackendError) – If a step is not ffmpeg-backed, or is gated to a
@@ -6844,6 +6916,13 @@ The seam every consumer asked for is one string — `muvid` splices it into
 the filter chain `_render_part` already builds, and that only works if
 nothing here names a stream.
 
+Every YUV<->RGB conversion the chain needs is declared in the clip’s matrix
+(`matrix_wrap()`): around RGB-only steps on any clip, and around
+YUV-only ones on an RGB clip (issue #56). An RGB clip that declares no
+YUV matrix (`gbr` is the honest tag for one) is not refused for a YUV-only
+step, unlike rule 22: ffmpeg then makes both conversions with one guess,
+and an identity round trip measured 1/255.
+
 * **Raises:**
   [**FfmpegBackendError**](_autosummary/looks.html.md#looks.FfmpegBackendError) – If a step is not ffmpeg-backed, or is gated to a
       span its filter cannot honour. The second is why
@@ -11363,20 +11442,18 @@ frames...
 
 # About this build
 
-This documentation was built on **2026-11-02 17:47 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/4eb5dd8fabb313f5546c42e579b0b136eb5006a2"><code>4eb5dd8</code></a> on branch <code>main</code>, for **looks 0.0.35** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 18:22 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/d97537a4ed24902b05a90d57b643c03951fee9b6"><code>d97537a</code></a> on branch <code>main</code>, for **looks 0.0.36** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.35) is ahead of the latest release on PyPI (0.0.34): these docs describe unreleased code.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/looks/commit/4eb5dd8fabb313f5546c42e579b0b136eb5006a2"><code>4eb5dd8fabb313f5546c42e579b0b136eb5006a2</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/looks/commit/d97537a4ed24902b05a90d57b643c03951fee9b6"><code>d97537a4ed24902b05a90d57b643c03951fee9b6</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | <code>0.0.35</code>                                                                                                                                   |
+| Tags at this commit | <code>0.0.36</code>                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/looks</code>                                                                                                        |
 
@@ -11385,9 +11462,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/looks</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/41493601396">41493601396</a>       |
+| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/41498959383">41498959383</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>fb18c62cdb357ea3006e717ceadf3d6064940b96</code> (in the history of the built commit) |
+| Event commit | <code>d843f04bebed3539cc2c00d4a30ae830ce976ad2</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -11412,13 +11489,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/looks/0.0.34/">0.0.34</a>, older than the documented version (0.0.35).
+Latest release: <a href="https://pypi.org/project/looks/0.0.36/">0.0.36</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout 4eb5dd8fabb313f5546c42e579b0b136eb5006a2
+git checkout d97537a4ed24902b05a90d57b643c03951fee9b6
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

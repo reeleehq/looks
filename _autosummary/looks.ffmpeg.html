@@ -179,8 +179,20 @@ keeps the package honest would have nothing left to protect.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.RGB_DOMAIN_FILTERS" title="looks.ffmpeg.RGB_DOMAIN_FILTERS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RGB_DOMAIN_FILTERS</span></code></a></p></td>
 <td><p>Filters that only take RGB, so ffmpeg converts YUV to RGB and back around them.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.RGB_ONLY_IMPL_VERSION" title="looks.ffmpeg.RGB_ONLY_IMPL_VERSION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RGB_ONLY_IMPL_VERSION</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.YUV_DOMAIN_FILTERS" title="looks.ffmpeg.YUV_DOMAIN_FILTERS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">YUV_DOMAIN_FILTERS</span></code></a></p></td>
+<td><p>Filters that only take YUV (or gray), so ffmpeg converts an RGB input to YUV and back around them, with a matrix nothing declares: the mirror of <a class="reference internal" href="#looks.ffmpeg.RGB_DOMAIN_FILTERS" title="looks.ffmpeg.RGB_DOMAIN_FILTERS"><code class="xref py py-data docutils literal notranslate"><span class="pre">RGB_DOMAIN_FILTERS</span></code></a>, issue #56.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.RGB_RUN" title="looks.ffmpeg.RGB_RUN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RGB_RUN</span></code></a></p></td>
+<td><p>The two kinds of run <code class="code docutils literal notranslate"><span class="pre">vf</span></code> wraps in the clip's colour matrix.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.YUV_RUN" title="looks.ffmpeg.YUV_RUN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">YUV_RUN</span></code></a></p></td>
+<td><p>The two kinds of run <code class="code docutils literal notranslate"><span class="pre">vf</span></code> wraps in the clip's colour matrix.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.RGB_ONLY_IMPL_VERSION" title="looks.ffmpeg.RGB_ONLY_IMPL_VERSION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RGB_ONLY_IMPL_VERSION</span></code></a></p></td>
 <td><p>The version of an implementation that sits in an RGB-only run.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.YUV_ONLY_IMPL_VERSION" title="looks.ffmpeg.YUV_ONLY_IMPL_VERSION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">YUV_ONLY_IMPL_VERSION</span></code></a></p></td>
+<td><p>The version of a YUV-only implementation, since <code class="code docutils literal notranslate"><span class="pre">vf</span></code> declares the matrix around it on an RGB clip (issue #56), which moves that clip's pixels.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.SETSAR_MAX" title="looks.ffmpeg.SETSAR_MAX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SETSAR_MAX</span></code></a></p></td>
 <td><p><code class="code docutils literal notranslate"><span class="pre">setsar</span></code>'s largest allowed rational term.</p></td>
@@ -231,6 +243,12 @@ keeps the package honest would have nothing left to protect.</p>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.is_rgb_domain" title="looks.ffmpeg.is_rgb_domain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_rgb_domain</span></code></a>(filters)</p></td>
 <td><p>Whether any of these ffmpeg filters only takes RGB.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.is_rgb_pix_fmt" title="looks.ffmpeg.is_rgb_pix_fmt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_rgb_pix_fmt</span></code></a>(pix_fmt)</p></td>
+<td><p>Whether a pixel format is RGB; an undeclared one reads as not.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.is_yuv_domain" title="looks.ffmpeg.is_yuv_domain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_yuv_domain</span></code></a>(filters)</p></td>
+<td><p>Whether any of these ffmpeg filters only takes YUV.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.matrix_wrap" title="looks.ffmpeg.matrix_wrap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matrix_wrap</span></code></a>(clip)</p></td>
 <td><p>The <code class="docutils literal notranslate"><span class="pre">scale</span></code> that makes a YUV&lt;-&gt;RGB conversion use the clip's own matrix.</p></td>
@@ -295,6 +313,11 @@ filter (<code class="code docutils literal notranslate"><span class="pre">lutyuv
 <dd><p>The version of an implementation that sits in an RGB-only run.</p>
 </dd></dl>
 <dl class="py data">
+<dt class="sig sig-object py" id="looks.ffmpeg.RGB_RUN">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">RGB_RUN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rgb'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.RGB_RUN" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.RGB_RUN'">¶</a></dt>
+<dd><p>The two kinds of run <code class="code docutils literal notranslate"><span class="pre">vf</span></code> wraps in the clip’s colour matrix.</p>
+</dd></dl>
+<dl class="py data">
 <dt class="sig sig-object py" id="looks.ffmpeg.RIPPLE_BLOOM_GAIN">
 <span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">RIPPLE_BLOOM_GAIN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.15</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.RIPPLE_BLOOM_GAIN" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.RIPPLE_BLOOM_GAIN'">¶</a></dt>
 <dd><p>a luma gain, and a lift as a fraction of
@@ -354,6 +377,32 @@ signs, so the pattern churns rather than scrolls.</p>
 <span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">SETSAR_MAX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2147483647</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.SETSAR_MAX" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.SETSAR_MAX'">¶</a></dt>
 <dd><p><code class="code docutils literal notranslate"><span class="pre">setsar</span></code>’s largest allowed rational term. Its default of 100 rewrites any
 SAR with a bigger term (118/81 -&gt; 67/46, 1001/1000 -&gt; 1/1).</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.ffmpeg.YUV_DOMAIN_FILTERS">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">YUV_DOMAIN_FILTERS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'bbox',</span> <span class="pre">'blackdetect',</span> <span class="pre">'blackframe',</span> <span class="pre">'chromahold',</span> <span class="pre">'chromakey',</span> <span class="pre">'chromanr',</span> <span class="pre">'chromashift',</span> <span class="pre">'codecview',</span> <span class="pre">'colorcorrect',</span> <span class="pre">'colorize',</span> <span class="pre">'cover_rect',</span> <span class="pre">'dedot',</span> <span class="pre">'deflicker',</span> <span class="pre">'deshake',</span> <span class="pre">'eq',</span> <span class="pre">'fftfilt',</span> <span class="pre">'framerate',</span> <span class="pre">'geq',</span> <span class="pre">'hqdn3d',</span> <span class="pre">'hsvhold',</span> <span class="pre">'hsvkey',</span> <span class="pre">'hue',</span> <span class="pre">'idet',</span> <span class="pre">'interlace',</span> <span class="pre">'lumakey',</span> <span class="pre">'lutyuv',</span> <span class="pre">'mcdeint',</span> <span class="pre">'mestimate',</span> <span class="pre">'minterpolate',</span> <span class="pre">'monochrome',</span> <span class="pre">'ocr',</span> <span class="pre">'owdenoise',</span> <span class="pre">'pullup',</span> <span class="pre">'readeia608',</span> <span class="pre">'readvitc',</span> <span class="pre">'repeatfields',</span> <span class="pre">'sab',</span> <span class="pre">'showpalette',</span> <span class="pre">'signalstats',</span> <span class="pre">'siti',</span> <span class="pre">'smartblur',</span> <span class="pre">'swapuv',</span> <span class="pre">'tiltandshift',</span> <span class="pre">'tinterlace',</span> <span class="pre">'unsharp',</span> <span class="pre">'uspp',</span> <span class="pre">'vmafmotion'})</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.YUV_DOMAIN_FILTERS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.YUV_DOMAIN_FILTERS'">¶</a></dt>
+<dd><p>Filters that only take YUV (or gray), so ffmpeg converts an RGB input to
+YUV and back around them, with a matrix nothing declares: the mirror of
+<a class="reference internal" href="#looks.ffmpeg.RGB_DOMAIN_FILTERS" title="looks.ffmpeg.RGB_DOMAIN_FILTERS"><code class="xref py py-data docutils literal notranslate"><span class="pre">RGB_DOMAIN_FILTERS</span></code></a>, issue #56. Measured on 6.1 and 9.0 by sweeping
+every V-&gt;V filter with default arguments on an rgb24 source and reading its
+<code class="code docutils literal notranslate"><span class="pre">auto_scale</span></code> line (<code class="code docutils literal notranslate"><span class="pre">test_yuv_domain_filters.py</span></code> repeats the sweep). The cost
+of the undeclared matrix is small, an identity round trip moved 1/255, but a
+luma operation then acts on BT.601 luma whatever the clip says. Listed for
+the union of both builds.
+<code class="code docutils literal notranslate"><span class="pre">geq</span></code> is listed because it takes YUV when given lum=/cb=/cr= expressions,
+which is the form an implementation here emits (<code class="code docutils literal notranslate"><span class="pre">ripple</span></code>); one that emits
+r=/g=/b= declares <code class="code docutils literal notranslate"><span class="pre">rgb_only=True</span></code>, which wins.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.ffmpeg.YUV_ONLY_IMPL_VERSION">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">YUV_ONLY_IMPL_VERSION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'2'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.YUV_ONLY_IMPL_VERSION" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.YUV_ONLY_IMPL_VERSION'">¶</a></dt>
+<dd><p>The version of a YUV-only implementation, since <code class="code docutils literal notranslate"><span class="pre">vf</span></code> declares the matrix
+around it on an RGB clip (issue #56), which moves that clip’s pixels.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.ffmpeg.YUV_RUN">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">YUV_RUN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'yuv'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.YUV_RUN" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.YUV_RUN'">¶</a></dt>
+<dd><p>The two kinds of run <code class="code docutils literal notranslate"><span class="pre">vf</span></code> wraps in the clip’s colour matrix.</p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="looks.ffmpeg.escape_filter_value">
@@ -465,13 +514,48 @@ compiler and <a class="reference internal" href="#looks.ffmpeg.vf" title="looks.
 </dl>
 </dd></dl>
 <dl class="py function">
+<dt class="sig sig-object py" id="looks.ffmpeg.is_rgb_pix_fmt">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">is_rgb_pix_fmt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pix_fmt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/ffmpeg.html#is_rgb_pix_fmt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.is_rgb_pix_fmt" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.is_rgb_pix_fmt'">¶</a></dt>
+<dd><p>Whether a pixel format is RGB; an undeclared one reads as not.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">is_rgb_pix_fmt</span><span class="p">(</span><span class="s2">"gbrp10le"</span><span class="p">),</span> <span class="n">is_rgb_pix_fmt</span><span class="p">(</span><span class="s2">"yuv420p"</span><span class="p">),</span> <span class="n">is_rgb_pix_fmt</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+</span><span id="line-2"><span class="go">(True, False, False)</span>
+</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">is_rgb_pix_fmt</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"rgba"</span><span class="p">,</span> <span class="s2">"bgr0"</span><span class="p">,</span> <span class="s2">"x2rgb10le"</span><span class="p">,</span> <span class="s2">"gray"</span><span class="p">,</span> <span class="s2">"ya8"</span><span class="p">)]</span>
+</span><span id="line-4"><span class="go">[True, True, True, False, False]</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="looks.ffmpeg.is_yuv_domain">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">is_yuv_domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/ffmpeg.html#is_yuv_domain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.is_yuv_domain" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.is_yuv_domain'">¶</a></dt>
+<dd><p>Whether any of these ffmpeg filters only takes YUV.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">is_yuv_domain</span><span class="p">((</span><span class="s2">"lutyuv"</span><span class="p">,)),</span> <span class="n">is_yuv_domain</span><span class="p">((</span><span class="s2">"gblur"</span><span class="p">,))</span>
+</span><span id="line-2"><span class="go">(True, False)</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
 <dt class="sig sig-object py" id="looks.ffmpeg.matrix_wrap">
 <span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">matrix_wrap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/ffmpeg.html#matrix_wrap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.matrix_wrap" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.matrix_wrap'">¶</a></dt>
 <dd><p>The <code class="docutils literal notranslate"><span class="pre">scale</span></code> that makes a YUV&lt;-&gt;RGB conversion use the clip’s own matrix.</p>
 <p>Rule 24’s mechanism: declare the matrix instead of trusting ffmpeg to read
-the tag. Placed on either side of each run of RGB-only steps, it is where
-that conversion happens (ffmpeg’s negotiation moves it into the <code class="docutils literal notranslate"><span class="pre">scale</span></code>),
-and costs nothing where the two sides already agree. <strong>Absent</strong> when the
+the tag. Placed on either side of each run of RGB-only steps, and on an RGB
+clip of each run of YUV-only ones (issue #56), it is where that conversion
+happens (ffmpeg’s negotiation moves it into the <code class="docutils literal notranslate"><span class="pre">scale</span></code>), and costs
+nothing where the two sides already agree.</p>
+<p>An RGB clip’s range tag is not passed on: it describes the RGB, and the
+YUV in between is limited range, as ffmpeg’s own conversion makes it.
+Declared full, <code class="docutils literal notranslate"><span class="pre">lutyuv</span></code> (which clamps chroma to 16..240 whatever the
+range) moved an identity contrast by up to 29/255. <strong>Absent</strong> when the
 clip does not say its colour space: the conversion is then left to ffmpeg,
 which is what it always was. <a class="reference internal" href="looks.compile.html#looks.compile.compile_look" title="looks.compile.compile_look"><code class="xref py py-func docutils literal notranslate"><span class="pre">looks.compile.compile_look()</span></code></a> refuses
 before this is reached (rule 22), unless the colour was explicitly assumed.</p>
@@ -547,6 +631,12 @@ turned that into an unparseable chain the moment it was gated —
 <p>The seam every consumer asked for is one string — <code class="docutils literal notranslate"><span class="pre">muvid</span></code> splices it into
 the filter chain <code class="docutils literal notranslate"><span class="pre">_render_part</span></code> already builds, and that only works if
 nothing here names a stream.</p>
+<p>Every YUV&lt;-&gt;RGB conversion the chain needs is declared in the clip’s matrix
+(<a class="reference internal" href="#looks.ffmpeg.matrix_wrap" title="looks.ffmpeg.matrix_wrap"><code class="xref py py-func docutils literal notranslate"><span class="pre">matrix_wrap()</span></code></a>): around RGB-only steps on any clip, and around
+YUV-only ones on an RGB clip (issue #56). An RGB clip that declares no
+YUV matrix (<code class="docutils literal notranslate"><span class="pre">gbr</span></code> is the honest tag for one) is not refused for a YUV-only
+step, unlike rule 22: ffmpeg then makes both conversions with one guess,
+and an identity round trip measured 1/255.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#looks.ffmpeg.FfmpegBackendError" title="looks.ffmpeg.FfmpegBackendError"><strong>FfmpegBackendError</strong></a> – If a step is not ffmpeg-backed, or is gated to a
@@ -570,6 +660,7 @@ nothing here names a stream.</p>
 <li><a :data-current="activeSection === '#looks.ffmpeg.OPTION_LEVEL_SPECIALS'" class="reference internal" href="#looks.ffmpeg.OPTION_LEVEL_SPECIALS"><code class="docutils literal notranslate"><span class="pre">OPTION_LEVEL_SPECIALS</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.RGB_DOMAIN_FILTERS'" class="reference internal" href="#looks.ffmpeg.RGB_DOMAIN_FILTERS"><code class="docutils literal notranslate"><span class="pre">RGB_DOMAIN_FILTERS</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.RGB_ONLY_IMPL_VERSION'" class="reference internal" href="#looks.ffmpeg.RGB_ONLY_IMPL_VERSION"><code class="docutils literal notranslate"><span class="pre">RGB_ONLY_IMPL_VERSION</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.RGB_RUN'" class="reference internal" href="#looks.ffmpeg.RGB_RUN"><code class="docutils literal notranslate"><span class="pre">RGB_RUN</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.RIPPLE_BLOOM_GAIN'" class="reference internal" href="#looks.ffmpeg.RIPPLE_BLOOM_GAIN"><code class="docutils literal notranslate"><span class="pre">RIPPLE_BLOOM_GAIN</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.RIPPLE_BLOOM_PLANES'" class="reference internal" href="#looks.ffmpeg.RIPPLE_BLOOM_PLANES"><code class="docutils literal notranslate"><span class="pre">RIPPLE_BLOOM_PLANES</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.RIPPLE_BLOOM_SIGMA'" class="reference internal" href="#looks.ffmpeg.RIPPLE_BLOOM_SIGMA"><code class="docutils literal notranslate"><span class="pre">RIPPLE_BLOOM_SIGMA</span></code></a></li>
@@ -579,11 +670,16 @@ nothing here names a stream.</p>
 <li><a :data-current="activeSection === '#looks.ffmpeg.RIPPLE_VERTICAL_SPEED'" class="reference internal" href="#looks.ffmpeg.RIPPLE_VERTICAL_SPEED"><code class="docutils literal notranslate"><span class="pre">RIPPLE_VERTICAL_SPEED</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.RIPPLE_VERTICAL_WAVELENGTH'" class="reference internal" href="#looks.ffmpeg.RIPPLE_VERTICAL_WAVELENGTH"><code class="docutils literal notranslate"><span class="pre">RIPPLE_VERTICAL_WAVELENGTH</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.SETSAR_MAX'" class="reference internal" href="#looks.ffmpeg.SETSAR_MAX"><code class="docutils literal notranslate"><span class="pre">SETSAR_MAX</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.YUV_DOMAIN_FILTERS'" class="reference internal" href="#looks.ffmpeg.YUV_DOMAIN_FILTERS"><code class="docutils literal notranslate"><span class="pre">YUV_DOMAIN_FILTERS</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.YUV_ONLY_IMPL_VERSION'" class="reference internal" href="#looks.ffmpeg.YUV_ONLY_IMPL_VERSION"><code class="docutils literal notranslate"><span class="pre">YUV_ONLY_IMPL_VERSION</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.YUV_RUN'" class="reference internal" href="#looks.ffmpeg.YUV_RUN"><code class="docutils literal notranslate"><span class="pre">YUV_RUN</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.escape_filter_value'" class="reference internal" href="#looks.ffmpeg.escape_filter_value"><code class="docutils literal notranslate"><span class="pre">escape_filter_value()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.filter_string'" class="reference internal" href="#looks.ffmpeg.filter_string"><code class="docutils literal notranslate"><span class="pre">filter_string()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.gated'" class="reference internal" href="#looks.ffmpeg.gated"><code class="docutils literal notranslate"><span class="pre">gated()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.has_scale_matrix'" class="reference internal" href="#looks.ffmpeg.has_scale_matrix"><code class="docutils literal notranslate"><span class="pre">has_scale_matrix()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.is_rgb_domain'" class="reference internal" href="#looks.ffmpeg.is_rgb_domain"><code class="docutils literal notranslate"><span class="pre">is_rgb_domain()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.is_rgb_pix_fmt'" class="reference internal" href="#looks.ffmpeg.is_rgb_pix_fmt"><code class="docutils literal notranslate"><span class="pre">is_rgb_pix_fmt()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.is_yuv_domain'" class="reference internal" href="#looks.ffmpeg.is_yuv_domain"><code class="docutils literal notranslate"><span class="pre">is_yuv_domain()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.matrix_wrap'" class="reference internal" href="#looks.ffmpeg.matrix_wrap"><code class="docutils literal notranslate"><span class="pre">matrix_wrap()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.register_defaults'" class="reference internal" href="#looks.ffmpeg.register_defaults"><code class="docutils literal notranslate"><span class="pre">register_defaults()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.split_filters'" class="reference internal" href="#looks.ffmpeg.split_filters"><code class="docutils literal notranslate"><span class="pre">split_filters()</span></code></a></li>
@@ -601,7 +697,7 @@ nothing here names a stream.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=39aadc1c"></script>
+<script src="../_static/documentation_options.js?v=0e525676"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

@@ -4104,6 +4104,13 @@ The seam every consumer asked for is one string — `muvid` splices it into
 the filter chain `_render_part` already builds, and that only works if
 nothing here names a stream.
 
+Every YUV<->RGB conversion the chain needs is declared in the clip’s matrix
+(`matrix_wrap()`): around RGB-only steps on any clip, and around
+YUV-only ones on an RGB clip (issue #56). An RGB clip that declares no
+YUV matrix (`gbr` is the honest tag for one) is not refused for a YUV-only
+step, unlike rule 22: ffmpeg then makes both conversions with one guess,
+and an identity round trip measured 1/255.
+
 * **Raises:**
   [**FfmpegBackendError**](#looks.FfmpegBackendError) – If a step is not ffmpeg-backed, or is gated to a
       span its filter cannot honour. The second is why
