@@ -57,7 +57,7 @@ substitute is exactly the failure the version lock exists to prevent.
 
 | [`audit`](#looks.compile.audit)(plan, \*[, policy, registry])              | Re-check a plan against its own declared ceiling.                |
 |---------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
-| [`check_effect_params`](#looks.compile.check_effect_params)(effect[, registry])          | Refuse parameters no implementation of this effect could honour. |
+| [`check_effect_params`](#looks.compile.check_effect_params)(effect[, registry, pix_fmt]) | Refuse parameters no implementation of this effect could honour. |
 | [`compile_all`](#looks.compile.compile_all)(looks_, \*\*kwargs)                  | Compile several Looks under one set of arguments.                |
 | [`compile_look`](#looks.compile.compile_look)(look, \*[, clip, env, policy, ...]) | Compile a Look into a plan.                                      |
 | [`describe`](#looks.compile.describe)(plan)                                   | A plan as a few lines of text — for a CLI, a log, or a review.   |
@@ -109,7 +109,7 @@ refresh.
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
-### looks.compile.check_effect_params(effect, registry=EffectRegistry(name='looks', effects=20, implementations=23))
+### looks.compile.check_effect_params(effect, registry=EffectRegistry(name='looks', effects=20, implementations=23), , pix_fmt=None)
 
 Refuse parameters no implementation of this effect could honour.
 
@@ -146,7 +146,9 @@ Compile a Look into a plan. No process is started and no file is written.
   * **look** ([`Look`](looks.spec.html.md#looks.spec.Look)) – What was asked for. Portable data.
   * **clip** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ClipSpec`](looks.spec.html.md#looks.spec.ClipSpec)]) – What it is being applied to. Needed by any effect whose answer
     depends on the frame — its absence is only an error if an effect
-    asks for it.
+    asks for it. Its `pix_fmt` is what the first step receives, and
+    that step’s parameters are checked against it (a `curves` whose
+    x-points share one code value of it is refused, issue #33).
   * **env** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`FfmpegEnv`](looks.environment.html.md#looks.environment.FfmpegEnv)]) – Which binary. When given, an implementation whose filters this
     build lacks is dropped from selection rather than discovered at
     run time.
@@ -173,6 +175,8 @@ Compile a Look into a plan. No process is started and no file is written.
   * [**CompileError**](#looks.compile.CompileError) – If a step only takes RGB and the clip’s colour space is
         undeclared (rule 22) and not assumed. ffmpeg would pick a matrix
         for it, and on some builds picks wrongly.
+  * [**CompileError**](#looks.compile.CompileError) – If an effect’s parameters are refused by its schema,
+        the first step’s also against `clip.pix_fmt`.
   * [**CompileError**](#looks.compile.CompileError) – If an effect has no admissible implementation. The
         message says which constraint emptied the pool, because “no
         implementation available” alone is the least useful refusal in the

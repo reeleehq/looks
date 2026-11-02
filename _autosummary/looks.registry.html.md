@@ -130,9 +130,12 @@ available is not the same as asking for something:
 ()
 ```
 
-#### check_params(effect, params)
+#### check_params(effect, params, , pix_fmt=None)
 
 Refuse parameters this registry’s schema for `effect` rejects.
+
+`pix_fmt` is the format the effect receives, when known: see
+[`looks.params.check_params()`](looks.params.html.md#looks.params.check_params).
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)

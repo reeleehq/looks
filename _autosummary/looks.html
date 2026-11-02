@@ -1270,8 +1270,10 @@ available is not the same as asking for something:</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="looks.EffectRegistry.check_params">
-<span class="sig-name descname"><span class="pre">check_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">effect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/registry.html#EffectRegistry.check_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.EffectRegistry.check_params" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.EffectRegistry.check_params'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">check_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">effect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">pix_fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/registry.html#EffectRegistry.check_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.EffectRegistry.check_params" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.EffectRegistry.check_params'">¶</a></dt>
 <dd><p>Refuse parameters this registry’s schema for <code class="docutils literal notranslate"><span class="pre">effect</span></code> rejects.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pix_fmt</span></code> is the format the effect receives, when known: see
+<a class="reference internal" href="looks.params.html#looks.params.check_params" title="looks.params.check_params"><code class="xref py py-func docutils literal notranslate"><span class="pre">looks.params.check_params()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></span></p>
@@ -3182,7 +3184,9 @@ expression. It is cheap, and the failure it prevents is silent.</p>
 <li><p><strong>look</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="looks.spec.html#looks.spec.Look" title="looks.spec.Look"><code class="xref py py-class docutils literal notranslate"><span class="pre">Look</span></code></a></span>) – What was asked for. Portable data.</p></li>
 <li><p><strong>clip</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="looks.spec.html#looks.spec.ClipSpec" title="looks.spec.ClipSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClipSpec</span></code></a>]</span>) – What it is being applied to. Needed by any effect whose answer
 depends on the frame — its absence is only an error if an effect
-asks for it.</p></li>
+asks for it. Its <code class="docutils literal notranslate"><span class="pre">pix_fmt</span></code> is what the first step receives, and
+that step’s parameters are checked against it (a <code class="docutils literal notranslate"><span class="pre">curves</span></code> whose
+x-points share one code value of it is refused, issue #33).</p></li>
 <li><p><strong>env</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="looks.environment.html#looks.environment.FfmpegEnv" title="looks.environment.FfmpegEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">FfmpegEnv</span></code></a>]</span>) – Which binary. When given, an implementation whose filters this
 build lacks is dropped from selection rather than discovered at
 run time.</p></li>
@@ -3215,6 +3219,8 @@ resolves each step’s code from the registry by key.</p>
 <li><p><a class="reference internal" href="#looks.CompileError" title="looks.CompileError"><strong>CompileError</strong></a> – If a step only takes RGB and the clip’s colour space is
     undeclared (rule 22) and not assumed. ffmpeg would pick a matrix
     for it, and on some builds picks wrongly.</p></li>
+<li><p><a class="reference internal" href="#looks.CompileError" title="looks.CompileError"><strong>CompileError</strong></a> – If an effect’s parameters are refused by its schema,
+    the first step’s also against <code class="docutils literal notranslate"><span class="pre">clip.pix_fmt</span></code>.</p></li>
 <li><p><a class="reference internal" href="#looks.CompileError" title="looks.CompileError"><strong>CompileError</strong></a> – If an effect has no admissible implementation. The
     message says which constraint emptied the pool, because “no
     implementation available” alone is the least useful refusal in the
@@ -5040,7 +5046,7 @@ count check — the obvious check — passes in both cases.</p></li>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=61a342a2"></script>
+<script src="../_static/documentation_options.js?v=c5dbc6bb"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
