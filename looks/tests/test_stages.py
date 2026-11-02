@@ -63,7 +63,7 @@ def test_a_resampler_after_posterize_is_reported_once():
 
 
 #: Registered effects deliberately outside the canon.
-UNSTAGED = {"blur", "sharpen", "gate_weave"}
+UNSTAGED = {"blur", "sharpen", "gate_weave", "ripple"}
 
 
 def test_every_registered_effect_is_staged_or_deliberately_not():

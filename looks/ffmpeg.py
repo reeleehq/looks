@@ -831,6 +831,15 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         timeline=False,
         time_varying=True,
     )
+    add(
+        "ripple.ffmpeg.geq",
+        ("split", "gblur", "lutyuv", "blend", "geq"),
+        _ripple_compiler,
+        # A branch, gated by its own window: an Effect.at would reach `split`,
+        # which has no timeline support. And it reads the clock by design.
+        timeline=False,
+        time_varying=True,
+    )
     return reg
 
 
@@ -1137,3 +1146,118 @@ def _gate_weave_compiler(params, *, clip=None, **_kw):
         {"sar": f"sar*w*(h-{margin})/(h*(w-{margin}))", "max": SETSAR_MAX},
     )
     return {"filter": f"{square_unknown},{crop},{scale},{restore}"}
+
+
+# --------------------------------------------------------------- ripple (#49)
+# The shape of the warp, fixed; its size and timing are parameters. Values are
+# the 2026-10-27 production's, normalised from 1024x576.
+
+#: Weight of the second horizontal harmonic against the first.
+RIPPLE_HARMONIC = 0.45
+#: Phase speeds of the two horizontal harmonics, radians per second. Opposite
+#: signs, so the pattern churns rather than scrolls.
+RIPPLE_SPEEDS = (7, -11)
+#: Vertical wander, as a fraction of the horizontal amplitude.
+RIPPLE_VERTICAL = 0.35
+#: Wavelength of the vertical wander along x, as a fraction of the width.
+RIPPLE_VERTICAL_WAVELENGTH = 140 / 1024
+#: Phase speed of the vertical wander, radians per second.
+RIPPLE_VERTICAL_SPEED = 5
+#: The bloom's blur, as a fraction of the frame's height (14 px at 576).
+RIPPLE_BLOOM_SIGMA = 14 / 576
+#: The bloom's brightening: luma gain, and lift as a fraction of full scale.
+RIPPLE_BLOOM_GAIN = 1.15
+RIPPLE_BLOOM_LIFT = 8 / 255
+#: `gblur` planes for the bloom: luma and both chroma, never alpha, so a
+#: transparent edge is not softened by the glow.
+RIPPLE_BLOOM_PLANES = 7
+
+
+def _ripple_compiler(params, *, clip=None, **_kw):
+    """A ripple that swells and settles over a window, with a bloom at its peak.
+
+    One plane-aware ``geq``, ``p(X+dx, Y+dy)``: a pixel is read from where the
+    ripple moved it, with bilinear interpolation. Not ``displace``, which the
+    production that asked for this (issue #49) used, and which was wrong twice
+    over, measured on 9.0 and 6.1:
+
+    * ``displace`` takes three inputs of one format, so gray maps were
+      converted to the picture's ``yuv420p``, chroma planes neutral: **chroma
+      never moved**, and the tv-range conversion turned 128 into about 126, so
+      a 10 px map moved luma 7 px and a zero map moved it 2.
+    * ``displace`` is 8-bit only, so a 10-bit stream lost its depth for its
+      whole length, not just the window.
+
+    ``geq`` keeps the input's format and reads every plane in that plane's own
+    pixels: ``X``, ``Y``, ``W``, ``H`` are per plane, and ``SW``/``SH`` scale
+    the vertical wander, so chroma follows luma at 4:2:0, 4:2:2 and 4:4:4
+    alike. Displacement is a fraction of the frame, so the look is the same at
+    any size.
+
+    The envelope is ``sin²`` across the window, peaking at its middle, the
+    point of the dissolve the host runs beside it (:class:`looks.transition.
+    Ripple`). Every filter carries ``enable=`` for the open window, so outside
+    it the picture passes through untouched and the cost is confined to it
+    (about 90 ms a frame at 1024x576). Inside it, ffmpeg 6.1's bilinear ``geq``
+    also disturbs the frame's last column by up to 17/255; 9.0 does not.
+
+    >>> from looks.params import with_defaults
+    >>> f = _ripple_compiler(with_defaults("ripple", {"start_s": 1, "duration_s": 0.5, "bloom": 0}))
+    >>> f["filter"].startswith("geq=lum=p(X+")
+    True
+    >>> "enable=gt(t\\,1)*lt(t\\,1.5)" in f["filter"]
+    True
+    """
+    start, duration = float(params["start_s"]), float(params["duration_s"])
+    end = start + duration
+    amplitude, bloom = float(params["amplitude"]), float(params["bloom"])
+    near, far = (float(w) for w in params["wavelengths"])
+    envelope = (
+        f"between(T,{_num(start)},{_num(end)})"
+        f"*pow(sin(PI*(T-{_num(start)})/{_num(duration)}),2)"
+    )
+    first, second = RIPPLE_SPEEDS
+    dx = (
+        f"{_num(amplitude)}*W*{envelope}*(sin(2*PI*Y/({_num(near)}*H){first:+}*T)"
+        f"+{RIPPLE_HARMONIC}*sin(2*PI*Y/({_num(far)}*H){second:+}*T))"
+    )
+    dy = (
+        f"{_num(RIPPLE_VERTICAL * amplitude)}*W/SW*SH*{envelope}"
+        f"*sin(2*PI*X/({_num(RIPPLE_VERTICAL_WAVELENGTH)}*W)+{RIPPLE_VERTICAL_SPEED}*T)"
+    )
+    moved = f"p(X+{dx},Y+{dy})"
+    # Open at both ends: the envelope is zero there, and on 6.1 a bilinear
+    # `geq` is not an identity even at zero displacement (its last column moved
+    # by up to 17/255; 9.0 is exact), so a closed window would alter two frames
+    # the ripple has not reached.
+    window = {"enable": f"gt(t,{_num(start)})*lt(t,{_num(end)})"}
+    warp = filter_string(
+        "geq", {"lum": moved, "cb": moved, "cr": moved, "a": moved, **window}
+    )
+    if bloom == 0:
+        return {"filter": warp}
+    if clip is None:
+        raise FfmpegBackendError(
+            "the 'ripple' effect's bloom is sized to the frame, so it needs a "
+            "ClipSpec. Pass clip= to compile_look(), or bloom=0."
+        )
+    a, b, g = (f"[{LABEL_NAMESPACE}{name}]" for name in ("ra", "rb", "rg"))
+    sigma = RIPPLE_BLOOM_SIGMA * clip.height
+    glow = ",".join(
+        (
+            filter_string(
+                "gblur",
+                {"sigma": _num(sigma), "planes": RIPPLE_BLOOM_PLANES, **window},
+            ),
+            filter_string(
+                "lutyuv",
+                {
+                    "y": f"clip(val*{RIPPLE_BLOOM_GAIN}+maxval*{_num(RIPPLE_BLOOM_LIFT)},minval,maxval)",
+                    **window,
+                },
+            ),
+        )
+    )
+    weight = f"{_num(bloom)}*{envelope}"
+    mix = filter_string("blend", {"all_expr": f"A*(1-{weight})+B*{weight}", **window})
+    return {"filter": f"split{a}{b};{b}{glow}{g};{a}{g}{mix},{warp}"}

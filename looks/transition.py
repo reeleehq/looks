@@ -61,7 +61,14 @@ import math
 from dataclasses import dataclass
 from typing import Mapping, Optional
 
-from looks.spec import SpecError
+from looks.params import (
+    DFLT_RIPPLE_AMPLITUDE,
+    DFLT_RIPPLE_BLOOM,
+    DFLT_RIPPLE_WAVELENGTHS,
+    ParamError,
+    check_params,
+)
+from looks.spec import Effect, SpecError
 
 #: The transitions this package offers: a curated subset of ffmpeg's 58, chosen
 #: because they read as deliberate edits rather than as effects. Adding one is a
@@ -171,6 +178,85 @@ class Transition:
             duration_s=float(d["duration_s"]),
             curve=str(d.get("curve", DFLT_CURVE)),
         )
+
+
+@dataclass(frozen=True)
+class Ripple:
+    """A dream transition: the picture ripples, blooms and dissolves into the next.
+
+    Not a :data:`TRANSITION_CURVES` name, because ``xfade`` cannot move a
+    pixel. It is two things the host already knows how to place, over one
+    window:
+
+    * :attr:`dissolve`, an ordinary :class:`Transition` (a cross-fade) for the
+      host's ``xfade``, as for any other transition;
+    * :meth:`effect`, a single-input ``ripple`` effect for the stream that
+      ``xfade`` produces, swelling from nothing at the window's start to its
+      peak at the middle of the fade and settling by its end. It compiles
+      through :func:`looks.compile_look` like any effect, so it carries a
+      licence tier.
+
+    Sizes are fractions of the frame (``amplitude`` of its width,
+    ``wavelengths`` of its height), so a look reads the same at any resolution;
+    the defaults are 18 px and 86/33 px at 1024x576, judged on real footage.
+
+    Examples:
+        >>> r = Ripple(1.0)
+        >>> r.dissolve
+        Transition(duration_s=1.0, curve='fade')
+        >>> e = r.effect(offset=6.3)
+        >>> e.name, e.params["start_s"], e.params["duration_s"]
+        ('ripple', 6.3, 1.0)
+        >>> Ripple.from_dict(r.to_dict()) == r
+        True
+        >>> Ripple(1.0, bloom=2)
+        Traceback (most recent call last):
+        ...
+        looks.transition.TransitionError: ripple: bloom must be a number in [0, 1]; got 2
+    """
+
+    duration_s: float
+    amplitude: float = DFLT_RIPPLE_AMPLITUDE
+    wavelengths: tuple[float, float] = DFLT_RIPPLE_WAVELENGTHS
+    bloom: float = DFLT_RIPPLE_BLOOM
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "wavelengths", tuple(self.wavelengths))
+        # A non-positive duration is refused by Transition, word for word.
+        Transition(self.duration_s)
+        try:
+            check_params("ripple", self.effect(offset=0).params)
+        except ParamError as error:
+            raise TransitionError(str(error)) from error
+
+    @property
+    def dissolve(self) -> Transition:
+        """The cross-fade the host runs between the two shots."""
+        return Transition(self.duration_s, DFLT_CURVE)
+
+    def effect(self, *, offset: float) -> Effect:
+        """The warp, for the stream the dissolve produces.
+
+        ``offset`` is the dissolve's start in that stream's time, the number
+        passed to ``xfade`` (:func:`xfade_options`), so the warp's peak lands
+        on the fade's midpoint.
+        """
+        return Effect(
+            name="ripple",
+            params={"start_s": offset, **self.to_dict()},
+        )
+
+    def to_dict(self) -> dict:
+        return {
+            "duration_s": self.duration_s,
+            "amplitude": self.amplitude,
+            "wavelengths": self.wavelengths,
+            "bloom": self.bloom,
+        }
+
+    @classmethod
+    def from_dict(cls, d: Mapping) -> "Ripple":
+        return cls(**d)
 
 
 def blended_frames(

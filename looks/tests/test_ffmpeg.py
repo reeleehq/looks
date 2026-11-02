@@ -64,6 +64,7 @@ PARAMS = {
     "halation": {"sigma": 12},
     "grain": {"strength": 7, "seed": 7},
     "gate_weave": {},
+    "ripple": {"start_s": 0, "duration_s": 1},
 }
 
 

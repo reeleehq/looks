@@ -206,13 +206,13 @@ def anything(name, default=NO_DEFAULT):
     return Param(name, lambda v: True, "", default)
 
 
-def vector(name, length, default=NO_DEFAULT, *, low=None, high=None):
+def vector(name, length, default=NO_DEFAULT, *, low=None, high=None, low_open=False):
     """``length`` finite numbers, each optionally bounded."""
-    within = _bounds(low, high)
+    within = _bounds(low, high, low_open=low_open)
     return Param(
         name,
         lambda v: _is_sequence(v, length) and all(_is_real(c) and within(c) for c in v),
-        f"must be {length} numbers, each " + _describe(low, high),
+        f"must be {length} numbers, each " + _describe(low, high, low_open=low_open),
         default,
         kind="vector",
         is_type=lambda v: _is_sequence(v, length) and all(_is_real(c) for c in v),
@@ -342,6 +342,17 @@ MAX_POSTERIZE_LEVELS = 256
 MAX_FLATTEN_SPATIAL = 512
 MAX_FLATTEN_PLANES = 15
 
+#: The ripple warp (issue #49), normalised so one look reads the same at any
+#: size. The values are the 2026-10-27 production's, judged on a contact sheet
+#: at 1024x576: 18 px of horizontal wander, harmonics of 86 and 33 px, and a
+#: bloom of 0.55 at the peak.
+#: Peak horizontal displacement, as a fraction of the frame's width.
+DFLT_RIPPLE_AMPLITUDE = 18 / 1024
+#: The two ripple harmonics' wavelengths, as fractions of the frame's height.
+DFLT_RIPPLE_WAVELENGTHS = (86 / 576, 33 / 576)
+#: Peak weight of the blurred, brightened copy mixed in at the middle.
+DFLT_RIPPLE_BLOOM = 0.55
+
 #: `looks` channel names to ffmpeg `curves` option names.
 CURVES_CHANNELS = ("all", "red", "green", "blue")
 
@@ -467,6 +478,16 @@ EFFECT_PARAMS: Mapping[str, Mapping[str, Param]] = {
     "grain": _params(
         whole("strength", DFLT_GRAIN_STRENGTH, low=0, high=MAX_GRAIN_STRENGTH),
         whole("seed", DFLT_GRAIN_SEED, low=0, high=MAX_GRAIN_SEED),
+    ),
+    # `start_s` and `duration_s` are the transition's window in the stream's
+    # own time, not an `Effect.at`: the envelope is computed from them, and a
+    # span gate cannot reach inside a branch (`split` has no timeline).
+    "ripple": _params(
+        real("start_s", low=0),
+        real("duration_s", low=0, low_open=True),
+        real("amplitude", DFLT_RIPPLE_AMPLITUDE, low=0),
+        vector("wavelengths", 2, DFLT_RIPPLE_WAVELENGTHS, low=0, low_open=True),
+        real("bloom", DFLT_RIPPLE_BLOOM, low=0, high=1),
     ),
     "gate_weave": _params(
         whole("amplitude", DFLT_WEAVE_AMPLITUDE, low=0),
