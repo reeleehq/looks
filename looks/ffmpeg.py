@@ -437,6 +437,10 @@ RGB_ONLY_IMPL_VERSION = "2"
 #: The version of a YUV-only implementation, since `vf` declares the matrix
 #: around it on an RGB clip (issue #56), which moves that clip's pixels.
 YUV_ONLY_IMPL_VERSION = "2"
+#: The version of an implementation whose ``lutyuv`` became depth-independent
+#: and stopped clamping chroma (issue #63): its pixels moved on clips above
+#: 8 bits and on chroma outside 16..240.
+LUTYUV_FIXED_IMPL_VERSION = "3"
 
 #: ClipSpec.color_space (the tag's name) -> scale's matrix name, where they differ.
 _SCALE_MATRICES = {
@@ -706,6 +710,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         timeline=True,
         tags=(),
         keeps_depth=False,
+        impl_version=None,
     ):
         # `time_varying` has no default, deliberately: `ImplRef.time_varying`
         # is unknown (`None`) unless declared, and unknown is not the same
@@ -721,7 +726,8 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
                 # `vf` now declares the colour matrix around an RGB-only step
                 # (issue #29), which changes its pixels: version 2, so a plan
                 # stored with the old behaviour is refused rather than trusted.
-                impl_version=(
+                impl_version=impl_version
+                or (
                     RGB_ONLY_IMPL_VERSION
                     if rgb_only
                     else YUV_ONLY_IMPL_VERSION
@@ -780,6 +786,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         _simple("lutyuv", _contrast_luma),
         time_varying=False,
         keeps_depth=True,
+        impl_version=LUTYUV_FIXED_IMPL_VERSION,
     )
     add(
         "contrast.ffmpeg.eq",
@@ -964,6 +971,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         timeline=False,
         time_varying=True,
         keeps_depth=True,
+        impl_version=LUTYUV_FIXED_IMPL_VERSION,
     )
     return reg
 
@@ -991,6 +999,21 @@ def _saturation_matrix(params) -> Mapping[str, Any]:
         "bg": cell(0, lg),
         "bb": cell(1, lb),
     }
+
+
+#: Contrast's pivot in 8-bit code values: the mid grey ``eq`` turns about.
+CONTRAST_PIVOT_8BIT = 128
+
+#: A ``lutyuv`` expression for ``2**(depth - 8)``: 1, 4, 16, 256 at 8, 10, 12,
+#: 16 bits. ``lutyuv`` names no bit depth, and ``maxval`` is 235/940 on a
+#: limited format, 255/1023 on a full one, so the depth is read off it rounded
+#: (measured exact on yuv, yuvj, gray, nv12 and p010, 8 to 16 bits, both
+#: builds). A ratio such as ``maxval/235`` is not: 4.01 on ``gray10le``.
+LUTYUV_DEPTH_SCALE = "pow(2,round(log(maxval+1)/log(2))-8)"
+
+#: ``lutyuv``'s chroma left as it is. Its defaults are ``clipval``, which clamp
+#: chroma to 16..240 even when only ``y`` is given (issue #63).
+LUTYUV_CHROMA_UNTOUCHED = {"u": "val", "v": "val"}
 
 
 def _contrast_luma(params) -> Mapping[str, Any]:
@@ -1028,10 +1051,21 @@ def _contrast_luma(params) -> Mapping[str, Any]:
     original ``curves`` form had — no ringing (rule 26), no degenerate clamp,
     and no eased clip corner. Zero non-monotone steps at every amount measured.
 
-    >>> _contrast_luma({"amount": 1.0})["y"]
-    'clip(128+1*(val-128),0,255)'
+    **At any bit depth** (issue #63). ``lutyuv`` runs at the clip's depth, and
+    the first form, ``clip(128+a*(val-128),0,255)``, crushed a 10-bit clip at
+    code 255 of 1023. The pivot is ``128`` scaled by :data:`LUTYUV_DEPTH_SCALE`,
+    and the clamp is ``lutyuv``'s own, to the code range: at 8 bits the output
+    is byte-identical to the first form (measured on 6.1 and 9.0, amounts 0.5
+    to 3), and at 10 and 12 bits within 1 code of the exact remap.
+
+    **Chroma untouched**, as ``eq`` leaves it: ``lutyuv``'s default ``u``/``v``
+    are ``clipval``, which clamped chroma to 16..240 even when only ``y`` was
+    given.
+
     >>> _contrast_luma({"amount": 1.5})["y"]
-    'clip(128+1.5*(val-128),0,255)'
+    '128*pow(2,round(log(maxval+1)/log(2))-8)+1.5*(val-128*pow(2,round(log(maxval+1)/log(2))-8))'
+    >>> _contrast_luma({"amount": 1.0})["u"], _contrast_luma({"amount": 1.0})["v"]
+    ('val', 'val')
     """
     # The non-negativity of `amount` is an EFFECT-level constraint and lives in
     # `looks.params.EFFECT_PARAMS`, not here: a check inside one compiler
@@ -1040,7 +1074,8 @@ def _contrast_luma(params) -> Mapping[str, Any]:
     # `%g` so 1.0 stays "1" and 1.5 stays "1.5": the expression reaches the
     # plan hash, and an amount that round-trips through a float repr would make
     # two identical Looks hash differently.
-    return {"y": f"clip(128+{amount:g}*(val-128),0,255)"}
+    pivot = f"{CONTRAST_PIVOT_8BIT}*{LUTYUV_DEPTH_SCALE}"
+    return {"y": f"{pivot}+{amount:g}*(val-{pivot})", **LUTYUV_CHROMA_UNTOUCHED}
 
 
 def _motion_compiler(params, *, clip=None, env=None, **_kw):
@@ -1368,7 +1403,7 @@ def _bloom(sigma: float, weight: str, *, full_range: bool, enable: str) -> str:
     range (0..255, 0..1023), measured on 9.0 and 6.1.
 
     >>> _bloom(2, "0.5", full_range=False, enable="lt(t,1)")
-    'split[lk_bloom_a][lk_bloom_b];[lk_bloom_b]gblur=sigma=2:planes=7:enable=lt(t\\,1),lutyuv=y=clip(val*1.15+maxval*0.031373\\,minval\\,maxval):enable=lt(t\\,1)[lk_bloom_g];[lk_bloom_a][lk_bloom_g]blend=all_expr=A*(1-0.5)+B*0.5:enable=lt(t\\,1)'
+    'split[lk_bloom_a][lk_bloom_b];[lk_bloom_b]gblur=sigma=2:planes=7:enable=lt(t\\,1),lutyuv=y=clip(val*1.15+maxval*0.031373\\,minval\\,maxval):u=val:v=val:enable=lt(t\\,1)[lk_bloom_g];[lk_bloom_a][lk_bloom_g]blend=all_expr=A*(1-0.5)+B*0.5:enable=lt(t\\,1)'
     >>> "clip(" in _bloom(2, "0.5", full_range=True, enable="lt(t,1)")
     False
     """
@@ -1382,7 +1417,10 @@ def _bloom(sigma: float, weight: str, *, full_range: bool, enable: str) -> str:
                 "gblur",
                 {"sigma": _num(sigma), "planes": RIPPLE_BLOOM_PLANES, "enable": enable},
             ),
-            filter_string("lutyuv", {"y": brightened, "enable": enable}),
+            filter_string(
+                "lutyuv",
+                {"y": brightened, **LUTYUV_CHROMA_UNTOUCHED, "enable": enable},
+            ),
         )
     )
     mix = filter_string(

@@ -698,4 +698,4 @@ def test_every_builtin_flag_matches_its_filters():
                 assert ref.rgb_only is is_rgb_domain(ref.requires_filters), ref.impl
                 # `vf` wraps both kinds in the matrix (rule 24, issue #56).
                 wrapped = ref.rgb_only or is_yuv_domain(ref.requires_filters)
-                assert (ref.impl_version == "2") is wrapped, ref.impl
+                assert (ref.impl_version != "1") is wrapped, ref.impl
