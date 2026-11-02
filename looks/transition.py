@@ -58,7 +58,7 @@ rate, because the question does.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from typing import Mapping, Optional
 
 from looks.params import (
@@ -215,11 +215,15 @@ class Ripple:
     **Where the effect goes.** On the stream that holds *both* shots across the
     window, the composite the dissolve produces, with ``offset`` the dissolve's
     start in *that stream's own timeline*, after any ``setpts`` the host
-    applies. The trap: a host that runs ``xfade`` at offset 0 and then shifts
-    the result into place with ``setpts`` (as ``reeleehq/mixing``'s
-    ``_entrance`` does) must pass the shifted start ``t0``, or apply the
-    effect *before* the shift with ``offset=0``. Pass the unshifted 0 after
-    the shift and the ripple runs on the wrong frames, with no error.
+    applies. Two traps, both silent. A stream holding only the *incoming*
+    shot is the wrong one: ``reeleehq/mixing``'s ``_entrance`` cross-fades a
+    cutaway from a transparent copy of itself, so its ``xfade`` output holds
+    the cutaway alone, and a ripple there would never move the outgoing scene.
+    In ``mixing`` the stream with both shots exists only after the overlay (a
+    post-overlay chain, the seam of reeleehq/mixing#115), with ``offset=t0``.
+    And a host that cross-fades at offset 0 and then shifts the result with
+    ``setpts`` must pass the shifted start; the unshifted 0 runs the ripple on
+    the wrong frames.
 
     **What it cannot do.** A window of about one frame period or less blends
     nothing and ripples on at most one frame: call
@@ -312,20 +316,29 @@ class Ripple:
 
     @classmethod
     def from_dict(cls, d: Mapping) -> "Ripple":
+        """A stored Ripple. An unknown key is refused, not ignored: a misspelt
+        ``amplitde``, or a field from a newer version, would otherwise render
+        a different picture from the one stored."""
         if d.get("kind") != RIPPLE_KIND:
             raise TransitionError(
                 f"not a Ripple document: its kind is {d.get('kind')!r}, not "
                 f"{RIPPLE_KIND!r}. A Transition document has no kind; read it "
                 "with Transition.from_dict."
             )
-        return cls(
-            duration_s=float(d["duration_s"]),
-            amplitude=float(d.get("amplitude", DFLT_RIPPLE_AMPLITUDE)),
-            wavelengths=tuple(
-                float(w) for w in d.get("wavelengths", DFLT_RIPPLE_WAVELENGTHS)
-            ),
-            bloom=float(d.get("bloom", DFLT_RIPPLE_BLOOM)),
-        )
+        unknown = sorted(set(d) - {"kind", *(f.name for f in fields(cls))})
+        if unknown:
+            raise TransitionError(f"a Ripple document has no {unknown}")
+        try:
+            return cls(
+                duration_s=float(d["duration_s"]),
+                amplitude=float(d.get("amplitude", DFLT_RIPPLE_AMPLITUDE)),
+                wavelengths=tuple(
+                    float(w) for w in d.get("wavelengths", DFLT_RIPPLE_WAVELENGTHS)
+                ),
+                bloom=float(d.get("bloom", DFLT_RIPPLE_BLOOM)),
+            )
+        except (TypeError, ValueError) as error:
+            raise TransitionError(f"not a Ripple document: {error}") from error
 
 
 def blended_frames(

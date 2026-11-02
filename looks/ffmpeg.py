@@ -1227,14 +1227,14 @@ def _ripple_displaced(start, duration, *, amplitude, wavelengths) -> str:
     return f"p(X+{dx},Y+{dy})"
 
 
-def _bloom(sigma: float, weight: str, *, full_range: bool, enable=None) -> str:
+def _bloom(sigma: float, weight: str, *, full_range: bool, enable: str) -> str:
     r"""A blurred, brightened copy of the picture, mixed back in at ``weight``.
 
     A branch (``split`` ... ``blend``) whose first and last pads are
     unlabelled, so it comma-splices like any filter; its labels are opened and
     closed inside it, so two in one chain do not collide (see
     :func:`_halation_compiler`). ``weight`` is a ``blend`` expression, so it
-    may read ``T``; ``enable``, when given, gates every filter of the branch.
+    may read ``T``; ``enable`` gates every filter of the branch.
 
     The brightening is range-aware. ``lutyuv``'s ``minval``/``maxval`` are the
     limited-range 16/235 whatever the stream's range tag, so clipping to them
@@ -1242,9 +1242,9 @@ def _bloom(sigma: float, weight: str, *, full_range: bool, enable=None) -> str:
     full-range stream is therefore left to ``lutyuv``'s own clamp to the code
     range (0..255, 0..1023), measured on 9.0 and 6.1.
 
-    >>> _bloom(2, "0.5", full_range=False)
-    'split[lk_bloom_a][lk_bloom_b];[lk_bloom_b]gblur=sigma=2:planes=7,lutyuv=y=clip(val*1.15+maxval*0.031373\\,minval\\,maxval)[lk_bloom_g];[lk_bloom_a][lk_bloom_g]blend=all_expr=A*(1-0.5)+B*0.5'
-    >>> "clip(" in _bloom(2, "0.5", full_range=True)
+    >>> _bloom(2, "0.5", full_range=False, enable="lt(t,1)")
+    'split[lk_bloom_a][lk_bloom_b];[lk_bloom_b]gblur=sigma=2:planes=7:enable=lt(t\\,1),lutyuv=y=clip(val*1.15+maxval*0.031373\\,minval\\,maxval):enable=lt(t\\,1)[lk_bloom_g];[lk_bloom_a][lk_bloom_g]blend=all_expr=A*(1-0.5)+B*0.5:enable=lt(t\\,1)'
+    >>> "clip(" in _bloom(2, "0.5", full_range=True, enable="lt(t,1)")
     False
     """
     a, b, g = (f"[{LABEL_NAMESPACE}bloom_{name}]" for name in "abg")
@@ -1299,10 +1299,10 @@ def _ripple_compiler(params, *, clip=None, **_kw):
     window or not, with a matrix nothing declares (measured: up to 2/255 on
     ``testsrc2`` rgb24 and gbrp, outside the window).
 
-    ffmpeg 6.1.6's bilinear ``geq`` is not an identity at the right and bottom
-    edges on 4:4:4 and 4:2:2 (yuv420p was exact): at zero displacement it
-    moved ``testsrc2``'s last row by up to 116/255 and its last column by up to
-    31/255. So during the warp 6.1 and 9.0 disagree, on pixels that sample
+    ffmpeg 6.1.6's bilinear ``geq`` is not an identity at the frame's edges,
+    and CI's ffmpeg is a 6.1: at zero displacement on a 160x90 ``testsrc2``
+    (one frame, all planes) it changed up to 223/255 at 4:4:4, and at 4:2:0 and
+    4:2:2 left luma exact but moved chroma's edge by up to 8/255. So during the warp 6.1 and 9.0 disagree, on pixels that sample
     the last row or column, by up to 109/255 in the last row, 26/255 in the
     last column and 96/255 just inside them (160x90 and 320x180). 9.0.1 is
     exact. The window is open at both ends for the same reason: a closed one

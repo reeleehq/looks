@@ -136,10 +136,10 @@ def test_a_round_trip_through_a_document_keeps_the_record():
     assert r.wavelengths == (0.1, 0.05)
 
 
-def test_a_document_is_coerced_and_filtered_like_a_transitions():
-    """As JSON would bring it back: ints, a list, and a key it does not know."""
+def test_a_document_is_coerced_as_json_brings_it_back():
+    """Ints and a list, as JSON would return them."""
     r = Ripple.from_dict(
-        {"kind": "ripple", "duration_s": 1, "wavelengths": [0.1, 0.05], "note": "x"}
+        {"kind": "ripple", "duration_s": 1, "wavelengths": [0.1, 0.05]}
     )
     assert r == Ripple(1.0, wavelengths=(0.1, 0.05))
     assert isinstance(r.duration_s, float) and isinstance(r.wavelengths, tuple)
@@ -560,3 +560,16 @@ def test_the_ripple_moves_rather_than_breathes(env):
     before, after = PEAK - 1, PEAK + 1
     profiles = _displacement_profiles(env, [before, after])
     assert _mean_abs(profiles[before], profiles[after]) > 0.5
+
+
+@pytest.mark.parametrize(
+    "doc, match",
+    [
+        ({"kind": "ripple", "duration_s": 1, "amplitde": 0.02}, "amplitde"),
+        ({"kind": "ripple", "duration_s": 1, "wavelengths": "ab"}, "not a Ripple"),
+        ({"kind": "ripple", "duration_s": "one"}, "not a Ripple"),
+    ],
+)
+def test_a_document_that_would_render_something_else_is_refused(doc, match):
+    with pytest.raises(TransitionError, match=match):
+        Ripple.from_dict(doc)
