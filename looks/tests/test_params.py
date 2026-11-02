@@ -4,6 +4,7 @@ Pure data plus `compile_look`'s refusal; no ffmpeg process is started except
 where a test says so and skips without one.
 """
 
+import functools
 import math
 import re
 import shutil
@@ -393,6 +394,7 @@ def test_the_check_and_the_binary_agree(env, points, pix_fmt):
     assert _ffmpeg_accepts(fragment, pix_fmt) is not refused_here
 
 
+@functools.lru_cache(maxsize=None)
 def _pix_fmt_depths() -> dict:
     """``ffmpeg -pix_fmts``: each format's deepest component, in bits."""
     out = subprocess.run(
@@ -468,20 +470,41 @@ def test_the_depth_holds_whatever_the_output_format_is(env, output_pix_fmt):
 
 
 #: Parameters that let every registered implementation compile on its own.
-#: An effect missing here cannot be measured, so it must not claim to keep depth.
 _SWEEP_PARAMS = {
     "fit": {"target": "64x36"},
     "fill": {"target": "64x36"},
     "stretch": {"target": "64x36"},
     "curves": {"all": [(0, 0), (1, 1)]},
     "ripple": {"start_s": 0, "duration_s": 1},
+    "gradient_map": {"stops": [[8.2, "#2E0C18"], [100.0, "#FEF0DC"]], "size": 9},
+    # A zoom, which compiles to `zoompan`: 8-bit only, measured on 6.1 and 9.0.
+    # A pan compiles to `crop` and keeps depth, so `motion`'s depth depends on
+    # its keyframes and the implementation cannot claim to keep it (#60).
+    "motion": {"keyframes": [(0, (0, 0, 1, 1)), (1, (0.25, 0.25, 0.5, 0.5))]},
 }
-_UNMEASURED = {"gradient_map", "lut3d", "motion"}
 
 
-def _depth_into_curves_after(env, key, pix_fmt):
+@pytest.fixture(scope="module")
+def cubes(tmp_path_factory):
+    """A folder holding a cube for `lut3d`, and for `gradient_map` to build into."""
+    from looks.lut import Ramp, gradient_map, write_cube
+
+    folder = tmp_path_factory.mktemp("cubes")
+    stops = [tuple(s) for s in _SWEEP_PARAMS["gradient_map"]["stops"]]
+    write_cube(gradient_map(Ramp.from_hex(stops)), folder / "ramp.cube", size=9)
+    return folder
+
+
+def _sweep_params(effect, cubes):
+    if effect == "lut3d":
+        return {"cube": str(cubes / "ramp.cube")}
+    return _SWEEP_PARAMS.get(effect, {})
+
+
+def _depth_into_curves_after(env, key, pix_fmt, *, cubes):
     """The bit depth a curves receives right after implementation ``key``, in
     ``vf``'s own chain, read by showinfo."""
+    from looks.cache import materialize
     from looks.ffmpeg import vf
     from looks.licence import Tier
     from looks.spec import LookPlan, Step
@@ -501,12 +524,12 @@ def _depth_into_curves_after(env, key, pix_fmt):
     effect = REGISTRY.impl(key).effect
     plan = LookPlan(
         steps=(
-            step(effect, key, _SWEEP_PARAMS.get(effect, {})),
+            step(effect, key, _sweep_params(effect, cubes)),
             step("curves", "curves.ffmpeg.curves", _SWEEP_PARAMS["curves"]),
         ),
         clip=clip,
     )
-    head, mark, tail = vf(plan).rpartition(":interp=pchip")
+    head, mark, tail = vf(materialize(plan, into=cubes)).rpartition(":interp=pchip")
     chain = f"{head}{mark},showinfo{tail}"  # right after the last step, curves
     argv = ["ffmpeg", "-hide_banner", "-v", "info", "-f", "lavfi"]
     argv += [
@@ -523,7 +546,7 @@ def _depth_into_curves_after(env, key, pix_fmt):
 
 
 @pytest.mark.parametrize("pix_fmt, depth", [("yuv420p10le", 10), ("yuv444p12le", 12)])
-def test_every_keeps_depth_declaration_is_measured(env, pix_fmt, depth):
+def test_every_keeps_depth_declaration_is_measured(env, cubes, pix_fmt, depth):
     """Each registration's ``keeps_depth`` against the binary: a step declared
     to keep depth hands curves the clip's depth, and one that does hands it on
     is declared. Measured on 6.1 and 9.0, preservation also composes: all 223
@@ -534,17 +557,15 @@ def test_every_keeps_depth_declaration_is_measured(env, pix_fmt, depth):
     for effect in REGISTRY.effects():
         for impl in REGISTRY.implementations(effect):
             declared = REGISTRY.keeps_depth(impl.impl)
-            if effect in _UNMEASURED:
-                if declared:
-                    wrong[impl.impl] = "declared, and no measurement here"
-                continue
-            kept = _depth_into_curves_after(env, impl.impl, pix_fmt) == depth
+            kept = (
+                _depth_into_curves_after(env, impl.impl, pix_fmt, cubes=cubes) == depth
+            )
             if kept != declared:
                 wrong[impl.impl] = f"declared {declared}, measured {kept}"
     assert wrong == {}
 
 
-def test_every_keeper_keeps_depth_on_every_carried_format(env):
+def test_every_keeper_keeps_depth_on_every_carried_format(env, cubes):
     """Issue #52's review: a keeper declared on two formats raised 14-bit and
     10/12-bit alpha clips to 16 bits, and a carried check then refused what
     ffmpeg accepts. So every keeper is measured on every carried format."""
@@ -565,7 +586,9 @@ def test_every_keeper_keeps_depth_on_every_carried_format(env):
     formats = sorted(f for f in DEPTH_CARRIED_FORMATS if not f.endswith("be"))
     cases = [(k, f) for k in keepers for f in formats]
     with ThreadPoolExecutor() as pool:
-        got = list(pool.map(lambda c: _depth_into_curves_after(env, *c), cases))
+        got = list(
+            pool.map(lambda c: _depth_into_curves_after(env, *c, cubes=cubes), cases)
+        )
     wrong = [(k, f, d) for (k, f), d in zip(cases, got) if d != CURVES_DEPTH[f]]
     assert wrong == []
 
