@@ -62,7 +62,7 @@ import warnings
 
 from looks.environment import FfmpegEnv
 from looks.licence import Policy, classify, check, ffmpeg_terms
-from looks.params import ParamError
+from looks.params import DEPTH_CARRIED_FORMATS, ParamError
 from looks.registry import REGISTRY, EffectRegistry, UnknownImpl
 from looks.stages import StageOrderWarning, check_stage_order
 from looks.spec import (
@@ -155,11 +155,12 @@ def compile_look(
         warnings.warn(message, StageOrderWarning, stacklevel=2)
 
     steps = []
-    # The clip's format stands for the bit depth a step receives for as long
-    # as every step before it was registered as keeping depth (issue #52).
-    # After one that was not, the depth is ffmpeg's negotiation across the
-    # whole chain (eq and vignette drop a 10-bit clip to 8, noise and halation
-    # raise it to 16), and a guess would refuse what ffmpeg accepts.
+    # The clip's format, standing for the bit depth a step receives: exact for
+    # the first step, and carried past a step registered as keeping depth when
+    # the clip's format is one that was measured to survive that (issue #52).
+    # Past any other step the depth is ffmpeg's negotiation across the whole
+    # chain (eq and vignette drop a 10-bit clip to 8, noise and halation raise
+    # it to 16), and a guess would refuse what ffmpeg accepts.
     arriving = None if clip is None else clip.pix_fmt
     for effect in concrete.steps:
         impl = _select(
@@ -170,7 +171,7 @@ def compile_look(
             env=env,
             pix_fmt=arriving,
         )
-        if not reg.keeps_depth(impl.impl):
+        if not (reg.keeps_depth(impl.impl) and arriving in DEPTH_CARRIED_FORMATS):
             arriving = None
         payload = _payload(reg, impl, effect, clip=clip, env=env)
         steps.append(

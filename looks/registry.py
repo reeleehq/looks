@@ -161,12 +161,15 @@ class EffectRegistry:
                 the one compiled into this package. Pass a binary's own set to
                 validate against that instead.
             keeps_depth: Does the step hand the next one the bit depth it was
-                given? Measured, never assumed: ffmpeg negotiates formats across
-                the whole chain, and ``eq``, ``vignette`` (to 8 bits), ``noise``
-                and ``halation``'s ``format`` (to 16) do not. ``compile_look``
-                carries the clip's format past a step only when this is true,
-                for the checks that depend on it (issue #52). False, the
-                default, means "not known to", and costs only a check skipped.
+                given, on every format in
+                :data:`looks.params.DEPTH_CARRIED_FORMATS`? Measured, never
+                assumed: ffmpeg negotiates formats across the whole chain, and
+                ``eq``, ``vignette`` (to 8 bits), ``noise`` and ``halation``'s
+                ``format`` (to 16) do not. ``compile_look`` carries the clip's
+                format past a step only when this is true, for the checks that
+                depend on it (issue #52). False, the default, means "not known
+                to", and costs only a check skipped. Only an ffmpeg step can
+                claim it: a frame step hands on whatever the pipe carries.
 
         Raises:
             ImplConflict: If the key is taken.
@@ -181,6 +184,12 @@ class EffectRegistry:
         declared ``rgb_only`` changes ``vf``'s pixels; bump ``impl_version``.)
         """
         self._check_key(impl)
+        if keeps_depth and impl.backend != "ffmpeg":
+            raise RegistryError(
+                f"{impl.impl!r} declares keeps_depth, but only an ffmpeg step "
+                "can: a frame step hands on whatever the pipe carries (8-bit "
+                "packed RGB), whatever it was given."
+            )
         if impl.impl in self._by_key:
             existing = self._by_key[impl.impl].impl
             raise ImplConflict(

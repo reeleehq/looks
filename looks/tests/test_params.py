@@ -542,3 +542,53 @@ def test_every_keeps_depth_declaration_is_measured(env, pix_fmt, depth):
             if kept != declared:
                 wrong[impl.impl] = f"declared {declared}, measured {kept}"
     assert wrong == {}
+
+
+def test_every_keeper_keeps_depth_on_every_carried_format(env):
+    """Issue #52's review: a keeper declared on two formats raised 14-bit and
+    10/12-bit alpha clips to 16 bits, and a carried check then refused what
+    ffmpeg accepts. So every keeper is measured on every carried format."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    from looks.params import CURVES_DEPTH, DEPTH_CARRIED_FORMATS
+
+    if shutil.which("ffmpeg") is None:
+        pytest.skip("ffmpeg not on PATH")
+    keepers = [
+        impl.impl
+        for effect in REGISTRY.effects()
+        for impl in REGISTRY.implementations(effect)
+        if REGISTRY.keeps_depth(impl.impl)
+    ]
+    # Little-endian and endian-free formats only: their big-endian twins
+    # measured identically on both builds, at half the cost.
+    formats = sorted(f for f in DEPTH_CARRIED_FORMATS if not f.endswith("be"))
+    cases = [(k, f) for k in keepers for f in formats]
+    with ThreadPoolExecutor() as pool:
+        got = list(pool.map(lambda c: _depth_into_curves_after(env, *c), cases))
+    wrong = [(k, f, d) for (k, f), d in zip(cases, got) if d != CURVES_DEPTH[f]]
+    assert wrong == []
+
+
+def test_a_format_that_is_not_carried_is_not_checked_past_the_first_step(env):
+    """yuva444p10le after contrast reaches curves at 16 bits: ffmpeg accepts
+    points 0.0003 apart that a carried 10-bit check would refuse."""
+    steps = (
+        Effect(name="contrast", params={"amount": 1.2}),
+        Effect(name="curves", params={"all": CLOSE_AT_10}),
+    )
+    _compile(env, steps, "yuva444p10le")
+    with pytest.raises(CompileError, match="one code value"):
+        _compile(env, steps[1:], "yuva444p10le")
+
+
+def test_only_an_ffmpeg_step_may_claim_to_keep_depth():
+    from dataclasses import replace
+
+    from looks.registry import EffectRegistry, RegistryError
+
+    impl = replace(
+        REGISTRY.impl("blur.ffmpeg.gblur"), impl="blur.frame.x", backend="frame"
+    )
+    with pytest.raises(RegistryError, match="keeps_depth"):
+        EffectRegistry().register(impl, lambda p, **k: {}, keeps_depth=True)
