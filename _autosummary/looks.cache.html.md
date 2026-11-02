@@ -54,7 +54,7 @@ would give. [`sweep()`](#looks.cache.sweep) exists for a caller who wants that, 
 |--------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|
 | [`cube_file`](#looks.cache.cube_file)(spec, \*[, size, title, into])  | Ensure the cube for `spec` exists on disk, and say where.                 |
 | [`entries`](#looks.cache.entries)([into])                           | Every cube in the cache.                                                  |
-| [`materialize`](#looks.cache.materialize)(plan, \*[, into])             | Build every artifact this plan asks for, and return a plan that has them. |
+| [`materialize`](#looks.cache.materialize)(plan, \*[, into, name_of])    | Build every artifact this plan asks for, and return a plan that has them. |
 | [`materialize_many`](#looks.cache.materialize_many)(specs, \*[, size, into]) | Materialise several specs into one directory.                             |
 | [`pending`](#looks.cache.pending)(plan)                             | The cube addresses this plan needs and has not been given.                |
 | [`sweep`](#looks.cache.sweep)([into, keep])                       | Delete cached cubes, optionally keeping a set of keys.                    |
@@ -161,9 +161,24 @@ Every cube in the cache. Partial writes in flight are not listed.
 * **Return type:**
   [`Iterator`](https://docs.python.org/3/library/typing.html#typing.Iterator)[[`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]
 
-### looks.cache.materialize(plan, , into=None)
+### looks.cache.materialize(plan, , into=None, name_of=None)
 
 Build every artifact this plan asks for, and return a plan that has them.
+
+`name_of` is how the filter names a cube it was given: by default its
+absolute path, so the fragment runs anywhere on this machine. A host that
+resolves names itself passes a function of the cube’s path, e.g.
+`lambda p: p.relative_to(lut_dir)` for `lut3d=file=<key>.cube`, and
+keeps no host path in what it stores (reeleehq/muvid#252). It returns a
+string or a path; a path is written with forward slashes on every OS, since
+a name is not a Windows path. The name is escaped as the path would have
+been. `payload["cube"]` stays the absolute path either way: it is where
+the file is, not what to call it, and so a materialised plan’s
+`plan_hash` still depends on the folder.
+
+A step’s name is chosen when its cube is built. Giving `name_of` for a
+plan already materialised is refused: the request it would rename from is
+gone, and ignoring the argument would leave the absolute path in silently.
 
 The split this preserves is the reason it is a separate verb rather than
 part of compiling: **\`compile_look\` starts no process and writes no file**,
@@ -202,6 +217,15 @@ that needs a binary is a doctest that does not run in CI.
 ...     pending(ready) == ()
 True
 >>> ready.steps[0].payload['filter'].startswith('lut3d=file=')
+True
+```
+
+A host that names cubes relative to its own folder:
+
+```pycon
+>>> with tempfile.TemporaryDirectory() as tmp:
+...     named = materialize(plan, into=tmp, name_of=lambda p: p.name)
+...     named.steps[0].payload['filter'] == f"lut3d=file={Path(named.steps[0].payload['cube']).name}"
 True
 ```
 

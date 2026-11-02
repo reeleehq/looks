@@ -84,7 +84,7 @@ Two names are deliberately absent, and a test asserts it: there is no
 | [`probes_for`](#looks.probes_for)(spread, parameter)                      | A [`Spread`](#looks.Spread) as the probes [`looks.resolve_across()`](#looks.resolve_across) takes. |
 | [`pipe_plan`](#looks.pipe_plan)(plan, \*, source[, clip, pix_fmt])       | Arrange a compiled plan as processes — emitted as data, never started.                                                                                 |
 | [`runs`](#looks.runs)(plan)                                         | Maximal runs of consecutive steps sharing a backend.                                                                                                   |
-| [`materialize`](#looks.materialize)(plan, \*[, into])                      | Build every artifact this plan asks for, and return a plan that has them.                                                                              |
+| [`materialize`](#looks.materialize)(plan, \*[, into, name_of])             | Build every artifact this plan asks for, and return a plan that has them.                                                                              |
 | [`cube_file`](#looks.cube_file)(spec, \*[, size, title, into])           | Ensure the cube for `spec` exists on disk, and say where.                                                                                              |
 | [`pending`](#looks.pending)(plan)                                      | The cube addresses this plan needs and has not been given.                                                                                             |
 | [`cache_dir`](#looks.cache_dir)([into])                                  | Where cubes are kept, resolved in one place.                                                                                                           |
@@ -3167,9 +3167,24 @@ A JSON-able form of a Look, carrying its schema tag.
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
-### looks.materialize(plan, , into=None)
+### looks.materialize(plan, , into=None, name_of=None)
 
 Build every artifact this plan asks for, and return a plan that has them.
+
+`name_of` is how the filter names a cube it was given: by default its
+absolute path, so the fragment runs anywhere on this machine. A host that
+resolves names itself passes a function of the cube’s path, e.g.
+`lambda p: p.relative_to(lut_dir)` for `lut3d=file=<key>.cube`, and
+keeps no host path in what it stores (reeleehq/muvid#252). It returns a
+string or a path; a path is written with forward slashes on every OS, since
+a name is not a Windows path. The name is escaped as the path would have
+been. `payload["cube"]` stays the absolute path either way: it is where
+the file is, not what to call it, and so a materialised plan’s
+`plan_hash` still depends on the folder.
+
+A step’s name is chosen when its cube is built. Giving `name_of` for a
+plan already materialised is refused: the request it would rename from is
+gone, and ignoring the argument would leave the absolute path in silently.
 
 The split this preserves is the reason it is a separate verb rather than
 part of compiling: **\`compile_look\` starts no process and writes no file**,
@@ -3208,6 +3223,15 @@ that needs a binary is a doctest that does not run in CI.
 ...     pending(ready) == ()
 True
 >>> ready.steps[0].payload['filter'].startswith('lut3d=file=')
+True
+```
+
+A host that names cubes relative to its own folder:
+
+```pycon
+>>> with tempfile.TemporaryDirectory() as tmp:
+...     named = materialize(plan, into=tmp, name_of=lambda p: p.name)
+...     named.steps[0].payload['filter'] == f"lut3d=file={Path(named.steps[0].payload['cube']).name}"
 True
 ```
 

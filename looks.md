@@ -1,4 +1,4 @@
-> built 2026-11-02 15:39 UTC from 04a1444 (main) · looks 0.0.31. Details: build_info.json
+> built 2026-11-02 16:05 UTC from c448524 (main) · looks 0.0.31. Details: build_info.json
 
 # index.html.md
 
@@ -418,7 +418,7 @@ would give. [`sweep()`](_autosummary/looks.cache.html.md#looks.cache.sweep) exis
 |--------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|
 | [`cube_file`](_autosummary/looks.cache.html.md#looks.cache.cube_file)(spec, \*[, size, title, into])  | Ensure the cube for `spec` exists on disk, and say where.                 |
 | [`entries`](_autosummary/looks.cache.html.md#looks.cache.entries)([into])                           | Every cube in the cache.                                                  |
-| [`materialize`](_autosummary/looks.cache.html.md#looks.cache.materialize)(plan, \*[, into])             | Build every artifact this plan asks for, and return a plan that has them. |
+| [`materialize`](_autosummary/looks.cache.html.md#looks.cache.materialize)(plan, \*[, into, name_of])    | Build every artifact this plan asks for, and return a plan that has them. |
 | [`materialize_many`](_autosummary/looks.cache.html.md#looks.cache.materialize_many)(specs, \*[, size, into]) | Materialise several specs into one directory.                             |
 | [`pending`](_autosummary/looks.cache.html.md#looks.cache.pending)(plan)                             | The cube addresses this plan needs and has not been given.                |
 | [`sweep`](_autosummary/looks.cache.html.md#looks.cache.sweep)([into, keep])                       | Delete cached cubes, optionally keeping a set of keys.                    |
@@ -525,9 +525,24 @@ Every cube in the cache. Partial writes in flight are not listed.
 * **Return type:**
   [`Iterator`](https://docs.python.org/3/library/typing.html#typing.Iterator)[[`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]
 
-### looks.cache.materialize(plan, , into=None)
+### looks.cache.materialize(plan, , into=None, name_of=None)
 
 Build every artifact this plan asks for, and return a plan that has them.
+
+`name_of` is how the filter names a cube it was given: by default its
+absolute path, so the fragment runs anywhere on this machine. A host that
+resolves names itself passes a function of the cube’s path, e.g.
+`lambda p: p.relative_to(lut_dir)` for `lut3d=file=<key>.cube`, and
+keeps no host path in what it stores (reeleehq/muvid#252). It returns a
+string or a path; a path is written with forward slashes on every OS, since
+a name is not a Windows path. The name is escaped as the path would have
+been. `payload["cube"]` stays the absolute path either way: it is where
+the file is, not what to call it, and so a materialised plan’s
+`plan_hash` still depends on the folder.
+
+A step’s name is chosen when its cube is built. Giving `name_of` for a
+plan already materialised is refused: the request it would rename from is
+gone, and ignoring the argument would leave the absolute path in silently.
 
 The split this preserves is the reason it is a separate verb rather than
 part of compiling: **\`compile_look\` starts no process and writes no file**,
@@ -566,6 +581,15 @@ that needs a binary is a doctest that does not run in CI.
 ...     pending(ready) == ()
 True
 >>> ready.steps[0].payload['filter'].startswith('lut3d=file=')
+True
+```
+
+A host that names cubes relative to its own folder:
+
+```pycon
+>>> with tempfile.TemporaryDirectory() as tmp:
+...     named = materialize(plan, into=tmp, name_of=lambda p: p.name)
+...     named.steps[0].payload['filter'] == f"lut3d=file={Path(named.steps[0].payload['cube']).name}"
 True
 ```
 
@@ -2745,7 +2769,7 @@ Two names are deliberately absent, and a test asserts it: there is no
 | [`probes_for`](_autosummary/looks.html.md#looks.probes_for)(spread, parameter)                      | A [`Spread`](_autosummary/looks.html.md#looks.Spread) as the probes [`looks.resolve_across()`](_autosummary/looks.html.md#looks.resolve_across) takes. |
 | [`pipe_plan`](_autosummary/looks.html.md#looks.pipe_plan)(plan, \*, source[, clip, pix_fmt])       | Arrange a compiled plan as processes — emitted as data, never started.                                                                                 |
 | [`runs`](_autosummary/looks.html.md#looks.runs)(plan)                                         | Maximal runs of consecutive steps sharing a backend.                                                                                                   |
-| [`materialize`](_autosummary/looks.html.md#looks.materialize)(plan, \*[, into])                      | Build every artifact this plan asks for, and return a plan that has them.                                                                              |
+| [`materialize`](_autosummary/looks.html.md#looks.materialize)(plan, \*[, into, name_of])             | Build every artifact this plan asks for, and return a plan that has them.                                                                              |
 | [`cube_file`](_autosummary/looks.html.md#looks.cube_file)(spec, \*[, size, title, into])           | Ensure the cube for `spec` exists on disk, and say where.                                                                                              |
 | [`pending`](_autosummary/looks.html.md#looks.pending)(plan)                                      | The cube addresses this plan needs and has not been given.                                                                                             |
 | [`cache_dir`](_autosummary/looks.html.md#looks.cache_dir)([into])                                  | Where cubes are kept, resolved in one place.                                                                                                           |
@@ -5828,9 +5852,24 @@ A JSON-able form of a Look, carrying its schema tag.
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
-### looks.materialize(plan, , into=None)
+### looks.materialize(plan, , into=None, name_of=None)
 
 Build every artifact this plan asks for, and return a plan that has them.
+
+`name_of` is how the filter names a cube it was given: by default its
+absolute path, so the fragment runs anywhere on this machine. A host that
+resolves names itself passes a function of the cube’s path, e.g.
+`lambda p: p.relative_to(lut_dir)` for `lut3d=file=<key>.cube`, and
+keeps no host path in what it stores (reeleehq/muvid#252). It returns a
+string or a path; a path is written with forward slashes on every OS, since
+a name is not a Windows path. The name is escaped as the path would have
+been. `payload["cube"]` stays the absolute path either way: it is where
+the file is, not what to call it, and so a materialised plan’s
+`plan_hash` still depends on the folder.
+
+A step’s name is chosen when its cube is built. Giving `name_of` for a
+plan already materialised is refused: the request it would rename from is
+gone, and ignoring the argument would leave the absolute path in silently.
 
 The split this preserves is the reason it is a separate verb rather than
 part of compiling: **\`compile_look\` starts no process and writes no file**,
@@ -5869,6 +5908,15 @@ that needs a binary is a doctest that does not run in CI.
 ...     pending(ready) == ()
 True
 >>> ready.steps[0].payload['filter'].startswith('lut3d=file=')
+True
+```
+
+A host that names cubes relative to its own folder:
+
+```pycon
+>>> with tempfile.TemporaryDirectory() as tmp:
+...     named = materialize(plan, into=tmp, name_of=lambda p: p.name)
+...     named.steps[0].payload['filter'] == f"lut3d=file={Path(named.steps[0].payload['cube']).name}"
 True
 ```
 
@@ -10966,7 +11014,7 @@ frames...
 
 # About this build
 
-This documentation was built on **2026-11-02 15:39 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/04a1444f37f695571f99abed03c6be7b8f44200d"><code>04a1444</code></a> on branch <code>main</code>, for **looks 0.0.31** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 16:05 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/c4485244508af171f7fed7c9b5f32dad4dd43cc5"><code>c448524</code></a> on branch <code>main</code>, for **looks 0.0.31** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -10975,9 +11023,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/looks/commit/04a1444f37f695571f99abed03c6be7b8f44200d"><code>04a1444f37f695571f99abed03c6be7b8f44200d</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/looks/commit/c4485244508af171f7fed7c9b5f32dad4dd43cc5"><code>c4485244508af171f7fed7c9b5f32dad4dd43cc5</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | <code>0.0.31</code>                                                                                                                                   |
+| Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/looks</code>                                                                                                        |
 
@@ -10986,9 +11034,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/looks</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/41473130863">41473130863</a>       |
+| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/41477165694">41477165694</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>44b474164e610c1b270529064ad68c44ddaa70cc</code> (in the history of the built commit) |
+| Event commit | <code>c4485244508af171f7fed7c9b5f32dad4dd43cc5</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -11019,7 +11067,7 @@ Latest release: <a href="https://pypi.org/project/looks/0.0.31/">0.0.31</a>, the
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout 04a1444f37f695571f99abed03c6be7b8f44200d
+git checkout c4485244508af171f7fed7c9b5f32dad4dd43cc5
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

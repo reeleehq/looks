@@ -290,7 +290,7 @@ submodule it keeps its own short name.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#looks.runs" title="looks.runs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runs</span></code></a>(plan)</p></td>
 <td><p>Maximal runs of consecutive steps sharing a backend.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.materialize" title="looks.materialize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">materialize</span></code></a>(plan, *[, into])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.materialize" title="looks.materialize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">materialize</span></code></a>(plan, *[, into, name_of])</p></td>
 <td><p>Build every artifact this plan asks for, and return a plan that has them.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#looks.cube_file" title="looks.cube_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cube_file</span></code></a>(spec, *[, size, title, into])</p></td>
@@ -3788,8 +3788,21 @@ ceiling changes what a Look may compile to, never what it asks for.</p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="looks.materialize">
-<span class="sig-prename descclassname"><span class="pre">looks.</span></span><span class="sig-name descname"><span class="pre">materialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">into</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/cache.html#materialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.materialize" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.materialize'">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">looks.</span></span><span class="sig-name descname"><span class="pre">materialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">into</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_of</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/cache.html#materialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.materialize" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.materialize'">¶</a></dt>
 <dd><p>Build every artifact this plan asks for, and return a plan that has them.</p>
+<p><code class="docutils literal notranslate"><span class="pre">name_of</span></code> is how the filter names a cube it was given: by default its
+absolute path, so the fragment runs anywhere on this machine. A host that
+resolves names itself passes a function of the cube’s path, e.g.
+<code class="docutils literal notranslate"><span class="pre">lambda</span> <span class="pre">p:</span> <span class="pre">p.relative_to(lut_dir)</span></code> for <code class="docutils literal notranslate"><span class="pre">lut3d=file=&lt;key&gt;.cube</span></code>, and
+keeps no host path in what it stores (reeleehq/muvid#252). It returns a
+string or a path; a path is written with forward slashes on every OS, since
+a name is not a Windows path. The name is escaped as the path would have
+been. <code class="docutils literal notranslate"><span class="pre">payload["cube"]</span></code> stays the absolute path either way: it is where
+the file is, not what to call it, and so a materialised plan’s
+<code class="docutils literal notranslate"><span class="pre">plan_hash</span></code> still depends on the folder.</p>
+<p>A step’s name is chosen when its cube is built. Giving <code class="docutils literal notranslate"><span class="pre">name_of</span></code> for a
+plan already materialised is refused: the request it would rename from is
+gone, and ignoring the argument would leave the absolute path in silently.</p>
 <p>The split this preserves is the reason it is a separate verb rather than
 part of compiling: <strong>`compile_look` starts no process and writes no file</strong>,
 so a plan is pure data that can be hashed, stored, diffed and sent
@@ -3822,6 +3835,13 @@ that needs a binary is a doctest that does not run in CI.</p>
 </span><span id="line-17"><span class="go">True</span>
 </span><span id="line-18"><span class="gp">&gt;&gt;&gt; </span><span class="n">ready</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">payload</span><span class="p">[</span><span class="s1">'filter'</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'lut3d=file='</span><span class="p">)</span>
 </span><span id="line-19"><span class="go">True</span>
+</span></code></pre></div>
+</div>
+<p>A host that names cubes relative to its own folder:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
+</span><span id="line-2"><span class="gp">... </span>    <span class="n">named</span> <span class="o">=</span> <span class="n">materialize</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">into</span><span class="o">=</span><span class="n">tmp</span><span class="p">,</span> <span class="n">name_of</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span id="line-3"><span class="gp">... </span>    <span class="n">named</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">payload</span><span class="p">[</span><span class="s1">'filter'</span><span class="p">]</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">"lut3d=file=</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">named</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">payload</span><span class="p">[</span><span class="s1">'cube'</span><span class="p">])</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-4"><span class="go">True</span>
 </span></code></pre></div>
 </div>
 <dl class="field-list simple">
