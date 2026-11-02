@@ -15,6 +15,8 @@ looks.frame\_dependency
       FLICKER_FREE
       DETERMINISM_PROBE_FRAMES
       TEMPORAL_PROBE_FRAMES
+      TEMPORAL_NUDGE
+      MID_PROBE_HEAD_FRAME
    
    .. rubric:: Functions
 

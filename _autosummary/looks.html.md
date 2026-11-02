@@ -2292,9 +2292,10 @@ importing `burns`, and so does anything else a caller already has.
 
 Raise unless `chain` provably cannot flicker.
 
-\*\*What a pass means, precisely: three probes could not make this effect
+\*\*What a pass means, precisely: the probes could not make this effect
 depend on anything they varied.\*\* It is not a proof of frame independence —
-`tblend` and `atadenoise` pass and are temporal. For an effect whose class
+a temporal filter whose memory reaches beyond the frames sampled would
+pass. For an effect whose class
 matters, pair this with the structural argument (a stateless per-pixel
 lookup cannot depend on anything else) or with a declared class this
 function is used to *falsify*.

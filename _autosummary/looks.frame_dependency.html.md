@@ -56,26 +56,27 @@ Each cost a false reading before it was fixed, and each fails **silently**.
 
 ### What this does not answer
 
-**Some temporal filters.** A third probe (below) catches the common case by
+**Some temporal filters, once.** A third probe catches the common case by
 running two sequences that differ only *before* a shared textured tail:
-`tmix=frames=3` shows **146**/255 in the tail and `hqdn3d` shows 2. But
-`tblend` and `atadenoise` both read **0** and are misreported as independent.
-Measured, and the reason is structural rather than a tuning failure: `tblend`
-consumes two input frames per output frame, so the trim that skips the
-perturbation for a normal filter lands *past* it; `atadenoise` keeps nine
-frames of history, more than a short probe can perturb. Lengthening the
-perturbation from one frame to three changed neither — verified.
+`tmix=frames=3` shows **146**/255 in the tail and `hqdn3d` shows 2. `tblend`
+and `atadenoise` both read **0** there, for structural reasons: `tblend`
+consumes two input frames per output frame, so its memory of the
+perturbation lands in the frame the trim skips, and `atadenoise` never
+averages in a black-against-white difference, only one within its threshold.
+Two more graphs close that (issue #59): a perturbation *mid-sequence*, large
+and small, with every other frame compared by timestamp. `tblend` now reads
+110/255, `atadenoise` 2/255, every stateless filter measured still 0, on 6.1
+and 9.0.
 
-Those two are refused for an unrelated and stronger reason anyway: \*\*every
-temporal filter is out of scope\*\*, because the execution model this package
-serves renders one bounded ffmpeg *per cut*, so a temporal filter meets a hard
-discontinuity at every cut. Do not read that as making the gap harmless —
-it means the gap is not currently load-bearing, not that it is closed.
+Temporal filters stay refused for an unrelated and stronger reason anyway:
+**every temporal filter is out of scope**, because the execution model this
+package serves renders one bounded ffmpeg *per cut*, so a temporal filter
+meets a hard discontinuity at every cut.
 
-\*\*And an `INDEPENDENT` verdict is evidence, not proof.\*\* It says: none of three
+\*\*And an `INDEPENDENT` verdict is evidence, not proof.\*\* It says: none of the
 probes could make this effect change a pixel it should not have touched. An
-effect adapting to a statistic none of them moves would pass, and so would
-`tblend`.
+effect adapting to a statistic none of them moves would pass, and so would a
+temporal filter whose memory reaches beyond the frames sampled.
 That is why the flagship look’s claim does **not** rest on this module — a
 fixed per-pixel lookup with no state cannot depend on anything else, which is a
 *structural* argument, and the measurement corroborates it rather than
@@ -89,14 +90,16 @@ Every process here goes through `looks._run`, and every one is an
 
 ### Module Attributes
 
-| [`PROBE_SIZE`](#looks.frame_dependency.PROBE_SIZE)               | Probe geometry.                                                     |
-|---------------------------------------------------------------------------|---------------------------------------------------------------------|
-| [`SEAM_MARGIN`](#looks.frame_dependency.SEAM_MARGIN)              | How far in from the seam the constant half is sampled, in pixels.   |
-| [`NOISE_FLOOR`](#looks.frame_dependency.NOISE_FLOOR)              | A difference at or below this (out of 255) is treated as no change. |
-| [`UNDETERMINED`](#looks.frame_dependency.UNDETERMINED)             | Convenience alias for the value that means "no answer".             |
-| [`FLICKER_FREE`](#looks.frame_dependency.FLICKER_FREE)             | The classes that cannot produce flicker.                            |
-| [`DETERMINISM_PROBE_FRAMES`](#looks.frame_dependency.DETERMINISM_PROBE_FRAMES) | How many frames the determinism probe examines.                     |
-| [`TEMPORAL_PROBE_FRAMES`](#looks.frame_dependency.TEMPORAL_PROBE_FRAMES)    | How many frames of the shared tail the temporal probe examines.     |
+| [`PROBE_SIZE`](#looks.frame_dependency.PROBE_SIZE)               | Probe geometry.                                                                                                                                                                             |
+|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`SEAM_MARGIN`](#looks.frame_dependency.SEAM_MARGIN)              | How far in from the seam the constant half is sampled, in pixels.                                                                                                                           |
+| [`NOISE_FLOOR`](#looks.frame_dependency.NOISE_FLOOR)              | A difference at or below this (out of 255) is treated as no change.                                                                                                                         |
+| [`UNDETERMINED`](#looks.frame_dependency.UNDETERMINED)             | Convenience alias for the value that means "no answer".                                                                                                                                     |
+| [`FLICKER_FREE`](#looks.frame_dependency.FLICKER_FREE)             | The classes that cannot produce flicker.                                                                                                                                                    |
+| [`DETERMINISM_PROBE_FRAMES`](#looks.frame_dependency.DETERMINISM_PROBE_FRAMES) | How many frames the determinism probe examines.                                                                                                                                             |
+| [`TEMPORAL_PROBE_FRAMES`](#looks.frame_dependency.TEMPORAL_PROBE_FRAMES)    | How many frames of the shared tail the temporal probe examines.                                                                                                                             |
+| [`TEMPORAL_NUDGE`](#looks.frame_dependency.TEMPORAL_NUDGE)           | inside the band `atadenoise` averages (it skips pixels that differ by more than its threshold, about 5/255 by default), so a black/white perturbation is never averaged in and this one is. |
+| [`MID_PROBE_HEAD_FRAME`](#looks.frame_dependency.MID_PROBE_HEAD_FRAME)     | any but frame 0, which the tail opens with (see `_mid_perturbation_probe()`).                                                                                                               |
 
 ### Functions
 
@@ -227,6 +230,14 @@ Why, when something could not be measured.
 
 The classes that cannot produce flicker.
 
+### looks.frame_dependency.MID_PROBE_HEAD_FRAME *= 3*
+
+any but frame 0, which
+the tail opens with (see `_mid_perturbation_probe()`).
+
+* **Type:**
+  Which `testsrc2` frame opens the mid-sequence probe
+
 ### looks.frame_dependency.NOISE_FLOOR *= 1*
 
 A difference at or below this (out of 255) is treated as no change.
@@ -254,6 +265,16 @@ cannot. For a refusal engine that is the safe direction — the unsafe one is
 calling an adaptive effect independent. Widen the margin (and the probe) if a
 specific broad filter needs a correct verdict.
 
+### looks.frame_dependency.TEMPORAL_NUDGE *= 6*
+
+inside the
+band `atadenoise` averages (it skips pixels that differ by more than its
+threshold, about 5/255 by default), so a black/white perturbation is never
+averaged in and this one is. Measured: `atadenoise` 2/255, stateless 0.
+
+* **Type:**
+  The small perturbation of the mid-sequence probe, in luma codes
+
 ### looks.frame_dependency.TEMPORAL_PROBE_FRAMES *= 3*
 
 How many frames of the shared tail the temporal probe examines.
@@ -272,9 +293,10 @@ Convenience alias for the value that means “no answer”.
 
 Raise unless `chain` provably cannot flicker.
 
-\*\*What a pass means, precisely: three probes could not make this effect
+\*\*What a pass means, precisely: the probes could not make this effect
 depend on anything they varied.\*\* It is not a proof of frame independence —
-`tblend` and `atadenoise` pass and are temporal. For an effect whose class
+a temporal filter whose memory reaches beyond the frames sampled would
+pass. For an effect whose class
 matters, pair this with the structural argument (a stateless per-pixel
 lookup cannot depend on anything else) or with a declared class this
 function is used to *falsify*.

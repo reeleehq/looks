@@ -1,4 +1,4 @@
-> built 2026-11-02 18:55 UTC from 6f4ff12 (main) · looks 0.0.37. Details: build_info.json
+> built 2026-11-02 19:19 UTC from 1c776e8 (main) · looks 0.0.38. Details: build_info.json
 
 # index.html.md
 
@@ -2162,26 +2162,27 @@ Each cost a false reading before it was fixed, and each fails **silently**.
 
 ### What this does not answer
 
-**Some temporal filters.** A third probe (below) catches the common case by
+**Some temporal filters, once.** A third probe catches the common case by
 running two sequences that differ only *before* a shared textured tail:
-`tmix=frames=3` shows **146**/255 in the tail and `hqdn3d` shows 2. But
-`tblend` and `atadenoise` both read **0** and are misreported as independent.
-Measured, and the reason is structural rather than a tuning failure: `tblend`
-consumes two input frames per output frame, so the trim that skips the
-perturbation for a normal filter lands *past* it; `atadenoise` keeps nine
-frames of history, more than a short probe can perturb. Lengthening the
-perturbation from one frame to three changed neither — verified.
+`tmix=frames=3` shows **146**/255 in the tail and `hqdn3d` shows 2. `tblend`
+and `atadenoise` both read **0** there, for structural reasons: `tblend`
+consumes two input frames per output frame, so its memory of the
+perturbation lands in the frame the trim skips, and `atadenoise` never
+averages in a black-against-white difference, only one within its threshold.
+Two more graphs close that (issue #59): a perturbation *mid-sequence*, large
+and small, with every other frame compared by timestamp. `tblend` now reads
+110/255, `atadenoise` 2/255, every stateless filter measured still 0, on 6.1
+and 9.0.
 
-Those two are refused for an unrelated and stronger reason anyway: \*\*every
-temporal filter is out of scope\*\*, because the execution model this package
-serves renders one bounded ffmpeg *per cut*, so a temporal filter meets a hard
-discontinuity at every cut. Do not read that as making the gap harmless —
-it means the gap is not currently load-bearing, not that it is closed.
+Temporal filters stay refused for an unrelated and stronger reason anyway:
+**every temporal filter is out of scope**, because the execution model this
+package serves renders one bounded ffmpeg *per cut*, so a temporal filter
+meets a hard discontinuity at every cut.
 
-\*\*And an `INDEPENDENT` verdict is evidence, not proof.\*\* It says: none of three
+\*\*And an `INDEPENDENT` verdict is evidence, not proof.\*\* It says: none of the
 probes could make this effect change a pixel it should not have touched. An
-effect adapting to a statistic none of them moves would pass, and so would
-`tblend`.
+effect adapting to a statistic none of them moves would pass, and so would a
+temporal filter whose memory reaches beyond the frames sampled.
 That is why the flagship look’s claim does **not** rest on this module — a
 fixed per-pixel lookup with no state cannot depend on anything else, which is a
 *structural* argument, and the measurement corroborates it rather than
@@ -2195,14 +2196,16 @@ Every process here goes through `looks._run`, and every one is an
 
 ### Module Attributes
 
-| [`PROBE_SIZE`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.PROBE_SIZE)               | Probe geometry.                                                     |
-|---------------------------------------------------------------------------|---------------------------------------------------------------------|
-| [`SEAM_MARGIN`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.SEAM_MARGIN)              | How far in from the seam the constant half is sampled, in pixels.   |
-| [`NOISE_FLOOR`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.NOISE_FLOOR)              | A difference at or below this (out of 255) is treated as no change. |
-| [`UNDETERMINED`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.UNDETERMINED)             | Convenience alias for the value that means "no answer".             |
-| [`FLICKER_FREE`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.FLICKER_FREE)             | The classes that cannot produce flicker.                            |
-| [`DETERMINISM_PROBE_FRAMES`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.DETERMINISM_PROBE_FRAMES) | How many frames the determinism probe examines.                     |
-| [`TEMPORAL_PROBE_FRAMES`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.TEMPORAL_PROBE_FRAMES)    | How many frames of the shared tail the temporal probe examines.     |
+| [`PROBE_SIZE`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.PROBE_SIZE)               | Probe geometry.                                                                                                                                                                             |
+|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`SEAM_MARGIN`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.SEAM_MARGIN)              | How far in from the seam the constant half is sampled, in pixels.                                                                                                                           |
+| [`NOISE_FLOOR`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.NOISE_FLOOR)              | A difference at or below this (out of 255) is treated as no change.                                                                                                                         |
+| [`UNDETERMINED`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.UNDETERMINED)             | Convenience alias for the value that means "no answer".                                                                                                                                     |
+| [`FLICKER_FREE`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.FLICKER_FREE)             | The classes that cannot produce flicker.                                                                                                                                                    |
+| [`DETERMINISM_PROBE_FRAMES`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.DETERMINISM_PROBE_FRAMES) | How many frames the determinism probe examines.                                                                                                                                             |
+| [`TEMPORAL_PROBE_FRAMES`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.TEMPORAL_PROBE_FRAMES)    | How many frames of the shared tail the temporal probe examines.                                                                                                                             |
+| [`TEMPORAL_NUDGE`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.TEMPORAL_NUDGE)           | inside the band `atadenoise` averages (it skips pixels that differ by more than its threshold, about 5/255 by default), so a black/white perturbation is never averaged in and this one is. |
+| [`MID_PROBE_HEAD_FRAME`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.MID_PROBE_HEAD_FRAME)     | any but frame 0, which the tail opens with (see `_mid_perturbation_probe()`).                                                                                                               |
 
 ### Functions
 
@@ -2333,6 +2336,14 @@ Why, when something could not be measured.
 
 The classes that cannot produce flicker.
 
+### looks.frame_dependency.MID_PROBE_HEAD_FRAME *= 3*
+
+any but frame 0, which
+the tail opens with (see `_mid_perturbation_probe()`).
+
+* **Type:**
+  Which `testsrc2` frame opens the mid-sequence probe
+
 ### looks.frame_dependency.NOISE_FLOOR *= 1*
 
 A difference at or below this (out of 255) is treated as no change.
@@ -2360,6 +2371,16 @@ cannot. For a refusal engine that is the safe direction — the unsafe one is
 calling an adaptive effect independent. Widen the margin (and the probe) if a
 specific broad filter needs a correct verdict.
 
+### looks.frame_dependency.TEMPORAL_NUDGE *= 6*
+
+inside the
+band `atadenoise` averages (it skips pixels that differ by more than its
+threshold, about 5/255 by default), so a black/white perturbation is never
+averaged in and this one is. Measured: `atadenoise` 2/255, stateless 0.
+
+* **Type:**
+  The small perturbation of the mid-sequence probe, in luma codes
+
 ### looks.frame_dependency.TEMPORAL_PROBE_FRAMES *= 3*
 
 How many frames of the shared tail the temporal probe examines.
@@ -2378,9 +2399,10 @@ Convenience alias for the value that means “no answer”.
 
 Raise unless `chain` provably cannot flicker.
 
-\*\*What a pass means, precisely: three probes could not make this effect
+\*\*What a pass means, precisely: the probes could not make this effect
 depend on anything they varied.\*\* It is not a proof of frame independence —
-`tblend` and `atadenoise` pass and are temporal. For an effect whose class
+a temporal filter whose memory reaches beyond the frames sampled would
+pass. For an effect whose class
 matters, pair this with the structural argument (a stateless per-pixel
 lookup cannot depend on anything else) or with a declared class this
 function is used to *falsify*.
@@ -5139,9 +5161,10 @@ importing `burns`, and so does anything else a caller already has.
 
 Raise unless `chain` provably cannot flicker.
 
-\*\*What a pass means, precisely: three probes could not make this effect
+\*\*What a pass means, precisely: the probes could not make this effect
 depend on anything they varied.\*\* It is not a proof of frame independence —
-`tblend` and `atadenoise` pass and are temporal. For an effect whose class
+a temporal filter whose memory reaches beyond the frames sampled would
+pass. For an effect whose class
 matters, pair this with the structural argument (a stateless per-pixel
 lookup cannot depend on anything else) or with a declared class this
 function is used to *falsify*.
@@ -11477,7 +11500,7 @@ frames...
 
 # About this build
 
-This documentation was built on **2026-11-02 18:55 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/6f4ff12f0ffaddcd314ad3ededc9c30250837dd2"><code>6f4ff12</code></a> on branch <code>main</code>, for **looks 0.0.37** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 19:19 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/1c776e8aa9b65f0b49d57f8561dd3413dfdc50ee"><code>1c776e8</code></a> on branch <code>main</code>, for **looks 0.0.38** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -11486,9 +11509,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/looks/commit/6f4ff12f0ffaddcd314ad3ededc9c30250837dd2"><code>6f4ff12f0ffaddcd314ad3ededc9c30250837dd2</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/looks/commit/1c776e8aa9b65f0b49d57f8561dd3413dfdc50ee"><code>1c776e8aa9b65f0b49d57f8561dd3413dfdc50ee</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | <code>0.0.37</code>                                                                                                                                   |
+| Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/looks</code>                                                                                                        |
 
@@ -11497,9 +11520,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/looks</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/41504094020">41504094020</a>       |
+| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/41508025945">41508025945</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>e5fdba75d400febb9bcff92c2a41ffe34aa8c311</code> (in the history of the built commit) |
+| Event commit | <code>9eb803717b8472edb17177dc5197ebb0f253a3ba</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -11524,13 +11547,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/looks/0.0.37/">0.0.37</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/looks/0.0.38/">0.0.38</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout 6f4ff12f0ffaddcd314ad3ededc9c30250837dd2
+git checkout 1c776e8aa9b65f0b49d57f8561dd3413dfdc50ee
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

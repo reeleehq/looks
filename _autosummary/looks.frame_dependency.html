@@ -183,24 +183,25 @@ force that conversion, so the format is pinned on <strong>both</strong> sides of
 effect under test.</p></li>
 </ul>
 <p class="rubric">What this does not answer</p>
-<p><strong>Some temporal filters.</strong> A third probe (below) catches the common case by
+<p><strong>Some temporal filters, once.</strong> A third probe catches the common case by
 running two sequences that differ only <em>before</em> a shared textured tail:
-<code class="code docutils literal notranslate"><span class="pre">tmix=frames=3</span></code> shows <strong>146</strong>/255 in the tail and <code class="code docutils literal notranslate"><span class="pre">hqdn3d</span></code> shows 2. But
-<code class="code docutils literal notranslate"><span class="pre">tblend</span></code> and <code class="code docutils literal notranslate"><span class="pre">atadenoise</span></code> both read <strong>0</strong> and are misreported as independent.
-Measured, and the reason is structural rather than a tuning failure: <code class="code docutils literal notranslate"><span class="pre">tblend</span></code>
-consumes two input frames per output frame, so the trim that skips the
-perturbation for a normal filter lands <em>past</em> it; <code class="code docutils literal notranslate"><span class="pre">atadenoise</span></code> keeps nine
-frames of history, more than a short probe can perturb. Lengthening the
-perturbation from one frame to three changed neither — verified.</p>
-<p>Those two are refused for an unrelated and stronger reason anyway: **every
-temporal filter is out of scope**, because the execution model this package
-serves renders one bounded ffmpeg <em>per cut</em>, so a temporal filter meets a hard
-discontinuity at every cut. Do not read that as making the gap harmless —
-it means the gap is not currently load-bearing, not that it is closed.</p>
-<p>**And an <code class="code docutils literal notranslate"><span class="pre">INDEPENDENT</span></code> verdict is evidence, not proof.** It says: none of three
+<code class="code docutils literal notranslate"><span class="pre">tmix=frames=3</span></code> shows <strong>146</strong>/255 in the tail and <code class="code docutils literal notranslate"><span class="pre">hqdn3d</span></code> shows 2. <code class="code docutils literal notranslate"><span class="pre">tblend</span></code>
+and <code class="code docutils literal notranslate"><span class="pre">atadenoise</span></code> both read <strong>0</strong> there, for structural reasons: <code class="code docutils literal notranslate"><span class="pre">tblend</span></code>
+consumes two input frames per output frame, so its memory of the
+perturbation lands in the frame the trim skips, and <code class="code docutils literal notranslate"><span class="pre">atadenoise</span></code> never
+averages in a black-against-white difference, only one within its threshold.
+Two more graphs close that (issue #59): a perturbation <em>mid-sequence</em>, large
+and small, with every other frame compared by timestamp. <code class="code docutils literal notranslate"><span class="pre">tblend</span></code> now reads
+110/255, <code class="code docutils literal notranslate"><span class="pre">atadenoise</span></code> 2/255, every stateless filter measured still 0, on 6.1
+and 9.0.</p>
+<p>Temporal filters stay refused for an unrelated and stronger reason anyway:
+<strong>every temporal filter is out of scope</strong>, because the execution model this
+package serves renders one bounded ffmpeg <em>per cut</em>, so a temporal filter
+meets a hard discontinuity at every cut.</p>
+<p>**And an <code class="code docutils literal notranslate"><span class="pre">INDEPENDENT</span></code> verdict is evidence, not proof.** It says: none of the
 probes could make this effect change a pixel it should not have touched. An
-effect adapting to a statistic none of them moves would pass, and so would
-<code class="code docutils literal notranslate"><span class="pre">tblend</span></code>.
+effect adapting to a statistic none of them moves would pass, and so would a
+temporal filter whose memory reaches beyond the frames sampled.
 That is why the flagship look’s claim does <strong>not</strong> rest on this module — a
 fixed per-pixel lookup with no state cannot depend on anything else, which is a
 <em>structural</em> argument, and the measurement corroborates it rather than
@@ -233,6 +234,12 @@ argument.</p>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#looks.frame_dependency.TEMPORAL_PROBE_FRAMES" title="looks.frame_dependency.TEMPORAL_PROBE_FRAMES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEMPORAL_PROBE_FRAMES</span></code></a></p></td>
 <td><p>How many frames of the shared tail the temporal probe examines.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.frame_dependency.TEMPORAL_NUDGE" title="looks.frame_dependency.TEMPORAL_NUDGE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEMPORAL_NUDGE</span></code></a></p></td>
+<td><p>inside the band <code class="code docutils literal notranslate"><span class="pre">atadenoise</span></code> averages (it skips pixels that differ by more than its threshold, about 5/255 by default), so a black/white perturbation is never averaged in and this one is.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.frame_dependency.MID_PROBE_HEAD_FRAME" title="looks.frame_dependency.MID_PROBE_HEAD_FRAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MID_PROBE_HEAD_FRAME</span></code></a></p></td>
+<td><p>any but frame 0, which the tail opens with (see <code class="xref py py-func docutils literal notranslate"><span class="pre">_mid_perturbation_probe()</span></code>).</p></td>
 </tr>
 </tbody>
 </table>
@@ -397,6 +404,17 @@ guarantee.</p>
 <dd><p>The classes that cannot produce flicker.</p>
 </dd></dl>
 <dl class="py data">
+<dt class="sig sig-object py" id="looks.frame_dependency.MID_PROBE_HEAD_FRAME">
+<span class="sig-prename descclassname"><span class="pre">looks.frame_dependency.</span></span><span class="sig-name descname"><span class="pre">MID_PROBE_HEAD_FRAME</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.MID_PROBE_HEAD_FRAME" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.MID_PROBE_HEAD_FRAME'">¶</a></dt>
+<dd><p>any but frame 0, which
+the tail opens with (see <code class="xref py py-func docutils literal notranslate"><span class="pre">_mid_perturbation_probe()</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Which <code class="code docutils literal notranslate"><span class="pre">testsrc2</span></code> frame opens the mid-sequence probe</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py data">
 <dt class="sig sig-object py" id="looks.frame_dependency.NOISE_FLOOR">
 <span class="sig-prename descclassname"><span class="pre">looks.frame_dependency.</span></span><span class="sig-name descname"><span class="pre">NOISE_FLOOR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.NOISE_FLOOR" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.NOISE_FLOOR'">¶</a></dt>
 <dd><p>A difference at or below this (out of 255) is treated as no change.
@@ -425,6 +443,19 @@ calling an adaptive effect independent. Widen the margin (and the probe) if a
 specific broad filter needs a correct verdict.</p>
 </dd></dl>
 <dl class="py data">
+<dt class="sig sig-object py" id="looks.frame_dependency.TEMPORAL_NUDGE">
+<span class="sig-prename descclassname"><span class="pre">looks.frame_dependency.</span></span><span class="sig-name descname"><span class="pre">TEMPORAL_NUDGE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.TEMPORAL_NUDGE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.TEMPORAL_NUDGE'">¶</a></dt>
+<dd><p>inside the
+band <code class="code docutils literal notranslate"><span class="pre">atadenoise</span></code> averages (it skips pixels that differ by more than its
+threshold, about 5/255 by default), so a black/white perturbation is never
+averaged in and this one is. Measured: <code class="code docutils literal notranslate"><span class="pre">atadenoise</span></code> 2/255, stateless 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The small perturbation of the mid-sequence probe, in luma codes</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py data">
 <dt class="sig sig-object py" id="looks.frame_dependency.TEMPORAL_PROBE_FRAMES">
 <span class="sig-prename descclassname"><span class="pre">looks.frame_dependency.</span></span><span class="sig-name descname"><span class="pre">TEMPORAL_PROBE_FRAMES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.TEMPORAL_PROBE_FRAMES" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.TEMPORAL_PROBE_FRAMES'">¶</a></dt>
 <dd><p>How many frames of the shared tail the temporal probe examines.</p>
@@ -443,9 +474,10 @@ after the perturbation and 146/255 when it began 1 frame after.</p>
 <dt class="sig sig-object py" id="looks.frame_dependency.assert_flicker_free">
 <span class="sig-prename descclassname"><span class="pre">looks.frame_dependency.</span></span><span class="sig-name descname"><span class="pre">assert_flicker_free</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chain</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/frame_dependency.html#assert_flicker_free"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.frame_dependency.assert_flicker_free" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.frame_dependency.assert_flicker_free'">¶</a></dt>
 <dd><p>Raise unless <code class="docutils literal notranslate"><span class="pre">chain</span></code> provably cannot flicker.</p>
-<p>**What a pass means, precisely: three probes could not make this effect
+<p>**What a pass means, precisely: the probes could not make this effect
 depend on anything they varied.** It is not a proof of frame independence —
-<code class="code docutils literal notranslate"><span class="pre">tblend</span></code> and <code class="code docutils literal notranslate"><span class="pre">atadenoise</span></code> pass and are temporal. For an effect whose class
+a temporal filter whose memory reaches beyond the frames sampled would
+pass. For an effect whose class
 matters, pair this with the structural argument (a stateless per-pixel
 lookup cannot depend on anything else) or with a declared class this
 function is used to <em>falsify</em>.</p>
@@ -502,9 +534,11 @@ licence tier follows, applied to the other guarantee this package makes.</p>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#looks.frame_dependency.FLICKER_FREE'" class="reference internal" href="#looks.frame_dependency.FLICKER_FREE"><code class="docutils literal notranslate"><span class="pre">FLICKER_FREE</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.MID_PROBE_HEAD_FRAME'" class="reference internal" href="#looks.frame_dependency.MID_PROBE_HEAD_FRAME"><code class="docutils literal notranslate"><span class="pre">MID_PROBE_HEAD_FRAME</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.frame_dependency.NOISE_FLOOR'" class="reference internal" href="#looks.frame_dependency.NOISE_FLOOR"><code class="docutils literal notranslate"><span class="pre">NOISE_FLOOR</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.frame_dependency.PROBE_SIZE'" class="reference internal" href="#looks.frame_dependency.PROBE_SIZE"><code class="docutils literal notranslate"><span class="pre">PROBE_SIZE</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.frame_dependency.SEAM_MARGIN'" class="reference internal" href="#looks.frame_dependency.SEAM_MARGIN"><code class="docutils literal notranslate"><span class="pre">SEAM_MARGIN</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.frame_dependency.TEMPORAL_NUDGE'" class="reference internal" href="#looks.frame_dependency.TEMPORAL_NUDGE"><code class="docutils literal notranslate"><span class="pre">TEMPORAL_NUDGE</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.frame_dependency.TEMPORAL_PROBE_FRAMES'" class="reference internal" href="#looks.frame_dependency.TEMPORAL_PROBE_FRAMES"><code class="docutils literal notranslate"><span class="pre">TEMPORAL_PROBE_FRAMES</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.frame_dependency.UNDETERMINED'" class="reference internal" href="#looks.frame_dependency.UNDETERMINED"><code class="docutils literal notranslate"><span class="pre">UNDETERMINED</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.frame_dependency.assert_flicker_free'" class="reference internal" href="#looks.frame_dependency.assert_flicker_free"><code class="docutils literal notranslate"><span class="pre">assert_flicker_free()</span></code></a></li>
@@ -522,7 +556,7 @@ licence tier follows, applied to the other guarantee this package makes.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=aa2ad26f"></script>
+<script src="../_static/documentation_options.js?v=423071ad"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

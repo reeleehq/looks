@@ -1,34 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-02T18:55:52Z",
+  "built_at": "2026-11-02T19:19:40Z",
   "package": {
     "name": "looks",
-    "version": "0.0.37",
+    "version": "0.0.38",
     "display_name": "looks",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "6f4ff12f0ffaddcd314ad3ededc9c30250837dd2",
-    "short_commit": "6f4ff12",
+    "commit": "1c776e8aa9b65f0b49d57f8561dd3413dfdc50ee",
+    "short_commit": "1c776e8",
     "branch": "main",
-    "tags": [
-      "0.0.37"
-    ],
+    "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/reeleehq/looks",
-    "commit_url": "https://github.com/reeleehq/looks/commit/6f4ff12f0ffaddcd314ad3ededc9c30250837dd2",
+    "commit_url": "https://github.com/reeleehq/looks/commit/1c776e8aa9b65f0b49d57f8561dd3413dfdc50ee",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "reeleehq/looks",
-    "sha": "e5fdba75d400febb9bcff92c2a41ffe34aa8c311",
+    "sha": "9eb803717b8472edb17177dc5197ebb0f253a3ba",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "41504094020",
-    "run_url": "https://github.com/reeleehq/looks/actions/runs/41504094020",
+    "run_id": "41508025945",
+    "run_url": "https://github.com/reeleehq/looks/actions/runs/41508025945",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -58,15 +56,15 @@
   },
   "site": {
     "modules_documented": 18,
-    "objects_documented": 664
+    "objects_documented": 666
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.37",
+    "latest": "0.0.38",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/reeleehq/looks && cd looks\ngit checkout 6f4ff12f0ffaddcd314ad3ededc9c30250837dd2\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/reeleehq/looks && cd looks\ngit checkout 1c776e8aa9b65f0b49d57f8561dd3413dfdc50ee\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

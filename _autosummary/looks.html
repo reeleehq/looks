@@ -2902,9 +2902,10 @@ importing <code class="docutils literal notranslate"><span class="pre">burns</sp
 <dt class="sig sig-object py" id="looks.assert_flicker_free">
 <span class="sig-prename descclassname"><span class="pre">looks.</span></span><span class="sig-name descname"><span class="pre">assert_flicker_free</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chain</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/frame_dependency.html#assert_flicker_free"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.assert_flicker_free" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.assert_flicker_free'">¶</a></dt>
 <dd><p>Raise unless <code class="docutils literal notranslate"><span class="pre">chain</span></code> provably cannot flicker.</p>
-<p>**What a pass means, precisely: three probes could not make this effect
+<p>**What a pass means, precisely: the probes could not make this effect
 depend on anything they varied.** It is not a proof of frame independence —
-<code class="code docutils literal notranslate"><span class="pre">tblend</span></code> and <code class="code docutils literal notranslate"><span class="pre">atadenoise</span></code> pass and are temporal. For an effect whose class
+a temporal filter whose memory reaches beyond the frames sampled would
+pass. For an effect whose class
 matters, pair this with the structural argument (a stateless per-pixel
 lookup cannot depend on anything else) or with a declared class this
 function is used to <em>falsify</em>.</p>
@@ -5210,7 +5211,7 @@ count check — the obvious check — passes in both cases.</p></li>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=aa2ad26f"></script>
+<script src="../_static/documentation_options.js?v=423071ad"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
