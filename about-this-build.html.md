@@ -2,18 +2,20 @@
 
 # About this build
 
-This documentation was built on **2026-11-02 16:05 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/c4485244508af171f7fed7c9b5f32dad4dd43cc5"><code>c448524</code></a> on branch <code>main</code>, for **looks 0.0.31** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 16:45 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/a37e43321d04f3fb314b9ef63c61e8f31d6d9ce0"><code>a37e433</code></a> on branch <code>main</code>, for **looks 0.0.33** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.33) is ahead of the latest release on PyPI (0.0.32): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/looks/commit/c4485244508af171f7fed7c9b5f32dad4dd43cc5"><code>c4485244508af171f7fed7c9b5f32dad4dd43cc5</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/looks/commit/a37e43321d04f3fb314b9ef63c61e8f31d6d9ce0"><code>a37e43321d04f3fb314b9ef63c61e8f31d6d9ce0</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | none                                                                                                                                                  |
+| Tags at this commit | <code>0.0.33</code>                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/looks</code>                                                                                                        |
 
@@ -22,9 +24,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/looks</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/41477165694">41477165694</a>       |
+| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/41483802363">41483802363</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>c4485244508af171f7fed7c9b5f32dad4dd43cc5</code> (in the history of the built commit) |
+| Event commit | <code>7f63444af679c25bf9e893d4f978a6e5cfb59cfe</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -49,13 +51,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/looks/0.0.31/">0.0.31</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/looks/0.0.32/">0.0.32</a>, older than the documented version (0.0.33).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout c4485244508af171f7fed7c9b5f32dad4dd43cc5
+git checkout a37e43321d04f3fb314b9ef63c61e8f31d6d9ce0
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

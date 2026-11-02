@@ -65,7 +65,7 @@ Effect name -> stage. An effect absent from here is unconstrained.
 
 The effect after which nothing may resample.
 
-### looks.stages.RESAMPLING_EFFECTS *= frozenset({'blur', 'fill', 'fit', 'gate_weave', 'gradient_map', 'lut3d', 'motion', 'sharpen', 'stretch'})*
+### looks.stages.RESAMPLING_EFFECTS *= frozenset({'blur', 'fill', 'fit', 'gate_weave', 'gradient_map', 'lut3d', 'motion', 'ripple', 'sharpen', 'stretch'})*
 
 Effects that resample, interpolate or smooth the picture, and so manufacture
 in-between values. After `posterize` they un-quantise it. Includes the LUT
@@ -84,7 +84,7 @@ Bases: [`UserWarning`](https://docs.python.org/3/builtins/exceptions.html#UserWa
 
 A Look puts an effect in a stage the catalogue measured as wrong.
 
-### looks.stages.check_stage_order(effects, , stages={'colorbalance': Stage.GRADE, 'contrast': Stage.GRADE, 'curves': Stage.GRADE, 'fill': Stage.GEOMETRY, 'fit': Stage.GEOMETRY, 'flatten': Stage.FLATTEN, 'gamma': Stage.GRADE, 'gradient_map': Stage.LOOK, 'grain': Stage.GRAIN, 'halation': Stage.OPTICAL, 'levels': Stage.GRADE, 'lut3d': Stage.LOOK, 'motion': Stage.GEOMETRY, 'posterize': Stage.LOOK, 'saturation': Stage.GRADE, 'stretch': Stage.GEOMETRY, 'vignette': Stage.OPTICAL}, resampling=frozenset({'blur', 'fill', 'fit', 'gate_weave', 'gradient_map', 'lut3d', 'motion', 'sharpen', 'stretch'}), quantiser='posterize')
+### looks.stages.check_stage_order(effects, , stages={'colorbalance': Stage.GRADE, 'contrast': Stage.GRADE, 'curves': Stage.GRADE, 'fill': Stage.GEOMETRY, 'fit': Stage.GEOMETRY, 'flatten': Stage.FLATTEN, 'gamma': Stage.GRADE, 'gradient_map': Stage.LOOK, 'grain': Stage.GRAIN, 'halation': Stage.OPTICAL, 'levels': Stage.GRADE, 'lut3d': Stage.LOOK, 'motion': Stage.GEOMETRY, 'posterize': Stage.LOOK, 'saturation': Stage.GRADE, 'stretch': Stage.GEOMETRY, 'vignette': Stage.OPTICAL}, resampling=frozenset({'blur', 'fill', 'fit', 'gate_weave', 'gradient_map', 'lut3d', 'motion', 'ripple', 'sharpen', 'stretch'}), quantiser='posterize')
 
 Describe each departure from the canonical order; empty when there is none.
 

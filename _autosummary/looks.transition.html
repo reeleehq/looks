@@ -216,6 +216,12 @@ rate, because the question does.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#looks.transition.MIN_TRANSITION_S" title="looks.transition.MIN_TRANSITION_S"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MIN_TRANSITION_S</span></code></a></p></td>
 <td><p>The floor below which a transition is a hard cut wearing a label.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.transition.XFADE_KIND" title="looks.transition.XFADE_KIND"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XFADE_KIND</span></code></a></p></td>
+<td><p><a href="#id1"><span class="problematic" id="id2">`</span></a>Transition.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.transition.RIPPLE_KIND" title="looks.transition.RIPPLE_KIND"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RIPPLE_KIND</span></code></a></p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">kind</span></code> a <a class="reference internal" href="#looks.transition.Ripple" title="looks.transition.Ripple"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ripple</span></code></a> document carries, and must.</p></td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Functions</p>
@@ -241,7 +247,10 @@ rate, because the question does.</p>
 <p class="rubric">Classes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#looks.transition.Transition" title="looks.transition.Transition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transition</span></code></a>(duration_s[, curve])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.transition.Ripple" title="looks.transition.Ripple"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ripple</span></code></a>(duration_s[, amplitude, wavelengths, ...])</p></td>
+<td><p>A dream transition: the picture ripples, blooms and dissolves into the next.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.transition.Transition" title="looks.transition.Transition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transition</span></code></a>(duration_s[, curve])</p></td>
 <td><p>How a shot blends in from its predecessor.</p></td>
 </tr>
 </tbody>
@@ -268,6 +277,115 @@ from <code class="code docutils literal notranslate"><span class="pre">muvid</sp
 where the number comes from. It is therefore too small at lower rates, and
 <a class="reference internal" href="#looks.transition.blended_frames" title="looks.transition.blended_frames"><code class="xref py py-func docutils literal notranslate"><span class="pre">blended_frames()</span></code></a> is the form that knows it: prefer that when the rate
 is available, and treat this as the rate-free fallback it is.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.transition.RIPPLE_KIND">
+<span class="sig-prename descclassname"><span class="pre">looks.transition.</span></span><span class="sig-name descname"><span class="pre">RIPPLE_KIND</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ripple'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.transition.RIPPLE_KIND" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.transition.RIPPLE_KIND'">¶</a></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">kind</span></code> a <a class="reference internal" href="#looks.transition.Ripple" title="looks.transition.Ripple"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ripple</span></code></a> document carries, and must.</p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="looks.transition.Ripple">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.transition.</span></span><span class="sig-name descname"><span class="pre">Ripple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">duration_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.017578125</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelengths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.14930555555555555,</span> <span class="pre">0.057291666666666664)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bloom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.55</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/transition.html#Ripple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.transition.Ripple" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.transition.Ripple'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A dream transition: the picture ripples, blooms and dissolves into the next.</p>
+<p>Not a <a class="reference internal" href="#looks.transition.TRANSITION_CURVES" title="looks.transition.TRANSITION_CURVES"><code class="xref py py-data docutils literal notranslate"><span class="pre">TRANSITION_CURVES</span></code></a> name, because <code class="docutils literal notranslate"><span class="pre">xfade</span></code> cannot move a
+pixel. It is two things the host already knows how to place, over one
+window:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#looks.transition.Ripple.dissolve" title="looks.transition.Ripple.dissolve"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dissolve</span></code></a>, an ordinary <a class="reference internal" href="#looks.transition.Transition" title="looks.transition.Transition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transition</span></code></a> for the host’s
+<code class="docutils literal notranslate"><span class="pre">xfade</span></code>, as for any other transition. It is <code class="docutils literal notranslate"><span class="pre">xfade</span></code>’s linear
+<code class="docutils literal notranslate"><span class="pre">fade</span></code>; the production this came from (issue #49) used a smoothstep
+blend, which no <a class="reference internal" href="#looks.transition.TRANSITION_CURVES" title="looks.transition.TRANSITION_CURVES"><code class="xref py py-data docutils literal notranslate"><span class="pre">TRANSITION_CURVES</span></code></a> name gives.</p></li>
+<li><p><a class="reference internal" href="#looks.transition.Ripple.effect" title="looks.transition.Ripple.effect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">effect()</span></code></a>, a single-input <code class="docutils literal notranslate"><span class="pre">ripple</span></code> effect, swelling from nothing
+at the window’s start to its peak at the middle of the fade and settling
+by its end. It compiles through <a class="reference internal" href="looks.html#looks.compile_look" title="looks.compile_look"><code class="xref py py-func docutils literal notranslate"><span class="pre">looks.compile_look()</span></code></a> like any
+effect, so it carries a licence tier.</p></li>
+</ul>
+<p><strong>Where the effect goes.</strong> On the stream that holds <em>both</em> shots across the
+window, the composite the dissolve produces, with <code class="docutils literal notranslate"><span class="pre">offset</span></code> the dissolve’s
+start in <em>that stream’s own timeline</em>, after any <code class="docutils literal notranslate"><span class="pre">setpts</span></code> the host
+applies. Two traps, both silent. A stream holding only the <em>incoming</em>
+shot is the wrong one: <code class="docutils literal notranslate"><span class="pre">reeleehq/mixing</span></code>’s <code class="docutils literal notranslate"><span class="pre">_entrance</span></code> cross-fades a
+cutaway from a transparent copy of itself, so its <code class="docutils literal notranslate"><span class="pre">xfade</span></code> output holds
+the cutaway alone, and a ripple there would never move the outgoing scene.
+In <code class="docutils literal notranslate"><span class="pre">mixing</span></code> the stream with both shots exists only after the overlay (a
+post-overlay chain, the seam of reeleehq/mixing#115), with <code class="docutils literal notranslate"><span class="pre">offset=t0</span></code>.
+And a host that cross-fades at offset 0 and then shifts the result with
+<code class="docutils literal notranslate"><span class="pre">setpts</span></code> must pass the shifted start; the unshifted 0 runs the ripple on
+the wrong frames.</p>
+<p><strong>What it cannot do.</strong> A window of about one frame period or less blends
+nothing and ripples on at most one frame: call
+<a class="reference internal" href="#looks.transition.check_visible" title="looks.transition.check_visible"><code class="xref py py-func docutils literal notranslate"><span class="pre">check_visible()</span></code></a> on <a class="reference internal" href="#looks.transition.Ripple.dissolve" title="looks.transition.Ripple.dissolve"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dissolve</span></code></a> with the rate. The bloom’s blur
+is sized from <a class="reference internal" href="looks.spec.html#looks.spec.ClipSpec" title="looks.spec.ClipSpec"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ClipSpec.height</span></code></a> at compile
+time, while the warp scales with the frame at run time, so compile against
+the clip the effect will actually run on. The motion’s phases are counted
+from the window’s start, so the same record is the same picture wherever
+the window lands.</p>
+<p>Sizes are fractions of the frame (<code class="docutils literal notranslate"><span class="pre">amplitude</span></code> of its width,
+<code class="docutils literal notranslate"><span class="pre">wavelengths</span></code> of its height), so a look reads the same at any resolution;
+the defaults are 18 px and 86/33 px at 1024x576, judged on real footage.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">Ripple</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+</span><span id="line-2"><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">dissolve</span>
+</span><span id="line-3"><span class="go">Transition(duration_s=1.0, curve='fade')</span>
+</span><span id="line-4"><span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">effect</span><span class="p">(</span><span class="n">offset</span><span class="o">=</span><span class="mf">6.3</span><span class="p">)</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="n">e</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">"start_s"</span><span class="p">],</span> <span class="n">e</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">"duration_s"</span><span class="p">]</span>
+</span><span id="line-6"><span class="go">('ripple', 6.3, 1.0)</span>
+</span><span id="line-7"><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()[</span><span class="s2">"kind"</span><span class="p">]</span>
+</span><span id="line-8"><span class="go">'ripple'</span>
+</span><span id="line-9"><span class="gp">&gt;&gt;&gt; </span><span class="n">Ripple</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span> <span class="o">==</span> <span class="n">r</span>
+</span><span id="line-10"><span class="go">True</span>
+</span><span id="line-11"><span class="gp">&gt;&gt;&gt; </span><span class="n">Ripple</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">bloom</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="line-12"><span class="gt">Traceback (most recent call last):</span>
+</span><span id="line-13"><span class="c">...</span>
+</span><span id="line-14"><span class="gr">looks.transition.TransitionError</span>: <span class="n">ripple: bloom must be a number in [0, 1]; got 2</span>
+</span></code></pre></div>
+</div>
+<p>A stored cross-fade is not read as a ripple, nor a ripple as a fade:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Ripple</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s2">"duration_s"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">"curve"</span><span class="p">:</span> <span class="s2">"fade"</span><span class="p">})</span>
+</span><span id="line-2"><span class="gt">Traceback (most recent call last):</span>
+</span><span id="line-3"><span class="c">...</span>
+</span><span id="line-4"><span class="gr">looks.transition.TransitionError</span>: <span class="n">not a Ripple document...</span>
+</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="n">Transition</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+</span><span id="line-6"><span class="gt">Traceback (most recent call last):</span>
+</span><span id="line-7"><span class="c">...</span>
+</span><span id="line-8"><span class="gr">looks.transition.TransitionError</span>: <span class="n">not a Transition document...</span>
+</span></code></pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="looks.transition.Ripple.dissolve">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dissolve</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#looks.transition.Transition" title="looks.transition.Transition"><span class="pre">Transition</span></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.transition.Ripple.dissolve" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.transition.Ripple.dissolve'">¶</a></dt>
+<dd><p>The cross-fade the host runs between the two shots.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.transition.Ripple.effect">
+<span class="sig-name descname"><span class="pre">effect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/transition.html#Ripple.effect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.transition.Ripple.effect" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.transition.Ripple.effect'">¶</a></dt>
+<dd><p>The warp, for the stream that holds both shots across the window.</p>
+<p><code class="docutils literal notranslate"><span class="pre">offset</span></code> is the dissolve’s start in <em>that</em> stream’s own timeline: the
+number passed to <code class="docutils literal notranslate"><span class="pre">xfade</span></code> (<a class="reference internal" href="#looks.transition.xfade_options" title="looks.transition.xfade_options"><code class="xref py py-func docutils literal notranslate"><span class="pre">xfade_options()</span></code></a>) when the effect runs
+on <code class="docutils literal notranslate"><span class="pre">xfade</span></code>’s output directly, or the shifted start when the host
+moves that output with <code class="docutils literal notranslate"><span class="pre">setpts</span></code> first (see the class docstring). The
+warp’s peak then lands on the fade’s midpoint.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="looks.spec.html#looks.spec.Effect" title="looks.spec.Effect"><code class="xref py py-class docutils literal notranslate"><span class="pre">Effect</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.transition.Ripple.from_dict">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/transition.html#Ripple.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.transition.Ripple.from_dict" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.transition.Ripple.from_dict'">¶</a></dt>
+<dd><p>A stored Ripple. An unknown key is refused, not ignored: a misspelt
+<code class="docutils literal notranslate"><span class="pre">amplitde</span></code>, or a field from a newer version, would otherwise render
+a different picture from the one stored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#looks.transition.Ripple" title="looks.transition.Ripple"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ripple</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
 </dd></dl>
 <dl class="py data">
 <dt class="sig sig-object py" id="looks.transition.TRANSITION_CURVES">
@@ -325,6 +443,21 @@ the edit model.</p>
 <span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.transition.</span></span><span class="sig-name descname"><span class="pre">TransitionError</span></span><a class="reference internal" href="../_modules/looks/transition.html#TransitionError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.transition.TransitionError" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.transition.TransitionError'">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="looks.spec.html#looks.spec.SpecError" title="looks.spec.SpecError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpecError</span></code></a></p>
 <p>A transition that cannot be honoured as asked.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.transition.XFADE_KIND">
+<span class="sig-prename descclassname"><span class="pre">looks.transition.</span></span><span class="sig-name descname"><span class="pre">XFADE_KIND</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'xfade'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.transition.XFADE_KIND" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.transition.XFADE_KIND'">¶</a></dt>
+<dd><p><code class="code docutils literal notranslate"><span class="pre">Transition.</span>
+<span class="pre">to_dict</span></code> writes none, so a document without one is an <code class="docutils literal notranslate"><span class="pre">xfade</span></code> transition;
+any other kind is refused rather than read as a fade.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The <code class="docutils literal notranslate"><span class="pre">kind</span></code> a <a class="reference internal" href="#looks.transition.Transition" title="looks.transition.Transition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transition</span></code></a> document may carry.</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>meth</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="looks.transition.blended_frames">
@@ -472,9 +605,17 @@ the same failure a zero duration is refused for.</p></li>
 <ul>
 <li><a :data-current="activeSection === '#looks.transition.DFLT_CURVE'" class="reference internal" href="#looks.transition.DFLT_CURVE"><code class="docutils literal notranslate"><span class="pre">DFLT_CURVE</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.transition.MIN_TRANSITION_S'" class="reference internal" href="#looks.transition.MIN_TRANSITION_S"><code class="docutils literal notranslate"><span class="pre">MIN_TRANSITION_S</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.transition.RIPPLE_KIND'" class="reference internal" href="#looks.transition.RIPPLE_KIND"><code class="docutils literal notranslate"><span class="pre">RIPPLE_KIND</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.transition.Ripple'" class="reference internal" href="#looks.transition.Ripple"><code class="docutils literal notranslate"><span class="pre">Ripple</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.transition.Ripple.dissolve'" class="reference internal" href="#looks.transition.Ripple.dissolve"><code class="docutils literal notranslate"><span class="pre">Ripple.dissolve</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.transition.Ripple.effect'" class="reference internal" href="#looks.transition.Ripple.effect"><code class="docutils literal notranslate"><span class="pre">Ripple.effect()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.transition.Ripple.from_dict'" class="reference internal" href="#looks.transition.Ripple.from_dict"><code class="docutils literal notranslate"><span class="pre">Ripple.from_dict()</span></code></a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#looks.transition.TRANSITION_CURVES'" class="reference internal" href="#looks.transition.TRANSITION_CURVES"><code class="docutils literal notranslate"><span class="pre">TRANSITION_CURVES</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.transition.Transition'" class="reference internal" href="#looks.transition.Transition"><code class="docutils literal notranslate"><span class="pre">Transition</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.transition.TransitionError'" class="reference internal" href="#looks.transition.TransitionError"><code class="docutils literal notranslate"><span class="pre">TransitionError</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.transition.XFADE_KIND'" class="reference internal" href="#looks.transition.XFADE_KIND"><code class="docutils literal notranslate"><span class="pre">XFADE_KIND</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.transition.blended_frames'" class="reference internal" href="#looks.transition.blended_frames"><code class="docutils literal notranslate"><span class="pre">blended_frames()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.transition.check_visible'" class="reference internal" href="#looks.transition.check_visible"><code class="docutils literal notranslate"><span class="pre">check_visible()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.transition.is_hard_cut'" class="reference internal" href="#looks.transition.is_hard_cut"><code class="docutils literal notranslate"><span class="pre">is_hard_cut()</span></code></a></li>
@@ -493,7 +634,7 @@ the same failure a zero duration is refused for.</p></li>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=c5dbc6bb"></script>
+<script src="../_static/documentation_options.js?v=565bc8c8"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

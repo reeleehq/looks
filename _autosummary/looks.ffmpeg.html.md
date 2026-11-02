@@ -48,13 +48,21 @@ keeps the package honest would have nothing left to protect.
 
 ### Module Attributes
 
-| [`OPTION_LEVEL_SPECIALS`](#looks.ffmpeg.OPTION_LEVEL_SPECIALS)   | Characters the **option** parser gives meaning to, within one filter's arguments.                                                                                   |
-|--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`GRAPH_LEVEL_SPECIALS`](#looks.ffmpeg.GRAPH_LEVEL_SPECIALS)    | Characters the **filtergraph** parser gives meaning to across the graph: `,` chains, `;` separates, `[]` delimit pad labels, `\\` and `'` do that parser's quoting. |
-| [`RGB_DOMAIN_FILTERS`](#looks.ffmpeg.RGB_DOMAIN_FILTERS)      | Filters that only take RGB, so ffmpeg converts YUV to RGB and back around them.                                                                                     |
-| [`RGB_ONLY_IMPL_VERSION`](#looks.ffmpeg.RGB_ONLY_IMPL_VERSION)   | The version of an implementation that sits in an RGB-only run.                                                                                                      |
-| [`SETSAR_MAX`](#looks.ffmpeg.SETSAR_MAX)              | `setsar`'s largest allowed rational term.                                                                                                                           |
-| [`LABEL_NAMESPACE`](#looks.ffmpeg.LABEL_NAMESPACE)         | Prefix of the pad labels a branching effect uses internally, so they stay clear of a host's own (`[a]`, `[bg]`: note 05, label rule 2).                             |
+| [`OPTION_LEVEL_SPECIALS`](#looks.ffmpeg.OPTION_LEVEL_SPECIALS)      | Characters the **option** parser gives meaning to, within one filter's arguments.                                                                                   |
+|-----------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`GRAPH_LEVEL_SPECIALS`](#looks.ffmpeg.GRAPH_LEVEL_SPECIALS)       | Characters the **filtergraph** parser gives meaning to across the graph: `,` chains, `;` separates, `[]` delimit pad labels, `\\` and `'` do that parser's quoting. |
+| [`RGB_DOMAIN_FILTERS`](#looks.ffmpeg.RGB_DOMAIN_FILTERS)         | Filters that only take RGB, so ffmpeg converts YUV to RGB and back around them.                                                                                     |
+| [`RGB_ONLY_IMPL_VERSION`](#looks.ffmpeg.RGB_ONLY_IMPL_VERSION)      | The version of an implementation that sits in an RGB-only run.                                                                                                      |
+| [`SETSAR_MAX`](#looks.ffmpeg.SETSAR_MAX)                 | `setsar`'s largest allowed rational term.                                                                                                                           |
+| [`LABEL_NAMESPACE`](#looks.ffmpeg.LABEL_NAMESPACE)            | Prefix of the pad labels a branching effect uses internally, so they stay clear of a host's own (`[a]`, `[bg]`: note 05, label rule 2).                             |
+| [`RIPPLE_HARMONIC`](#looks.ffmpeg.RIPPLE_HARMONIC)            | Weight of the second horizontal harmonic against the first.                                                                                                         |
+| [`RIPPLE_SPEEDS`](#looks.ffmpeg.RIPPLE_SPEEDS)              | Phase speeds of the two horizontal harmonics, radians per second.                                                                                                   |
+| [`RIPPLE_VERTICAL`](#looks.ffmpeg.RIPPLE_VERTICAL)            | Vertical wander, as a fraction of the horizontal amplitude.                                                                                                         |
+| [`RIPPLE_VERTICAL_WAVELENGTH`](#looks.ffmpeg.RIPPLE_VERTICAL_WAVELENGTH) | Wavelength of the vertical wander along x, as a fraction of the width.                                                                                              |
+| [`RIPPLE_VERTICAL_SPEED`](#looks.ffmpeg.RIPPLE_VERTICAL_SPEED)      | Phase speed of the vertical wander, radians per second.                                                                                                             |
+| [`RIPPLE_BLOOM_SIGMA`](#looks.ffmpeg.RIPPLE_BLOOM_SIGMA)         | The bloom's blur, as a fraction of the frame's height (14 px at 576).                                                                                               |
+| [`RIPPLE_BLOOM_GAIN`](#looks.ffmpeg.RIPPLE_BLOOM_GAIN)          | a luma gain, and a lift as a fraction of `lutyuv`'s `maxval`.                                                                                                       |
+| [`RIPPLE_BLOOM_PLANES`](#looks.ffmpeg.RIPPLE_BLOOM_PLANES)        | luma and both chroma, never alpha, so a transparent edge is not softened by the glow.                                                                               |
 
 ### Functions
 
@@ -108,6 +116,49 @@ filter (`lutyuv`, `gblur`) is untouched by it and so is not listed.
 ### looks.ffmpeg.RGB_ONLY_IMPL_VERSION *= '2'*
 
 The version of an implementation that sits in an RGB-only run.
+
+### looks.ffmpeg.RIPPLE_BLOOM_GAIN *= 1.15*
+
+a luma gain, and a lift as a fraction of
+`lutyuv`’s `maxval`. That is nominal white, 235 at 8 bits and 940 at 10
+whatever the range tag (measured on 9.0 and 6.1), so the lift is the same
+proportion at any depth.
+
+* **Type:**
+  The bloom’s brightening
+
+### looks.ffmpeg.RIPPLE_BLOOM_PLANES *= 7*
+
+luma and both chroma, never alpha, so a
+transparent edge is not softened by the glow.
+
+* **Type:**
+  `gblur` planes for the bloom
+
+### looks.ffmpeg.RIPPLE_BLOOM_SIGMA *= 0.024305555555555556*
+
+The bloom’s blur, as a fraction of the frame’s height (14 px at 576).
+
+### looks.ffmpeg.RIPPLE_HARMONIC *= 0.45*
+
+Weight of the second horizontal harmonic against the first.
+
+### looks.ffmpeg.RIPPLE_SPEEDS *= (7, -11)*
+
+Phase speeds of the two horizontal harmonics, radians per second. Opposite
+signs, so the pattern churns rather than scrolls.
+
+### looks.ffmpeg.RIPPLE_VERTICAL *= 0.35*
+
+Vertical wander, as a fraction of the horizontal amplitude.
+
+### looks.ffmpeg.RIPPLE_VERTICAL_SPEED *= 5*
+
+Phase speed of the vertical wander, radians per second.
+
+### looks.ffmpeg.RIPPLE_VERTICAL_WAVELENGTH *= 0.13671875*
+
+Wavelength of the vertical wander along x, as a fraction of the width.
 
 ### looks.ffmpeg.SETSAR_MAX *= 2147483647*
 

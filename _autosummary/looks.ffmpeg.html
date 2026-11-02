@@ -188,6 +188,30 @@ keeps the package honest would have nothing left to protect.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.LABEL_NAMESPACE" title="looks.ffmpeg.LABEL_NAMESPACE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LABEL_NAMESPACE</span></code></a></p></td>
 <td><p>Prefix of the pad labels a branching effect uses internally, so they stay clear of a host's own (<code class="docutils literal notranslate"><span class="pre">[a]</span></code>, <code class="docutils literal notranslate"><span class="pre">[bg]</span></code>: note 05, label rule 2).</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.RIPPLE_HARMONIC" title="looks.ffmpeg.RIPPLE_HARMONIC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RIPPLE_HARMONIC</span></code></a></p></td>
+<td><p>Weight of the second horizontal harmonic against the first.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.RIPPLE_SPEEDS" title="looks.ffmpeg.RIPPLE_SPEEDS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RIPPLE_SPEEDS</span></code></a></p></td>
+<td><p>Phase speeds of the two horizontal harmonics, radians per second.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.RIPPLE_VERTICAL" title="looks.ffmpeg.RIPPLE_VERTICAL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RIPPLE_VERTICAL</span></code></a></p></td>
+<td><p>Vertical wander, as a fraction of the horizontal amplitude.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.RIPPLE_VERTICAL_WAVELENGTH" title="looks.ffmpeg.RIPPLE_VERTICAL_WAVELENGTH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RIPPLE_VERTICAL_WAVELENGTH</span></code></a></p></td>
+<td><p>Wavelength of the vertical wander along x, as a fraction of the width.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.RIPPLE_VERTICAL_SPEED" title="looks.ffmpeg.RIPPLE_VERTICAL_SPEED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RIPPLE_VERTICAL_SPEED</span></code></a></p></td>
+<td><p>Phase speed of the vertical wander, radians per second.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.RIPPLE_BLOOM_SIGMA" title="looks.ffmpeg.RIPPLE_BLOOM_SIGMA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RIPPLE_BLOOM_SIGMA</span></code></a></p></td>
+<td><p>The bloom's blur, as a fraction of the frame's height (14 px at 576).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.RIPPLE_BLOOM_GAIN" title="looks.ffmpeg.RIPPLE_BLOOM_GAIN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RIPPLE_BLOOM_GAIN</span></code></a></p></td>
+<td><p>a luma gain, and a lift as a fraction of <code class="docutils literal notranslate"><span class="pre">lutyuv</span></code>'s <code class="docutils literal notranslate"><span class="pre">maxval</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.RIPPLE_BLOOM_PLANES" title="looks.ffmpeg.RIPPLE_BLOOM_PLANES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RIPPLE_BLOOM_PLANES</span></code></a></p></td>
+<td><p>luma and both chroma, never alpha, so a transparent edge is not softened by the glow.</p></td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Functions</p>
@@ -269,6 +293,61 @@ filter (<code class="code docutils literal notranslate"><span class="pre">lutyuv
 <dt class="sig sig-object py" id="looks.ffmpeg.RGB_ONLY_IMPL_VERSION">
 <span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">RGB_ONLY_IMPL_VERSION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'2'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.RGB_ONLY_IMPL_VERSION" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.RGB_ONLY_IMPL_VERSION'">¶</a></dt>
 <dd><p>The version of an implementation that sits in an RGB-only run.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.ffmpeg.RIPPLE_BLOOM_GAIN">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">RIPPLE_BLOOM_GAIN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.15</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.RIPPLE_BLOOM_GAIN" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.RIPPLE_BLOOM_GAIN'">¶</a></dt>
+<dd><p>a luma gain, and a lift as a fraction of
+<code class="docutils literal notranslate"><span class="pre">lutyuv</span></code>’s <code class="docutils literal notranslate"><span class="pre">maxval</span></code>. That is nominal white, 235 at 8 bits and 940 at 10
+whatever the range tag (measured on 9.0 and 6.1), so the lift is the same
+proportion at any depth.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The bloom’s brightening</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.ffmpeg.RIPPLE_BLOOM_PLANES">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">RIPPLE_BLOOM_PLANES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.RIPPLE_BLOOM_PLANES" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.RIPPLE_BLOOM_PLANES'">¶</a></dt>
+<dd><p>luma and both chroma, never alpha, so a
+transparent edge is not softened by the glow.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">gblur</span></code> planes for the bloom</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.ffmpeg.RIPPLE_BLOOM_SIGMA">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">RIPPLE_BLOOM_SIGMA</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.024305555555555556</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.RIPPLE_BLOOM_SIGMA" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.RIPPLE_BLOOM_SIGMA'">¶</a></dt>
+<dd><p>The bloom’s blur, as a fraction of the frame’s height (14 px at 576).</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.ffmpeg.RIPPLE_HARMONIC">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">RIPPLE_HARMONIC</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.45</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.RIPPLE_HARMONIC" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.RIPPLE_HARMONIC'">¶</a></dt>
+<dd><p>Weight of the second horizontal harmonic against the first.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.ffmpeg.RIPPLE_SPEEDS">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">RIPPLE_SPEEDS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(7,</span> <span class="pre">-11)</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.RIPPLE_SPEEDS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.RIPPLE_SPEEDS'">¶</a></dt>
+<dd><p>Phase speeds of the two horizontal harmonics, radians per second. Opposite
+signs, so the pattern churns rather than scrolls.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.ffmpeg.RIPPLE_VERTICAL">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">RIPPLE_VERTICAL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.35</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.RIPPLE_VERTICAL" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.RIPPLE_VERTICAL'">¶</a></dt>
+<dd><p>Vertical wander, as a fraction of the horizontal amplitude.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.ffmpeg.RIPPLE_VERTICAL_SPEED">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">RIPPLE_VERTICAL_SPEED</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.RIPPLE_VERTICAL_SPEED" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.RIPPLE_VERTICAL_SPEED'">¶</a></dt>
+<dd><p>Phase speed of the vertical wander, radians per second.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.ffmpeg.RIPPLE_VERTICAL_WAVELENGTH">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">RIPPLE_VERTICAL_WAVELENGTH</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.13671875</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.RIPPLE_VERTICAL_WAVELENGTH" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.RIPPLE_VERTICAL_WAVELENGTH'">¶</a></dt>
+<dd><p>Wavelength of the vertical wander along x, as a fraction of the width.</p>
 </dd></dl>
 <dl class="py data">
 <dt class="sig sig-object py" id="looks.ffmpeg.SETSAR_MAX">
@@ -491,6 +570,14 @@ nothing here names a stream.</p>
 <li><a :data-current="activeSection === '#looks.ffmpeg.OPTION_LEVEL_SPECIALS'" class="reference internal" href="#looks.ffmpeg.OPTION_LEVEL_SPECIALS"><code class="docutils literal notranslate"><span class="pre">OPTION_LEVEL_SPECIALS</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.RGB_DOMAIN_FILTERS'" class="reference internal" href="#looks.ffmpeg.RGB_DOMAIN_FILTERS"><code class="docutils literal notranslate"><span class="pre">RGB_DOMAIN_FILTERS</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.RGB_ONLY_IMPL_VERSION'" class="reference internal" href="#looks.ffmpeg.RGB_ONLY_IMPL_VERSION"><code class="docutils literal notranslate"><span class="pre">RGB_ONLY_IMPL_VERSION</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.RIPPLE_BLOOM_GAIN'" class="reference internal" href="#looks.ffmpeg.RIPPLE_BLOOM_GAIN"><code class="docutils literal notranslate"><span class="pre">RIPPLE_BLOOM_GAIN</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.RIPPLE_BLOOM_PLANES'" class="reference internal" href="#looks.ffmpeg.RIPPLE_BLOOM_PLANES"><code class="docutils literal notranslate"><span class="pre">RIPPLE_BLOOM_PLANES</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.RIPPLE_BLOOM_SIGMA'" class="reference internal" href="#looks.ffmpeg.RIPPLE_BLOOM_SIGMA"><code class="docutils literal notranslate"><span class="pre">RIPPLE_BLOOM_SIGMA</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.RIPPLE_HARMONIC'" class="reference internal" href="#looks.ffmpeg.RIPPLE_HARMONIC"><code class="docutils literal notranslate"><span class="pre">RIPPLE_HARMONIC</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.RIPPLE_SPEEDS'" class="reference internal" href="#looks.ffmpeg.RIPPLE_SPEEDS"><code class="docutils literal notranslate"><span class="pre">RIPPLE_SPEEDS</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.RIPPLE_VERTICAL'" class="reference internal" href="#looks.ffmpeg.RIPPLE_VERTICAL"><code class="docutils literal notranslate"><span class="pre">RIPPLE_VERTICAL</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.RIPPLE_VERTICAL_SPEED'" class="reference internal" href="#looks.ffmpeg.RIPPLE_VERTICAL_SPEED"><code class="docutils literal notranslate"><span class="pre">RIPPLE_VERTICAL_SPEED</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.RIPPLE_VERTICAL_WAVELENGTH'" class="reference internal" href="#looks.ffmpeg.RIPPLE_VERTICAL_WAVELENGTH"><code class="docutils literal notranslate"><span class="pre">RIPPLE_VERTICAL_WAVELENGTH</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.SETSAR_MAX'" class="reference internal" href="#looks.ffmpeg.SETSAR_MAX"><code class="docutils literal notranslate"><span class="pre">SETSAR_MAX</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.escape_filter_value'" class="reference internal" href="#looks.ffmpeg.escape_filter_value"><code class="docutils literal notranslate"><span class="pre">escape_filter_value()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.filter_string'" class="reference internal" href="#looks.ffmpeg.filter_string"><code class="docutils literal notranslate"><span class="pre">filter_string()</span></code></a></li>
@@ -514,7 +601,7 @@ nothing here names a stream.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=c5dbc6bb"></script>
+<script src="../_static/documentation_options.js?v=565bc8c8"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

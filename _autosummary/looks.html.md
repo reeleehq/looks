@@ -139,6 +139,7 @@ Two names are deliberately absent, and a test asserts it: there is no
 | [`Solid`](#looks.Solid)([rgb])                                        | A flat colour behind the placed frame.                                                                           |
 | [`Blurred`](#looks.Blurred)([sigma, dim])                               | A blurred, dimmed copy of the source, scaled to cover — the "social" look.                                       |
 | [`EffectRegistry`](#looks.EffectRegistry)([name])                              | Effect name to implementations, and implementation key to code.                                                  |
+| [`Ripple`](#looks.Ripple)(duration_s[, amplitude, wavelengths, ...])   | A dream transition: the picture ripples, blooms and dissolves into the next.                                     |
 | [`Transition`](#looks.Transition)(duration_s[, curve])                     | How a shot blends in from its predecessor.                                                                       |
 | [`Candidate`](#looks.Candidate)(value, stats)                             | One candidate parameter value, and what it measured.                                                             |
 | [`Choice`](#looks.Choice)(source_id, value, statistic)                 | The value one clip was given, and the measurement that justifies it.                                             |
@@ -1763,6 +1764,109 @@ Blurred(sigma=15.0, dim=0.7)
 Bases: [`SpecError`](looks.spec.html.md#looks.spec.SpecError)
 
 A registration that would make a later refusal point at the wrong thing.
+
+### *class* looks.Ripple(duration_s, amplitude=0.017578125, wavelengths=(0.14930555555555555, 0.057291666666666664), bloom=0.55)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A dream transition: the picture ripples, blooms and dissolves into the next.
+
+Not a `TRANSITION_CURVES` name, because `xfade` cannot move a
+pixel. It is two things the host already knows how to place, over one
+window:
+
+* [`dissolve`](#looks.Ripple.dissolve), an ordinary [`Transition`](#looks.Transition) for the host’s
+  `xfade`, as for any other transition. It is `xfade`’s linear
+  `fade`; the production this came from (issue #49) used a smoothstep
+  blend, which no `TRANSITION_CURVES` name gives.
+* [`effect()`](#looks.Ripple.effect), a single-input `ripple` effect, swelling from nothing
+  at the window’s start to its peak at the middle of the fade and settling
+  by its end. It compiles through [`looks.compile_look()`](#looks.compile_look) like any
+  effect, so it carries a licence tier.
+
+**Where the effect goes.** On the stream that holds *both* shots across the
+window, the composite the dissolve produces, with `offset` the dissolve’s
+start in *that stream’s own timeline*, after any `setpts` the host
+applies. Two traps, both silent. A stream holding only the *incoming*
+shot is the wrong one: `reeleehq/mixing`’s `_entrance` cross-fades a
+cutaway from a transparent copy of itself, so its `xfade` output holds
+the cutaway alone, and a ripple there would never move the outgoing scene.
+In `mixing` the stream with both shots exists only after the overlay (a
+post-overlay chain, the seam of reeleehq/mixing#115), with `offset=t0`.
+And a host that cross-fades at offset 0 and then shifts the result with
+`setpts` must pass the shifted start; the unshifted 0 runs the ripple on
+the wrong frames.
+
+**What it cannot do.** A window of about one frame period or less blends
+nothing and ripples on at most one frame: call
+[`check_visible()`](#looks.check_visible) on [`dissolve`](#looks.Ripple.dissolve) with the rate. The bloom’s blur
+is sized from [`ClipSpec.height`](looks.spec.html.md#looks.spec.ClipSpec) at compile
+time, while the warp scales with the frame at run time, so compile against
+the clip the effect will actually run on. The motion’s phases are counted
+from the window’s start, so the same record is the same picture wherever
+the window lands.
+
+Sizes are fractions of the frame (`amplitude` of its width,
+`wavelengths` of its height), so a look reads the same at any resolution;
+the defaults are 18 px and 86/33 px at 1024x576, judged on real footage.
+
+### Examples
+
+```pycon
+>>> r = Ripple(1.0)
+>>> r.dissolve
+Transition(duration_s=1.0, curve='fade')
+>>> e = r.effect(offset=6.3)
+>>> e.name, e.params["start_s"], e.params["duration_s"]
+('ripple', 6.3, 1.0)
+>>> r.to_dict()["kind"]
+'ripple'
+>>> Ripple.from_dict(r.to_dict()) == r
+True
+>>> Ripple(1.0, bloom=2)
+Traceback (most recent call last):
+...
+looks.transition.TransitionError: ripple: bloom must be a number in [0, 1]; got 2
+```
+
+A stored cross-fade is not read as a ripple, nor a ripple as a fade:
+
+```pycon
+>>> Ripple.from_dict({"duration_s": 1.0, "curve": "fade"})
+Traceback (most recent call last):
+...
+looks.transition.TransitionError: not a Ripple document...
+>>> Transition.from_dict(r.to_dict())
+Traceback (most recent call last):
+...
+looks.transition.TransitionError: not a Transition document...
+```
+
+#### *property* dissolve *: [Transition](looks.transition.html.md#looks.transition.Transition)*
+
+The cross-fade the host runs between the two shots.
+
+#### effect(, offset)
+
+The warp, for the stream that holds both shots across the window.
+
+`offset` is the dissolve’s start in *that* stream’s own timeline: the
+number passed to `xfade` ([`xfade_options()`](#looks.xfade_options)) when the effect runs
+on `xfade`’s output directly, or the shifted start when the host
+moves that output with `setpts` first (see the class docstring). The
+warp’s peak then lands on the fade’s midpoint.
+
+* **Return type:**
+  [`Effect`](looks.spec.html.md#looks.spec.Effect)
+
+#### *classmethod* from_dict(d)
+
+A stored Ripple. An unknown key is refused, not ignored: a misspelt
+`amplitde`, or a field from a newer version, would otherwise render
+a different picture from the one stored.
+
+* **Return type:**
+  [`Ripple`](looks.transition.html.md#looks.transition.Ripple)
 
 ### *exception* looks.SchemaError
 

@@ -262,65 +262,66 @@
 </span><span id="line-76">        <span class="s2">"stretch"</span><span class="p">,</span>
 </span><span id="line-77">        <span class="s2">"motion"</span><span class="p">,</span>
 </span><span id="line-78">        <span class="s2">"gate_weave"</span><span class="p">,</span>
-</span><span id="line-79">        <span class="s2">"lut3d"</span><span class="p">,</span>
-</span><span id="line-80">        <span class="s2">"gradient_map"</span><span class="p">,</span>
-</span><span id="line-81">        <span class="s2">"blur"</span><span class="p">,</span>
-</span><span id="line-82">        <span class="s2">"sharpen"</span><span class="p">,</span>
-</span><span id="line-83">    <span class="p">}</span>
-</span><span id="line-84"><span class="p">)</span>
-</span><span id="line-85">
-</span><span id="line-86"><span class="c1">#: The effect after which nothing may resample.</span>
-</span><span id="line-87"><span class="n">QUANTISER</span> <span class="o">=</span> <span class="s2">"posterize"</span>
-</span><span id="line-88">
-</span><span id="line-89"><span class="n">_CANON</span> <span class="o">=</span> <span class="s2">" -&gt; "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">Stage</span><span class="p">)</span>
-</span><span id="line-90">
+</span><span id="line-79">        <span class="s2">"ripple"</span><span class="p">,</span>
+</span><span id="line-80">        <span class="s2">"lut3d"</span><span class="p">,</span>
+</span><span id="line-81">        <span class="s2">"gradient_map"</span><span class="p">,</span>
+</span><span id="line-82">        <span class="s2">"blur"</span><span class="p">,</span>
+</span><span id="line-83">        <span class="s2">"sharpen"</span><span class="p">,</span>
+</span><span id="line-84">    <span class="p">}</span>
+</span><span id="line-85"><span class="p">)</span>
+</span><span id="line-86">
+</span><span id="line-87"><span class="c1">#: The effect after which nothing may resample.</span>
+</span><span id="line-88"><span class="n">QUANTISER</span> <span class="o">=</span> <span class="s2">"posterize"</span>
+</span><span id="line-89">
+</span><span id="line-90"><span class="n">_CANON</span> <span class="o">=</span> <span class="s2">" -&gt; "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">Stage</span><span class="p">)</span>
 </span><span id="line-91">
+</span><span id="line-92">
 <div class="viewcode-block" id="check_stage_order">
 <a class="viewcode-back" href="../../_autosummary/looks.stages.html#looks.check_stage_order">[docs]</a>
-</span><span id="line-92"><span class="k">def</span><span class="w"> </span><span class="nf">check_stage_order</span><span class="p">(</span>
-</span><span id="line-93">    <span class="n">effects</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Effect</span><span class="p">],</span>
-</span><span id="line-94">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-95">    <span class="n">stages</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Stage</span><span class="p">]</span> <span class="o">=</span> <span class="n">EFFECT_STAGES</span><span class="p">,</span>
-</span><span id="line-96">    <span class="n">resampling</span><span class="p">:</span> <span class="nb">frozenset</span> <span class="o">=</span> <span class="n">RESAMPLING_EFFECTS</span><span class="p">,</span>
-</span><span id="line-97">    <span class="n">quantiser</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">QUANTISER</span><span class="p">,</span>
-</span><span id="line-98"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-99"><span class="w">    </span><span class="sd">"""Describe each departure from the canonical order; empty when there is none.</span>
-</span><span id="line-100">
-</span><span id="line-101"><span class="sd">    Each message names the offending (later) effect once, against the first</span>
-</span><span id="line-102"><span class="sd">    earlier effect that belongs after it.</span>
-</span><span id="line-103">
-</span><span id="line-104"><span class="sd">    Examples:</span>
-</span><span id="line-105"><span class="sd">        &gt;&gt;&gt; from looks.spec import Effect</span>
-</span><span id="line-106"><span class="sd">        &gt;&gt;&gt; check_stage_order([Effect(name="posterize"), Effect(name="fit")])  # doctest: +ELLIPSIS</span>
-</span><span id="line-107"><span class="sd">        ['fit resamples the picture after posterize...']</span>
-</span><span id="line-108"><span class="sd">        &gt;&gt;&gt; check_stage_order([Effect(name="fit"), Effect(name="saturation"), Effect(name="grain")])</span>
-</span><span id="line-109"><span class="sd">        []</span>
-</span><span id="line-110"><span class="sd">    """</span>
-</span><span id="line-111">    <span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-112">    <span class="n">seen</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Stage</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-113">    <span class="n">quantised</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="line-114">    <span class="k">for</span> <span class="n">effect</span> <span class="ow">in</span> <span class="n">effects</span><span class="p">:</span>
-</span><span id="line-115">        <span class="n">name</span> <span class="o">=</span> <span class="n">effect</span><span class="o">.</span><span class="n">name</span>
-</span><span id="line-116">        <span class="k">if</span> <span class="n">quantised</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">resampling</span><span class="p">:</span>
-</span><span id="line-117">            <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-118">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> resamples the picture after </span><span class="si">{</span><span class="n">quantiser</span><span class="si">}</span><span class="s2">, which "</span>
-</span><span id="line-119">                <span class="s2">"un-quantises it (measured: downscaling after posterize left "</span>
-</span><span id="line-120">                <span class="s2">"359 distinct colours where before it left 77; a LUT after it, "</span>
-</span><span id="line-121">                <span class="s2">"96 where before it, 51)"</span>
-</span><span id="line-122">            <span class="p">)</span>
-</span><span id="line-123">        <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">stages</span><span class="p">:</span>
-</span><span id="line-124">            <span class="n">stage</span> <span class="o">=</span> <span class="n">stages</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-</span><span id="line-125">            <span class="n">earlier</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(((</span><span class="n">n</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">seen</span> <span class="k">if</span> <span class="n">s</span> <span class="o">&gt;</span> <span class="n">stage</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="line-126">            <span class="k">if</span> <span class="n">earlier</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-127">                <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span id="line-128">                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (stage </span><span class="si">{</span><span class="n">stage</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">) follows "</span>
-</span><span id="line-129">                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">earlier</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> (stage </span><span class="si">{</span><span class="n">earlier</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">); "</span>
-</span><span id="line-130">                    <span class="sa">f</span><span class="s2">"the canonical order is </span><span class="si">{</span><span class="n">_CANON</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-131">                <span class="p">)</span>
-</span><span id="line-132">        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">stages</span><span class="p">:</span>
-</span><span id="line-133">            <span class="n">seen</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">stages</span><span class="p">[</span><span class="n">name</span><span class="p">]))</span>
-</span><span id="line-134">        <span class="n">quantised</span> <span class="o">=</span> <span class="n">quantised</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="n">quantiser</span>
-</span><span id="line-135">    <span class="k">return</span> <span class="n">messages</span></div>
+</span><span id="line-93"><span class="k">def</span><span class="w"> </span><span class="nf">check_stage_order</span><span class="p">(</span>
+</span><span id="line-94">    <span class="n">effects</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Effect</span><span class="p">],</span>
+</span><span id="line-95">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-96">    <span class="n">stages</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Stage</span><span class="p">]</span> <span class="o">=</span> <span class="n">EFFECT_STAGES</span><span class="p">,</span>
+</span><span id="line-97">    <span class="n">resampling</span><span class="p">:</span> <span class="nb">frozenset</span> <span class="o">=</span> <span class="n">RESAMPLING_EFFECTS</span><span class="p">,</span>
+</span><span id="line-98">    <span class="n">quantiser</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">QUANTISER</span><span class="p">,</span>
+</span><span id="line-99"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-100"><span class="w">    </span><span class="sd">"""Describe each departure from the canonical order; empty when there is none.</span>
+</span><span id="line-101">
+</span><span id="line-102"><span class="sd">    Each message names the offending (later) effect once, against the first</span>
+</span><span id="line-103"><span class="sd">    earlier effect that belongs after it.</span>
+</span><span id="line-104">
+</span><span id="line-105"><span class="sd">    Examples:</span>
+</span><span id="line-106"><span class="sd">        &gt;&gt;&gt; from looks.spec import Effect</span>
+</span><span id="line-107"><span class="sd">        &gt;&gt;&gt; check_stage_order([Effect(name="posterize"), Effect(name="fit")])  # doctest: +ELLIPSIS</span>
+</span><span id="line-108"><span class="sd">        ['fit resamples the picture after posterize...']</span>
+</span><span id="line-109"><span class="sd">        &gt;&gt;&gt; check_stage_order([Effect(name="fit"), Effect(name="saturation"), Effect(name="grain")])</span>
+</span><span id="line-110"><span class="sd">        []</span>
+</span><span id="line-111"><span class="sd">    """</span>
+</span><span id="line-112">    <span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-113">    <span class="n">seen</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Stage</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-114">    <span class="n">quantised</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="line-115">    <span class="k">for</span> <span class="n">effect</span> <span class="ow">in</span> <span class="n">effects</span><span class="p">:</span>
+</span><span id="line-116">        <span class="n">name</span> <span class="o">=</span> <span class="n">effect</span><span class="o">.</span><span class="n">name</span>
+</span><span id="line-117">        <span class="k">if</span> <span class="n">quantised</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">resampling</span><span class="p">:</span>
+</span><span id="line-118">            <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-119">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> resamples the picture after </span><span class="si">{</span><span class="n">quantiser</span><span class="si">}</span><span class="s2">, which "</span>
+</span><span id="line-120">                <span class="s2">"un-quantises it (measured: downscaling after posterize left "</span>
+</span><span id="line-121">                <span class="s2">"359 distinct colours where before it left 77; a LUT after it, "</span>
+</span><span id="line-122">                <span class="s2">"96 where before it, 51)"</span>
+</span><span id="line-123">            <span class="p">)</span>
+</span><span id="line-124">        <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">stages</span><span class="p">:</span>
+</span><span id="line-125">            <span class="n">stage</span> <span class="o">=</span> <span class="n">stages</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+</span><span id="line-126">            <span class="n">earlier</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(((</span><span class="n">n</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">seen</span> <span class="k">if</span> <span class="n">s</span> <span class="o">&gt;</span> <span class="n">stage</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="line-127">            <span class="k">if</span> <span class="n">earlier</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-128">                <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="line-129">                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (stage </span><span class="si">{</span><span class="n">stage</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">) follows "</span>
+</span><span id="line-130">                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">earlier</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> (stage </span><span class="si">{</span><span class="n">earlier</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">); "</span>
+</span><span id="line-131">                    <span class="sa">f</span><span class="s2">"the canonical order is </span><span class="si">{</span><span class="n">_CANON</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-132">                <span class="p">)</span>
+</span><span id="line-133">        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">stages</span><span class="p">:</span>
+</span><span id="line-134">            <span class="n">seen</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">stages</span><span class="p">[</span><span class="n">name</span><span class="p">]))</span>
+</span><span id="line-135">        <span class="n">quantised</span> <span class="o">=</span> <span class="n">quantised</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="n">quantiser</span>
+</span><span id="line-136">    <span class="k">return</span> <span class="n">messages</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -335,7 +336,7 @@
 </footer>
     </div>
     
-    <script src="../../_static/documentation_options.js?v=c5dbc6bb"></script>
+    <script src="../../_static/documentation_options.js?v=565bc8c8"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

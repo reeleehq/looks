@@ -109,7 +109,7 @@ refresh.
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
-### looks.compile.check_effect_params(effect, registry=EffectRegistry(name='looks', effects=20, implementations=23), , pix_fmt=None)
+### looks.compile.check_effect_params(effect, registry=EffectRegistry(name='looks', effects=21, implementations=24), , pix_fmt=None)
 
 Refuse parameters no implementation of this effect could honour.
 

@@ -11,6 +11,8 @@ looks.transition
       TRANSITION_CURVES
       DFLT_CURVE
       MIN_TRANSITION_S
+      XFADE_KIND
+      RIPPLE_KIND
    
    .. rubric:: Functions
 
@@ -26,6 +28,7 @@ looks.transition
 
    .. autosummary::
    
+      Ripple
       Transition
    
    .. rubric:: Exceptions

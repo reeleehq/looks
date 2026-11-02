@@ -250,7 +250,7 @@ That key is taken. Last-write-wins would change what a stored plan runs.
 
 The shape an implementation key must have, in words, for error messages.
 
-### looks.registry.REGISTRY *= EffectRegistry(name='looks', effects=20, implementations=23)*
+### looks.registry.REGISTRY *= EffectRegistry(name='looks', effects=21, implementations=24)*
 
 The registry the compiler uses when not given another.
 
