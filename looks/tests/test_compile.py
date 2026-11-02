@@ -698,4 +698,19 @@ def test_every_builtin_flag_matches_its_filters():
                 assert ref.rgb_only is is_rgb_domain(ref.requires_filters), ref.impl
                 # `vf` wraps both kinds in the matrix (rule 24, issue #56).
                 wrapped = ref.rgb_only or is_yuv_domain(ref.requires_filters)
-                assert (ref.impl_version == "2") is wrapped, ref.impl
+                domain = ref.impl_version.split(".")[0]
+                assert domain == ("2" if wrapped else "1"), ref.impl
+
+
+def test_the_revised_implementations_are_the_ones_whose_compiler_changed():
+    """A revision is appended to the domain's version when a compiler's pixels
+    moved: `lutyuv` made depth-independent and chroma-preserving (#63)."""
+    from looks.registry import REGISTRY
+
+    revised = {
+        ref.impl: ref.impl_version
+        for effect in REGISTRY.effects()
+        for ref in REGISTRY.implementations(effect)
+        if "." in ref.impl_version
+    }
+    assert revised == {"contrast.ffmpeg.lutyuv": "2.1", "ripple.ffmpeg.geq": "2.1"}

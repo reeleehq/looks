@@ -462,3 +462,77 @@ class TestRule26HoldsForAnythingThatEmitsCurves:
             "is not enforced on, so the list is pinned rather than tolerated — "
             "add params that reach the new one, or add it here deliberately."
         )
+
+
+class TestAtEveryBitDepth:
+    """Issue #63: the LGPL path wrote 8-bit code values into `lutyuv`, which runs
+    at the clip's depth, so a 10-bit clip was crushed at code 255 of 1023.
+
+    `gray` is here for full range: ffmpeg hands it to `lutyuv` as `yuvj444p`,
+    where `maxval` is 255, not 235, so a pivot read off `maxval/235` drifts.
+    (A `yuvj` source is not used because `geq` cannot write one.)"""
+
+    FORMATS = [("yuv444p10le", 10), ("yuv444p12le", 12), ("gray", 8)]
+
+    @staticmethod
+    def _planes(env, pix_fmt, depth, amount):
+        """(source, contrasted) as luma lists, over a full-scale ramp."""
+        top = 2**depth - 1
+        mid = 2 ** (depth - 1)
+        chroma = "" if pix_fmt.startswith("gray") else f":cb={mid}:cr={mid}"
+        source = f"nullsrc=s=1024x2:r=1:d=1,format={pix_fmt},geq=lum=X*{top}/1023{chroma}"
+        clip = ClipSpec(width=1024, height=2, fps=1, pix_fmt=pix_fmt, color_space="bt709")
+        look = Look(steps=(Effect(name="contrast", params={"amount": amount}),))
+        chain = vf(compile_look(look, clip=clip, env=env))
+        width = 2 if depth > 8 else 1
+
+        def luma(vf_arg):
+            raw = subprocess.run(
+                ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", source, "-vf", vf_arg,
+                 "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", pix_fmt, "-"],
+                capture_output=True, check=True,
+            ).stdout  # fmt: skip
+            return [
+                int.from_bytes(raw[i : i + width], "little")
+                for i in range(0, 1024 * width, width)
+            ]
+
+        return luma("null"), luma(chain)
+
+    @pytest.mark.parametrize("pix_fmt, depth", FORMATS)
+    def test_the_identity_is_the_identity(self, env, pix_fmt, depth):
+        _ffmpeg_or_skip()
+        source, out = self._planes(env, pix_fmt, depth, 1.0)
+        assert out == source
+
+    @pytest.mark.parametrize("pix_fmt, depth", FORMATS)
+    @pytest.mark.parametrize("amount", [0.5, 1.3, 2.0])
+    def test_the_remap_turns_about_mid_grey_at_this_depth(
+        self, env, pix_fmt, depth, amount
+    ):
+        _ffmpeg_or_skip()
+        source, out = self._planes(env, pix_fmt, depth, amount)
+        pivot, top = 128 * 2 ** (depth - 8), 2**depth - 1
+        expected = [min(max(pivot + amount * (v - pivot), 0), top) for v in source]
+        assert max(abs(a - b) for a, b in zip(out, expected)) <= 1
+        assert max(out) > 2**depth // 2, "crushed: the top of the ramp is gone"
+
+
+def test_contrast_leaves_chroma_alone(env):
+    """`lutyuv`'s default u/v are `clipval`, which clamped chroma to 16..240 even
+    with only y= given; `eq`, the sibling it must agree with, leaves it alone."""
+    _ffmpeg_or_skip()
+    source = "nullsrc=s=64x2:r=1:d=1,format=yuv444p,geq=lum=128:cb=X*4:cr=255-X*4"
+    clip = ClipSpec(width=64, height=2, fps=1, pix_fmt="yuv444p", color_space="bt709")
+    look = Look(steps=(Effect(name="contrast", params={"amount": 1.3}),))
+    chain = vf(compile_look(look, clip=clip, env=env))
+
+    def chroma(vf_arg):
+        raw = subprocess.run(
+            ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", source, "-vf", vf_arg,
+             "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "yuv444p", "-"],
+            capture_output=True, check=True,
+        ).stdout  # fmt: skip
+        return raw[64 * 2 :]
+
+    assert chroma(chain) == chroma("null")
