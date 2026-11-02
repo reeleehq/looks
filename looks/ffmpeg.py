@@ -437,10 +437,11 @@ RGB_ONLY_IMPL_VERSION = "2"
 #: The version of a YUV-only implementation, since `vf` declares the matrix
 #: around it on an RGB clip (issue #56), which moves that clip's pixels.
 YUV_ONLY_IMPL_VERSION = "2"
-#: The version of an implementation whose ``lutyuv`` became depth-independent
+#: The revision of an implementation whose ``lutyuv`` became depth-independent
 #: and stopped clamping chroma (issue #63): its pixels moved on clips above
-#: 8 bits and on chroma outside 16..240.
-LUTYUV_FIXED_IMPL_VERSION = "3"
+#: 8 bits and on chroma outside 16..240. A revision is appended to the
+#: domain's version ("2.1"), so a later bump of the domain still moves it.
+LUTYUV_FIXED_REVISION = "1"
 
 #: ClipSpec.color_space (the tag's name) -> scale's matrix name, where they differ.
 _SCALE_MATRICES = {
@@ -674,6 +675,16 @@ def _gradient_map_compiler(params, **_kw):
     return {PENDING: request}
 
 
+def _impl_version(domain: str, revision: Optional[str]) -> str:
+    """An implementation's version: its domain's (how ``vf`` wraps it), plus
+    its own revision when its compiler changed the pixels.
+
+    >>> _impl_version("2", None), _impl_version("2", "1")
+    ('2', '2.1')
+    """
+    return domain if revision is None else f"{domain}.{revision}"
+
+
 def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegistry:
     """Register the built-in ffmpeg effects. Idempotent per registry.
 
@@ -710,7 +721,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         timeline=True,
         tags=(),
         keeps_depth=False,
-        impl_version=None,
+        revision=None,
     ):
         # `time_varying` has no default, deliberately: `ImplRef.time_varying`
         # is unknown (`None`) unless declared, and unknown is not the same
@@ -726,13 +737,13 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
                 # `vf` now declares the colour matrix around an RGB-only step
                 # (issue #29), which changes its pixels: version 2, so a plan
                 # stored with the old behaviour is refused rather than trusted.
-                impl_version=impl_version
-                or (
+                impl_version=_impl_version(
                     RGB_ONLY_IMPL_VERSION
                     if rgb_only
                     else YUV_ONLY_IMPL_VERSION
                     if is_yuv_domain(filters)
-                    else "1"
+                    else "1",
+                    revision,
                 ),
                 backend=backend,
                 terms=terms,
@@ -786,7 +797,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         _simple("lutyuv", _contrast_luma),
         time_varying=False,
         keeps_depth=True,
-        impl_version=LUTYUV_FIXED_IMPL_VERSION,
+        revision=LUTYUV_FIXED_REVISION,
     )
     add(
         "contrast.ffmpeg.eq",
@@ -971,7 +982,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         timeline=False,
         time_varying=True,
         keeps_depth=True,
-        impl_version=LUTYUV_FIXED_IMPL_VERSION,
+        revision=LUTYUV_FIXED_REVISION,
     )
     return reg
 
@@ -1005,10 +1016,11 @@ def _saturation_matrix(params) -> Mapping[str, Any]:
 CONTRAST_PIVOT_8BIT = 128
 
 #: A ``lutyuv`` expression for ``2**(depth - 8)``: 1, 4, 16, 256 at 8, 10, 12,
-#: 16 bits. ``lutyuv`` names no bit depth, and ``maxval`` is 235/940 on a
-#: limited format, 255/1023 on a full one, so the depth is read off it rounded
-#: (measured exact on yuv, yuvj, gray, nv12 and p010, 8 to 16 bits, both
-#: builds). A ratio such as ``maxval/235`` is not: 4.01 on ``gray10le``.
+#: 16 bits. ``lutyuv`` names no bit depth, and ``maxval`` is 235 scaled to the
+#: depth on a limited format but 255 on a ``yuvj`` one (and on gray, which
+#: ffmpeg converts to ``yuvj444p`` for it), so the depth is read off it rounded:
+#: exact on every format ``lutyuv`` takes, 8 to 16 bits, both builds. A ratio
+#: such as ``maxval/235`` is not: 1.085 on ``yuvj``.
 LUTYUV_DEPTH_SCALE = "pow(2,round(log(maxval+1)/log(2))-8)"
 
 #: ``lutyuv``'s chroma left as it is. Its defaults are ``clipval``, which clamp

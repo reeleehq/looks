@@ -573,3 +573,17 @@ def test_the_ripple_moves_rather_than_breathes(env):
 def test_a_document_that_would_render_something_else_is_refused(doc, match):
     with pytest.raises(TransitionError, match=match):
         Ripple.from_dict(doc)
+
+
+def test_the_bloom_leaves_chroma_where_it_was(env):
+    """`lutyuv`'s default u/v clamp chroma to 16..240 (#63). A flat chroma of 4
+    blooms to 4; clamped, the peak mixed it toward 16 (0.45*4 + 0.55*16)."""
+    source = (
+        f"nullsrc=size=160x90:rate={FPS}:duration={FRAMES / FPS},"
+        "format=yuv444p,geq=lum=128:cb=4:cr=250"
+    )
+    chain = _chain(env, _clip(160, 90, "yuv444p"))
+    peak = _split(_frames(source, chain, out_pix_fmt="yuv444p"), FRAMES)[PEAK]
+    plane = 160 * 90
+    u, v = peak[plane : 2 * plane], peak[2 * plane :]
+    assert max(abs(c - 4) for c in u) <= 1 and max(abs(c - 250) for c in v) <= 1

@@ -468,10 +468,9 @@ class TestAtEveryBitDepth:
     """Issue #63: the LGPL path wrote 8-bit code values into `lutyuv`, which runs
     at the clip's depth, so a 10-bit clip was crushed at code 255 of 1023.
 
-    `gray` is here because `lutyuv`'s `maxval` is 255 on it, not 235, so a
-    pivot read off `maxval/235` drifts (`gray10le` and `yuvj` are not used:
-    `lutyuv` does not take the first and `geq` cannot write the second, so
-    ffmpeg converts either before the step under test)."""
+    `gray` is here for full range: ffmpeg hands it to `lutyuv` as `yuvj444p`,
+    where `maxval` is 255, not 235, so a pivot read off `maxval/235` drifts.
+    (A `yuvj` source is not used because `geq` cannot write one.)"""
 
     FORMATS = [("yuv444p10le", 10), ("yuv444p12le", 12), ("gray", 8)]
 
