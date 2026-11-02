@@ -1,4 +1,4 @@
-> built 2026-11-02 18:22 UTC from d97537a (main) · looks 0.0.36. Details: build_info.json
+> built 2026-11-02 18:55 UTC from 6f4ff12 (main) · looks 0.0.37. Details: build_info.json
 
 # index.html.md
 
@@ -1678,6 +1678,10 @@ keeps the package honest would have nothing left to protect.
 | [`YUV_RUN`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.YUV_RUN)                    | The two kinds of run `vf` wraps in the clip's colour matrix.                                                                                                                                                                     |
 | [`RGB_ONLY_IMPL_VERSION`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RGB_ONLY_IMPL_VERSION)      | The version of an implementation that sits in an RGB-only run.                                                                                                                                                                   |
 | [`YUV_ONLY_IMPL_VERSION`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.YUV_ONLY_IMPL_VERSION)      | The version of a YUV-only implementation, since `vf` declares the matrix around it on an RGB clip (issue #56), which moves that clip's pixels.                                                                                   |
+| [`LUTYUV_FIXED_REVISION`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.LUTYUV_FIXED_REVISION)      | The revision of an implementation whose `lutyuv` became depth-independent and stopped clamping chroma (issue #63): its pixels moved on clips above 8 bits and on chroma outside 16..240.                                         |
+| [`CONTRAST_PIVOT_8BIT`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.CONTRAST_PIVOT_8BIT)        | the mid grey `eq` turns about.                                                                                                                                                                                                   |
+| [`LUTYUV_DEPTH_SCALE`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.LUTYUV_DEPTH_SCALE)         | 1, 4, 16, 256 at 8, 10, 12, 16 bits.                                                                                                                                                                                             |
+| [`LUTYUV_CHROMA_UNTOUCHED`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.LUTYUV_CHROMA_UNTOUCHED)    | `lutyuv`'s chroma left as it is.                                                                                                                                                                                                 |
 | [`SETSAR_MAX`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.SETSAR_MAX)                 | `setsar`'s largest allowed rational term.                                                                                                                                                                                        |
 | [`LABEL_NAMESPACE`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.LABEL_NAMESPACE)            | Prefix of the pad labels a branching effect uses internally, so they stay clear of a host's own (`[a]`, `[bg]`: note 05, label rule 2).                                                                                          |
 | [`RIPPLE_HARMONIC`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.RIPPLE_HARMONIC)            | Weight of the second horizontal harmonic against the first.                                                                                                                                                                      |
@@ -1709,6 +1713,13 @@ keeps the package honest would have nothing left to protect.
 | [`FfmpegBackendError`](_autosummary/looks.ffmpeg.html.md#looks.ffmpeg.FfmpegBackendError)   | A step that cannot be expressed as a filter fragment.   |
 |-----------------------------------------------------------------------|---------------------------------------------------------|
 
+### looks.ffmpeg.CONTRAST_PIVOT_8BIT *= 128*
+
+the mid grey `eq` turns about.
+
+* **Type:**
+  Contrast’s pivot in 8-bit code values
+
 ### *exception* looks.ffmpeg.FfmpegBackendError
 
 Bases: [`SpecError`](_autosummary/looks.spec.html.md#looks.spec.SpecError)
@@ -1725,6 +1736,30 @@ do that parser’s quoting.
 
 Prefix of the pad labels a branching effect uses internally, so they stay
 clear of a host’s own (`[a]`, `[bg]`: note 05, label rule 2).
+
+### looks.ffmpeg.LUTYUV_CHROMA_UNTOUCHED *= {'u': 'val', 'v': 'val'}*
+
+`lutyuv`’s chroma left as it is. Its defaults are `clipval`, which clamp
+chroma to 16..240 even when only `y` is given (issue #63).
+
+### looks.ffmpeg.LUTYUV_DEPTH_SCALE *= 'pow(2,round(log(maxval+1)/log(2))-8)'*
+
+1, 4, 16, 256 at 8, 10, 12,
+16 bits. `lutyuv` names no bit depth, and `maxval` is 235 scaled to the
+depth on a limited format but 255 on a `yuvj` one (and on gray, which
+ffmpeg converts to `yuvj444p` for it), so the depth is read off it rounded:
+exact on every format `lutyuv` takes, 8 to 16 bits, both builds. A ratio
+such as `maxval/235` is not: 1.085 on `yuvj`.
+
+* **Type:**
+  A `lutyuv` expression for `2**(depth - 8)`
+
+### looks.ffmpeg.LUTYUV_FIXED_REVISION *= '1'*
+
+The revision of an implementation whose `lutyuv` became depth-independent
+and stopped clamping chroma (issue #63): its pixels moved on clips above
+8 bits and on chroma outside 16..240. A revision is appended to the
+domain’s version (“2.1”), so a later bump of the domain still moves it.
 
 ### looks.ffmpeg.OPTION_LEVEL_SPECIALS *= ('\\\\', "'", ':')*
 
@@ -11442,7 +11477,7 @@ frames...
 
 # About this build
 
-This documentation was built on **2026-11-02 18:22 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/d97537a4ed24902b05a90d57b643c03951fee9b6"><code>d97537a</code></a> on branch <code>main</code>, for **looks 0.0.36** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 18:55 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/6f4ff12f0ffaddcd314ad3ededc9c30250837dd2"><code>6f4ff12</code></a> on branch <code>main</code>, for **looks 0.0.37** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -11451,9 +11486,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/looks/commit/d97537a4ed24902b05a90d57b643c03951fee9b6"><code>d97537a4ed24902b05a90d57b643c03951fee9b6</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/looks/commit/6f4ff12f0ffaddcd314ad3ededc9c30250837dd2"><code>6f4ff12f0ffaddcd314ad3ededc9c30250837dd2</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | <code>0.0.36</code>                                                                                                                                   |
+| Tags at this commit | <code>0.0.37</code>                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/looks</code>                                                                                                        |
 
@@ -11462,9 +11497,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/looks</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/41498959383">41498959383</a>       |
+| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/41504094020">41504094020</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>d843f04bebed3539cc2c00d4a30ae830ce976ad2</code> (in the history of the built commit) |
+| Event commit | <code>e5fdba75d400febb9bcff92c2a41ffe34aa8c311</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -11489,13 +11524,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/looks/0.0.36/">0.0.36</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/looks/0.0.37/">0.0.37</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout d97537a4ed24902b05a90d57b643c03951fee9b6
+git checkout 6f4ff12f0ffaddcd314ad3ededc9c30250837dd2
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

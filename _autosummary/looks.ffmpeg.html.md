@@ -57,6 +57,10 @@ keeps the package honest would have nothing left to protect.
 | [`YUV_RUN`](#looks.ffmpeg.YUV_RUN)                    | The two kinds of run `vf` wraps in the clip's colour matrix.                                                                                                                                                                     |
 | [`RGB_ONLY_IMPL_VERSION`](#looks.ffmpeg.RGB_ONLY_IMPL_VERSION)      | The version of an implementation that sits in an RGB-only run.                                                                                                                                                                   |
 | [`YUV_ONLY_IMPL_VERSION`](#looks.ffmpeg.YUV_ONLY_IMPL_VERSION)      | The version of a YUV-only implementation, since `vf` declares the matrix around it on an RGB clip (issue #56), which moves that clip's pixels.                                                                                   |
+| [`LUTYUV_FIXED_REVISION`](#looks.ffmpeg.LUTYUV_FIXED_REVISION)      | The revision of an implementation whose `lutyuv` became depth-independent and stopped clamping chroma (issue #63): its pixels moved on clips above 8 bits and on chroma outside 16..240.                                         |
+| [`CONTRAST_PIVOT_8BIT`](#looks.ffmpeg.CONTRAST_PIVOT_8BIT)        | the mid grey `eq` turns about.                                                                                                                                                                                                   |
+| [`LUTYUV_DEPTH_SCALE`](#looks.ffmpeg.LUTYUV_DEPTH_SCALE)         | 1, 4, 16, 256 at 8, 10, 12, 16 bits.                                                                                                                                                                                             |
+| [`LUTYUV_CHROMA_UNTOUCHED`](#looks.ffmpeg.LUTYUV_CHROMA_UNTOUCHED)    | `lutyuv`'s chroma left as it is.                                                                                                                                                                                                 |
 | [`SETSAR_MAX`](#looks.ffmpeg.SETSAR_MAX)                 | `setsar`'s largest allowed rational term.                                                                                                                                                                                        |
 | [`LABEL_NAMESPACE`](#looks.ffmpeg.LABEL_NAMESPACE)            | Prefix of the pad labels a branching effect uses internally, so they stay clear of a host's own (`[a]`, `[bg]`: note 05, label rule 2).                                                                                          |
 | [`RIPPLE_HARMONIC`](#looks.ffmpeg.RIPPLE_HARMONIC)            | Weight of the second horizontal harmonic against the first.                                                                                                                                                                      |
@@ -88,6 +92,13 @@ keeps the package honest would have nothing left to protect.
 | [`FfmpegBackendError`](#looks.ffmpeg.FfmpegBackendError)   | A step that cannot be expressed as a filter fragment.   |
 |-----------------------------------------------------------------------|---------------------------------------------------------|
 
+### looks.ffmpeg.CONTRAST_PIVOT_8BIT *= 128*
+
+the mid grey `eq` turns about.
+
+* **Type:**
+  Contrast’s pivot in 8-bit code values
+
 ### *exception* looks.ffmpeg.FfmpegBackendError
 
 Bases: [`SpecError`](looks.spec.html.md#looks.spec.SpecError)
@@ -104,6 +115,30 @@ do that parser’s quoting.
 
 Prefix of the pad labels a branching effect uses internally, so they stay
 clear of a host’s own (`[a]`, `[bg]`: note 05, label rule 2).
+
+### looks.ffmpeg.LUTYUV_CHROMA_UNTOUCHED *= {'u': 'val', 'v': 'val'}*
+
+`lutyuv`’s chroma left as it is. Its defaults are `clipval`, which clamp
+chroma to 16..240 even when only `y` is given (issue #63).
+
+### looks.ffmpeg.LUTYUV_DEPTH_SCALE *= 'pow(2,round(log(maxval+1)/log(2))-8)'*
+
+1, 4, 16, 256 at 8, 10, 12,
+16 bits. `lutyuv` names no bit depth, and `maxval` is 235 scaled to the
+depth on a limited format but 255 on a `yuvj` one (and on gray, which
+ffmpeg converts to `yuvj444p` for it), so the depth is read off it rounded:
+exact on every format `lutyuv` takes, 8 to 16 bits, both builds. A ratio
+such as `maxval/235` is not: 1.085 on `yuvj`.
+
+* **Type:**
+  A `lutyuv` expression for `2**(depth - 8)`
+
+### looks.ffmpeg.LUTYUV_FIXED_REVISION *= '1'*
+
+The revision of an implementation whose `lutyuv` became depth-independent
+and stopped clamping chroma (issue #63): its pixels moved on clips above
+8 bits and on chroma outside 16..240. A revision is appended to the
+domain’s version (“2.1”), so a later bump of the domain still moves it.
 
 ### looks.ffmpeg.OPTION_LEVEL_SPECIALS *= ('\\\\', "'", ':')*
 

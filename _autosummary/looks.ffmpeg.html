@@ -194,6 +194,18 @@ keeps the package honest would have nothing left to protect.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.YUV_ONLY_IMPL_VERSION" title="looks.ffmpeg.YUV_ONLY_IMPL_VERSION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">YUV_ONLY_IMPL_VERSION</span></code></a></p></td>
 <td><p>The version of a YUV-only implementation, since <code class="code docutils literal notranslate"><span class="pre">vf</span></code> declares the matrix around it on an RGB clip (issue #56), which moves that clip's pixels.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.LUTYUV_FIXED_REVISION" title="looks.ffmpeg.LUTYUV_FIXED_REVISION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LUTYUV_FIXED_REVISION</span></code></a></p></td>
+<td><p>The revision of an implementation whose <code class="docutils literal notranslate"><span class="pre">lutyuv</span></code> became depth-independent and stopped clamping chroma (issue #63): its pixels moved on clips above 8 bits and on chroma outside 16..240.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.CONTRAST_PIVOT_8BIT" title="looks.ffmpeg.CONTRAST_PIVOT_8BIT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CONTRAST_PIVOT_8BIT</span></code></a></p></td>
+<td><p>the mid grey <code class="docutils literal notranslate"><span class="pre">eq</span></code> turns about.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.LUTYUV_DEPTH_SCALE" title="looks.ffmpeg.LUTYUV_DEPTH_SCALE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LUTYUV_DEPTH_SCALE</span></code></a></p></td>
+<td><p>1, 4, 16, 256 at 8, 10, 12, 16 bits.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#looks.ffmpeg.LUTYUV_CHROMA_UNTOUCHED" title="looks.ffmpeg.LUTYUV_CHROMA_UNTOUCHED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LUTYUV_CHROMA_UNTOUCHED</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lutyuv</span></code>'s chroma left as it is.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#looks.ffmpeg.SETSAR_MAX" title="looks.ffmpeg.SETSAR_MAX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SETSAR_MAX</span></code></a></p></td>
 <td><p><code class="code docutils literal notranslate"><span class="pre">setsar</span></code>'s largest allowed rational term.</p></td>
 </tr>
@@ -272,6 +284,16 @@ keeps the package honest would have nothing left to protect.</p>
 </tr>
 </tbody>
 </table>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.ffmpeg.CONTRAST_PIVOT_8BIT">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">CONTRAST_PIVOT_8BIT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">128</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.CONTRAST_PIVOT_8BIT" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.CONTRAST_PIVOT_8BIT'">¶</a></dt>
+<dd><p>the mid grey <code class="docutils literal notranslate"><span class="pre">eq</span></code> turns about.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Contrast’s pivot in 8-bit code values</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="looks.ffmpeg.FfmpegBackendError">
 <span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">FfmpegBackendError</span></span><a class="reference internal" href="../_modules/looks/ffmpeg.html#FfmpegBackendError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.FfmpegBackendError" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.FfmpegBackendError'">¶</a></dt>
@@ -290,6 +312,35 @@ do that parser’s quoting.</p>
 <span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">LABEL_NAMESPACE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lk_'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.LABEL_NAMESPACE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.LABEL_NAMESPACE'">¶</a></dt>
 <dd><p>Prefix of the pad labels a branching effect uses internally, so they stay
 clear of a host’s own (<code class="docutils literal notranslate"><span class="pre">[a]</span></code>, <code class="docutils literal notranslate"><span class="pre">[bg]</span></code>: note 05, label rule 2).</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.ffmpeg.LUTYUV_CHROMA_UNTOUCHED">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">LUTYUV_CHROMA_UNTOUCHED</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'u':</span> <span class="pre">'val',</span> <span class="pre">'v':</span> <span class="pre">'val'}</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.LUTYUV_CHROMA_UNTOUCHED" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.LUTYUV_CHROMA_UNTOUCHED'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">lutyuv</span></code>’s chroma left as it is. Its defaults are <code class="docutils literal notranslate"><span class="pre">clipval</span></code>, which clamp
+chroma to 16..240 even when only <code class="docutils literal notranslate"><span class="pre">y</span></code> is given (issue #63).</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.ffmpeg.LUTYUV_DEPTH_SCALE">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">LUTYUV_DEPTH_SCALE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'pow(2,round(log(maxval+1)/log(2))-8)'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.LUTYUV_DEPTH_SCALE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.LUTYUV_DEPTH_SCALE'">¶</a></dt>
+<dd><p>1, 4, 16, 256 at 8, 10, 12,
+16 bits. <code class="docutils literal notranslate"><span class="pre">lutyuv</span></code> names no bit depth, and <code class="docutils literal notranslate"><span class="pre">maxval</span></code> is 235 scaled to the
+depth on a limited format but 255 on a <code class="docutils literal notranslate"><span class="pre">yuvj</span></code> one (and on gray, which
+ffmpeg converts to <code class="docutils literal notranslate"><span class="pre">yuvj444p</span></code> for it), so the depth is read off it rounded:
+exact on every format <code class="docutils literal notranslate"><span class="pre">lutyuv</span></code> takes, 8 to 16 bits, both builds. A ratio
+such as <code class="docutils literal notranslate"><span class="pre">maxval/235</span></code> is not: 1.085 on <code class="docutils literal notranslate"><span class="pre">yuvj</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A <code class="docutils literal notranslate"><span class="pre">lutyuv</span></code> expression for <code class="docutils literal notranslate"><span class="pre">2**(depth</span> <span class="pre">-</span> <span class="pre">8)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="looks.ffmpeg.LUTYUV_FIXED_REVISION">
+<span class="sig-prename descclassname"><span class="pre">looks.ffmpeg.</span></span><span class="sig-name descname"><span class="pre">LUTYUV_FIXED_REVISION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'1'</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.ffmpeg.LUTYUV_FIXED_REVISION" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.ffmpeg.LUTYUV_FIXED_REVISION'">¶</a></dt>
+<dd><p>The revision of an implementation whose <code class="docutils literal notranslate"><span class="pre">lutyuv</span></code> became depth-independent
+and stopped clamping chroma (issue #63): its pixels moved on clips above
+8 bits and on chroma outside 16..240. A revision is appended to the
+domain’s version (“2.1”), so a later bump of the domain still moves it.</p>
 </dd></dl>
 <dl class="py data">
 <dt class="sig sig-object py" id="looks.ffmpeg.OPTION_LEVEL_SPECIALS">
@@ -654,9 +705,13 @@ and an identity round trip measured 1/255.</p>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
+<li><a :data-current="activeSection === '#looks.ffmpeg.CONTRAST_PIVOT_8BIT'" class="reference internal" href="#looks.ffmpeg.CONTRAST_PIVOT_8BIT"><code class="docutils literal notranslate"><span class="pre">CONTRAST_PIVOT_8BIT</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.FfmpegBackendError'" class="reference internal" href="#looks.ffmpeg.FfmpegBackendError"><code class="docutils literal notranslate"><span class="pre">FfmpegBackendError</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.GRAPH_LEVEL_SPECIALS'" class="reference internal" href="#looks.ffmpeg.GRAPH_LEVEL_SPECIALS"><code class="docutils literal notranslate"><span class="pre">GRAPH_LEVEL_SPECIALS</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.LABEL_NAMESPACE'" class="reference internal" href="#looks.ffmpeg.LABEL_NAMESPACE"><code class="docutils literal notranslate"><span class="pre">LABEL_NAMESPACE</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.LUTYUV_CHROMA_UNTOUCHED'" class="reference internal" href="#looks.ffmpeg.LUTYUV_CHROMA_UNTOUCHED"><code class="docutils literal notranslate"><span class="pre">LUTYUV_CHROMA_UNTOUCHED</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.LUTYUV_DEPTH_SCALE'" class="reference internal" href="#looks.ffmpeg.LUTYUV_DEPTH_SCALE"><code class="docutils literal notranslate"><span class="pre">LUTYUV_DEPTH_SCALE</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.ffmpeg.LUTYUV_FIXED_REVISION'" class="reference internal" href="#looks.ffmpeg.LUTYUV_FIXED_REVISION"><code class="docutils literal notranslate"><span class="pre">LUTYUV_FIXED_REVISION</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.OPTION_LEVEL_SPECIALS'" class="reference internal" href="#looks.ffmpeg.OPTION_LEVEL_SPECIALS"><code class="docutils literal notranslate"><span class="pre">OPTION_LEVEL_SPECIALS</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.RGB_DOMAIN_FILTERS'" class="reference internal" href="#looks.ffmpeg.RGB_DOMAIN_FILTERS"><code class="docutils literal notranslate"><span class="pre">RGB_DOMAIN_FILTERS</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.ffmpeg.RGB_ONLY_IMPL_VERSION'" class="reference internal" href="#looks.ffmpeg.RGB_ONLY_IMPL_VERSION"><code class="docutils literal notranslate"><span class="pre">RGB_ONLY_IMPL_VERSION</span></code></a></li>
@@ -697,7 +752,7 @@ and an identity round trip measured 1/255.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=0e525676"></script>
+<script src="../_static/documentation_options.js?v=aa2ad26f"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
