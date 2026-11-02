@@ -688,7 +688,7 @@ def test_a_yuv_ffmpeg_impl_settles_to_not_rgb_only():
 
 
 def test_every_builtin_flag_matches_its_filters():
-    from looks.ffmpeg import is_rgb_domain
+    from looks.ffmpeg import is_rgb_domain, is_yuv_domain
     from looks.registry import REGISTRY
 
     assert REGISTRY.effects()
@@ -696,4 +696,6 @@ def test_every_builtin_flag_matches_its_filters():
         for ref in REGISTRY.implementations(effect):
             if ref.backend == "ffmpeg":
                 assert ref.rgb_only is is_rgb_domain(ref.requires_filters), ref.impl
-                assert (ref.impl_version == "2") is ref.rgb_only, ref.impl
+                # `vf` wraps both kinds in the matrix (rule 24, issue #56).
+                wrapped = ref.rgb_only or is_yuv_domain(ref.requires_filters)
+                assert (ref.impl_version == "2") is wrapped, ref.impl

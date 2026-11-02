@@ -48,6 +48,7 @@ keeps the package honest would have nothing left to protect.
 from __future__ import annotations
 
 import math
+import re
 from typing import Any, Mapping, Optional, Sequence
 
 from looks.geometry import Size, ffmpeg_chain, placement, social_size
@@ -217,7 +218,8 @@ def vf(plan: LookPlan, *, gate: bool = True) -> str:
             accepted by the string and ignored by the binary.
     """
     fragments = []
-    in_rgb_run = False
+    home_rgb = plan.clip is not None and is_rgb_pix_fmt(plan.clip.pix_fmt)
+    current_run = None
     wrap = matrix_wrap(plan.clip)
     for index, step in enumerate(plan.steps):
         if step.impl.backend != "ffmpeg":
@@ -257,12 +259,22 @@ def vf(plan: LookPlan, *, gate: bool = True) -> str:
                 "pick the matrix (rule 22). Compile with a ClipSpec that "
                 "declares color_space, or assume_color_space=."
             )
-        if wrap:
-            if rgb != in_rgb_run:
-                fragments.append(wrap)
-                in_rgb_run = rgb
+        # Runs of RGB-only steps are wrapped on every clip, as rule 24 has
+        # it; on an RGB clip, runs of YUV-only steps are wrapped too, its
+        # mirror (issue #56). A YUV clip's chain is what it always was, and an
+        # RGB clip's RGB steps keep the wrap that pins `curves`' depth (#33).
+        run = (
+            RGB_RUN
+            if rgb
+            else YUV_RUN
+            if home_rgb and _is_yuv_only(step.impl)
+            else None
+        )
+        if wrap and run != current_run:
+            fragments.append(wrap)
+            current_run = run
         fragments.append(fragment)
-    if in_rgb_run:
+    if wrap and current_run:
         fragments.append(wrap)
     return ",".join(fragments)
 
@@ -322,6 +334,61 @@ RGB_DOMAIN_FILTERS = frozenset(
 )
 
 
+#: Filters that only take YUV (or gray), so ffmpeg converts an RGB input to
+#: YUV and back around them, with a matrix nothing declares: the mirror of
+#: :data:`RGB_DOMAIN_FILTERS`, issue #56. Measured on 6.1 and 9.0 by sweeping
+#: every V->V filter with default arguments on an rgb24 source and reading its
+#: `auto_scale` line (`test_yuv_domain_filters.py` repeats the sweep). The cost
+#: of the undeclared matrix is small, an identity round trip moved 1/255, but a
+#: luma operation then acts on BT.601 luma whatever the clip says. Listed for
+#: the union of both builds.
+#: `geq` is listed because it takes YUV when given lum=/cb=/cr= expressions,
+#: which is the form an implementation here emits (`ripple`); one that emits
+#: r=/g=/b= declares `rgb_only=True`, which wins.
+YUV_DOMAIN_FILTERS = frozenset(
+    {
+        "lutyuv", "eq", "unsharp", "geq", "hue", "hqdn3d", "smartblur", "sab",
+        "owdenoise", "uspp", "chromanr", "chromashift", "chromahold",
+        "chromakey", "colorcorrect", "colorize", "monochrome", "lumakey",
+        "hsvhold", "hsvkey", "swapuv", "dedot", "deflicker", "deshake",
+        "fftfilt", "framerate", "minterpolate", "mestimate", "mcdeint",
+        "interlace", "tinterlace", "tiltandshift", "repeatfields", "pullup",
+        "idet", "bbox", "blackdetect", "blackframe", "signalstats", "siti",
+        "vmafmotion", "readeia608", "readvitc", "codecview", "cover_rect",
+        "showpalette", "ocr",
+    }
+)  # fmt: skip
+
+#: The two kinds of run `vf` wraps in the clip's colour matrix.
+RGB_RUN, YUV_RUN = "rgb", "yuv"
+
+#: An RGB pixel format's name, packed or planar, with or without alpha.
+_RGB_PIX_FMT = re.compile(r"^(0?rgb|0?bgr|gbr|a?rgb|abgr|rgba|bgra|x2rgb|x2bgr)")
+
+
+def is_rgb_pix_fmt(pix_fmt: Optional[str]) -> bool:
+    """Whether a pixel format is RGB; an undeclared one reads as not.
+
+    >>> is_rgb_pix_fmt("gbrp10le"), is_rgb_pix_fmt("yuv420p"), is_rgb_pix_fmt(None)
+    (True, False, False)
+    """
+    return bool(pix_fmt) and bool(_RGB_PIX_FMT.match(pix_fmt))
+
+
+def is_yuv_domain(filters) -> bool:
+    """Whether any of these ffmpeg filters only takes YUV.
+
+    >>> is_yuv_domain(("lutyuv",)), is_yuv_domain(("gblur",))
+    (True, False)
+    """
+    return bool(YUV_DOMAIN_FILTERS & set(filters))
+
+
+def _is_yuv_only(impl) -> bool:
+    """Only takes YUV: a YUV-only filter, in an implementation not RGB-only."""
+    return not _is_rgb_only(impl) and is_yuv_domain(impl.requires_filters)
+
+
 def is_rgb_domain(filters) -> bool:
     """Whether any of these ffmpeg filters only takes RGB.
 
@@ -350,6 +417,9 @@ def _is_rgb_only(impl) -> bool:
 
 #: The version of an implementation that sits in an RGB-only run.
 RGB_ONLY_IMPL_VERSION = "2"
+#: The version of a YUV-only implementation, since `vf` declares the matrix
+#: around it on an RGB clip (issue #56), which moves that clip's pixels.
+YUV_ONLY_IMPL_VERSION = "2"
 
 #: ClipSpec.color_space (the tag's name) -> scale's matrix name, where they differ.
 _SCALE_MATRICES = {
@@ -628,7 +698,13 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
                 # `vf` now declares the colour matrix around an RGB-only step
                 # (issue #29), which changes its pixels: version 2, so a plan
                 # stored with the old behaviour is refused rather than trusted.
-                impl_version=RGB_ONLY_IMPL_VERSION if rgb_only else "1",
+                impl_version=(
+                    RGB_ONLY_IMPL_VERSION
+                    if rgb_only
+                    else YUV_ONLY_IMPL_VERSION
+                    if is_yuv_domain(filters)
+                    else "1"
+                ),
                 backend=backend,
                 terms=terms,
                 requires_filters=filters,
