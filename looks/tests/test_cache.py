@@ -385,6 +385,58 @@ class TestThePlanLevelVerb:
         )
         assert materialize(plan) is plan
 
+    def test_a_host_can_name_the_cube_relative_to_its_own_folder(self, tmp_path):
+        """reeleehq/looks#51: muvid stores ``lut3d=file=<name>`` and resolves
+        the name at render time, so an absolute path in the filter is refused
+        by its gate. The file's location stays absolute in the payload."""
+        import shutil
+
+        from looks.cache import materialize
+        from looks.ffmpeg import vf
+
+        ready = materialize(
+            self._plan(), into=tmp_path, name_of=lambda p: p.relative_to(tmp_path)
+        )
+        cube = Path(ready.steps[0].payload["cube"])
+        assert cube.is_absolute() and cube.parent == tmp_path
+        fragment = vf(ready)
+        assert f"lut3d=file={cube.name}:" in fragment
+        assert str(tmp_path) not in fragment
+        if shutil.which("ffmpeg") is None:
+            pytest.skip("ffmpeg not on PATH")
+        proc = subprocess.run(
+            [
+                "ffmpeg",
+                "-v",
+                "error",
+                "-f",
+                "lavfi",
+                "-i",
+                "testsrc2=size=64x48:rate=5:duration=0.2",
+                "-vf",
+                fragment,
+                "-f",
+                "null",
+                "-",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=tmp_path,
+        )
+        assert proc.returncode == 0, proc.stderr
+
+    def test_a_host_name_is_escaped_like_a_path(self, tmp_path):
+        from looks.cache import materialize
+
+        ready = materialize(self._plan(), into=tmp_path, name_of=lambda p: "a,b:c.cube")
+        assert "lut3d=file=a\\,b\\\\:c.cube" in ready.steps[0].payload["filter"]
+
+    def test_a_name_that_is_not_a_path_is_refused(self, tmp_path):
+        from looks.cache import materialize
+
+        with pytest.raises(TypeError):
+            materialize(self._plan(), into=tmp_path, name_of=lambda p: 7)
+
     def test_the_path_reaches_the_filter_ESCAPED(self, tmp_path):
         """The flagship effect takes a caller-supplied directory, and a comma
         in it would otherwise end the filter."""
