@@ -211,9 +211,15 @@ class EffectRegistry:
         """Has this registry declared a schema for ``effect``?"""
         return effect in self._params
 
-    def check_params(self, effect: str, params: Mapping[str, Any]) -> None:
-        """Refuse parameters this registry's schema for ``effect`` rejects."""
-        check_params(effect, params, schemas=self._params)
+    def check_params(
+        self, effect: str, params: Mapping[str, Any], *, pix_fmt: Optional[str] = None
+    ) -> None:
+        """Refuse parameters this registry's schema for ``effect`` rejects.
+
+        ``pix_fmt`` is the format the effect receives, when known: see
+        :func:`looks.params.check_params`.
+        """
+        check_params(effect, params, schemas=self._params, pix_fmt=pix_fmt)
 
     def with_defaults(self, effect: str, params: Mapping[str, Any]) -> dict:
         """``params`` with this registry's declared defaults filled in."""

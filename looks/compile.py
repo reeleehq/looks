@@ -148,8 +148,15 @@ def compile_look(
         warnings.warn(message, StageOrderWarning, stacklevel=2)
 
     steps = []
-    for effect in concrete.steps:
-        impl = _select(effect, reg, policy=ceiling, available=available, env=env)
+    for index, effect in enumerate(concrete.steps):
+        impl = _select(
+            effect,
+            reg,
+            policy=ceiling,
+            available=available,
+            env=env,
+            pix_fmt=_arriving_pix_fmt(clip, index),
+        )
         payload = _payload(reg, impl, effect, clip=clip, env=env)
         steps.append(
             Step(
@@ -212,7 +219,24 @@ def _require_declared_colour(steps, clip) -> None:
         )
 
 
-def check_effect_params(effect: Effect, registry: EffectRegistry = REGISTRY) -> None:
+def _arriving_pix_fmt(clip: Optional[ClipSpec], index: int) -> Optional[str]:
+    """The pixel format step ``index`` receives, where that is known: step 0 only.
+
+    The first step receives the clip. A later one receives whatever ffmpeg
+    negotiates across the whole chain, which no step declares: measured on 6.1
+    and 9.0, a 10-bit clip reaches a ``curves`` after ``lutyuv``, ``eq`` or
+    ``vignette`` at 8 bits and one after ``noise`` at 16 (issue #33). A guess
+    there would refuse documents ffmpeg accepts, so the step gets ``None``.
+    """
+    return clip.pix_fmt if clip is not None and index == 0 else None
+
+
+def check_effect_params(
+    effect: Effect,
+    registry: EffectRegistry = REGISTRY,
+    *,
+    pix_fmt: Optional[str] = None,
+) -> None:
     """Refuse parameters no implementation of this effect could honour.
 
     Called before an implementation is chosen, so every implementation of an
@@ -226,7 +250,7 @@ def check_effect_params(effect: Effect, registry: EffectRegistry = REGISTRY) -> 
     document is accepted either.
     """
     try:
-        registry.check_params(effect.name, effect.params)
+        registry.check_params(effect.name, effect.params, pix_fmt=pix_fmt)
     except ParamError as error:
         raise CompileError(str(error)) from error
 
@@ -238,8 +262,9 @@ def _select(
     policy: Policy,
     available: Optional[frozenset],
     env: Optional[FfmpegEnv],
+    pix_fmt: Optional[str] = None,
 ) -> Any:
-    check_effect_params(effect, registry)
+    check_effect_params(effect, registry, pix_fmt=pix_fmt)
     candidates = registry.implementations(effect.name)
     if not candidates:
         raise CompileError(
