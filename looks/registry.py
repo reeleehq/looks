@@ -76,9 +76,9 @@ class UnknownImpl(RegistryError):
 
 
 class _Entry:
-    """One registration: the declaration, the code, and the tags."""
+    """One registration: the declaration, the code, and what the registrant measured."""
 
-    __slots__ = ("impl", "compiler", "cost", "tags")
+    __slots__ = ("impl", "compiler", "cost", "tags", "keeps_depth")
 
     def __init__(
         self,
@@ -86,11 +86,13 @@ class _Entry:
         compiler: Compiler,
         cost: Optional[CostFn],
         tags: frozenset,
+        keeps_depth: bool,
     ) -> None:
         self.impl = impl
         self.compiler = compiler
         self.cost = cost
         self.tags = tags
+        self.keeps_depth = keeps_depth
 
 
 class EffectRegistry:
@@ -141,6 +143,7 @@ class EffectRegistry:
         cost: Optional[CostFn] = None,
         tags: Sequence[str] = (),
         known_filters: Optional[frozenset] = None,
+        keeps_depth: bool = False,
     ) -> ImplRef:
         """Record an implementation. Returns it, so this reads well inline.
 
@@ -157,6 +160,16 @@ class EffectRegistry:
             known_filters: The filter universe to validate against. Defaults to
                 the one compiled into this package. Pass a binary's own set to
                 validate against that instead.
+            keeps_depth: Does the step hand the next one the bit depth it was
+                given, on every format in
+                :data:`looks.params.DEPTH_CARRIED_FORMATS`? Measured, never
+                assumed: ffmpeg negotiates formats across the whole chain, and
+                ``eq``, ``vignette`` (to 8 bits), ``noise`` and ``halation``'s
+                ``format`` (to 16) do not. ``compile_look`` carries the clip's
+                format past a step only when this is true, for the checks that
+                depend on it (issue #52). False, the default, means "not known
+                to", and costs only a check skipped. Only an ffmpeg step can
+                claim it: a frame step hands on whatever the pipe carries.
 
         Raises:
             ImplConflict: If the key is taken.
@@ -171,6 +184,12 @@ class EffectRegistry:
         declared ``rgb_only`` changes ``vf``'s pixels; bump ``impl_version``.)
         """
         self._check_key(impl)
+        if keeps_depth and impl.backend != "ffmpeg":
+            raise RegistryError(
+                f"{impl.impl!r} declares keeps_depth, but only an ffmpeg step "
+                "can: a frame step hands on whatever the pipe carries (8-bit "
+                "packed RGB), whatever it was given."
+            )
         if impl.impl in self._by_key:
             existing = self._by_key[impl.impl].impl
             raise ImplConflict(
@@ -185,7 +204,9 @@ class EffectRegistry:
             impl = self._settle_rgb_only(impl)
             if impl.requires_filters:
                 self._check_filters(impl, known_filters)
-        self._by_key[impl.impl] = _Entry(impl, compiler, cost, frozenset(tags))
+        self._by_key[impl.impl] = _Entry(
+            impl, compiler, cost, frozenset(tags), keeps_depth
+        )
         self._by_effect.setdefault(impl.effect, []).append(impl.impl)
         return impl
 
@@ -340,6 +361,10 @@ class EffectRegistry:
 
     def tags(self, key: str) -> frozenset:
         return self._entry(key).tags
+
+    def keeps_depth(self, key: str) -> bool:
+        """Was this implementation registered as keeping the arriving bit depth?"""
+        return self._entry(key).keeps_depth
 
     def _entry(self, key: str) -> _Entry:
         try:

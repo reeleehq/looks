@@ -401,6 +401,27 @@ CURVES_DEPTH: Mapping[str, int] = {
 }
 # fmt: on
 
+#: Formats whose bit depth survives a step registered with ``keeps_depth``
+#: (``EffectRegistry.register``), so ``compile_look`` may carry the clip's
+#: format past such a step for the depth checks (issue #52). Measured on 6.1
+#: and 9.0, every keeper on every :data:`CURVES_DEPTH` format: these 18 are
+#: the exceptions, all RAISED to 16 bits by some keeper (``unsharp`` takes
+#: every 14-bit format there, ``lutyuv`` the 10- and 12-bit alpha ones, ``geq``
+#: ``gbrap12``), and a carried check would refuse what ffmpeg accepts.
+DEPTH_CARRIED_FORMATS: frozenset = frozenset(CURVES_DEPTH) - frozenset(
+    _endian(
+        "yuv420p14",
+        "yuv422p14",
+        "yuv444p14",
+        "gbrp14",
+        "gray14",
+        "yuva420p10",
+        "yuva444p10",
+        "gbrap10",
+        "gbrap12",
+    )
+)
+
 
 def _params(*params: Param) -> Mapping[str, Param]:
     return {p.name: p for p in params}
@@ -517,9 +538,10 @@ def check_params(
     an absent one takes its declared default, so a check never has a second
     copy of it.
 
-    ``pix_fmt`` is the pixel format the effect receives, when the caller knows
-    it; a parameter that depends on it (a ``curves`` x-point, issue #33) is
-    checked against it too. ``None`` checks only what holds for every format.
+    ``pix_fmt`` is the pixel format the effect receives, or one of the same
+    bit depth, when the caller knows it; a parameter that depends on it (a
+    ``curves`` x-point, issue #33) is checked against it too. ``None`` checks
+    only what holds for every format.
 
     >>> check_params("curves", {"all": [(0, 0), (0.5, 0.5), (0.501, 1)]})
     >>> check_params("curves", {"all": [(0, 0), (0.5, 0.5), (0.501, 1)]}, pix_fmt="rgb24")
