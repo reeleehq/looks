@@ -4,6 +4,7 @@ Pure data plus `compile_look`'s refusal; no ffmpeg process is started except
 where a test says so and skips without one.
 """
 
+import functools
 import math
 import re
 import shutil
@@ -393,6 +394,7 @@ def test_the_check_and_the_binary_agree(env, points, pix_fmt):
     assert _ffmpeg_accepts(fragment, pix_fmt) is not refused_here
 
 
+@functools.lru_cache(maxsize=None)
 def _pix_fmt_depths() -> dict:
     """``ffmpeg -pix_fmts``: each format's deepest component, in bits."""
     out = subprocess.run(
