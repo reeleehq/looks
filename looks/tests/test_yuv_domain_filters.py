@@ -227,3 +227,12 @@ def test_an_alpha_rgb_clip_is_wrapped_and_keeps_its_alpha(env):
         capture_output=True, check=True,
     ).stdout  # fmt: skip
     assert run(chain)[3::4] == run("null")[3::4]
+
+
+def test_a_yuv_run_on_an_rgb_clip_is_closed_by_the_wrap_after_neutral_steps(env):
+    """A step taking both formats after a YUV-only one stays in the YUV run, so
+    the chain ends in the wrap rather than an undeclared conversion. Pinned as
+    a string because only 6.1 shows it in pixels."""
+    steps = (_IDENTITY["contrast"], Effect(name="blur", params={"sigma": 1}))
+    chain = vf(compile_look(Look(steps=steps), clip=_clip("bt709"), env=env))
+    assert chain.endswith(matrix_wrap(_clip("bt709"))), chain
