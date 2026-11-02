@@ -1,4 +1,4 @@
-> built 2026-11-02 16:45 UTC from a37e433 (main) · looks 0.0.33. Details: build_info.json
+> built 2026-11-02 17:20 UTC from 2c51ba4 (main) · looks 0.0.34. Details: build_info.json
 
 # index.html.md
 
@@ -960,8 +960,12 @@ Compile a Look into a plan. No process is started and no file is written.
   * **clip** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ClipSpec`](_autosummary/looks.spec.html.md#looks.spec.ClipSpec)]) – What it is being applied to. Needed by any effect whose answer
     depends on the frame — its absence is only an error if an effect
     asks for it. Its `pix_fmt` is what the first step receives, and
-    that step’s parameters are checked against it (a `curves` whose
-    x-points share one code value of it is refused, issue #33).
+    what each later one receives as far as bit depth goes while every
+    step before it keeps depth (`EffectRegistry.register`’s
+    `keeps_depth`) and the format is one measured to survive that
+    ([`looks.params.DEPTH_CARRIED_FORMATS`](_autosummary/looks.params.html.md#looks.params.DEPTH_CARRIED_FORMATS)). Those steps’ parameters are checked against it:
+    a `curves` whose x-points share one code value is refused
+    (issues #33, #52).
   * **env** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`FfmpegEnv`](_autosummary/looks.environment.html.md#looks.environment.FfmpegEnv)]) – Which binary. When given, an implementation whose filters this
     build lacks is dropped from selection rather than discovered at
     run time.
@@ -989,7 +993,7 @@ Compile a Look into a plan. No process is started and no file is written.
         undeclared (rule 22) and not assumed. ffmpeg would pick a matrix
         for it, and on some builds picks wrongly.
   * [**CompileError**](_autosummary/looks.compile.html.md#looks.compile.CompileError) – If an effect’s parameters are refused by its schema,
-        the first step’s also against `clip.pix_fmt`.
+        and a step the clip’s depth reaches also against `clip.pix_fmt`.
   * [**CompileError**](_autosummary/looks.compile.html.md#looks.compile.CompileError) – If an effect has no admissible implementation. The
         message says which constraint emptied the pool, because “no
         implementation available” alone is the least useful refusal in the
@@ -3595,7 +3599,14 @@ Everything registered for an effect, registration order preserved.
 * **Return type:**
   [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`ImplRef`](_autosummary/looks.spec.html.md#looks.spec.ImplRef), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
 
-#### register(impl, compiler, , cost=None, tags=(), known_filters=None)
+#### keeps_depth(key)
+
+Was this implementation registered as keeping the arriving bit depth?
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+#### register(impl, compiler, , cost=None, tags=(), known_filters=None, keeps_depth=False)
 
 Record an implementation. Returns it, so this reads well inline.
 
@@ -3612,6 +3623,16 @@ Record an implementation. Returns it, so this reads well inline.
   * **known_filters** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)]) – The filter universe to validate against. Defaults to
     the one compiled into this package. Pass a binary’s own set to
     validate against that instead.
+  * **keeps_depth** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Does the step hand the next one the bit depth it was
+    given, on every format in
+    [`looks.params.DEPTH_CARRIED_FORMATS`](_autosummary/looks.params.html.md#looks.params.DEPTH_CARRIED_FORMATS)? Measured, never
+    assumed: ffmpeg negotiates formats across the whole chain, and
+    `eq`, `vignette` (to 8 bits), `noise` and `halation`’s
+    `format` (to 16) do not. `compile_look` carries the clip’s
+    format past a step only when this is true, for the checks that
+    depend on it (issue #52). False, the default, means “not known
+    to”, and costs only a check skipped. Only an ffmpeg step can
+    claim it: a frame step hands on whatever the pipe carries.
 * **Raises:**
   * [**ImplConflict**](_autosummary/looks.html.md#looks.ImplConflict) – If the key is taken.
   * [**RegistryError**](_autosummary/looks.html.md#looks.RegistryError) – If the key is not `<effect>.<backend>.<variant>`,
@@ -5410,8 +5431,12 @@ Compile a Look into a plan. No process is started and no file is written.
   * **clip** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ClipSpec`](_autosummary/looks.spec.html.md#looks.spec.ClipSpec)]) – What it is being applied to. Needed by any effect whose answer
     depends on the frame — its absence is only an error if an effect
     asks for it. Its `pix_fmt` is what the first step receives, and
-    that step’s parameters are checked against it (a `curves` whose
-    x-points share one code value of it is refused, issue #33).
+    what each later one receives as far as bit depth goes while every
+    step before it keeps depth (`EffectRegistry.register`’s
+    `keeps_depth`) and the format is one measured to survive that
+    ([`looks.params.DEPTH_CARRIED_FORMATS`](_autosummary/looks.params.html.md#looks.params.DEPTH_CARRIED_FORMATS)). Those steps’ parameters are checked against it:
+    a `curves` whose x-points share one code value is refused
+    (issues #33, #52).
   * **env** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`FfmpegEnv`](_autosummary/looks.environment.html.md#looks.environment.FfmpegEnv)]) – Which binary. When given, an implementation whose filters this
     build lacks is dropped from selection rather than discovered at
     run time.
@@ -5439,7 +5464,7 @@ Compile a Look into a plan. No process is started and no file is written.
         undeclared (rule 22) and not assumed. ffmpeg would pick a matrix
         for it, and on some builds picks wrongly.
   * [**CompileError**](_autosummary/looks.html.md#looks.CompileError) – If an effect’s parameters are refused by its schema,
-        the first step’s also against `clip.pix_fmt`.
+        and a step the clip’s depth reaches also against `clip.pix_fmt`.
   * [**CompileError**](_autosummary/looks.html.md#looks.CompileError) – If an effect has no admissible implementation. The
         message says which constraint emptied the pool, because “no
         implementation available” alone is the least useful refusal in the
@@ -8998,29 +9023,30 @@ looks.params.ParamError: grain: unknown parameter 'strenght'; it takes ['seed', 
 
 ### Module Attributes
 
-| [`NO_DEFAULT`](_autosummary/looks.params.html.md#looks.params.NO_DEFAULT)              | A parameter with no default is left absent when omitted.                                                                                         |
-|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`DFLT_VIGNETTE_ANGLE`](_autosummary/looks.params.html.md#looks.params.DFLT_VIGNETTE_ANGLE)     | Vignette half-angle, radians.                                                                                                                    |
-| [`MAX_VIGNETTE_ANGLE`](_autosummary/looks.params.html.md#looks.params.MAX_VIGNETTE_ANGLE)      | `vignette` clips its angle to [0, PI/2] instead of refusing, so a larger one would compile to a picture nobody asked for.                        |
-| [`MAX_BLUR_SIGMA`](_autosummary/looks.params.html.md#looks.params.MAX_BLUR_SIGMA)          | `gblur` refuses a larger sigma ("Result too large"; 9.0 and 6.1).                                                                                |
-| [`DFLT_HALATION_TINT`](_autosummary/looks.params.html.md#looks.params.DFLT_HALATION_TINT)      | film halation is the red layer scattering back off the base.                                                                                     |
-| [`MAX_GRAIN_STRENGTH`](_autosummary/looks.params.html.md#looks.params.MAX_GRAIN_STRENGTH)      | `noise`'s `alls` range is 0..100.                                                                                                                |
-| [`DFLT_GRAIN_SEED`](_autosummary/looks.params.html.md#looks.params.DFLT_GRAIN_SEED)         | Pinned rather than ffmpeg's own default, for portability across builds.                                                                          |
-| [`MAX_GRAIN_SEED`](_autosummary/looks.params.html.md#looks.params.MAX_GRAIN_SEED)          | `noise`'s `all_seed` tops out at INT_MAX; its `-1` (a random seed) is below the range on purpose, since a seed is what makes grain reproducible. |
-| [`DFLT_WEAVE_AMPLITUDE`](_autosummary/looks.params.html.md#looks.params.DFLT_WEAVE_AMPLITUDE)    | Gate-weave wander, in pixels either side of centre.                                                                                              |
-| [`DFLT_WEAVE_FREQUENCY`](_autosummary/looks.params.html.md#looks.params.DFLT_WEAVE_FREQUENCY)    | Horizontal and vertical wander, Hz.                                                                                                              |
-| [`DFLT_INTERP`](_autosummary/looks.params.html.md#looks.params.DFLT_INTERP)             | `lut3d`'s interpolation.                                                                                                                         |
-| [`MAX_CUBE_SIZE`](_autosummary/looks.params.html.md#looks.params.MAX_CUBE_SIZE)           | The largest `.cube` grid worth asking for (size\*\*3 entries; ffmpeg's own limit is 256).                                                        |
-| [`INTERP_MODES`](_autosummary/looks.params.html.md#looks.params.INTERP_MODES)            | `lut3d`'s `interp` values.                                                                                                                       |
-| [`MAX_POSTERIZE_LEVELS`](_autosummary/looks.params.html.md#looks.params.MAX_POSTERIZE_LEVELS)    | One code value per level on an 8-bit channel; more levels than that is the identity, and an absurd count only makes a huge expression.           |
-| [`MAX_FLATTEN_SPATIAL`](_autosummary/looks.params.html.md#looks.params.MAX_FLATTEN_SPATIAL)     | sigmaS 0..512, sigmaR 0..1, planes a 4-bit mask.                                                                                                 |
-| [`DFLT_RIPPLE_AMPLITUDE`](_autosummary/looks.params.html.md#looks.params.DFLT_RIPPLE_AMPLITUDE)   | The ripple warp (issue #49), normalised so one look reads the same at any size.                                                                  |
-| [`DFLT_RIPPLE_WAVELENGTHS`](_autosummary/looks.params.html.md#looks.params.DFLT_RIPPLE_WAVELENGTHS) | The two ripple harmonics' wavelengths, as fractions of the frame's height.                                                                       |
-| [`DFLT_RIPPLE_BLOOM`](_autosummary/looks.params.html.md#looks.params.DFLT_RIPPLE_BLOOM)       | Peak weight of the blurred, brightened copy mixed in at the middle.                                                                              |
-| [`CURVES_CHANNELS`](_autosummary/looks.params.html.md#looks.params.CURVES_CHANNELS)         | `looks` channel names to ffmpeg `curves` option names.                                                                                           |
-| [`COLORBALANCE_ZONES`](_autosummary/looks.params.html.md#looks.params.COLORBALANCE_ZONES)      | `colorbalance` tonal zones, keyed to the letter its options end in.                                                                              |
-| [`EFFECT_PARAMS`](_autosummary/looks.params.html.md#looks.params.EFFECT_PARAMS)           | Effect -> its parameters.                                                                                                                        |
-| [`PARAM_HINTS`](_autosummary/looks.params.html.md#looks.params.PARAM_HINTS)             | A refused key that deserves more than "unknown parameter".                                                                                       |
+| [`NO_DEFAULT`](_autosummary/looks.params.html.md#looks.params.NO_DEFAULT)              | A parameter with no default is left absent when omitted.                                                                                                                                            |
+|--------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`DFLT_VIGNETTE_ANGLE`](_autosummary/looks.params.html.md#looks.params.DFLT_VIGNETTE_ANGLE)     | Vignette half-angle, radians.                                                                                                                                                                       |
+| [`MAX_VIGNETTE_ANGLE`](_autosummary/looks.params.html.md#looks.params.MAX_VIGNETTE_ANGLE)      | `vignette` clips its angle to [0, PI/2] instead of refusing, so a larger one would compile to a picture nobody asked for.                                                                           |
+| [`MAX_BLUR_SIGMA`](_autosummary/looks.params.html.md#looks.params.MAX_BLUR_SIGMA)          | `gblur` refuses a larger sigma ("Result too large"; 9.0 and 6.1).                                                                                                                                   |
+| [`DFLT_HALATION_TINT`](_autosummary/looks.params.html.md#looks.params.DFLT_HALATION_TINT)      | film halation is the red layer scattering back off the base.                                                                                                                                        |
+| [`MAX_GRAIN_STRENGTH`](_autosummary/looks.params.html.md#looks.params.MAX_GRAIN_STRENGTH)      | `noise`'s `alls` range is 0..100.                                                                                                                                                                   |
+| [`DFLT_GRAIN_SEED`](_autosummary/looks.params.html.md#looks.params.DFLT_GRAIN_SEED)         | Pinned rather than ffmpeg's own default, for portability across builds.                                                                                                                             |
+| [`MAX_GRAIN_SEED`](_autosummary/looks.params.html.md#looks.params.MAX_GRAIN_SEED)          | `noise`'s `all_seed` tops out at INT_MAX; its `-1` (a random seed) is below the range on purpose, since a seed is what makes grain reproducible.                                                    |
+| [`DFLT_WEAVE_AMPLITUDE`](_autosummary/looks.params.html.md#looks.params.DFLT_WEAVE_AMPLITUDE)    | Gate-weave wander, in pixels either side of centre.                                                                                                                                                 |
+| [`DFLT_WEAVE_FREQUENCY`](_autosummary/looks.params.html.md#looks.params.DFLT_WEAVE_FREQUENCY)    | Horizontal and vertical wander, Hz.                                                                                                                                                                 |
+| [`DFLT_INTERP`](_autosummary/looks.params.html.md#looks.params.DFLT_INTERP)             | `lut3d`'s interpolation.                                                                                                                                                                            |
+| [`MAX_CUBE_SIZE`](_autosummary/looks.params.html.md#looks.params.MAX_CUBE_SIZE)           | The largest `.cube` grid worth asking for (size\*\*3 entries; ffmpeg's own limit is 256).                                                                                                           |
+| [`INTERP_MODES`](_autosummary/looks.params.html.md#looks.params.INTERP_MODES)            | `lut3d`'s `interp` values.                                                                                                                                                                          |
+| [`MAX_POSTERIZE_LEVELS`](_autosummary/looks.params.html.md#looks.params.MAX_POSTERIZE_LEVELS)    | One code value per level on an 8-bit channel; more levels than that is the identity, and an absurd count only makes a huge expression.                                                              |
+| [`MAX_FLATTEN_SPATIAL`](_autosummary/looks.params.html.md#looks.params.MAX_FLATTEN_SPATIAL)     | sigmaS 0..512, sigmaR 0..1, planes a 4-bit mask.                                                                                                                                                    |
+| [`DFLT_RIPPLE_AMPLITUDE`](_autosummary/looks.params.html.md#looks.params.DFLT_RIPPLE_AMPLITUDE)   | The ripple warp (issue #49), normalised so one look reads the same at any size.                                                                                                                     |
+| [`DFLT_RIPPLE_WAVELENGTHS`](_autosummary/looks.params.html.md#looks.params.DFLT_RIPPLE_WAVELENGTHS) | The two ripple harmonics' wavelengths, as fractions of the frame's height.                                                                                                                          |
+| [`DFLT_RIPPLE_BLOOM`](_autosummary/looks.params.html.md#looks.params.DFLT_RIPPLE_BLOOM)       | Peak weight of the blurred, brightened copy mixed in at the middle.                                                                                                                                 |
+| [`CURVES_CHANNELS`](_autosummary/looks.params.html.md#looks.params.CURVES_CHANNELS)         | `looks` channel names to ffmpeg `curves` option names.                                                                                                                                              |
+| [`COLORBALANCE_ZONES`](_autosummary/looks.params.html.md#looks.params.COLORBALANCE_ZONES)      | `colorbalance` tonal zones, keyed to the letter its options end in.                                                                                                                                 |
+| [`DEPTH_CARRIED_FORMATS`](_autosummary/looks.params.html.md#looks.params.DEPTH_CARRIED_FORMATS)   | Formats whose bit depth survives a step registered with `keeps_depth` (`EffectRegistry.register`), so `compile_look` may carry the clip's format past such a step for the depth checks (issue #52). |
+| [`EFFECT_PARAMS`](_autosummary/looks.params.html.md#looks.params.EFFECT_PARAMS)           | Effect -> its parameters.                                                                                                                                                                           |
+| [`PARAM_HINTS`](_autosummary/looks.params.html.md#looks.params.PARAM_HINTS)             | A refused key that deserves more than "unknown parameter".                                                                                                                                          |
 
 ### Functions
 
@@ -9054,6 +9080,16 @@ looks.params.ParamError: grain: unknown parameter 'strenght'; it takes ['seed', 
 ### looks.params.CURVES_CHANNELS *= ('all', 'red', 'green', 'blue')*
 
 `looks` channel names to ffmpeg `curves` option names.
+
+### looks.params.DEPTH_CARRIED_FORMATS *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)* *= frozenset({'0bgr', '0rgb', 'abgr', 'argb', 'bgr0', 'bgr24', 'bgr48be', 'bgr48le', 'bgra', 'bgra64be', 'bgra64le', 'gbrap', 'gbrap16be', 'gbrap16le', 'gbrapf32be', 'gbrapf32le', 'gbrp', 'gbrp10be', 'gbrp10le', 'gbrp12be', 'gbrp12le', 'gbrp16be', 'gbrp16le', 'gbrp9be', 'gbrp9le', 'gbrpf32be', 'gbrpf32le', 'gray', 'gray10be', 'gray10le', 'gray12be', 'gray12le', 'gray16be', 'gray16le', 'gray9be', 'gray9le', 'grayf32be', 'grayf32le', 'nv12', 'nv16', 'nv21', 'nv24', 'p010be', 'p010le', 'p012be', 'p012le', 'p016be', 'p016le', 'p210be', 'p210le', 'p216be', 'p216le', 'p410be', 'p410le', 'p416be', 'p416le', 'rgb0', 'rgb24', 'rgb48be', 'rgb48le', 'rgba', 'rgba64be', 'rgba64le', 'uyvy422', 'x2bgr10le', 'x2rgb10le', 'ya16be', 'ya16le', 'ya8', 'yuv411p', 'yuv420p', 'yuv420p10be', 'yuv420p10le', 'yuv420p12be', 'yuv420p12le', 'yuv420p16be', 'yuv420p16le', 'yuv420p9be', 'yuv420p9le', 'yuv422p', 'yuv422p10be', 'yuv422p10le', 'yuv422p12be', 'yuv422p12le', 'yuv422p16be', 'yuv422p16le', 'yuv440p', 'yuv444p', 'yuv444p10be', 'yuv444p10le', 'yuv444p12be', 'yuv444p12le', 'yuv444p16be', 'yuv444p16le', 'yuv444p9be', 'yuv444p9le', 'yuva420p', 'yuva444p', 'yuva444p16be', 'yuva444p16le', 'yuvj411p', 'yuvj420p', 'yuvj422p', 'yuvj444p', 'yuyv422'})*
+
+Formats whose bit depth survives a step registered with `keeps_depth`
+(`EffectRegistry.register`), so `compile_look` may carry the clip’s
+format past such a step for the depth checks (issue #52). Measured on 6.1
+and 9.0, every keeper on every `CURVES_DEPTH` format: these 18 are
+the exceptions, all RAISED to 16 bits by some keeper (`unsharp` takes
+every 14-bit format there, `lutyuv` the 10- and 12-bit alpha ones, `geq`
+`gbrap12`), and a carried check would refuse what ffmpeg accepts.
 
 ### looks.params.DFLT_GRAIN_SEED *= 0*
 
@@ -9215,9 +9251,10 @@ An effect with no schema is not checked. Only present keys are checked:
 an absent one takes its declared default, so a check never has a second
 copy of it.
 
-`pix_fmt` is the pixel format the effect receives, when the caller knows
-it; a parameter that depends on it (a `curves` x-point, issue #33) is
-checked against it too. `None` checks only what holds for every format.
+`pix_fmt` is the pixel format the effect receives, or one of the same
+bit depth, when the caller knows it; a parameter that depends on it (a
+`curves` x-point, issue #33) is checked against it too. `None` checks
+only what holds for every format.
 
 ```pycon
 >>> check_params("curves", {"all": [(0, 0), (0.5, 0.5), (0.501, 1)]})
@@ -9689,7 +9726,14 @@ Everything registered for an effect, registration order preserved.
 * **Return type:**
   [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`ImplRef`](_autosummary/looks.spec.html.md#looks.spec.ImplRef), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
 
-#### register(impl, compiler, , cost=None, tags=(), known_filters=None)
+#### keeps_depth(key)
+
+Was this implementation registered as keeping the arriving bit depth?
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+#### register(impl, compiler, , cost=None, tags=(), known_filters=None, keeps_depth=False)
 
 Record an implementation. Returns it, so this reads well inline.
 
@@ -9706,6 +9750,16 @@ Record an implementation. Returns it, so this reads well inline.
   * **known_filters** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)]) – The filter universe to validate against. Defaults to
     the one compiled into this package. Pass a binary’s own set to
     validate against that instead.
+  * **keeps_depth** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Does the step hand the next one the bit depth it was
+    given, on every format in
+    [`looks.params.DEPTH_CARRIED_FORMATS`](_autosummary/looks.params.html.md#looks.params.DEPTH_CARRIED_FORMATS)? Measured, never
+    assumed: ffmpeg negotiates formats across the whole chain, and
+    `eq`, `vignette` (to 8 bits), `noise` and `halation`’s
+    `format` (to 16) do not. `compile_look` carries the clip’s
+    format past a step only when this is true, for the checks that
+    depend on it (issue #52). False, the default, means “not known
+    to”, and costs only a check skipped. Only an ffmpeg step can
+    claim it: a frame step hands on whatever the pipe carries.
 * **Raises:**
   * [**ImplConflict**](_autosummary/looks.registry.html.md#looks.registry.ImplConflict) – If the key is taken.
   * [**RegistryError**](_autosummary/looks.registry.html.md#looks.registry.RegistryError) – If the key is not `<effect>.<backend>.<variant>`,
@@ -11309,20 +11363,18 @@ frames...
 
 # About this build
 
-This documentation was built on **2026-11-02 16:45 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/a37e43321d04f3fb314b9ef63c61e8f31d6d9ce0"><code>a37e433</code></a> on branch <code>main</code>, for **looks 0.0.33** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 17:20 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/2c51ba46db10e11e87b1bbc0000c5e7f6c7caf49"><code>2c51ba4</code></a> on branch <code>main</code>, for **looks 0.0.34** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.33) is ahead of the latest release on PyPI (0.0.32): these docs describe unreleased code.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/looks/commit/a37e43321d04f3fb314b9ef63c61e8f31d6d9ce0"><code>a37e43321d04f3fb314b9ef63c61e8f31d6d9ce0</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/looks/commit/2c51ba46db10e11e87b1bbc0000c5e7f6c7caf49"><code>2c51ba46db10e11e87b1bbc0000c5e7f6c7caf49</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | <code>0.0.33</code>                                                                                                                                   |
+| Tags at this commit | <code>0.0.34</code>                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/looks</code>                                                                                                        |
 
@@ -11331,9 +11383,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/looks</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/41483802363">41483802363</a>       |
+| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/41489388212">41489388212</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>7f63444af679c25bf9e893d4f978a6e5cfb59cfe</code> (in the history of the built commit) |
+| Event commit | <code>efaa088479ba8b2ead14718dd417fbde550eec17</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -11358,13 +11410,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/looks/0.0.32/">0.0.32</a>, older than the documented version (0.0.33).
+Latest release: <a href="https://pypi.org/project/looks/0.0.34/">0.0.34</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout a37e43321d04f3fb314b9ef63c61e8f31d6d9ce0
+git checkout 2c51ba46db10e11e87b1bbc0000c5e7f6c7caf49
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

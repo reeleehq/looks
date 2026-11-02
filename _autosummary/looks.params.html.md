@@ -39,29 +39,30 @@ looks.params.ParamError: grain: unknown parameter 'strenght'; it takes ['seed', 
 
 ### Module Attributes
 
-| [`NO_DEFAULT`](#looks.params.NO_DEFAULT)              | A parameter with no default is left absent when omitted.                                                                                         |
-|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`DFLT_VIGNETTE_ANGLE`](#looks.params.DFLT_VIGNETTE_ANGLE)     | Vignette half-angle, radians.                                                                                                                    |
-| [`MAX_VIGNETTE_ANGLE`](#looks.params.MAX_VIGNETTE_ANGLE)      | `vignette` clips its angle to [0, PI/2] instead of refusing, so a larger one would compile to a picture nobody asked for.                        |
-| [`MAX_BLUR_SIGMA`](#looks.params.MAX_BLUR_SIGMA)          | `gblur` refuses a larger sigma ("Result too large"; 9.0 and 6.1).                                                                                |
-| [`DFLT_HALATION_TINT`](#looks.params.DFLT_HALATION_TINT)      | film halation is the red layer scattering back off the base.                                                                                     |
-| [`MAX_GRAIN_STRENGTH`](#looks.params.MAX_GRAIN_STRENGTH)      | `noise`'s `alls` range is 0..100.                                                                                                                |
-| [`DFLT_GRAIN_SEED`](#looks.params.DFLT_GRAIN_SEED)         | Pinned rather than ffmpeg's own default, for portability across builds.                                                                          |
-| [`MAX_GRAIN_SEED`](#looks.params.MAX_GRAIN_SEED)          | `noise`'s `all_seed` tops out at INT_MAX; its `-1` (a random seed) is below the range on purpose, since a seed is what makes grain reproducible. |
-| [`DFLT_WEAVE_AMPLITUDE`](#looks.params.DFLT_WEAVE_AMPLITUDE)    | Gate-weave wander, in pixels either side of centre.                                                                                              |
-| [`DFLT_WEAVE_FREQUENCY`](#looks.params.DFLT_WEAVE_FREQUENCY)    | Horizontal and vertical wander, Hz.                                                                                                              |
-| [`DFLT_INTERP`](#looks.params.DFLT_INTERP)             | `lut3d`'s interpolation.                                                                                                                         |
-| [`MAX_CUBE_SIZE`](#looks.params.MAX_CUBE_SIZE)           | The largest `.cube` grid worth asking for (size\*\*3 entries; ffmpeg's own limit is 256).                                                        |
-| [`INTERP_MODES`](#looks.params.INTERP_MODES)            | `lut3d`'s `interp` values.                                                                                                                       |
-| [`MAX_POSTERIZE_LEVELS`](#looks.params.MAX_POSTERIZE_LEVELS)    | One code value per level on an 8-bit channel; more levels than that is the identity, and an absurd count only makes a huge expression.           |
-| [`MAX_FLATTEN_SPATIAL`](#looks.params.MAX_FLATTEN_SPATIAL)     | sigmaS 0..512, sigmaR 0..1, planes a 4-bit mask.                                                                                                 |
-| [`DFLT_RIPPLE_AMPLITUDE`](#looks.params.DFLT_RIPPLE_AMPLITUDE)   | The ripple warp (issue #49), normalised so one look reads the same at any size.                                                                  |
-| [`DFLT_RIPPLE_WAVELENGTHS`](#looks.params.DFLT_RIPPLE_WAVELENGTHS) | The two ripple harmonics' wavelengths, as fractions of the frame's height.                                                                       |
-| [`DFLT_RIPPLE_BLOOM`](#looks.params.DFLT_RIPPLE_BLOOM)       | Peak weight of the blurred, brightened copy mixed in at the middle.                                                                              |
-| [`CURVES_CHANNELS`](#looks.params.CURVES_CHANNELS)         | `looks` channel names to ffmpeg `curves` option names.                                                                                           |
-| [`COLORBALANCE_ZONES`](#looks.params.COLORBALANCE_ZONES)      | `colorbalance` tonal zones, keyed to the letter its options end in.                                                                              |
-| [`EFFECT_PARAMS`](#looks.params.EFFECT_PARAMS)           | Effect -> its parameters.                                                                                                                        |
-| [`PARAM_HINTS`](#looks.params.PARAM_HINTS)             | A refused key that deserves more than "unknown parameter".                                                                                       |
+| [`NO_DEFAULT`](#looks.params.NO_DEFAULT)              | A parameter with no default is left absent when omitted.                                                                                                                                            |
+|--------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`DFLT_VIGNETTE_ANGLE`](#looks.params.DFLT_VIGNETTE_ANGLE)     | Vignette half-angle, radians.                                                                                                                                                                       |
+| [`MAX_VIGNETTE_ANGLE`](#looks.params.MAX_VIGNETTE_ANGLE)      | `vignette` clips its angle to [0, PI/2] instead of refusing, so a larger one would compile to a picture nobody asked for.                                                                           |
+| [`MAX_BLUR_SIGMA`](#looks.params.MAX_BLUR_SIGMA)          | `gblur` refuses a larger sigma ("Result too large"; 9.0 and 6.1).                                                                                                                                   |
+| [`DFLT_HALATION_TINT`](#looks.params.DFLT_HALATION_TINT)      | film halation is the red layer scattering back off the base.                                                                                                                                        |
+| [`MAX_GRAIN_STRENGTH`](#looks.params.MAX_GRAIN_STRENGTH)      | `noise`'s `alls` range is 0..100.                                                                                                                                                                   |
+| [`DFLT_GRAIN_SEED`](#looks.params.DFLT_GRAIN_SEED)         | Pinned rather than ffmpeg's own default, for portability across builds.                                                                                                                             |
+| [`MAX_GRAIN_SEED`](#looks.params.MAX_GRAIN_SEED)          | `noise`'s `all_seed` tops out at INT_MAX; its `-1` (a random seed) is below the range on purpose, since a seed is what makes grain reproducible.                                                    |
+| [`DFLT_WEAVE_AMPLITUDE`](#looks.params.DFLT_WEAVE_AMPLITUDE)    | Gate-weave wander, in pixels either side of centre.                                                                                                                                                 |
+| [`DFLT_WEAVE_FREQUENCY`](#looks.params.DFLT_WEAVE_FREQUENCY)    | Horizontal and vertical wander, Hz.                                                                                                                                                                 |
+| [`DFLT_INTERP`](#looks.params.DFLT_INTERP)             | `lut3d`'s interpolation.                                                                                                                                                                            |
+| [`MAX_CUBE_SIZE`](#looks.params.MAX_CUBE_SIZE)           | The largest `.cube` grid worth asking for (size\*\*3 entries; ffmpeg's own limit is 256).                                                                                                           |
+| [`INTERP_MODES`](#looks.params.INTERP_MODES)            | `lut3d`'s `interp` values.                                                                                                                                                                          |
+| [`MAX_POSTERIZE_LEVELS`](#looks.params.MAX_POSTERIZE_LEVELS)    | One code value per level on an 8-bit channel; more levels than that is the identity, and an absurd count only makes a huge expression.                                                              |
+| [`MAX_FLATTEN_SPATIAL`](#looks.params.MAX_FLATTEN_SPATIAL)     | sigmaS 0..512, sigmaR 0..1, planes a 4-bit mask.                                                                                                                                                    |
+| [`DFLT_RIPPLE_AMPLITUDE`](#looks.params.DFLT_RIPPLE_AMPLITUDE)   | The ripple warp (issue #49), normalised so one look reads the same at any size.                                                                                                                     |
+| [`DFLT_RIPPLE_WAVELENGTHS`](#looks.params.DFLT_RIPPLE_WAVELENGTHS) | The two ripple harmonics' wavelengths, as fractions of the frame's height.                                                                                                                          |
+| [`DFLT_RIPPLE_BLOOM`](#looks.params.DFLT_RIPPLE_BLOOM)       | Peak weight of the blurred, brightened copy mixed in at the middle.                                                                                                                                 |
+| [`CURVES_CHANNELS`](#looks.params.CURVES_CHANNELS)         | `looks` channel names to ffmpeg `curves` option names.                                                                                                                                              |
+| [`COLORBALANCE_ZONES`](#looks.params.COLORBALANCE_ZONES)      | `colorbalance` tonal zones, keyed to the letter its options end in.                                                                                                                                 |
+| [`DEPTH_CARRIED_FORMATS`](#looks.params.DEPTH_CARRIED_FORMATS)   | Formats whose bit depth survives a step registered with `keeps_depth` (`EffectRegistry.register`), so `compile_look` may carry the clip's format past such a step for the depth checks (issue #52). |
+| [`EFFECT_PARAMS`](#looks.params.EFFECT_PARAMS)           | Effect -> its parameters.                                                                                                                                                                           |
+| [`PARAM_HINTS`](#looks.params.PARAM_HINTS)             | A refused key that deserves more than "unknown parameter".                                                                                                                                          |
 
 ### Functions
 
@@ -95,6 +96,16 @@ looks.params.ParamError: grain: unknown parameter 'strenght'; it takes ['seed', 
 ### looks.params.CURVES_CHANNELS *= ('all', 'red', 'green', 'blue')*
 
 `looks` channel names to ffmpeg `curves` option names.
+
+### looks.params.DEPTH_CARRIED_FORMATS *: [frozenset](https://docs.python.org/3/builtins/stdtypes.html#frozenset)* *= frozenset({'0bgr', '0rgb', 'abgr', 'argb', 'bgr0', 'bgr24', 'bgr48be', 'bgr48le', 'bgra', 'bgra64be', 'bgra64le', 'gbrap', 'gbrap16be', 'gbrap16le', 'gbrapf32be', 'gbrapf32le', 'gbrp', 'gbrp10be', 'gbrp10le', 'gbrp12be', 'gbrp12le', 'gbrp16be', 'gbrp16le', 'gbrp9be', 'gbrp9le', 'gbrpf32be', 'gbrpf32le', 'gray', 'gray10be', 'gray10le', 'gray12be', 'gray12le', 'gray16be', 'gray16le', 'gray9be', 'gray9le', 'grayf32be', 'grayf32le', 'nv12', 'nv16', 'nv21', 'nv24', 'p010be', 'p010le', 'p012be', 'p012le', 'p016be', 'p016le', 'p210be', 'p210le', 'p216be', 'p216le', 'p410be', 'p410le', 'p416be', 'p416le', 'rgb0', 'rgb24', 'rgb48be', 'rgb48le', 'rgba', 'rgba64be', 'rgba64le', 'uyvy422', 'x2bgr10le', 'x2rgb10le', 'ya16be', 'ya16le', 'ya8', 'yuv411p', 'yuv420p', 'yuv420p10be', 'yuv420p10le', 'yuv420p12be', 'yuv420p12le', 'yuv420p16be', 'yuv420p16le', 'yuv420p9be', 'yuv420p9le', 'yuv422p', 'yuv422p10be', 'yuv422p10le', 'yuv422p12be', 'yuv422p12le', 'yuv422p16be', 'yuv422p16le', 'yuv440p', 'yuv444p', 'yuv444p10be', 'yuv444p10le', 'yuv444p12be', 'yuv444p12le', 'yuv444p16be', 'yuv444p16le', 'yuv444p9be', 'yuv444p9le', 'yuva420p', 'yuva444p', 'yuva444p16be', 'yuva444p16le', 'yuvj411p', 'yuvj420p', 'yuvj422p', 'yuvj444p', 'yuyv422'})*
+
+Formats whose bit depth survives a step registered with `keeps_depth`
+(`EffectRegistry.register`), so `compile_look` may carry the clip’s
+format past such a step for the depth checks (issue #52). Measured on 6.1
+and 9.0, every keeper on every `CURVES_DEPTH` format: these 18 are
+the exceptions, all RAISED to 16 bits by some keeper (`unsharp` takes
+every 14-bit format there, `lutyuv` the 10- and 12-bit alpha ones, `geq`
+`gbrap12`), and a carried check would refuse what ffmpeg accepts.
 
 ### looks.params.DFLT_GRAIN_SEED *= 0*
 
@@ -256,9 +267,10 @@ An effect with no schema is not checked. Only present keys are checked:
 an absent one takes its declared default, so a check never has a second
 copy of it.
 
-`pix_fmt` is the pixel format the effect receives, when the caller knows
-it; a parameter that depends on it (a `curves` x-point, issue #33) is
-checked against it too. `None` checks only what holds for every format.
+`pix_fmt` is the pixel format the effect receives, or one of the same
+bit depth, when the caller knows it; a parameter that depends on it (a
+`curves` x-point, issue #33) is checked against it too. `None` checks
+only what holds for every format.
 
 ```pycon
 >>> check_params("curves", {"all": [(0, 0), (0.5, 0.5), (0.501, 1)]})

@@ -2,20 +2,18 @@
 
 # About this build
 
-This documentation was built on **2026-11-02 16:45 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/a37e43321d04f3fb314b9ef63c61e8f31d6d9ce0"><code>a37e433</code></a> on branch <code>main</code>, for **looks 0.0.33** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 17:20 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/2c51ba46db10e11e87b1bbc0000c5e7f6c7caf49"><code>2c51ba4</code></a> on branch <code>main</code>, for **looks 0.0.34** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.33) is ahead of the latest release on PyPI (0.0.32): these docs describe unreleased code.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/looks/commit/a37e43321d04f3fb314b9ef63c61e8f31d6d9ce0"><code>a37e43321d04f3fb314b9ef63c61e8f31d6d9ce0</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/looks/commit/2c51ba46db10e11e87b1bbc0000c5e7f6c7caf49"><code>2c51ba46db10e11e87b1bbc0000c5e7f6c7caf49</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | <code>0.0.33</code>                                                                                                                                   |
+| Tags at this commit | <code>0.0.34</code>                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/looks</code>                                                                                                        |
 
@@ -24,9 +22,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/looks</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/41483802363">41483802363</a>       |
+| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/41489388212">41489388212</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>7f63444af679c25bf9e893d4f978a6e5cfb59cfe</code> (in the history of the built commit) |
+| Event commit | <code>efaa088479ba8b2ead14718dd417fbde550eec17</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -51,13 +49,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/looks/0.0.32/">0.0.32</a>, older than the documented version (0.0.33).
+Latest release: <a href="https://pypi.org/project/looks/0.0.34/">0.0.34</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout a37e43321d04f3fb314b9ef63c61e8f31d6d9ce0
+git checkout 2c51ba46db10e11e87b1bbc0000c5e7f6c7caf49
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

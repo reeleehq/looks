@@ -859,7 +859,14 @@ Everything registered for an effect, registration order preserved.
 * **Return type:**
   [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`ImplRef`](looks.spec.html.md#looks.spec.ImplRef), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
 
-#### register(impl, compiler, , cost=None, tags=(), known_filters=None)
+#### keeps_depth(key)
+
+Was this implementation registered as keeping the arriving bit depth?
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+#### register(impl, compiler, , cost=None, tags=(), known_filters=None, keeps_depth=False)
 
 Record an implementation. Returns it, so this reads well inline.
 
@@ -876,6 +883,16 @@ Record an implementation. Returns it, so this reads well inline.
   * **known_filters** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)]) – The filter universe to validate against. Defaults to
     the one compiled into this package. Pass a binary’s own set to
     validate against that instead.
+  * **keeps_depth** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Does the step hand the next one the bit depth it was
+    given, on every format in
+    [`looks.params.DEPTH_CARRIED_FORMATS`](looks.params.html.md#looks.params.DEPTH_CARRIED_FORMATS)? Measured, never
+    assumed: ffmpeg negotiates formats across the whole chain, and
+    `eq`, `vignette` (to 8 bits), `noise` and `halation`’s
+    `format` (to 16) do not. `compile_look` carries the clip’s
+    format past a step only when this is true, for the checks that
+    depend on it (issue #52). False, the default, means “not known
+    to”, and costs only a check skipped. Only an ffmpeg step can
+    claim it: a frame step hands on whatever the pipe carries.
 * **Raises:**
   * [**ImplConflict**](#looks.ImplConflict) – If the key is taken.
   * [**RegistryError**](#looks.RegistryError) – If the key is not `<effect>.<backend>.<variant>`,
@@ -2674,8 +2691,12 @@ Compile a Look into a plan. No process is started and no file is written.
   * **clip** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ClipSpec`](looks.spec.html.md#looks.spec.ClipSpec)]) – What it is being applied to. Needed by any effect whose answer
     depends on the frame — its absence is only an error if an effect
     asks for it. Its `pix_fmt` is what the first step receives, and
-    that step’s parameters are checked against it (a `curves` whose
-    x-points share one code value of it is refused, issue #33).
+    what each later one receives as far as bit depth goes while every
+    step before it keeps depth (`EffectRegistry.register`’s
+    `keeps_depth`) and the format is one measured to survive that
+    ([`looks.params.DEPTH_CARRIED_FORMATS`](looks.params.html.md#looks.params.DEPTH_CARRIED_FORMATS)). Those steps’ parameters are checked against it:
+    a `curves` whose x-points share one code value is refused
+    (issues #33, #52).
   * **env** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`FfmpegEnv`](looks.environment.html.md#looks.environment.FfmpegEnv)]) – Which binary. When given, an implementation whose filters this
     build lacks is dropped from selection rather than discovered at
     run time.
@@ -2703,7 +2724,7 @@ Compile a Look into a plan. No process is started and no file is written.
         undeclared (rule 22) and not assumed. ffmpeg would pick a matrix
         for it, and on some builds picks wrongly.
   * [**CompileError**](#looks.CompileError) – If an effect’s parameters are refused by its schema,
-        the first step’s also against `clip.pix_fmt`.
+        and a step the clip’s depth reaches also against `clip.pix_fmt`.
   * [**CompileError**](#looks.CompileError) – If an effect has no admissible implementation. The
         message says which constraint emptied the pool, because “no
         implementation available” alone is the least useful refusal in the
