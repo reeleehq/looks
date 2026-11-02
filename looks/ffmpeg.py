@@ -648,6 +648,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         ("lut3d",),
         _gradient_map_compiler,
         time_varying=False,
+        keeps_depth=True,
     )
     add(
         "lut3d.ffmpeg.default",
@@ -657,6 +658,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
             lambda p: {"file": p["cube"], "interp": p["interp"]},
         ),
         time_varying=False,
+        keeps_depth=True,
     )
     add(
         "saturation.ffmpeg.colorchannelmixer",
@@ -791,6 +793,9 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         ("crop", "setpts"),
         _motion_compiler,
         timeline=False,
+        # keeps_depth stays False: a pan compiles to `crop` and keeps depth,
+        # but a zoom compiles to `zoompan`, 8-bit only (measured, #60), and
+        # which one is the keyframes' choice, not the implementation's.
         # `zoompan`/`crop` compile to expressions that reference `in_time` —
         # the one implementation registered here that reads the clock
         # regardless of any Effect.at span. See issue #17: `timeline=False`
