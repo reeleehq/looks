@@ -45,8 +45,8 @@ from __future__ import annotations
 import os
 import tempfile
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Iterator, Optional, Union
+from pathlib import Path, PurePath
+from typing import Callable, Iterator, Optional, Union
 
 from looks.lut import (
     DFLT_CUBE_SIZE,
@@ -267,8 +267,28 @@ def pending(plan) -> tuple[str, ...]:
     )
 
 
-def materialize(plan, *, into: Optional[Union[str, Path]] = None):
+def materialize(
+    plan,
+    *,
+    into: Optional[Union[str, Path]] = None,
+    name_of: Optional[Callable[[Path], Union[str, PurePath]]] = None,
+):
     """Build every artifact this plan asks for, and return a plan that has them.
+
+    ``name_of`` is how the filter names a cube it was given: by default its
+    absolute path, so the fragment runs anywhere on this machine. A host that
+    resolves names itself passes a function of the cube's path, e.g.
+    ``lambda p: p.relative_to(lut_dir)`` for ``lut3d=file=<key>.cube``, and
+    keeps no host path in what it stores (reeleehq/muvid#252). It returns a
+    string or a path; a path is written with forward slashes on every OS, since
+    a name is not a Windows path. The name is escaped as the path would have
+    been. ``payload["cube"]`` stays the absolute path either way: it is where
+    the file is, not what to call it, and so a materialised plan's
+    ``plan_hash`` still depends on the folder.
+
+    A step's name is chosen when its cube is built. Giving ``name_of`` for a
+    plan already materialised is refused: the request it would rename from is
+    gone, and ignoring the argument would leave the absolute path in silently.
 
     The split this preserves is the reason it is a separate verb rather than
     part of compiling: **`compile_look` starts no process and writes no file**,
@@ -306,6 +326,13 @@ def materialize(plan, *, into: Optional[Union[str, Path]] = None):
         True
         >>> ready.steps[0].payload['filter'].startswith('lut3d=file=')
         True
+
+        A host that names cubes relative to its own folder:
+
+        >>> with tempfile.TemporaryDirectory() as tmp:
+        ...     named = materialize(plan, into=tmp, name_of=lambda p: p.name)
+        ...     named.steps[0].payload['filter'] == f"lut3d=file={Path(named.steps[0].payload['cube']).name}"
+        True
     """
     import dataclasses
 
@@ -314,6 +341,12 @@ def materialize(plan, *, into: Optional[Union[str, Path]] = None):
     for step in plan.steps:
         request = step.payload.get(PENDING)
         if request is None:
+            if name_of is not None and "cube" in step.payload:
+                raise CacheError(
+                    f"step {step.effect!r} was materialised already, so its cube "
+                    "has its name; name_of applies when the cube is built. "
+                    "Materialise the portable plan (the one compile_look returned)."
+                )
             steps.append(step)
             continue
         built = cube_file(
@@ -323,13 +356,23 @@ def materialize(plan, *, into: Optional[Union[str, Path]] = None):
             into=into,
         )
         payload = {k: v for k, v in step.payload.items() if k != PENDING}
-        payload["filter"] = request["filter_template"].format(
-            file=_escaped(os.fspath(built))
-        )
+        name = os.fspath(built) if name_of is None else _name(name_of(built.path))
+        payload["filter"] = request["filter_template"].format(file=_escaped(name))
         payload["cube"] = os.fspath(built)
         steps.append(dataclasses.replace(step, payload=payload))
         changed = True
     return dataclasses.replace(plan, steps=tuple(steps)) if changed else plan
+
+
+def _name(given) -> str:
+    """What a host's ``name_of`` returned, as the text the filter carries."""
+    if isinstance(given, PurePath):
+        return given.as_posix()
+    if isinstance(given, str):
+        return given
+    raise TypeError(
+        f"name_of must return a str or a path, got {type(given).__name__}: {given!r}"
+    )
 
 
 def _escaped(value: str) -> str:

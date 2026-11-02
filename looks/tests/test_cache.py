@@ -385,6 +385,115 @@ class TestThePlanLevelVerb:
         )
         assert materialize(plan) is plan
 
+    def test_a_host_can_name_the_cube_relative_to_its_own_folder(self, tmp_path):
+        """reeleehq/looks#51: muvid stores ``lut3d=file=<name>`` and resolves
+        the name at render time, so an absolute path in the filter is refused
+        by its gate. The file's location stays absolute in the payload."""
+        import shutil
+
+        from looks.cache import materialize
+        from looks.ffmpeg import vf
+
+        ready = materialize(
+            self._plan(), into=tmp_path, name_of=lambda p: p.relative_to(tmp_path)
+        )
+        cube = Path(ready.steps[0].payload["cube"])
+        assert cube.is_absolute() and cube.parent == tmp_path
+        fragment = vf(ready)
+        assert f"lut3d=file={cube.name}:" in fragment
+        assert str(tmp_path) not in fragment
+        if shutil.which("ffmpeg") is None:
+            pytest.skip("ffmpeg not on PATH")
+        proc = subprocess.run(
+            [
+                "ffmpeg",
+                "-v",
+                "error",
+                "-f",
+                "lavfi",
+                "-i",
+                "testsrc2=size=64x48:rate=5:duration=0.2",
+                "-vf",
+                fragment,
+                "-f",
+                "null",
+                "-",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=tmp_path,
+        )
+        assert proc.returncode == 0, proc.stderr
+
+    @staticmethod
+    def _hand_plan():
+        """A pending plan built by hand, so a test of naming needs no ffmpeg
+        (Windows CI has none, and would skip it)."""
+        from looks.cache import PENDING
+        from looks.licence import Tier, terms_for
+        from looks.spec import ImplRef, LookPlan, Step
+
+        impl = ImplRef(
+            effect="gradient_map",
+            backend="ffmpeg",
+            impl="gradient_map.ffmpeg.lut3d",
+            terms=terms_for("ffmpeg")[0],
+        )
+        request = {
+            "stops": [list(s) for s in STOPS],
+            "size": 9,
+            "title": "demo",
+            "contrast": 1.0,
+            "lift": 0.0,
+            "key": "unused",
+            "filter_template": "lut3d=file={file}",
+        }
+        step = Step(
+            effect="gradient_map",
+            impl=impl,
+            tier=Tier.COPYLEFT_TOOL,
+            payload={PENDING: request},
+        )
+        return LookPlan(steps=(step,))
+
+    def test_a_host_name_is_escaped_like_a_path(self, tmp_path):
+        from looks.cache import materialize
+
+        ready = materialize(
+            self._hand_plan(), into=tmp_path, name_of=lambda p: "a,b:c.cube"
+        )
+        assert ready.steps[0].payload["filter"] == "lut3d=file=a\\,b\\\\:c.cube"
+
+    def test_a_path_name_is_written_with_forward_slashes_on_every_os(self, tmp_path):
+        """muvid refuses ``film\\x.cube``; a name is not a Windows path."""
+        from pathlib import PureWindowsPath
+
+        from looks.cache import materialize
+
+        ready = materialize(
+            self._hand_plan(),
+            into=tmp_path,
+            name_of=lambda p: PureWindowsPath("film") / p.name,
+        )
+        cube = Path(ready.steps[0].payload["cube"]).name
+        assert ready.steps[0].payload["filter"] == f"lut3d=file=film/{cube}"
+
+    @pytest.mark.parametrize("bad", [7, b"x.cube", None])
+    def test_a_name_that_is_not_a_str_or_a_path_is_refused(self, tmp_path, bad):
+        from looks.cache import materialize
+
+        with pytest.raises(TypeError, match="name_of must return"):
+            materialize(self._hand_plan(), into=tmp_path, name_of=lambda p: bad)
+
+    def test_renaming_a_plan_already_materialised_is_refused(self, tmp_path):
+        """Not ignored: the absolute path would stay in the filter silently."""
+        from looks.cache import CacheError, materialize
+
+        once = materialize(self._hand_plan(), into=tmp_path)
+        with pytest.raises(CacheError, match="materialised already"):
+            materialize(once, into=tmp_path, name_of=lambda p: p.name)
+        assert materialize(once, into=tmp_path) is once
+
     def test_the_path_reaches_the_filter_ESCAPED(self, tmp_path):
         """The flagship effect takes a caller-supplied directory, and a comma
         in it would otherwise end the filter."""
