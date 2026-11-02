@@ -87,7 +87,9 @@ def test_a_vector_parameter_refuses_the_same_laxities(effect, key, bad):
         check_params(effect, {key: bad})
 
 
-@pytest.mark.parametrize("bad", [True, "0/0 1/1", [(0, math.inf), (1, 1)], [(0, True), (1, 1)]])
+@pytest.mark.parametrize(
+    "bad", [True, "0/0 1/1", [(0, math.inf), (1, 1)], [(0, True), (1, 1)]]
+)
 def test_a_curve_refuses_the_same_laxities(bad):
     with pytest.raises(ParamError, match="all"):
         check_params("curves", {"all": bad})
@@ -211,9 +213,24 @@ def test_the_two_blurs_have_the_same_spread_in_rendered_pixels():
         fragment = get_compiler(key)({"sigma": 5})["filter"]
         source = "color=c=black:size=66x66:rate=1,drawbox=x=33:y=0:w=1:h=66:color=white:t=fill"
         raw = subprocess.run(
-            ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", source, "-vf",
-             f"format=gray,{fragment}", "-frames:v", "1", "-f", "rawvideo", "-"],
-            capture_output=True, check=True,
+            [
+                "ffmpeg",
+                "-v",
+                "error",
+                "-f",
+                "lavfi",
+                "-i",
+                source,
+                "-vf",
+                f"format=gray,{fragment}",
+                "-frames:v",
+                "1",
+                "-f",
+                "rawvideo",
+                "-",
+            ],
+            capture_output=True,
+            check=True,
         ).stdout
         row = raw[33 * 66 : 34 * 66]
         total = sum(row)
@@ -306,13 +323,35 @@ def test_compile_look_refuses_on_an_8_bit_clip_and_accepts_on_10(env):
     _compile(env, curves, "yuv420p10le")
 
 
-def test_a_curves_after_another_step_is_not_depth_checked(env):
-    """A later step's format is ffmpeg's negotiation, which nothing here knows."""
-    steps = (
-        Effect(name="levels", params={}),
-        Effect(name="curves", params={"all": CLOSE_AT_8}),
-    )
-    _compile(env, steps, "yuv420p")
+@pytest.mark.filterwarnings("ignore::looks.stages.StageOrderWarning")
+@pytest.mark.parametrize(
+    "before, checked",
+    [
+        (("levels",), True),
+        (("levels", "saturation", "blur"), True),
+        (("vignette",), False),
+        (("levels", "vignette"), False),
+        (("grain",), False),
+    ],
+)
+def test_the_clip_depth_reaches_curves_through_steps_that_keep_it(env, before, checked):
+    """Issue #52: the depth is carried past steps registered as keeping it, and
+    dropped at the first that is not (vignette goes to 8, grain to 16)."""
+    params = {
+        "levels": {},
+        "saturation": {"amount": 1.1},
+        "blur": {},
+        "vignette": {},
+        "grain": {},
+    }
+    steps = tuple(Effect(name=n, params=params[n]) for n in before)
+    steps += (Effect(name="curves", params={"all": CLOSE_AT_8}),)
+    if checked:
+        with pytest.raises(CompileError, match="one code value of yuv420p "):
+            _compile(env, steps, "yuv420p")
+        _compile(env, steps, "yuv420p10le")
+    else:
+        _compile(env, steps, "yuv420p")
 
 
 def _ffmpeg_accepts(fragment, pix_fmt) -> bool:
@@ -337,7 +376,8 @@ def _ffmpeg_accepts(fragment, pix_fmt) -> bool:
     ],
 )
 @pytest.mark.parametrize(
-    "points", [CLOSE_AT_8, CLOSE_AT_10, APART_BY_TRUNCATION, ON_THE_8_BIT_SCALE, AS_WRITTEN]
+    "points",
+    [CLOSE_AT_8, CLOSE_AT_10, APART_BY_TRUNCATION, ON_THE_8_BIT_SCALE, AS_WRITTEN],
 )
 def test_the_check_and_the_binary_agree(env, points, pix_fmt):
     """Run, not assumed: the refusal is ffmpeg's, at the depth ffmpeg negotiates."""
@@ -401,11 +441,18 @@ def test_every_listed_depth_is_the_one_curves_is_negotiated_to(env):
     depths = _pix_fmt_depths()
     assert set(CURVES_DEPTH) <= set(depths), "a listed format this ffmpeg lacks"
     with ThreadPoolExecutor() as pool:
-        got = dict(zip(CURVES_DEPTH, pool.map(lambda f: _negotiated_into_curves(env, f), CURVES_DEPTH)))
+        got = dict(
+            zip(
+                CURVES_DEPTH,
+                pool.map(lambda f: _negotiated_into_curves(env, f), CURVES_DEPTH),
+            )
+        )
     assert {f: depths[g] for f, g in got.items()} == dict(CURVES_DEPTH)
 
 
-@pytest.mark.parametrize("output_pix_fmt", ["yuv420p", "yuv420p10le", "rgb48le", "gbrp16le"])
+@pytest.mark.parametrize(
+    "output_pix_fmt", ["yuv420p", "yuv420p10le", "rgb48le", "gbrp16le"]
+)
 def test_the_depth_holds_whatever_the_output_format_is(env, output_pix_fmt):
     """`vf`'s matrix ``scale`` on BOTH sides of ``curves`` is what pins it.
 
@@ -418,3 +465,80 @@ def test_the_depth_holds_whatever_the_output_format_is(env, output_pix_fmt):
     for source, expected in (("yuv420p", "rgb24"), ("yuv420p10le", "gbrp10le")):
         got = _negotiated_into_curves(env, source, output_pix_fmt=output_pix_fmt)
         assert got == expected, (source, output_pix_fmt)
+
+
+#: Parameters that let every registered implementation compile on its own.
+#: An effect missing here cannot be measured, so it must not claim to keep depth.
+_SWEEP_PARAMS = {
+    "fit": {"target": "64x36"},
+    "fill": {"target": "64x36"},
+    "stretch": {"target": "64x36"},
+    "curves": {"all": [(0, 0), (1, 1)]},
+    "ripple": {"start_s": 0, "duration_s": 1},
+}
+_UNMEASURED = {"gradient_map", "lut3d", "motion"}
+
+
+def _depth_into_curves_after(env, key, pix_fmt):
+    """The bit depth a curves receives right after implementation ``key``, in
+    ``vf``'s own chain, read by showinfo."""
+    from looks.ffmpeg import vf
+    from looks.licence import Tier
+    from looks.spec import LookPlan, Step
+
+    clip = _clip(pix_fmt)
+
+    def step(name, k, params):
+        payload = REGISTRY.compiler(k)(params, clip=clip, env=env)
+        return Step(
+            effect=name,
+            impl=REGISTRY.impl(k),
+            tier=Tier.COPYLEFT_TOOL,
+            params=params,
+            payload=payload,
+        )
+
+    effect = REGISTRY.impl(key).effect
+    plan = LookPlan(
+        steps=(
+            step(effect, key, _SWEEP_PARAMS.get(effect, {})),
+            step("curves", "curves.ffmpeg.curves", _SWEEP_PARAMS["curves"]),
+        ),
+        clip=clip,
+    )
+    head, mark, tail = vf(plan).rpartition(":interp=pchip")
+    chain = f"{head}{mark},showinfo{tail}"  # right after the last step, curves
+    argv = ["ffmpeg", "-hide_banner", "-v", "info", "-f", "lavfi"]
+    argv += [
+        "-i",
+        f"testsrc2=size=64x36:rate=10:duration=0.1,format={pix_fmt}",
+        "-vf",
+        chain,
+    ]
+    argv += ["-frames:v", "1", "-f", "null", "-"]
+    run = subprocess.run(argv, capture_output=True, text=True)
+    shown = re.findall(r"Parsed_showinfo\S* .*fmt:(\S+)", run.stderr)
+    assert shown, f"{key}: {run.stderr[-300:]}"
+    return _pix_fmt_depths()[shown[-1]]
+
+
+@pytest.mark.parametrize("pix_fmt, depth", [("yuv420p10le", 10), ("yuv444p12le", 12)])
+def test_every_keeps_depth_declaration_is_measured(env, pix_fmt, depth):
+    """Each registration's ``keeps_depth`` against the binary: a step declared
+    to keep depth hands curves the clip's depth, and one that does hands it on
+    is declared. Measured on 6.1 and 9.0, preservation also composes: all 223
+    pairs of keeping steps kept 10 bits."""
+    if shutil.which("ffmpeg") is None:
+        pytest.skip("ffmpeg not on PATH")
+    wrong = {}
+    for effect in REGISTRY.effects():
+        for impl in REGISTRY.implementations(effect):
+            declared = REGISTRY.keeps_depth(impl.impl)
+            if effect in _UNMEASURED:
+                if declared:
+                    wrong[impl.impl] = "declared, and no measurement here"
+                continue
+            kept = _depth_into_curves_after(env, impl.impl, pix_fmt) == depth
+            if kept != declared:
+                wrong[impl.impl] = f"declared {declared}, measured {kept}"
+    assert wrong == {}

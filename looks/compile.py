@@ -103,8 +103,11 @@ def compile_look(
         clip: What it is being applied to. Needed by any effect whose answer
             depends on the frame — its absence is only an error if an effect
             asks for it. Its ``pix_fmt`` is what the first step receives, and
-            that step's parameters are checked against it (a ``curves`` whose
-            x-points share one code value of it is refused, issue #33).
+            what each later one receives as far as bit depth goes while every
+            step before it keeps depth (``EffectRegistry.register``'s
+            ``keeps_depth``). Those steps' parameters are checked against it:
+            a ``curves`` whose x-points share one code value is refused
+            (issues #33, #52).
         env: Which binary. When given, an implementation whose filters this
             build lacks is dropped from selection rather than discovered at
             run time.
@@ -133,7 +136,7 @@ def compile_look(
             undeclared (rule 22) and not assumed. ffmpeg would pick a matrix
             for it, and on some builds picks wrongly.
         CompileError: If an effect's parameters are refused by its schema,
-            the first step's also against ``clip.pix_fmt``.
+            and a step the clip's depth reaches also against ``clip.pix_fmt``.
         CompileError: If an effect has no admissible implementation. The
             message says which constraint emptied the pool, because "no
             implementation available" alone is the least useful refusal in the
@@ -152,20 +155,23 @@ def compile_look(
         warnings.warn(message, StageOrderWarning, stacklevel=2)
 
     steps = []
-    for index, effect in enumerate(concrete.steps):
+    # The clip's format stands for the bit depth a step receives for as long
+    # as every step before it was registered as keeping depth (issue #52).
+    # After one that was not, the depth is ffmpeg's negotiation across the
+    # whole chain (eq and vignette drop a 10-bit clip to 8, noise and halation
+    # raise it to 16), and a guess would refuse what ffmpeg accepts.
+    arriving = None if clip is None else clip.pix_fmt
+    for effect in concrete.steps:
         impl = _select(
             effect,
             reg,
             policy=ceiling,
             available=available,
             env=env,
-            # Only the first step's input format is known: it receives the
-            # clip. A later one gets ffmpeg's negotiation across the whole
-            # chain, which no step declares (measured on 6.1 and 9.0, a 10-bit
-            # clip reaches a curves after lutyuv, eq or vignette at 8 bits and
-            # after noise at 16), and a guess would refuse what ffmpeg accepts.
-            pix_fmt=clip.pix_fmt if clip is not None and index == 0 else None,
+            pix_fmt=arriving,
         )
+        if not reg.keeps_depth(impl.impl):
+            arriving = None
         payload = _payload(reg, impl, effect, clip=clip, env=env)
         steps.append(
             Step(

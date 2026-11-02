@@ -517,9 +517,10 @@ def check_params(
     an absent one takes its declared default, so a check never has a second
     copy of it.
 
-    ``pix_fmt`` is the pixel format the effect receives, when the caller knows
-    it; a parameter that depends on it (a ``curves`` x-point, issue #33) is
-    checked against it too. ``None`` checks only what holds for every format.
+    ``pix_fmt`` is the pixel format the effect receives, or one of the same
+    bit depth, when the caller knows it; a parameter that depends on it (a
+    ``curves`` x-point, issue #33) is checked against it too. ``None`` checks
+    only what holds for every format.
 
     >>> check_params("curves", {"all": [(0, 0), (0.5, 0.5), (0.501, 1)]})
     >>> check_params("curves", {"all": [(0, 0), (0.5, 0.5), (0.501, 1)]}, pix_fmt="rgb24")

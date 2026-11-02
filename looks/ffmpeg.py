@@ -612,6 +612,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         preference=0,
         timeline=True,
         tags=(),
+        keeps_depth=False,
     ):
         # `time_varying` has no default, deliberately: `ImplRef.time_varying`
         # is unknown (`None`) unless declared, and unknown is not the same
@@ -638,6 +639,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
             ),
             compiler,
             tags=tags,
+            keeps_depth=keeps_depth,
         )
 
     # --- colour, LGPL first -------------------------------------------------
@@ -661,6 +663,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         ("colorchannelmixer",),
         _simple("colorchannelmixer", _saturation_matrix),
         time_varying=False,
+        keeps_depth=True,
     )
     add(
         "saturation.ffmpeg.eq",
@@ -675,6 +678,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         ("lutyuv",),
         _simple("lutyuv", _contrast_luma),
         time_varying=False,
+        keeps_depth=True,
     )
     add(
         "contrast.ffmpeg.eq",
@@ -689,6 +693,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         ("lutrgb",),
         _simple("lutrgb", _gamma_expression),
         time_varying=False,
+        keeps_depth=True,
     )
     add(
         "levels.ffmpeg.colorlevels",
@@ -705,12 +710,14 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
             },
         ),
         time_varying=False,
+        keeps_depth=True,
     )
     add(
         "posterize.ffmpeg.lutrgb",
         ("lutrgb",),
         _simple("lutrgb", _posterize_expression),
         time_varying=False,
+        keeps_depth=True,
     )
     add(
         "flatten.ffmpeg.bilateral",
@@ -727,6 +734,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
             },
         ),
         time_varying=False,
+        keeps_depth=True,
     )
 
     # --- spatial ------------------------------------------------------------
@@ -735,6 +743,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         ("gblur",),
         _simple("gblur", lambda p: {"sigma": p["sigma"]}),
         time_varying=False,
+        keeps_depth=True,
     )
     add(
         "blur.ffmpeg.boxblur",
@@ -743,6 +752,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         preference=1,
         tags=("gpl-gated",),
         time_varying=False,
+        keeps_depth=True,
     )
     add(
         "sharpen.ffmpeg.unsharp",
@@ -755,6 +765,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
             lambda p: {"luma_amount": p["amount"]},
         ),
         time_varying=False,
+        keeps_depth=True,
     )
 
     # --- geometry, wrapping looks.geometry ----------------------------------
@@ -771,6 +782,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
             _geometry(mode),
             timeline=False,
             time_varying=False,
+            keeps_depth=True,
         )
 
     # --- motion, wrapping looks.motion --------------------------------------
@@ -790,12 +802,19 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
     # --- film: grade, optical, grain (issue #25) ----------------------------
     # The catalogue's stage order is geometry -> grade -> look -> optical ->
     # grain; `looks` composes in the order asked and does not reorder.
-    add("curves.ffmpeg.curves", ("curves",), _curves_compiler, time_varying=False)
+    add(
+        "curves.ffmpeg.curves",
+        ("curves",),
+        _curves_compiler,
+        time_varying=False,
+        keeps_depth=True,
+    )
     add(
         "colorbalance.ffmpeg.colorbalance",
         ("colorbalance",),
         _colorbalance_compiler,
         time_varying=False,
+        keeps_depth=True,
     )
     add(
         "vignette.ffmpeg.vignette",
@@ -830,6 +849,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         _gate_weave_compiler,
         timeline=False,
         time_varying=True,
+        keeps_depth=True,
     )
     add(
         "ripple.ffmpeg.geq",
@@ -839,6 +859,7 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         # which has no timeline support. And it reads the clock by design.
         timeline=False,
         time_varying=True,
+        keeps_depth=True,
     )
     return reg
 
