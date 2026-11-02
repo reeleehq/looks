@@ -12,6 +12,7 @@ import shutil
 import pytest
 
 from looks.frame_dependency import (
+    NOISE_FLOOR,
     Dependency,
     assert_flicker_free,
     classify,
@@ -204,18 +205,16 @@ class TestTheTemporalProbe:
         for chain in (f"lut3d={cube}", "curves=preset=lighter", "gblur=sigma=2"):
             assert classify(chain).temporal_delta == 0.0, chain
 
-    def test_the_known_gap_is_recorded_rather_than_hidden(self):
-        """`tblend` reads independent and is temporal. Pinned so the limitation
-        is a recorded fact rather than a surprise — and so that if a future
-        probe closes it, this test fails and someone deletes it deliberately.
-
-        The cause is structural: `tblend` consumes two input frames per output
-        frame, so the trim that skips the perturbation for a normal filter lands
-        past it. Lengthening the perturbation from one frame to three changed
-        nothing — measured.
-        """
+    @pytest.mark.parametrize("chain", ["tblend=all_mode=average", "atadenoise"])
+    def test_the_known_gap_is_closed(self, chain):
+        """Issue #59: both read INDEPENDENT until the mid-sequence probes.
+        `tblend` emits one frame fewer than it reads, so a leading perturbation
+        hid in the frame the trim skipped; `atadenoise` never averages in a
+        black/white perturbation, only one within its threshold."""
         _ffmpeg_or_skip()
-        assert classify("tblend=all_mode=average").dependency is Dependency.INDEPENDENT
+        report = classify(chain)
+        assert report.dependency is Dependency.TEMPORAL, report
+        assert report.temporal_delta > NOISE_FLOOR
 
     def test_spatial_is_not_a_reachable_verdict(self):
         """It was declared and never returned. An enum member that never occurs
