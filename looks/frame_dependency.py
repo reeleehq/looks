@@ -202,6 +202,10 @@ TEMPORAL_PROBE_FRAMES = 3
 #: averaged in and this one is. Measured: `atadenoise` 2/255, stateless 0.
 TEMPORAL_NUDGE = 6
 
+#: Which `testsrc2` frame opens the mid-sequence probe: any but frame 0, which
+#: the tail opens with (see :func:`_mid_perturbation_probe`).
+MID_PROBE_HEAD_FRAME = 3
+
 
 @dataclass(frozen=True)
 class DependencyReport:
@@ -239,7 +243,7 @@ class DependencyReport:
         return self.dependency not in FLICKER_FREE
 
 
-def _ymax_values(graph: str, *, ffprobe: str, timeout: float) -> Optional[list]:
+def _ymax_values(graph: str, *, ffprobe: str, timeout: float) -> Optional[list[float]]:
     """Every frame's ``signalstats`` YMAX from a lavfi graph, or ``None`` if it
     did not run."""
     result = run(
@@ -401,7 +405,11 @@ def _mid_perturbation_probe(chain: str, *, nudge: Optional[int]) -> str:
       filter measured). ``None`` is the black/white form.
 
     The sequence is renumbered after ``concat``, which otherwise stacks
-    one-frame segments at the same timestamp.
+    one-frame segments at the same timestamp. The frame left out is chosen by
+    timestamp, so a chain that retimes its input (``setpts=2*PTS``) moves the
+    perturbation out of that slot and reads ``TEMPORAL``: retiming is out of
+    scope for a look, and the verdict errs toward refusal, not toward a false
+    "cannot flicker".
     """
     w, h = PROBE_SIZE
     step = 1 / PROBE_RATE
@@ -423,9 +431,15 @@ def _mid_perturbation_probe(chain: str, *, nudge: Optional[int]) -> str:
         f"format=yuv444p,{chain},format=yuv444p,{keep}"
     )
     tail = f"{textured}:d={PROBE_DURATION * 2}"
+    # A head unlike the tail's first frame: with the two equal, a median over
+    # {head, perturbed, tail} hides the perturbation (`tmedian` read 0).
+    head = (
+        f"{textured}:d={PROBE_DURATION},"
+        f"trim=start_frame={MID_PROBE_HEAD_FRAME}:end_frame={MID_PROBE_HEAD_FRAME + 1}"
+    )
     return (
-        f"{textured}:d={step}[ah];{a}[ap];{tail}[at];[ah][ap][at]{branch}[A];"
-        f"{textured}:d={step}[bh];{b}[bp];{tail}[bt];[bh][bp][bt]{branch}[B];"
+        f"{head}[ah];{a}[ap];{tail}[at];[ah][ap][at]{branch}[A];"
+        f"{head}[bh];{b}[bp];{tail}[bt];[bh][bp][bt]{branch}[B];"
         f"[A][B]blend=all_mode=difference,signalstats"
     )
 
@@ -552,9 +566,10 @@ def classify(
 def assert_flicker_free(chain: str, **kwargs) -> DependencyReport:
     """Raise unless ``chain`` provably cannot flicker.
 
-    **What a pass means, precisely: three probes could not make this effect
+    **What a pass means, precisely: the probes could not make this effect
     depend on anything they varied.** It is not a proof of frame independence —
-    `tblend` and `atadenoise` pass and are temporal. For an effect whose class
+    a temporal filter whose memory reaches beyond the frames sampled would
+    pass. For an effect whose class
     matters, pair this with the structural argument (a stateless per-pixel
     lookup cannot depend on anything else) or with a declared class this
     function is used to *falsify*.

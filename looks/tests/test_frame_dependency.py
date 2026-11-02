@@ -205,16 +205,24 @@ class TestTheTemporalProbe:
         for chain in (f"lut3d={cube}", "curves=preset=lighter", "gblur=sigma=2"):
             assert classify(chain).temporal_delta == 0.0, chain
 
-    @pytest.mark.parametrize("chain", ["tblend=all_mode=average", "atadenoise"])
+    @pytest.mark.parametrize("chain", ["tblend=all_mode=average", "atadenoise", "tmedian"])
     def test_the_known_gap_is_closed(self, chain):
-        """Issue #59: both read INDEPENDENT until the mid-sequence probes.
+        """Issue #59: all three read INDEPENDENT until the mid-sequence probes.
         `tblend` emits one frame fewer than it reads, so a leading perturbation
         hid in the frame the trim skipped; `atadenoise` never averages in a
-        black/white perturbation, only one within its threshold."""
+        black/white perturbation, only one within its threshold; `tmedian`
+        stamps its output with its window's start and medians a head equal to
+        the tail's first frame away, until the head was made different."""
         _ffmpeg_or_skip()
         report = classify(chain)
         assert report.dependency is Dependency.TEMPORAL, report
         assert report.temporal_delta > NOISE_FLOOR
+
+    def test_the_large_mid_perturbation_carries_tblend_by_a_margin(self):
+        """The black/white form is there for margin: `tblend` reads 110/255 on
+        it and 3 on the nudge."""
+        _ffmpeg_or_skip()
+        assert classify("tblend=all_mode=average").temporal_delta > 50
 
     def test_spatial_is_not_a_reachable_verdict(self):
         """It was declared and never returned. An enum member that never occurs
