@@ -70,6 +70,9 @@ class Param:
     #: as one, never as a bound it did not fail.
     is_type: Callable[[Any], bool] = lambda value: True
     type_expects: str = ""
+    #: A further check against the pixel format the effect receives, when that
+    #: is known: why the value does not fit it, or ``None`` when it does.
+    fits_format: Callable[[Any, str], Optional[str]] = lambda value, pix_fmt: None
 
 
 def as_emitted(value: float) -> float:
@@ -217,12 +220,49 @@ def vector(name, length, default=NO_DEFAULT, *, low=None, high=None):
     )
 
 
+def _curve_collision(points, pix_fmt: str) -> Optional[str]:
+    """Two x-points ``curves`` would put in one code value of ``pix_fmt``.
+
+    ffmpeg's own test, from ``vf_curves.c`` (6.1 and 9.0 alike): with
+    ``scale = 2**depth - 1``, it refuses a point unless ``(int)(x * scale)``
+    exceeds the previous point's. Truncation, not distance: at 8 bits ``0.0039``
+    and ``0.004`` are accepted (code values 0 and 1), ``0.5`` and ``0.501`` are
+    not (127 and 127). So the rule is reproduced, not approximated, and is
+    applied to the x-points as emitted. A format :data:`CURVES_DEPTH` does not
+    list is not checked here.
+
+    Each channel is checked on its own, so an ``all`` that ffmpeg never reads
+    (it fills only the channels left unset) is checked too: a curve nobody
+    sees is still not a document this package writes, as with the six-decimal
+    check.
+
+    >>> _curve_collision([(0, 0), (0.5, 0.5), (0.501, 0.6), (1, 1)], "yuv420p")
+    'x-points 0.5 and 0.501 fall in one code value of yuv420p (8-bit), which curves refuses'
+    >>> _curve_collision([(0, 0), (0.5, 0.5), (0.501, 0.6), (1, 1)], "yuv420p10le") is None
+    True
+    """
+    depth = CURVES_DEPTH.get(pix_fmt)
+    if depth is None or not points:
+        return None
+    scale = 2**depth - 1
+    xs = [as_emitted(x) for x, _y in points]
+    for a, b in zip(xs, xs[1:]):
+        if int(a * scale) >= int(b * scale):
+            return (
+                f"x-points {a:g} and {b:g} fall in one code value of {pix_fmt} "
+                f"({depth}-bit), which curves refuses"
+            )
+    return None
+
+
 def curve(name):
     """At least two ``(x, y)`` points in 0..1 with x strictly increasing.
 
     Checked as emitted: x-points closer than the six decimals the compiler
     writes become one point, and ``curves`` refuses the curve. An empty value
-    is accepted, because the compiler skips an empty channel too.
+    is accepted, because the compiler skips an empty channel too. Given the
+    pixel format the effect receives, x-points are also refused where
+    ``curves`` would truncate two of them to one code value of it.
     """
 
     def accepts(points) -> bool:
@@ -244,6 +284,7 @@ def curve(name):
         "must be at least two (x, y) points in 0..1 with x strictly "
         "increasing at six decimals",
         kind="curve",
+        fits_format=_curve_collision,
     )
 
 
@@ -306,6 +347,48 @@ CURVES_CHANNELS = ("all", "red", "green", "blue")
 
 #: `colorbalance` tonal zones, keyed to the letter its options end in.
 COLORBALANCE_ZONES = {"shadows": "s", "midtones": "m", "highlights": "h"}
+
+
+def _endian(*names: str) -> tuple[str, ...]:
+    return tuple(f"{n}{e}" for n in names for e in ("le", "be"))
+
+
+#: The bit depth ``curves`` runs at for a frame arriving in a pixel format.
+#: Measured on ffmpeg 6.1 and 9.0, the format negotiated into ``curves`` has
+#: the arriving format's component depth (``yuv420p10le`` -> ``gbrp10le``,
+#: ``p016le`` -> ``rgb48le``); a float format lands on 16, ``curves``' deepest,
+#: and one with sub-8-bit components on 8. That holds because :func:`looks.ffmpeg.vf`
+#: puts its colour-matrix ``scale`` in front of ``curves``: without it ffmpeg
+#: pulls ``curves`` toward the OUTPUT format (an 8-bit source written as
+#: ``rgb48le`` ran it at 16). ``test_params`` re-measures every entry.
+#: A format not listed here is not depth-checked, rather than guessed at.
+# fmt: off
+CURVES_DEPTH: Mapping[str, int] = {
+    **dict.fromkeys((
+        "yuv420p", "yuvj420p", "yuv422p", "yuvj422p", "yuv444p", "yuvj444p",
+        "yuv411p", "yuv440p", "yuva420p", "yuva444p", "nv12", "nv21", "nv16",
+        "yuvj411p", "nv24", "yuyv422", "uyvy422", "rgb24", "bgr24", "rgba",
+        "bgra", "argb", "abgr", "rgb0", "bgr0", "0rgb", "0bgr", "gbrp", "gbrap",
+        "gray", "ya8",
+    ), 8),
+    **dict.fromkeys(_endian("yuv420p9", "yuv444p9", "gbrp9", "gray9"), 9),
+    **dict.fromkeys(_endian(
+        "yuv420p10", "yuv422p10", "yuv444p10", "yuva420p10", "yuva444p10",
+        "p010", "p210", "p410", "gbrp10", "gbrap10", "gray10",
+    ), 10), "x2rgb10le": 10, "x2bgr10le": 10,
+    **dict.fromkeys(_endian(
+        "yuv420p12", "yuv422p12", "yuv444p12", "p012", "gbrp12", "gbrap12", "gray12",
+    ), 12),
+    **dict.fromkeys(
+        _endian("yuv420p14", "yuv422p14", "yuv444p14", "gbrp14", "gray14"), 14
+    ),
+    **dict.fromkeys(_endian(
+        "yuv420p16", "yuv422p16", "yuv444p16", "yuva444p16", "p016", "p216",
+        "p416", "rgb48", "bgr48", "rgba64", "bgra64", "gbrp16", "gbrap16",
+        "gray16", "ya16", "gbrpf32", "gbrapf32", "grayf32",
+    ), 16),
+}
+# fmt: on
 
 
 def _params(*params: Param) -> Mapping[str, Param]:
@@ -405,12 +488,23 @@ def check_params(
     params: Mapping[str, Any],
     *,
     schemas: Mapping[str, Mapping[str, Param]] = EFFECT_PARAMS,
+    pix_fmt: Optional[str] = None,
 ) -> None:
     """Refuse an unknown key or a value the effect could not honour.
 
     An effect with no schema is not checked. Only present keys are checked:
     an absent one takes its declared default, so a check never has a second
     copy of it.
+
+    ``pix_fmt`` is the pixel format the effect receives, when the caller knows
+    it; a parameter that depends on it (a ``curves`` x-point, issue #33) is
+    checked against it too. ``None`` checks only what holds for every format.
+
+    >>> check_params("curves", {"all": [(0, 0), (0.5, 0.5), (0.501, 1)]})
+    >>> check_params("curves", {"all": [(0, 0), (0.5, 0.5), (0.501, 1)]}, pix_fmt="rgb24")
+    Traceback (most recent call last):
+    ...
+    looks.params.ParamError: curves: all: x-points 0.5 and 0.501 fall in one code value of rgb24 (8-bit), which curves refuses
 
     Raises:
         ParamError: Naming the effect, the key and what it expects.
@@ -433,6 +527,9 @@ def check_params(
             )
         if not param.accepts(value):
             raise ParamError(f"{effect}: {key} {param.expects}; got {value!r}")
+        misfit = None if pix_fmt is None else param.fits_format(value, pix_fmt)
+        if misfit:
+            raise ParamError(f"{effect}: {key}: {misfit}")
 
 
 def with_defaults(

@@ -5,6 +5,9 @@ where a test says so and skips without one.
 """
 
 import math
+import re
+import shutil
+import subprocess
 
 import pytest
 
@@ -218,3 +221,200 @@ def test_the_two_blurs_have_the_same_spread_in_rendered_pixels():
         return (sum(v * (i - mean) ** 2 for i, v in enumerate(row)) / total) ** 0.5
 
     assert abs(spread("blur.ffmpeg.gblur") - spread("blur.ffmpeg.boxblur")) < 0.5
+
+
+# ---------------------------------------------- curves and the pixel format (#33)
+#
+# ffmpeg refuses two `curves` x-points that truncate to one code value of the
+# format `curves` runs at: `(int)(x * (2**depth - 1))` must strictly increase.
+
+#: Refused at 8 bits (127, 127), accepted at 10 (511, 512).
+CLOSE_AT_8 = [(0, 0), (0.5, 0.5), (0.501, 0.6), (1, 1)]
+#: Refused at 10 bits (511, 511), accepted at 16 (32767, 32787).
+CLOSE_AT_10 = [(0, 0), (0.5, 0.5), (0.5003, 0.6), (1, 1)]
+#: At ffmpeg's scale of 255 (not 256) both are code value 127, so refused at 8
+#: bits; an off-by-one scale would put 0.5 at 128 and accept it.
+ON_THE_8_BIT_SCALE = [(0, 0), (0.4999, 0.4), (0.5, 0.6), (1, 1)]
+#: 0.5019605 is written 0.50196, which is 128.0 at 8 bits and so accepted; read
+#: unrounded it is 128.00001 too, but 0.5019605 * 255 lands BELOW 128 once the
+#: check forgets the six decimals the compiler writes.
+AS_WRITTEN = [(0, 0), (0.5, 0.5), (0.5019605, 0.6), (1, 1)]
+#: 0.0001 apart, yet in different 8-bit code values (0, 1): the rule truncates,
+#: it does not measure distance, so this is accepted.
+APART_BY_TRUNCATION = [(0.0039, 0), (0.004, 0.5), (1, 1)]
+
+
+@pytest.mark.parametrize(
+    "points, pix_fmt, refused",
+    [
+        (CLOSE_AT_8, "yuv420p", True),
+        (CLOSE_AT_8, "yuv420p10le", False),
+        (CLOSE_AT_10, "yuv420p10le", True),
+        (CLOSE_AT_10, "yuv444p16le", False),
+        (CLOSE_AT_10, "rgb48le", False),
+        (APART_BY_TRUNCATION, "rgb24", False),
+        (ON_THE_8_BIT_SCALE, "rgb24", True),
+        (AS_WRITTEN, "rgb24", False),
+    ],
+)
+def test_curves_refuses_points_in_one_code_value_of_the_format(
+    points, pix_fmt, refused
+):
+    if refused:
+        with pytest.raises(ParamError, match=f"one code value of {pix_fmt}"):
+            check_params("curves", {"red": points}, pix_fmt=pix_fmt)
+    else:
+        check_params("curves", {"red": points}, pix_fmt=pix_fmt)
+
+
+@pytest.mark.parametrize("pix_fmt", [None, "some_format_nobody_listed"])
+def test_without_a_known_format_only_the_six_decimal_check_applies(pix_fmt):
+    check_params("curves", {"all": CLOSE_AT_10}, pix_fmt=pix_fmt)
+    with pytest.raises(ParamError, match="six decimals"):
+        check_params(
+            "curves", {"all": [(0, 0), (0.5, 0.5), (0.5000001, 1)]}, pix_fmt=pix_fmt
+        )
+
+
+def _clip(pix_fmt):
+    from looks.spec import ClipSpec
+
+    return ClipSpec(width=64, height=64, fps=10.0, pix_fmt=pix_fmt, color_space="bt709")
+
+
+def _compile(env, steps, pix_fmt):
+    from looks.compile import compile_look
+    from looks.spec import Look
+
+    return compile_look(Look(steps=steps), clip=_clip(pix_fmt), env=env)
+
+
+@pytest.fixture(scope="module")
+def env():
+    from looks.environment import probe
+
+    e = probe()
+    if not e.available:
+        pytest.skip("ffmpeg not usable")
+    return e
+
+
+def test_compile_look_refuses_on_an_8_bit_clip_and_accepts_on_10(env):
+    curves = (Effect(name="curves", params={"all": CLOSE_AT_8}),)
+    with pytest.raises(CompileError, match="one code value of yuv420p "):
+        _compile(env, curves, "yuv420p")
+    _compile(env, curves, "yuv420p10le")
+
+
+def test_a_curves_after_another_step_is_not_depth_checked(env):
+    """A later step's format is ffmpeg's negotiation, which nothing here knows."""
+    steps = (
+        Effect(name="levels", params={}),
+        Effect(name="curves", params={"all": CLOSE_AT_8}),
+    )
+    _compile(env, steps, "yuv420p")
+
+
+def _ffmpeg_accepts(fragment, pix_fmt) -> bool:
+    if shutil.which("ffmpeg") is None:
+        pytest.skip("ffmpeg not on PATH")
+    source = f"testsrc2=size=64x64:rate=10:duration=0.1,format={pix_fmt}"
+    argv = ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", source]
+    argv += ["-vf", fragment, "-frames:v", "1", "-f", "null", "-"]
+    return subprocess.run(argv, capture_output=True).returncode == 0
+
+
+@pytest.mark.parametrize(
+    "pix_fmt",
+    [
+        "yuv420p",
+        "rgb24",
+        "yuv420p10le",
+        "p010le",
+        "yuv422p12le",
+        "yuv444p16le",
+        "gray16le",
+    ],
+)
+@pytest.mark.parametrize(
+    "points", [CLOSE_AT_8, CLOSE_AT_10, APART_BY_TRUNCATION, ON_THE_8_BIT_SCALE, AS_WRITTEN]
+)
+def test_the_check_and_the_binary_agree(env, points, pix_fmt):
+    """Run, not assumed: the refusal is ffmpeg's, at the depth ffmpeg negotiates."""
+    from looks.ffmpeg import vf
+
+    effect = Effect(name="curves", params={"all": points})
+    try:
+        _compile(env, (effect,), pix_fmt)
+        refused_here = False
+    except CompileError:
+        refused_here = True
+    fragment = vf(_compile(env, (effect,), None))  # the same chain, unchecked
+    assert _ffmpeg_accepts(fragment, pix_fmt) is not refused_here
+
+
+def _pix_fmt_depths() -> dict:
+    """``ffmpeg -pix_fmts``: each format's deepest component, in bits."""
+    out = subprocess.run(
+        ["ffmpeg", "-v", "error", "-pix_fmts"], capture_output=True, text=True
+    ).stdout
+    depths = {}
+    for line in out.splitlines():
+        parts = line.split()
+        if len(parts) == 5 and parts[3].isdigit():
+            depths[parts[1]] = max(int(d) for d in parts[4].split("-"))
+    return depths
+
+
+def _negotiated_into_curves(env, pix_fmt, *, output_pix_fmt=None) -> str:
+    """The format ffmpeg hands ``curves`` in ``vf``'s own chain, read by ``showinfo``."""
+    from looks.ffmpeg import vf
+
+    effect = Effect(name="curves", params={"all": [(0, 0), (1, 1)]})
+    chain = vf(_compile(env, (effect,), pix_fmt))
+    assert chain.count(":interp=pchip,") == 1, chain
+    chain = chain.replace(":interp=pchip,", ":interp=pchip,showinfo,")
+    argv = ["ffmpeg", "-hide_banner", "-v", "info", "-f", "lavfi"]
+    argv += ["-i", f"testsrc2=size=64x64:rate=10:duration=0.1,format={pix_fmt}"]
+    argv += ["-vf", chain]
+    if output_pix_fmt:
+        argv += ["-pix_fmt", output_pix_fmt]
+    argv += ["-frames:v", "1", "-f", "null", "-"]
+    run = subprocess.run(argv, capture_output=True, text=True)
+    shown = re.search(r"fmt:(\S+)", run.stderr)
+    assert shown, f"no showinfo line for {pix_fmt}: {run.stderr[-300:]}"
+    return shown.group(1)
+
+
+def test_every_listed_depth_is_the_one_curves_is_negotiated_to(env):
+    """`CURVES_DEPTH` re-measured, every entry: what ffmpeg hands `curves`.
+
+    Not the format's own component depth, which differs (`rgb565le` has 5- and
+    6-bit components and `curves` runs it at 8).
+    """
+    from concurrent.futures import ThreadPoolExecutor
+
+    from looks.params import CURVES_DEPTH
+
+    if shutil.which("ffmpeg") is None:
+        pytest.skip("ffmpeg not on PATH")
+    depths = _pix_fmt_depths()
+    assert set(CURVES_DEPTH) <= set(depths), "a listed format this ffmpeg lacks"
+    with ThreadPoolExecutor() as pool:
+        got = dict(zip(CURVES_DEPTH, pool.map(lambda f: _negotiated_into_curves(env, f), CURVES_DEPTH)))
+    assert {f: depths[g] for f, g in got.items()} == dict(CURVES_DEPTH)
+
+
+@pytest.mark.parametrize("output_pix_fmt", ["yuv420p", "yuv420p10le", "rgb48le", "gbrp16le"])
+def test_the_depth_holds_whatever_the_output_format_is(env, output_pix_fmt):
+    """`vf`'s matrix ``scale`` on BOTH sides of ``curves`` is what pins it.
+
+    Without the trailing one, an 8-bit source written as ``rgb48le`` ran
+    ``curves`` at 16 bits and accepted what the 8-bit check refuses. Measured
+    with the wrap on 6.1 and 9.0: the source's depth, for every output here.
+    """
+    if shutil.which("ffmpeg") is None:
+        pytest.skip("ffmpeg not on PATH")
+    for source, expected in (("yuv420p", "rgb24"), ("yuv420p10le", "gbrp10le")):
+        got = _negotiated_into_curves(env, source, output_pix_fmt=output_pix_fmt)
+        assert got == expected, (source, output_pix_fmt)

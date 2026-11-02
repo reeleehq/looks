@@ -102,7 +102,9 @@ def compile_look(
         look: What was asked for. Portable data.
         clip: What it is being applied to. Needed by any effect whose answer
             depends on the frame — its absence is only an error if an effect
-            asks for it.
+            asks for it. Its ``pix_fmt`` is what the first step receives, and
+            that step's parameters are checked against it (a ``curves`` whose
+            x-points share one code value of it is refused, issue #33).
         env: Which binary. When given, an implementation whose filters this
             build lacks is dropped from selection rather than discovered at
             run time.
@@ -130,6 +132,8 @@ def compile_look(
         CompileError: If a step only takes RGB and the clip's colour space is
             undeclared (rule 22) and not assumed. ffmpeg would pick a matrix
             for it, and on some builds picks wrongly.
+        CompileError: If an effect's parameters are refused by its schema,
+            the first step's also against ``clip.pix_fmt``.
         CompileError: If an effect has no admissible implementation. The
             message says which constraint emptied the pool, because "no
             implementation available" alone is the least useful refusal in the
@@ -148,8 +152,20 @@ def compile_look(
         warnings.warn(message, StageOrderWarning, stacklevel=2)
 
     steps = []
-    for effect in concrete.steps:
-        impl = _select(effect, reg, policy=ceiling, available=available, env=env)
+    for index, effect in enumerate(concrete.steps):
+        impl = _select(
+            effect,
+            reg,
+            policy=ceiling,
+            available=available,
+            env=env,
+            # Only the first step's input format is known: it receives the
+            # clip. A later one gets ffmpeg's negotiation across the whole
+            # chain, which no step declares (measured on 6.1 and 9.0, a 10-bit
+            # clip reaches a curves after lutyuv, eq or vignette at 8 bits and
+            # after noise at 16), and a guess would refuse what ffmpeg accepts.
+            pix_fmt=clip.pix_fmt if clip is not None and index == 0 else None,
+        )
         payload = _payload(reg, impl, effect, clip=clip, env=env)
         steps.append(
             Step(
@@ -212,7 +228,12 @@ def _require_declared_colour(steps, clip) -> None:
         )
 
 
-def check_effect_params(effect: Effect, registry: EffectRegistry = REGISTRY) -> None:
+def check_effect_params(
+    effect: Effect,
+    registry: EffectRegistry = REGISTRY,
+    *,
+    pix_fmt: Optional[str] = None,
+) -> None:
     """Refuse parameters no implementation of this effect could honour.
 
     Called before an implementation is chosen, so every implementation of an
@@ -226,7 +247,7 @@ def check_effect_params(effect: Effect, registry: EffectRegistry = REGISTRY) -> 
     document is accepted either.
     """
     try:
-        registry.check_params(effect.name, effect.params)
+        registry.check_params(effect.name, effect.params, pix_fmt=pix_fmt)
     except ParamError as error:
         raise CompileError(str(error)) from error
 
@@ -238,8 +259,9 @@ def _select(
     policy: Policy,
     available: Optional[frozenset],
     env: Optional[FfmpegEnv],
+    pix_fmt: Optional[str],
 ) -> Any:
-    check_effect_params(effect, registry)
+    check_effect_params(effect, registry, pix_fmt=pix_fmt)
     candidates = registry.implementations(effect.name)
     if not candidates:
         raise CompileError(

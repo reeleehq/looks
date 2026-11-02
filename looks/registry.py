@@ -211,9 +211,15 @@ class EffectRegistry:
         """Has this registry declared a schema for ``effect``?"""
         return effect in self._params
 
-    def check_params(self, effect: str, params: Mapping[str, Any]) -> None:
-        """Refuse parameters this registry's schema for ``effect`` rejects."""
-        check_params(effect, params, schemas=self._params)
+    def check_params(
+        self, effect: str, params: Mapping[str, Any], *, pix_fmt: Optional[str] = None
+    ) -> None:
+        """Refuse parameters this registry's schema for ``effect`` rejects.
+
+        ``pix_fmt`` is the format the effect receives, when known: see
+        :func:`looks.params.check_params`.
+        """
+        check_params(effect, params, schemas=self._params, pix_fmt=pix_fmt)
 
     def with_defaults(self, effect: str, params: Mapping[str, Any]) -> dict:
         """``params`` with this registry's declared defaults filled in."""
@@ -324,7 +330,9 @@ class EffectRegistry:
         @functools.wraps(function)
         def with_defaults_applied(params, **kwargs):
             # A stored plan may have been edited or come from elsewhere: the
-            # compiler is a chokepoint, so it is checked here too.
+            # compiler is a chokepoint, so it is checked here too. Not against
+            # the pixel format: which format a step receives is compile_look's
+            # to know, so a stored curve ffmpeg refuses is refused by ffmpeg.
             self.check_params(effect, params)
             return function(self.with_defaults(effect, params), **kwargs)
 
