@@ -55,26 +55,27 @@ Each cost a false reading before it was fixed, and each fails **silently**.
 
 ## What this does not answer
 
-**Some temporal filters.** A third probe (below) catches the common case by
+**Some temporal filters, once.** A third probe catches the common case by
 running two sequences that differ only *before* a shared textured tail:
-`tmix=frames=3` shows **146**/255 in the tail and `hqdn3d` shows 2. But
-`tblend` and `atadenoise` both read **0** and are misreported as independent.
-Measured, and the reason is structural rather than a tuning failure: `tblend`
-consumes two input frames per output frame, so the trim that skips the
-perturbation for a normal filter lands *past* it; `atadenoise` keeps nine
-frames of history, more than a short probe can perturb. Lengthening the
-perturbation from one frame to three changed neither — verified.
+`tmix=frames=3` shows **146**/255 in the tail and `hqdn3d` shows 2. `tblend`
+and `atadenoise` both read **0** there, for structural reasons: `tblend`
+consumes two input frames per output frame, so its memory of the
+perturbation lands in the frame the trim skips, and `atadenoise` never
+averages in a black-against-white difference, only one within its threshold.
+Two more graphs close that (issue #59): a perturbation *mid-sequence*, large
+and small, with every other frame compared by timestamp. `tblend` now reads
+110/255, `atadenoise` 2/255, every stateless filter measured still 0, on 6.1
+and 9.0.
 
-Those two are refused for an unrelated and stronger reason anyway: **every
-temporal filter is out of scope**, because the execution model this package
-serves renders one bounded ffmpeg *per cut*, so a temporal filter meets a hard
-discontinuity at every cut. Do not read that as making the gap harmless —
-it means the gap is not currently load-bearing, not that it is closed.
+Temporal filters stay refused for an unrelated and stronger reason anyway:
+**every temporal filter is out of scope**, because the execution model this
+package serves renders one bounded ffmpeg *per cut*, so a temporal filter
+meets a hard discontinuity at every cut.
 
-**And an `INDEPENDENT` verdict is evidence, not proof.** It says: none of three
+**And an `INDEPENDENT` verdict is evidence, not proof.** It says: none of the
 probes could make this effect change a pixel it should not have touched. An
-effect adapting to a statistic none of them moves would pass, and so would
-`tblend`.
+effect adapting to a statistic none of them moves would pass, and so would a
+temporal filter whose memory reaches beyond the frames sampled.
 That is why the flagship look's claim does **not** rest on this module — a
 fixed per-pixel lookup with no state cannot depend on anything else, which is a
 *structural* argument, and the measurement corroborates it rather than
@@ -195,6 +196,16 @@ DETERMINISM_PROBE_FRAMES = 20
 #: after the perturbation and 146/255 when it began 1 frame after.
 TEMPORAL_PROBE_FRAMES = 3
 
+#: The small perturbation of the mid-sequence probe, in luma codes: inside the
+#: band `atadenoise` averages (it skips pixels that differ by more than its
+#: threshold, about 5/255 by default), so a black/white perturbation is never
+#: averaged in and this one is. Measured: `atadenoise` 2/255, stateless 0.
+TEMPORAL_NUDGE = 6
+
+#: Which `testsrc2` frame opens the mid-sequence probe: any but frame 0, which
+#: the tail opens with (see :func:`_mid_perturbation_probe`).
+MID_PROBE_HEAD_FRAME = 3
+
 
 @dataclass(frozen=True)
 class DependencyReport:
@@ -232,10 +243,9 @@ class DependencyReport:
         return self.dependency not in FLICKER_FREE
 
 
-def _max_luma_delta(
-    source: str, chain: str, *, ffprobe: str, timeout: float
-) -> Optional[float]:
-    """Largest ``signalstats`` YMAX over a filter graph's frames, or ``None``."""
+def _ymax_values(graph: str, *, ffprobe: str, timeout: float) -> Optional[list[float]]:
+    """Every frame's ``signalstats`` YMAX from a lavfi graph, or ``None`` if it
+    did not run."""
     result = run(
         [
             ffprobe,
@@ -244,7 +254,7 @@ def _max_luma_delta(
             "-f",
             "lavfi",
             "-i",
-            f"{source},{chain}",
+            graph,
             "-show_entries",
             "frame_tags=lavfi.signalstats.YMAX",
             "-of",
@@ -262,9 +272,23 @@ def _max_luma_delta(
                 values.append(float(token))
             except ValueError:
                 continue
+    return values
+
+
+def _graph_max(graph: str, *, ffprobe: str, timeout: float) -> Optional[float]:
+    """The largest YMAX over a graph's frames, or ``None``."""
+    values = _ymax_values(graph, ffprobe=ffprobe, timeout=timeout)
+    return max(values) if values else None
+
+
+def _max_luma_delta(
+    source: str, chain: str, *, ffprobe: str, timeout: float
+) -> Optional[float]:
+    """Largest ``signalstats`` YMAX over a filter graph's frames, or ``None``."""
+    values = _ymax_values(f"{source},{chain}", ffprobe=ffprobe, timeout=timeout)
     # The first frame has nothing to difference against, so tblend emits it
     # unchanged; including it would report the picture rather than the delta.
-    return max(values[1:], default=None) if len(values) > 1 else None
+    return max(values[1:]) if values and len(values) > 1 else None
 
 
 def _still_source() -> str:
@@ -364,6 +388,62 @@ def _temporal_probe(chain: str) -> str:
     )
 
 
+def _mid_perturbation_probe(chain: str, *, nudge: Optional[int]) -> str:
+    """Two branches that differ in ONE frame mid-sequence; every OTHER frame
+    of the output is compared, selected by timestamp (issue #59).
+
+    The leading-perturbation probe above trims by output frame index, and that
+    misses two kinds of temporal filter, measured on 6.1 and 9.0:
+
+    - ``tblend`` emits one frame fewer than it reads, so its memory of a
+      leading perturbation lands in output frame 0, the frame the trim must
+      skip. With the perturbation at frame 1 of a textured sequence, its
+      neighbours carry it (110/255), while a stateless filter's do not (0).
+    - ``atadenoise`` only averages pixels that differ by less than its
+      threshold, so a black-against-white perturbation is never averaged in. A
+      ``nudge`` of a few luma codes is (2/255, against 0 for every stateless
+      filter measured). ``None`` is the black/white form.
+
+    The sequence is renumbered after ``concat``, which otherwise stacks
+    one-frame segments at the same timestamp. The frame left out is chosen by
+    timestamp, so a chain that retimes its input (``setpts=2*PTS``) moves the
+    perturbation out of that slot and reads ``TEMPORAL``: retiming is out of
+    scope for a look, and the verdict errs toward refusal, not toward a false
+    "cannot flicker".
+    """
+    w, h = PROBE_SIZE
+    step = 1 / PROBE_RATE
+    textured = f"testsrc2=s={w}x{h}:r={PROBE_RATE}"
+    if nudge is None:
+        a = f"color=c=black:s={w}x{h}:r={PROBE_RATE}:d={step}"
+        b = f"color=c=white:s={w}x{h}:r={PROBE_RATE}:d={step}"
+    else:
+        a = f"{textured}:d={step}"
+        b = f"{a},lutyuv=y=val+{nudge}"
+    # Frame 1 is the perturbed one; frames 0 and 2.. are shared, up to the
+    # same number the leading probe samples after it.
+    keep = (
+        f"select='not(between(t,{step / 2},{step * 1.5}))"
+        f"*lt(t,{step * (TEMPORAL_PROBE_FRAMES + 1.5)})'"
+    )
+    branch = (
+        f"concat=n=3:v=1:a=0,setpts=N/{PROBE_RATE}/TB,"
+        f"format=yuv444p,{chain},format=yuv444p,{keep}"
+    )
+    tail = f"{textured}:d={PROBE_DURATION * 2}"
+    # A head unlike the tail's first frame: with the two equal, a median over
+    # {head, perturbed, tail} hides the perturbation (`tmedian` read 0).
+    head = (
+        f"{textured}:d={PROBE_DURATION},"
+        f"trim=start_frame={MID_PROBE_HEAD_FRAME}:end_frame={MID_PROBE_HEAD_FRAME + 1}"
+    )
+    return (
+        f"{head}[ah];{a}[ap];{tail}[at];[ah][ap][at]{branch}[A];"
+        f"{head}[bh];{b}[bp];{tail}[bt];[bh][bp][bt]{branch}[B];"
+        f"[A][B]blend=all_mode=difference,signalstats"
+    )
+
+
 def classify(
     chain: str,
     *,
@@ -392,33 +472,9 @@ def classify(
     # FIRST, and the ordering is load-bearing: every probe below compares two
     # applications of the effect, so a random one makes them differ for reasons
     # unrelated to what is being measured.
-    determinism_delta: Optional[float] = None
-    result = run(
-        [
-            ffprobe,
-            "-v",
-            "error",
-            "-f",
-            "lavfi",
-            "-i",
-            _determinism_probe(chain),
-            "-show_entries",
-            "frame_tags=lavfi.signalstats.YMAX",
-            "-of",
-            "csv=p=0",
-        ],
-        timeout=timeout,
+    determinism_delta = _graph_max(
+        _determinism_probe(chain), ffprobe=ffprobe, timeout=timeout
     )
-    if result.ok:
-        vals = []
-        for line in result.stdout.splitlines():
-            tok = line.strip().rstrip(",")
-            if tok:
-                try:
-                    vals.append(float(tok))
-                except ValueError:
-                    continue
-        determinism_delta = max(vals) if vals else None
     if determinism_delta is None:
         return DependencyReport(
             dependency=Dependency.UNDETERMINED,
@@ -463,45 +519,30 @@ def classify(
     # effect only has to adapt to one of them to flicker.
     content_delta = max(deltas)
 
-    # The third probe: does the output depend on EARLIER frames? Neither probe
+    # The third probe: does the output depend on OTHER frames? Neither probe
     # above separates this — a looped still through a frame-averager is still
-    # constant, and so is the constant half.
-    result = run(
-        [
-            ffprobe,
-            "-v",
-            "error",
-            "-f",
-            "lavfi",
-            "-i",
-            _temporal_probe(f"{chain}"),
-            "-show_entries",
-            "frame_tags=lavfi.signalstats.YMAX",
-            "-of",
-            "csv=p=0",
-        ],
-        timeout=timeout,
-    )
-    temporal_delta: Optional[float] = None
-    if result.ok:
-        values = []
-        for line in result.stdout.splitlines():
-            token = line.strip().rstrip(",")
-            if token:
-                try:
-                    values.append(float(token))
-                except ValueError:
-                    continue
-        temporal_delta = max(values) if values else None
+    # constant, and so is the constant half. Three graphs, the largest wins:
+    # the tail after a leading perturbation (tmix: 146/255), and a perturbation
+    # mid-sequence, large and small, read by timestamp (tblend, atadenoise:
+    # issue #59). A probe added can only raise the verdict, never lower it.
+    temporal = [
+        _graph_max(graph, ffprobe=ffprobe, timeout=timeout)
+        for graph in (
+            _temporal_probe(chain),
+            _mid_perturbation_probe(chain, nudge=None),
+            _mid_perturbation_probe(chain, nudge=TEMPORAL_NUDGE),
+        )
+    ]
+    temporal_delta = None if None in temporal else max(temporal)
     if temporal_delta is None:
         return DependencyReport(
             dependency=Dependency.UNDETERMINED,
             time_delta=time_delta,
             content_delta=content_delta,
             note=(
-                f"the temporal probe did not run for {chain!r} — a filter that "
-                f"changes the frame count (tblend, framestep) breaks its trim "
-                f"indices, and that is itself a sign of temporal behaviour"
+                f"a temporal probe did not run for {chain!r} — a filter that "
+                f"changes the frame count (framestep) can break its frame "
+                f"selection, and that is itself a sign of temporal behaviour"
             ),
         )
 
@@ -525,9 +566,10 @@ def classify(
 def assert_flicker_free(chain: str, **kwargs) -> DependencyReport:
     """Raise unless ``chain`` provably cannot flicker.
 
-    **What a pass means, precisely: three probes could not make this effect
+    **What a pass means, precisely: the probes could not make this effect
     depend on anything they varied.** It is not a proof of frame independence —
-    `tblend` and `atadenoise` pass and are temporal. For an effect whose class
+    a temporal filter whose memory reaches beyond the frames sampled would
+    pass. For an effect whose class
     matters, pair this with the structural argument (a stateless per-pixel
     lookup cannot depend on anything else) or with a declared class this
     function is used to *falsify*.
