@@ -231,6 +231,11 @@ def _curve_collision(points, pix_fmt: str) -> Optional[str]:
     applied to the x-points as emitted. A format :data:`CURVES_DEPTH` does not
     list is not checked here.
 
+    Each channel is checked on its own, so an ``all`` that ffmpeg never reads
+    (it fills only the channels left unset) is checked too: a curve nobody
+    sees is still not a document this package writes, as with the six-decimal
+    check.
+
     >>> _curve_collision([(0, 0), (0.5, 0.5), (0.501, 0.6), (1, 1)], "yuv420p")
     'x-points 0.5 and 0.501 fall in one code value of yuv420p (8-bit), which curves refuses'
     >>> _curve_collision([(0, 0), (0.5, 0.5), (0.501, 0.6), (1, 1)], "yuv420p10le") is None
@@ -351,25 +356,32 @@ def _endian(*names: str) -> tuple[str, ...]:
 #: The bit depth ``curves`` runs at for a frame arriving in a pixel format.
 #: Measured on ffmpeg 6.1 and 9.0, the format negotiated into ``curves`` has
 #: the arriving format's component depth (``yuv420p10le`` -> ``gbrp10le``,
-#: ``p016le`` -> ``rgb48le``); a float format lands on 16, ``curves``' deepest.
+#: ``p016le`` -> ``rgb48le``); a float format lands on 16, ``curves``' deepest,
+#: and one with sub-8-bit components on 8. That holds because :func:`looks.ffmpeg.vf`
+#: puts its colour-matrix ``scale`` in front of ``curves``: without it ffmpeg
+#: pulls ``curves`` toward the OUTPUT format (an 8-bit source written as
+#: ``rgb48le`` ran it at 16). ``test_params`` re-measures every entry.
 #: A format not listed here is not depth-checked, rather than guessed at.
 # fmt: off
 CURVES_DEPTH: Mapping[str, int] = {
     **dict.fromkeys((
         "yuv420p", "yuvj420p", "yuv422p", "yuvj422p", "yuv444p", "yuvj444p",
         "yuv411p", "yuv440p", "yuva420p", "yuva444p", "nv12", "nv21", "nv16",
-        "rgb24", "bgr24", "rgba", "bgra", "argb", "abgr", "rgb0", "bgr0",
-        "0rgb", "0bgr", "gbrp", "gbrap", "gray",
+        "yuvj411p", "nv24", "yuyv422", "uyvy422", "rgb24", "bgr24", "rgba",
+        "bgra", "argb", "abgr", "rgb0", "bgr0", "0rgb", "0bgr", "gbrp", "gbrap",
+        "gray", "ya8",
     ), 8),
     **dict.fromkeys(_endian("yuv420p9", "yuv444p9", "gbrp9", "gray9"), 9),
     **dict.fromkeys(_endian(
         "yuv420p10", "yuv422p10", "yuv444p10", "yuva420p10", "yuva444p10",
-        "p010", "p210", "p410", "gbrp10", "gbrap10", "gray10", "x2rgb10",
-    ), 10),
+        "p010", "p210", "p410", "gbrp10", "gbrap10", "gray10",
+    ), 10), "x2rgb10le": 10, "x2bgr10le": 10,
     **dict.fromkeys(_endian(
         "yuv420p12", "yuv422p12", "yuv444p12", "p012", "gbrp12", "gbrap12", "gray12",
     ), 12),
-    **dict.fromkeys(_endian("yuv420p14", "yuv422p14", "yuv444p14", "gbrp14"), 14),
+    **dict.fromkeys(
+        _endian("yuv420p14", "yuv422p14", "yuv444p14", "gbrp14", "gray14"), 14
+    ),
     **dict.fromkeys(_endian(
         "yuv420p16", "yuv422p16", "yuv444p16", "yuva444p16", "p016", "p216",
         "p416", "rgb48", "bgr48", "rgba64", "bgra64", "gbrp16", "gbrap16",

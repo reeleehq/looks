@@ -330,7 +330,9 @@ class EffectRegistry:
         @functools.wraps(function)
         def with_defaults_applied(params, **kwargs):
             # A stored plan may have been edited or come from elsewhere: the
-            # compiler is a chokepoint, so it is checked here too.
+            # compiler is a chokepoint, so it is checked here too. Not against
+            # the pixel format: which format a step receives is compile_look's
+            # to know, so a stored curve ffmpeg refuses is refused by ffmpeg.
             self.check_params(effect, params)
             return function(self.with_defaults(effect, params), **kwargs)
 
