@@ -76,6 +76,7 @@ RESAMPLING_EFFECTS = frozenset(
         "stretch",
         "motion",
         "gate_weave",
+        "ripple",
         "lut3d",
         "gradient_map",
         "blur",

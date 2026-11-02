@@ -122,6 +122,7 @@ from looks.transition import (
     DFLT_CURVE,
     MIN_TRANSITION_S,
     TRANSITION_CURVES,
+    Ripple,
     Transition,
     TransitionError,
     blended_frames,
@@ -298,6 +299,7 @@ __all__ = [
     "CompileError",
     "PlanRefused",
     # transitions: the vocabulary, not the graph
+    "Ripple",
     "Transition",
     "TRANSITION_CURVES",
     "MIN_TRANSITION_S",

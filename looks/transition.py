@@ -58,10 +58,17 @@ rate, because the question does.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from typing import Mapping, Optional
 
-from looks.spec import SpecError
+from looks.params import (
+    DFLT_RIPPLE_AMPLITUDE,
+    DFLT_RIPPLE_BLOOM,
+    DFLT_RIPPLE_WAVELENGTHS,
+    ParamError,
+    check_params,
+)
+from looks.spec import Effect, SpecError
 
 #: The transitions this package offers: a curated subset of ffmpeg's 58, chosen
 #: because they read as deliberate edits rather than as effects. Adding one is a
@@ -98,6 +105,14 @@ DFLT_CURVE = "fade"
 #: :func:`blended_frames` is the form that knows it: prefer that when the rate
 #: is available, and treat this as the rate-free fallback it is.
 MIN_TRANSITION_S = 0.04
+
+
+#: The ``kind`` a :class:`Transition` document may carry. :meth:`Transition.
+#: to_dict` writes none, so a document without one is an ``xfade`` transition;
+#: any other kind is refused rather than read as a fade.
+XFADE_KIND = "xfade"
+#: The ``kind`` a :class:`Ripple` document carries, and must.
+RIPPLE_KIND = "ripple"
 
 
 class TransitionError(SpecError):
@@ -167,10 +182,163 @@ class Transition:
 
     @classmethod
     def from_dict(cls, d: Mapping) -> "Transition":
+        kind = d.get("kind", XFADE_KIND)
+        if kind != XFADE_KIND:
+            raise TransitionError(
+                f"not a Transition document: its kind is {kind!r}. A "
+                f"{RIPPLE_KIND!r} document is read with Ripple.from_dict; read "
+                "as a Transition it would silently become a plain fade."
+            )
         return cls(
             duration_s=float(d["duration_s"]),
             curve=str(d.get("curve", DFLT_CURVE)),
         )
+
+
+@dataclass(frozen=True)
+class Ripple:
+    """A dream transition: the picture ripples, blooms and dissolves into the next.
+
+    Not a :data:`TRANSITION_CURVES` name, because ``xfade`` cannot move a
+    pixel. It is two things the host already knows how to place, over one
+    window:
+
+    * :attr:`dissolve`, an ordinary :class:`Transition` for the host's
+      ``xfade``, as for any other transition. It is ``xfade``'s linear
+      ``fade``; the production this came from (issue #49) used a smoothstep
+      blend, which no :data:`TRANSITION_CURVES` name gives.
+    * :meth:`effect`, a single-input ``ripple`` effect, swelling from nothing
+      at the window's start to its peak at the middle of the fade and settling
+      by its end. It compiles through :func:`looks.compile_look` like any
+      effect, so it carries a licence tier.
+
+    **Where the effect goes.** On the stream that holds *both* shots across the
+    window, the composite the dissolve produces, with ``offset`` the dissolve's
+    start in *that stream's own timeline*, after any ``setpts`` the host
+    applies. Two traps, both silent. A stream holding only the *incoming*
+    shot is the wrong one: ``reeleehq/mixing``'s ``_entrance`` cross-fades a
+    cutaway from a transparent copy of itself, so its ``xfade`` output holds
+    the cutaway alone, and a ripple there would never move the outgoing scene.
+    In ``mixing`` the stream with both shots exists only after the overlay (a
+    post-overlay chain, the seam of reeleehq/mixing#115), with ``offset=t0``.
+    And a host that cross-fades at offset 0 and then shifts the result with
+    ``setpts`` must pass the shifted start; the unshifted 0 runs the ripple on
+    the wrong frames.
+
+    **What it cannot do.** A window of about one frame period or less blends
+    nothing and ripples on at most one frame: call
+    :func:`check_visible` on :attr:`dissolve` with the rate. The bloom's blur
+    is sized from :attr:`ClipSpec.height <looks.spec.ClipSpec>` at compile
+    time, while the warp scales with the frame at run time, so compile against
+    the clip the effect will actually run on. The motion's phases are counted
+    from the window's start, so the same record is the same picture wherever
+    the window lands.
+
+    Sizes are fractions of the frame (``amplitude`` of its width,
+    ``wavelengths`` of its height), so a look reads the same at any resolution;
+    the defaults are 18 px and 86/33 px at 1024x576, judged on real footage.
+
+    Examples:
+        >>> r = Ripple(1.0)
+        >>> r.dissolve
+        Transition(duration_s=1.0, curve='fade')
+        >>> e = r.effect(offset=6.3)
+        >>> e.name, e.params["start_s"], e.params["duration_s"]
+        ('ripple', 6.3, 1.0)
+        >>> r.to_dict()["kind"]
+        'ripple'
+        >>> Ripple.from_dict(r.to_dict()) == r
+        True
+        >>> Ripple(1.0, bloom=2)
+        Traceback (most recent call last):
+        ...
+        looks.transition.TransitionError: ripple: bloom must be a number in [0, 1]; got 2
+
+        A stored cross-fade is not read as a ripple, nor a ripple as a fade:
+
+        >>> Ripple.from_dict({"duration_s": 1.0, "curve": "fade"})
+        Traceback (most recent call last):
+        ...
+        looks.transition.TransitionError: not a Ripple document...
+        >>> Transition.from_dict(r.to_dict())
+        Traceback (most recent call last):
+        ...
+        looks.transition.TransitionError: not a Transition document...
+    """
+
+    duration_s: float
+    amplitude: float = DFLT_RIPPLE_AMPLITUDE
+    wavelengths: tuple[float, float] = DFLT_RIPPLE_WAVELENGTHS
+    bloom: float = DFLT_RIPPLE_BLOOM
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "wavelengths", tuple(self.wavelengths))
+        # A non-positive duration is refused by Transition, word for word.
+        Transition(self.duration_s)
+        try:
+            check_params("ripple", self.effect(offset=0).params)
+        except ParamError as error:
+            raise TransitionError(str(error)) from error
+
+    @property
+    def dissolve(self) -> Transition:
+        """The cross-fade the host runs between the two shots."""
+        return Transition(self.duration_s, DFLT_CURVE)
+
+    def effect(self, *, offset: float) -> Effect:
+        """The warp, for the stream that holds both shots across the window.
+
+        ``offset`` is the dissolve's start in *that* stream's own timeline: the
+        number passed to ``xfade`` (:func:`xfade_options`) when the effect runs
+        on ``xfade``'s output directly, or the shifted start when the host
+        moves that output with ``setpts`` first (see the class docstring). The
+        warp's peak then lands on the fade's midpoint.
+        """
+        return Effect(
+            name="ripple",
+            params={
+                "start_s": offset,
+                "duration_s": self.duration_s,
+                "amplitude": self.amplitude,
+                "wavelengths": self.wavelengths,
+                "bloom": self.bloom,
+            },
+        )
+
+    def to_dict(self) -> dict:
+        return {
+            "kind": RIPPLE_KIND,
+            "duration_s": self.duration_s,
+            "amplitude": self.amplitude,
+            "wavelengths": self.wavelengths,
+            "bloom": self.bloom,
+        }
+
+    @classmethod
+    def from_dict(cls, d: Mapping) -> "Ripple":
+        """A stored Ripple. An unknown key is refused, not ignored: a misspelt
+        ``amplitde``, or a field from a newer version, would otherwise render
+        a different picture from the one stored."""
+        if d.get("kind") != RIPPLE_KIND:
+            raise TransitionError(
+                f"not a Ripple document: its kind is {d.get('kind')!r}, not "
+                f"{RIPPLE_KIND!r}. A Transition document has no kind; read it "
+                "with Transition.from_dict."
+            )
+        unknown = sorted(set(d) - {"kind", *(f.name for f in fields(cls))})
+        if unknown:
+            raise TransitionError(f"a Ripple document has no {unknown}")
+        try:
+            return cls(
+                duration_s=float(d["duration_s"]),
+                amplitude=float(d.get("amplitude", DFLT_RIPPLE_AMPLITUDE)),
+                wavelengths=tuple(
+                    float(w) for w in d.get("wavelengths", DFLT_RIPPLE_WAVELENGTHS)
+                ),
+                bloom=float(d.get("bloom", DFLT_RIPPLE_BLOOM)),
+            )
+        except (TypeError, ValueError) as error:
+            raise TransitionError(f"not a Ripple document: {error}") from error
 
 
 def blended_frames(

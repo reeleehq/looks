@@ -831,6 +831,15 @@ def register_defaults(registry: Optional[EffectRegistry] = None) -> EffectRegist
         timeline=False,
         time_varying=True,
     )
+    add(
+        "ripple.ffmpeg.geq",
+        ("split", "gblur", "lutyuv", "blend", "geq"),
+        _ripple_compiler,
+        # A branch, gated by its own window: an Effect.at would reach `split`,
+        # which has no timeline support. And it reads the clock by design.
+        timeline=False,
+        time_varying=True,
+    )
     return reg
 
 
@@ -1137,3 +1146,196 @@ def _gate_weave_compiler(params, *, clip=None, **_kw):
         {"sar": f"sar*w*(h-{margin})/(h*(w-{margin}))", "max": SETSAR_MAX},
     )
     return {"filter": f"{square_unknown},{crop},{scale},{restore}"}
+
+
+# --------------------------------------------------------------- ripple (#49)
+# The shape of the warp, fixed; its size and timing are parameters. Values are
+# the 2026-10-27 production's, normalised from 1024x576.
+
+#: Weight of the second horizontal harmonic against the first.
+RIPPLE_HARMONIC = 0.45
+#: Phase speeds of the two horizontal harmonics, radians per second. Opposite
+#: signs, so the pattern churns rather than scrolls.
+RIPPLE_SPEEDS = (7, -11)
+#: Vertical wander, as a fraction of the horizontal amplitude.
+RIPPLE_VERTICAL = 0.35
+#: Wavelength of the vertical wander along x, as a fraction of the width.
+RIPPLE_VERTICAL_WAVELENGTH = 140 / 1024
+#: Phase speed of the vertical wander, radians per second.
+RIPPLE_VERTICAL_SPEED = 5
+#: The bloom's blur, as a fraction of the frame's height (14 px at 576).
+RIPPLE_BLOOM_SIGMA = 14 / 576
+#: The bloom's brightening: a luma gain, and a lift as a fraction of
+#: ``lutyuv``'s ``maxval``. That is nominal white, 235 at 8 bits and 940 at 10
+#: whatever the range tag (measured on 9.0 and 6.1), so the lift is the same
+#: proportion at any depth.
+RIPPLE_BLOOM_GAIN = 1.15
+RIPPLE_BLOOM_LIFT = 8 / 255
+#: `gblur` planes for the bloom: luma and both chroma, never alpha, so a
+#: transparent edge is not softened by the glow.
+RIPPLE_BLOOM_PLANES = 7
+
+
+def _open_window(start: float, end: float) -> str:
+    """An ``enable=`` expression true strictly inside ``(start, end)``.
+
+    >>> _open_window(1, 1.5)
+    'gt(t,1)*lt(t,1.5)'
+    """
+    return f"gt(t,{_num(start)})*lt(t,{_num(end)})"
+
+
+def _ripple_envelope(start: float, duration: float) -> str:
+    """``sin²`` of the window's phase: 0 at its ends, 1 at its middle.
+
+    No ``between()`` factor: every filter of the ripple is gated by
+    :func:`_open_window`, so outside the window it is never evaluated.
+
+    >>> _ripple_envelope(1, 0.5)
+    'pow(sin(PI*(T-1)/0.5),2)'
+    """
+    return f"pow(sin(PI*(T-{_num(start)})/{_num(duration)}),2)"
+
+
+def _ripple_displaced(start, duration, *, amplitude, wavelengths) -> str:
+    """The displaced read, ``p(X+dx,Y+dy)``, as a ``geq`` plane expression.
+
+    ``X``, ``Y``, ``W``, ``H`` are the evaluated plane's own, so one expression
+    serves every plane; ``W/SW*SH`` turns a width-relative vertical wander into
+    that plane's rows, which is what keeps 4:2:2 chroma on luma. Every motion
+    phase is relative to the window (``T-start``), so the same ripple is the
+    same picture wherever the window lands in the stream.
+
+    >>> e = _ripple_displaced(2, 1, amplitude=0.01, wavelengths=(0.2, 0.1))
+    >>> e.startswith("p(X+0.01*W*pow(sin(PI*(T-2)/1),2)*(sin(2*PI*Y/(0.2*H)+7*(T-2))")
+    True
+    """
+    envelope = _ripple_envelope(start, duration)
+    elapsed = f"(T-{_num(start)})"
+    near, far = (float(w) for w in wavelengths)
+    first, second = RIPPLE_SPEEDS
+    dx = (
+        f"{_num(amplitude)}*W*{envelope}"
+        f"*(sin(2*PI*Y/({_num(near)}*H){first:+}*{elapsed})"
+        f"+{RIPPLE_HARMONIC}*sin(2*PI*Y/({_num(far)}*H){second:+}*{elapsed}))"
+    )
+    dy = (
+        f"{_num(RIPPLE_VERTICAL * amplitude)}*W/SW*SH*{envelope}"
+        f"*sin(2*PI*X/({_num(RIPPLE_VERTICAL_WAVELENGTH)}*W)"
+        f"+{RIPPLE_VERTICAL_SPEED}*{elapsed})"
+    )
+    return f"p(X+{dx},Y+{dy})"
+
+
+def _bloom(sigma: float, weight: str, *, full_range: bool, enable: str) -> str:
+    r"""A blurred, brightened copy of the picture, mixed back in at ``weight``.
+
+    A branch (``split`` ... ``blend``) whose first and last pads are
+    unlabelled, so it comma-splices like any filter; its labels are opened and
+    closed inside it, so two in one chain do not collide (see
+    :func:`_halation_compiler`). ``weight`` is a ``blend`` expression, so it
+    may read ``T``; ``enable`` gates every filter of the branch.
+
+    The brightening is range-aware. ``lutyuv``'s ``minval``/``maxval`` are the
+    limited-range 16/235 whatever the stream's range tag, so clipping to them
+    darkens a full-range highlight (250 came out 241 at the peak). A
+    full-range stream is therefore left to ``lutyuv``'s own clamp to the code
+    range (0..255, 0..1023), measured on 9.0 and 6.1.
+
+    >>> _bloom(2, "0.5", full_range=False, enable="lt(t,1)")
+    'split[lk_bloom_a][lk_bloom_b];[lk_bloom_b]gblur=sigma=2:planes=7:enable=lt(t\\,1),lutyuv=y=clip(val*1.15+maxval*0.031373\\,minval\\,maxval):enable=lt(t\\,1)[lk_bloom_g];[lk_bloom_a][lk_bloom_g]blend=all_expr=A*(1-0.5)+B*0.5:enable=lt(t\\,1)'
+    >>> "clip(" in _bloom(2, "0.5", full_range=True, enable="lt(t,1)")
+    False
+    """
+    a, b, g = (f"[{LABEL_NAMESPACE}bloom_{name}]" for name in "abg")
+    brightened = f"val*{RIPPLE_BLOOM_GAIN}+maxval*{_num(RIPPLE_BLOOM_LIFT)}"
+    if not full_range:
+        brightened = f"clip({brightened},minval,maxval)"
+    glow = ",".join(
+        (
+            filter_string(
+                "gblur",
+                {"sigma": _num(sigma), "planes": RIPPLE_BLOOM_PLANES, "enable": enable},
+            ),
+            filter_string("lutyuv", {"y": brightened, "enable": enable}),
+        )
+    )
+    mix = filter_string(
+        "blend", {"all_expr": f"A*(1-{weight})+B*{weight}", "enable": enable}
+    )
+    return f"split{a}{b};{b}{glow}{g};{a}{g}{mix}"
+
+
+def _ripple_compiler(params, *, clip=None, **_kw):
+    """A ripple that swells and settles over a window, with a bloom at its peak.
+
+    One plane-aware ``geq``, ``p(X+dx, Y+dy)``: a pixel is read from where the
+    ripple moved it, with bilinear interpolation. Not ``displace``, which the
+    production that asked for this (issue #49) used, and which was wrong twice
+    over, measured on 9.0 and 6.1:
+
+    * ``displace`` takes three inputs of one format, so gray maps were
+      converted to the picture's ``yuv420p``, chroma planes neutral: **chroma
+      never moved**, and the tv-range conversion turned 128 into about 126, so
+      a 10 px map moved luma 7 px and a zero map moved it 2.
+    * ``displace`` is 8-bit only, so a 10-bit stream lost its depth for its
+      whole length, not just the window.
+
+    ``geq`` keeps the input's format and reads every plane in that plane's own
+    pixels (:func:`_ripple_displaced`). Only ``lum=`` and ``a=`` are given:
+    ``geq`` evaluates ``lum``'s expression for an absent ``cb``/``cr``
+    (decoded frames md5-identical with and without them on yuv420p, yuv422p,
+    yuv444p10le, yuva420p and nv12, on 9.0.1 and 6.1.6), but an absent ``a``
+    makes alpha opaque. Displacement is a fraction of the frame, so the look
+    is the same at any size.
+
+    The envelope is ``sin²`` across the window, peaking at its middle, the
+    point of the dissolve the host runs beside it (:class:`looks.transition.
+    Ripple`). Every filter carries ``enable=`` for the open window, so the
+    cost is confined to it (about 90 ms a frame at 1024x576) and, **for a YUV
+    stream**, outside it the picture passes through untouched. An RGB stream
+    does not: ``geq``'s ``lum=`` (like every YUV-only filter here, ``lutyuv``
+    contrast included) makes ffmpeg convert it to YUV and back on every frame,
+    window or not, with a matrix nothing declares (measured: up to 2/255 on
+    ``testsrc2`` rgb24 and gbrp, outside the window).
+
+    ffmpeg 6.1.6's bilinear ``geq`` is not an identity at the frame's edges,
+    and CI's ffmpeg is a 6.1: at zero displacement on a 160x90 ``testsrc2``
+    (one frame, all planes) it changed up to 223/255 at 4:4:4, and at 4:2:0 and
+    4:2:2 left luma exact but moved chroma's edge by up to 8/255. So during the warp 6.1 and 9.0 disagree, on pixels that sample
+    the last row or column, by up to 109/255 in the last row, 26/255 in the
+    last column and 96/255 just inside them (160x90 and 320x180). 9.0.1 is
+    exact. The window is open at both ends for the same reason: a closed one
+    would put that error on two frames the ripple has not reached.
+
+    >>> from looks.params import with_defaults
+    >>> f = _ripple_compiler(with_defaults("ripple", {"start_s": 1, "duration_s": 0.5, "bloom": 0}))
+    >>> f["filter"].startswith("geq=lum=p(X+")
+    True
+    >>> f["filter"].endswith(":enable=gt(t\\,1)*lt(t\\,1.5)")
+    True
+    """
+    start, duration = float(params["start_s"]), float(params["duration_s"])
+    enable = _open_window(start, start + duration)
+    moved = _ripple_displaced(
+        start,
+        duration,
+        amplitude=float(params["amplitude"]),
+        wavelengths=params["wavelengths"],
+    )
+    warp = filter_string("geq", {"lum": moved, "a": moved, "enable": enable})
+    bloom = float(params["bloom"])
+    if bloom == 0:
+        return {"filter": warp}
+    if clip is None:
+        raise FfmpegBackendError(
+            "the 'ripple' effect's bloom is sized to the frame, so it needs a "
+            "ClipSpec. Pass clip= to compile_look(), or bloom=0."
+        )
+    glow = _bloom(
+        RIPPLE_BLOOM_SIGMA * clip.height,
+        f"{_num(bloom)}*{_ripple_envelope(start, duration)}",
+        full_range=_SCALE_RANGES.get(clip.color_range) == "full",
+        enable=enable,
+    )
+    return {"filter": f"{glow},{warp}"}

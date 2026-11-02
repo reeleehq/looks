@@ -428,6 +428,8 @@ class TestRule26HoldsForAnythingThatEmitsCurves:
             {"all": [(0, 0), (0.5, 0.6), (1, 1)]},
             # `gate_weave` refuses an amplitude a 1-pixel-high clip cannot hold.
             {"amplitude": 0},
+            # `ripple` needs its window.
+            {"start_s": 0, "duration_s": 1},
         )
         for name in registry.effects():
             for params in param_sets:
