@@ -1,39 +1,41 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-02T19:19:40Z",
+  "built_at": "2026-11-22T14:11:53Z",
   "package": {
     "name": "looks",
-    "version": "0.0.38",
+    "version": "0.0.39",
     "display_name": "looks",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "1c776e8aa9b65f0b49d57f8561dd3413dfdc50ee",
-    "short_commit": "1c776e8",
+    "commit": "95ac5dafcdb943493ee1977316bce0c8c283685a",
+    "short_commit": "95ac5da",
     "branch": "main",
-    "tags": [],
+    "tags": [
+      "0.0.39"
+    ],
     "dirty": false,
     "remote_url": "https://github.com/reeleehq/looks",
-    "commit_url": "https://github.com/reeleehq/looks/commit/1c776e8aa9b65f0b49d57f8561dd3413dfdc50ee",
+    "commit_url": "https://github.com/reeleehq/looks/commit/95ac5dafcdb943493ee1977316bce0c8c283685a",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "reeleehq/looks",
-    "sha": "9eb803717b8472edb17177dc5197ebb0f253a3ba",
+    "sha": "969a944496d62640c60f00202121149b62e7c86b",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "41508025945",
-    "run_url": "https://github.com/reeleehq/looks/actions/runs/41508025945",
+    "run_id": "45031160244",
+    "run_url": "https://github.com/reeleehq/looks/actions/runs/45031160244",
     "server_url": "https://github.com"
   },
   "tools": {
-    "epythet": "0.2.22",
+    "epythet": "0.2.23",
     "sphinx": "9.1.1",
     "docutils": "0.22.4",
-    "python": "3.12.15"
+    "python": "3.12.16"
   },
   "config": {
     "theme": "auto",
@@ -56,15 +58,15 @@
   },
   "site": {
     "modules_documented": 18,
-    "objects_documented": 666
+    "objects_documented": 670
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.38",
+    "latest": "0.0.39",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/reeleehq/looks && cd looks\ngit checkout 1c776e8aa9b65f0b49d57f8561dd3413dfdc50ee\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/reeleehq/looks && cd looks\ngit checkout 95ac5dafcdb943493ee1977316bce0c8c283685a\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

@@ -1,4 +1,4 @@
-> built 2026-11-02 19:19 UTC from 1c776e8 (main) · looks 0.0.38. Details: build_info.json
+> built 2026-11-22 14:11 UTC from 95ac5da (main) · looks 0.0.39. Details: build_info.json
 
 # index.html.md
 
@@ -5079,6 +5079,35 @@ Traceback (most recent call last):
 looks.transition.TransitionError: a transition needs a positive
 duration; got 0.0...
 ```
+
+#### *property* dissolve *: [Transition](_autosummary/looks.transition.html.md#looks.transition.Transition)*
+
+itself. Shared with [`Ripple`](_autosummary/looks.html.md#looks.Ripple), so a
+host reads `t.dissolve` whatever kind of transition it was handed.
+
+```pycon
+>>> t = Transition(0.5)
+>>> t.dissolve is t
+True
+```
+
+* **Type:**
+  The cross-fade the host runs
+
+#### effect(, offset)
+
+The warp to add to the composite: `None`, a plain cross-fade has none.
+
+Shared with [`Ripple.effect()`](_autosummary/looks.html.md#looks.Ripple.effect), so a host asks `t.effect(offset=t0)`
+without an `isinstance` check.
+
+```pycon
+>>> Transition(0.5).effect(offset=1.0) is None
+True
+```
+
+* **Return type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Effect`](_autosummary/looks.spec.html.md#looks.spec.Effect)]
 
 ### *exception* looks.TransitionError
 
@@ -11340,6 +11369,35 @@ looks.transition.TransitionError: a transition needs a positive
 duration; got 0.0...
 ```
 
+#### *property* dissolve *: [Transition](_autosummary/looks.transition.html.md#looks.transition.Transition)*
+
+itself. Shared with [`Ripple`](_autosummary/looks.transition.html.md#looks.transition.Ripple), so a
+host reads `t.dissolve` whatever kind of transition it was handed.
+
+```pycon
+>>> t = Transition(0.5)
+>>> t.dissolve is t
+True
+```
+
+* **Type:**
+  The cross-fade the host runs
+
+#### effect(, offset)
+
+The warp to add to the composite: `None`, a plain cross-fade has none.
+
+Shared with [`Ripple.effect()`](_autosummary/looks.transition.html.md#looks.transition.Ripple.effect), so a host asks `t.effect(offset=t0)`
+without an `isinstance` check.
+
+```pycon
+>>> Transition(0.5).effect(offset=1.0) is None
+True
+```
+
+* **Return type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Effect`](_autosummary/looks.spec.html.md#looks.spec.Effect)]
+
 ### *exception* looks.transition.TransitionError
 
 Bases: [`SpecError`](_autosummary/looks.spec.html.md#looks.spec.SpecError)
@@ -11500,7 +11558,7 @@ frames...
 
 # About this build
 
-This documentation was built on **2026-11-02 19:19 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/1c776e8aa9b65f0b49d57f8561dd3413dfdc50ee"><code>1c776e8</code></a> on branch <code>main</code>, for **looks 0.0.38** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-22 14:11 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/95ac5dafcdb943493ee1977316bce0c8c283685a"><code>95ac5da</code></a> on branch <code>main</code>, for **looks 0.0.39** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -11509,9 +11567,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/looks/commit/1c776e8aa9b65f0b49d57f8561dd3413dfdc50ee"><code>1c776e8aa9b65f0b49d57f8561dd3413dfdc50ee</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/looks/commit/95ac5dafcdb943493ee1977316bce0c8c283685a"><code>95ac5dafcdb943493ee1977316bce0c8c283685a</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | none                                                                                                                                                  |
+| Tags at this commit | <code>0.0.39</code>                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/looks</code>                                                                                                        |
 
@@ -11520,18 +11578,18 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/looks</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/41508025945">41508025945</a>       |
+| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/45031160244">45031160244</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>9eb803717b8472edb17177dc5197ebb0f253a3ba</code> (in the history of the built commit) |
+| Event commit | <code>969a944496d62640c60f00202121149b62e7c86b</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
-| epythet  | 0.2.22  |
+| epythet  | 0.2.23  |
 | Sphinx   | 9.1.1   |
 | docutils | 0.22.4  |
-| Python   | 3.12.15 |
+| Python   | 3.12.16 |
 
 ## Configuration as resolved
 
@@ -11547,14 +11605,14 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/looks/0.0.38/">0.0.38</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/looks/0.0.39/">0.0.39</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout 1c776e8aa9b65f0b49d57f8561dd3413dfdc50ee
-pip install "epythet==0.2.22"
+git checkout 95ac5dafcdb943493ee1977316bce0c8c283685a
+pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 

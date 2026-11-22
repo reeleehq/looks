@@ -2211,6 +2211,35 @@ looks.transition.TransitionError: a transition needs a positive
 duration; got 0.0...
 ```
 
+#### *property* dissolve *: [Transition](looks.transition.html.md#looks.transition.Transition)*
+
+itself. Shared with [`Ripple`](#looks.Ripple), so a
+host reads `t.dissolve` whatever kind of transition it was handed.
+
+```pycon
+>>> t = Transition(0.5)
+>>> t.dissolve is t
+True
+```
+
+* **Type:**
+  The cross-fade the host runs
+
+#### effect(, offset)
+
+The warp to add to the composite: `None`, a plain cross-fade has none.
+
+Shared with [`Ripple.effect()`](#looks.Ripple.effect), so a host asks `t.effect(offset=t0)`
+without an `isinstance` check.
+
+```pycon
+>>> Transition(0.5).effect(offset=1.0) is None
+True
+```
+
+* **Return type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Effect`](looks.spec.html.md#looks.spec.Effect)]
+
 ### *exception* looks.TransitionError
 
 Bases: [`SpecError`](looks.spec.html.md#looks.spec.SpecError)
