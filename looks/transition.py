@@ -177,6 +177,28 @@ class Transition:
                 "the mistake nor the filter — which is why this is refused here."
             )
 
+    @property
+    def dissolve(self) -> "Transition":
+        """The cross-fade the host runs: itself. Shared with :class:`Ripple`, so a
+        host reads ``t.dissolve`` whatever kind of transition it was handed.
+
+        >>> t = Transition(0.5)
+        >>> t.dissolve is t
+        True
+        """
+        return self
+
+    def effect(self, *, offset: float) -> Optional[Effect]:
+        """The warp to add to the composite: ``None``, a plain cross-fade has none.
+
+        Shared with :meth:`Ripple.effect`, so a host asks ``t.effect(offset=t0)``
+        without an ``isinstance`` check.
+
+        >>> Transition(0.5).effect(offset=1.0) is None
+        True
+        """
+        return None
+
     def to_dict(self) -> dict:
         return {"duration_s": self.duration_s, "curve": self.curve}
 

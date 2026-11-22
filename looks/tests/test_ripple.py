@@ -587,3 +587,14 @@ def test_the_bloom_leaves_chroma_where_it_was(env):
     plane = 160 * 90
     u, v = peak[plane : 2 * plane], peak[2 * plane :]
     assert max(abs(c - 4) for c in u) <= 1 and max(abs(c - 250) for c in v) <= 1
+
+
+def test_transition_and_ripple_share_one_protocol():
+    from looks import Ripple, Transition
+
+    for t in (Transition(0.5), Ripple(0.5)):
+        assert isinstance(t.dissolve, Transition)
+        eff = t.effect(offset=2.0)
+        assert eff is None or eff.name == "ripple"
+    assert Transition(0.5).effect(offset=2.0) is None
+    assert Ripple(0.5).effect(offset=2.0).params["start_s"] == 2.0
