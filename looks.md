@@ -1,4 +1,4 @@
-> built 2026-11-23 02:44 UTC from ed31a76 (main) · looks 0.0.40. Details: build_info.json
+> built 2026-11-23 03:21 UTC from 5e63e5e (main) · looks 0.0.41. Details: build_info.json
 
 # index.html.md
 
@@ -8,6 +8,12 @@
 
 Named video effects that compile to a backend command, each carrying a **licence tier** — so you can demand commercial-safe-only and get a **refusal** rather than a surprise.
 
+```bash
+pip install looks
+```
+
+Zero dependencies: ffmpeg is shelled out to, never linked.
+
 ```python
 from looks.environment import needs_gpl
 
@@ -15,8 +21,6 @@ needs_gpl(["scale", "eq", "lut3d"])  # -> ('eq',)
 ```
 
 `eq` is the obvious brightness/contrast/gamma filter. It exists **only in a GPL build of ffmpeg**. Nothing in the ffmpeg CLI will tell you, because the binary on your machine runs it fine — and the LGPL-clean way to do the same thing (`curves`, `colorlevels`, `exposure`) is one substitution away. That gap is what this package is for.
-
-`pip install looks` — **zero dependencies.** ffmpeg is shelled out to, never linked.
 
 ## What it does today
 
@@ -11719,7 +11723,7 @@ frames...
 
 # About this build
 
-This documentation was built on **2026-11-23 02:44 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/ed31a76da2c642a452dc6930051b054aa3d715ef"><code>ed31a76</code></a> on branch <code>main</code>, for **looks 0.0.40** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-23 03:21 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/5e63e5ed238dfbe88835b6c1d2de5cf23dec0e62"><code>5e63e5e</code></a> on branch <code>main</code>, for **looks 0.0.41** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -11728,9 +11732,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/looks/commit/ed31a76da2c642a452dc6930051b054aa3d715ef"><code>ed31a76da2c642a452dc6930051b054aa3d715ef</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/looks/commit/5e63e5ed238dfbe88835b6c1d2de5cf23dec0e62"><code>5e63e5ed238dfbe88835b6c1d2de5cf23dec0e62</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | <code>0.0.40</code>                                                                                                                                   |
+| Tags at this commit | <code>0.0.41</code>                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/looks</code>                                                                                                        |
 
@@ -11739,9 +11743,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/looks</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/45101482162">45101482162</a>       |
+| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/45105111321">45105111321</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>6fed2e01f00a44cf88f77a79e0877f2668218055</code> (in the history of the built commit) |
+| Event commit | <code>fbb6a2a03fc9c5168b76fe408b3246df530468ba</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -11766,13 +11770,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/looks/0.0.40/">0.0.40</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/looks/0.0.41/">0.0.41</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout ed31a76da2c642a452dc6930051b054aa3d715ef
+git checkout 5e63e5ed238dfbe88835b6c1d2de5cf23dec0e62
 pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

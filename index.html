@@ -122,13 +122,16 @@
 <section id="looks">
 <h1>looks<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks">¶</a></h1>
 <p>Named video effects that compile to a backend command, each carrying a <strong>licence tier</strong> — so you can demand commercial-safe-only and get a <strong>refusal</strong> rather than a surprise.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">pip<span class="w"> </span>install<span class="w"> </span>looks
+</span></code></pre></div>
+</div>
+<p>Zero dependencies: ffmpeg is shelled out to, never linked.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">looks.environment</span><span class="w"> </span><span class="kn">import</span> <span class="n">needs_gpl</span>
 </span><span id="line-2">
 </span><span id="line-3"><span class="n">needs_gpl</span><span class="p">([</span><span class="s2">"scale"</span><span class="p">,</span> <span class="s2">"eq"</span><span class="p">,</span> <span class="s2">"lut3d"</span><span class="p">])</span>  <span class="c1"># -&gt; ('eq',)</span>
 </span></code></pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">eq</span></code> is the obvious brightness/contrast/gamma filter. It exists <strong>only in a GPL build of ffmpeg</strong>. Nothing in the ffmpeg CLI will tell you, because the binary on your machine runs it fine — and the LGPL-clean way to do the same thing (<code class="docutils literal notranslate"><span class="pre">curves</span></code>, <code class="docutils literal notranslate"><span class="pre">colorlevels</span></code>, <code class="docutils literal notranslate"><span class="pre">exposure</span></code>) is one substitution away. That gap is what this package is for.</p>
-<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">looks</span></code> — <strong>zero dependencies.</strong> ffmpeg is shelled out to, never linked.</p>
 <section id="what-it-does-today">
 <h2>What it does today<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#what-it-does-today" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#what-it-does-today'">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">looks.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Size</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">ffmpeg_chain</span><span class="p">,</span> <span class="n">social_size</span>
@@ -244,7 +247,7 @@
 
 </section>
 </section>
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-23 02:44 UTC from <a href="https://github.com/reeleehq/looks/commit/ed31a76da2c642a452dc6930051b054aa3d715ef">ed31a76</a> (main) · looks 0.0.40 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-23 03:21 UTC from <a href="https://github.com/reeleehq/looks/commit/5e63e5ed238dfbe88835b6c1d2de5cf23dec0e62">5e63e5e</a> (main) · looks 0.0.41 · <a href="about-this-build.html">about this build</a></p>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
@@ -267,7 +270,7 @@
 </div>
 </footer>
 </div>
-<script src="_static/documentation_options.js?v=84bd753f"></script>
+<script src="_static/documentation_options.js?v=20c5f126"></script>
 <script src="_static/doctools.js?v=fd6eb6e6"></script>
 <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="_static/clipboard.min.js?v=a7894cd8"></script>
