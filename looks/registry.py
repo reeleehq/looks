@@ -360,6 +360,7 @@ class EffectRegistry:
         return with_defaults_applied
 
     def tags(self, key: str) -> frozenset:
+        """The tags of the entry registered under ``key``."""
         return self._entry(key).tags
 
     def keeps_depth(self, key: str) -> bool:

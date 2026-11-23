@@ -185,6 +185,7 @@ def flag(name, default=NO_DEFAULT):
 
 
 def text(name, default=NO_DEFAULT):
+    """A free-text parameter: must be a string."""
     return Param(
         name, lambda v: isinstance(v, str), "must be a string", default, kind="text"
     )

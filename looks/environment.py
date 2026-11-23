@@ -190,6 +190,7 @@ class EnvFingerprint:
 
     @classmethod
     def from_dict(cls, d: Mapping[str, str]) -> "EnvFingerprint":
+        """Rebuild a fingerprint from :meth:`to_dict` output."""
         return cls(
             path=d["path"],
             version=d["version"],
