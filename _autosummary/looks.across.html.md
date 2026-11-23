@@ -151,6 +151,13 @@ Clips the trim left outside the window. Empty under `full_range`.
 Named rather than counted, because *which* clip could not be fixed is
 the interesting half of the answer.
 
+#### to_dict()
+
+The spread as a JSON-serialisable dict (`looks.spread/v1`).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
 ### looks.across.Statistic
 
 Which measurement to make consistent. Closed, because the objective is a

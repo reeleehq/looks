@@ -250,6 +250,13 @@ from its `requires_filters`, so rule 22 never reads `None` for
 one: leaving it out is not a way past the refusal. (Changing a
 declared `rgb_only` changes `vf`’s pixels; bump `impl_version`.)
 
+#### tags(key)
+
+The tags of the entry registered under `key`.
+
+* **Return type:**
+  [`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)
+
 #### with_defaults(effect, params)
 
 `params` with this registry’s declared defaults filled in.

@@ -226,6 +226,10 @@ Why, when something could not be measured.
 * **Type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
+#### *property* can_flicker *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[bool](https://docs.python.org/3/builtins/functions.html#bool)]*
+
+Whether the chain can flicker; `None` while the dependency is undetermined.
+
 ### looks.frame_dependency.FLICKER_FREE *= frozenset({Dependency.INDEPENDENT})*
 
 The classes that cannot produce flicker.

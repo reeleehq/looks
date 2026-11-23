@@ -168,6 +168,13 @@ The whole frame is the identity window:
 Window(x=0.0, y=0.0, w=1.0, h=1.0)
 ```
 
+#### *classmethod* full()
+
+The window covering the whole frame.
+
+* **Return type:**
+  [`Window`](#looks.motion.Window)
+
 ### *class* looks.motion.WindowLike(\*args, \*\*kwargs)
 
 Bases: [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol)

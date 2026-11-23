@@ -160,6 +160,13 @@ SHA-256 over the sorted filter names.
 True
 ```
 
+#### *classmethod* from_dict(d)
+
+Rebuild a fingerprint from [`to_dict()`](#looks.environment.EnvFingerprint.to_dict) output.
+
+* **Return type:**
+  [`EnvFingerprint`](#looks.environment.EnvFingerprint)
+
 #### to_dict()
 
 A JSON-able form, for a plan’s serialisation and its hash.

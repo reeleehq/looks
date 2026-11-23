@@ -376,465 +376,469 @@
 </span><span id="line-189">        <span class="p">}</span></div>
 
 </span><span id="line-190">
+<div class="viewcode-block" id="EnvFingerprint.from_dict">
+<a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.EnvFingerprint.from_dict">[docs]</a>
 </span><span id="line-191">    <span class="nd">@classmethod</span>
 </span><span id="line-192">    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">"EnvFingerprint"</span><span class="p">:</span>
-</span><span id="line-193">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-</span><span id="line-194">            <span class="n">path</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">"path"</span><span class="p">],</span>
-</span><span id="line-195">            <span class="n">version</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">"version"</span><span class="p">],</span>
-</span><span id="line-196">            <span class="n">licence</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">"licence"</span><span class="p">],</span>
-</span><span id="line-197">            <span class="n">filters_digest</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">"filters_digest"</span><span class="p">],</span>
-</span><span id="line-198">        <span class="p">)</span></div>
-
-</span><span id="line-199">
-</span><span id="line-200">
-<div class="viewcode-block" id="FfmpegEnv">
-<a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.FfmpegEnv">[docs]</a>
-</span><span id="line-201"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-202"><span class="k">class</span><span class="w"> </span><span class="nc">FfmpegEnv</span><span class="p">:</span>
-</span><span id="line-203"><span class="w">    </span><span class="sd">"""One machine's ffmpeg, as far as it can be determined without running it.</span>
-</span><span id="line-204">
-</span><span id="line-205"><span class="sd">    Attributes:</span>
-</span><span id="line-206"><span class="sd">        path: Resolved path to the binary, or ``None`` if none was found.</span>
-</span><span id="line-207"><span class="sd">        version: The version string from ``ffmpeg -version``'s first line, or</span>
-</span><span id="line-208"><span class="sd">            ``None``.</span>
-</span><span id="line-209"><span class="sd">        licence: What ``ffmpeg -L`` says. :attr:`Licence.UNKNOWN` whenever the</span>
-</span><span id="line-210"><span class="sd">            output matched nothing known, the binary was absent, or the probe</span>
-</span><span id="line-211"><span class="sd">            failed — three different reasons, one honest answer.</span>
-</span><span id="line-212"><span class="sd">        filters: Every filter name ``ffmpeg -filters`` listed. Empty when the</span>
-</span><span id="line-213"><span class="sd">            probe failed, which is why :attr:`available` exists to tell "no</span>
-</span><span id="line-214"><span class="sd">            filters" apart from "did not look".</span>
-</span><span id="line-215"><span class="sd">        configuration: The raw ``configuration:`` line, kept for diagnostics</span>
-</span><span id="line-216"><span class="sd">            only. **Never** read it to decide a licence — it is editable by the</span>
-</span><span id="line-217"><span class="sd">            builder, which is the whole reason :attr:`licence` comes from</span>
-</span><span id="line-218"><span class="sd">            ``-L``.</span>
-</span><span id="line-219"><span class="sd">        notes: Human-readable reasons anything above is missing.</span>
-</span><span id="line-220"><span class="sd">    """</span>
-</span><span id="line-221">
-</span><span id="line-222">    <span class="n">path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="line-223">    <span class="n">version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="line-224">    <span class="n">licence</span><span class="p">:</span> <span class="n">Licence</span> <span class="o">=</span> <span class="n">Licence</span><span class="o">.</span><span class="n">UNKNOWN</span>
-</span><span id="line-225">    <span class="n">filters</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">()</span>
-</span><span id="line-226">    <span class="n">configuration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="line-227">    <span class="n">notes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
-</span><span id="line-228">
-</span><span id="line-229">    <span class="nd">@property</span>
-</span><span id="line-230">    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="line-231"><span class="w">        </span><span class="sd">"""Whether an ffmpeg binary was found and answered at all.</span>
-</span><span id="line-232">
-</span><span id="line-233"><span class="sd">        Distinct from "has no filters": a probe that could not run leaves</span>
-</span><span id="line-234"><span class="sd">        :attr:`filters` empty too, and a caller must be able to tell those</span>
-</span><span id="line-235"><span class="sd">        apart before concluding anything.</span>
-</span><span id="line-236"><span class="sd">        """</span>
-</span><span id="line-237">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">)</span>
-</span><span id="line-238">
-<div class="viewcode-block" id="FfmpegEnv.has_filter">
-<a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.FfmpegEnv.has_filter">[docs]</a>
-</span><span id="line-239">    <span class="k">def</span><span class="w"> </span><span class="nf">has_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="line-240"><span class="w">        </span><span class="sd">"""Whether ``name`` is in this build's filter table.</span>
-</span><span id="line-241">
-</span><span id="line-242"><span class="sd">        Always ``False`` when the probe did not run — check :attr:`available`</span>
-</span><span id="line-243"><span class="sd">        first if the difference matters to you.</span>
-</span><span id="line-244">
-</span><span id="line-245"><span class="sd">        Examples:</span>
-</span><span id="line-246"><span class="sd">            &gt;&gt;&gt; FfmpegEnv(filters=frozenset({'lut3d'})).has_filter('lut3d')</span>
-</span><span id="line-247"><span class="sd">            True</span>
-</span><span id="line-248"><span class="sd">            &gt;&gt;&gt; FfmpegEnv(filters=frozenset({'lut3d'})).has_filter('eq')</span>
-</span><span id="line-249"><span class="sd">            False</span>
-</span><span id="line-250"><span class="sd">        """</span>
-</span><span id="line-251">        <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filters</span></div>
-
-</span><span id="line-252">
-<div class="viewcode-block" id="FfmpegEnv.fingerprint">
-<a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.FfmpegEnv.fingerprint">[docs]</a>
-</span><span id="line-253">    <span class="k">def</span><span class="w"> </span><span class="nf">fingerprint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EnvFingerprint</span><span class="p">:</span>
-</span><span id="line-254"><span class="w">        </span><span class="sd">"""The comparable summary a compiled plan records.</span>
-</span><span id="line-255">
-</span><span id="line-256"><span class="sd">        Raises:</span>
-</span><span id="line-257"><span class="sd">            RuntimeError: The probe did not run. A fingerprint of an</span>
-</span><span id="line-258"><span class="sd">                environment nobody looked at would make two plans compiled</span>
-</span><span id="line-259"><span class="sd">                against unknown binaries compare equal, which is the false</span>
-</span><span id="line-260"><span class="sd">                direction.</span>
-</span><span id="line-261">
-</span><span id="line-262"><span class="sd">        Examples:</span>
-</span><span id="line-263"><span class="sd">            &gt;&gt;&gt; FfmpegEnv().fingerprint()</span>
-</span><span id="line-264"><span class="sd">            Traceback (most recent call last):</span>
-</span><span id="line-265"><span class="sd">            ...</span>
-</span><span id="line-266"><span class="sd">            RuntimeError: cannot fingerprint an ffmpeg that did not answer...</span>
-</span><span id="line-267"><span class="sd">        """</span>
-</span><span id="line-268">        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">available</span><span class="p">:</span>
-</span><span id="line-269">            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-</span><span id="line-270">                <span class="sa">f</span><span class="s2">"cannot fingerprint an ffmpeg that did not answer: "</span>
-</span><span id="line-271">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">notes</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="p">(</span><span class="s1">'no probe was run'</span><span class="p">,)</span><span class="si">}</span><span class="s2">"</span>
-</span><span id="line-272">            <span class="p">)</span>
-</span><span id="line-273">        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span>
-</span><span id="line-274">            <span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span>
-</span><span id="line-275">        <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
-</span><span id="line-276">        <span class="k">return</span> <span class="n">EnvFingerprint</span><span class="p">(</span>
-</span><span id="line-277">            <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-278">            <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
-</span><span id="line-279">            <span class="n">licence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">licence</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-</span><span id="line-280">            <span class="n">filters_digest</span><span class="o">=</span><span class="n">digest</span><span class="p">,</span>
-</span><span id="line-281">        <span class="p">)</span></div>
-
-</span><span id="line-282">
-<div class="viewcode-block" id="FfmpegEnv.missing">
-<a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.FfmpegEnv.missing">[docs]</a>
-</span><span id="line-283">    <span class="k">def</span><span class="w"> </span><span class="nf">missing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-</span><span id="line-284"><span class="w">        </span><span class="sd">"""Which of ``names`` this build does not have, in the order given.</span>
-</span><span id="line-285">
-</span><span id="line-286"><span class="sd">        Examples:</span>
-</span><span id="line-287"><span class="sd">            &gt;&gt;&gt; env = FfmpegEnv(filters=frozenset({'lut3d', 'curves'}))</span>
-</span><span id="line-288"><span class="sd">            &gt;&gt;&gt; env.missing(['lut3d', 'eq', 'boxblur'])</span>
-</span><span id="line-289"><span class="sd">            ('eq', 'boxblur')</span>
-</span><span id="line-290"><span class="sd">        """</span>
-</span><span id="line-291">        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names</span> <span class="k">if</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">)</span></div>
+</span><span id="line-193"><span class="w">        </span><span class="sd">"""Rebuild a fingerprint from :meth:`to_dict` output."""</span>
+</span><span id="line-194">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+</span><span id="line-195">            <span class="n">path</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">"path"</span><span class="p">],</span>
+</span><span id="line-196">            <span class="n">version</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">"version"</span><span class="p">],</span>
+</span><span id="line-197">            <span class="n">licence</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">"licence"</span><span class="p">],</span>
+</span><span id="line-198">            <span class="n">filters_digest</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">"filters_digest"</span><span class="p">],</span>
+</span><span id="line-199">        <span class="p">)</span></div>
 </div>
 
-</span><span id="line-292">
+</span><span id="line-200">
+</span><span id="line-201">
+<div class="viewcode-block" id="FfmpegEnv">
+<a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.FfmpegEnv">[docs]</a>
+</span><span id="line-202"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-203"><span class="k">class</span><span class="w"> </span><span class="nc">FfmpegEnv</span><span class="p">:</span>
+</span><span id="line-204"><span class="w">    </span><span class="sd">"""One machine's ffmpeg, as far as it can be determined without running it.</span>
+</span><span id="line-205">
+</span><span id="line-206"><span class="sd">    Attributes:</span>
+</span><span id="line-207"><span class="sd">        path: Resolved path to the binary, or ``None`` if none was found.</span>
+</span><span id="line-208"><span class="sd">        version: The version string from ``ffmpeg -version``'s first line, or</span>
+</span><span id="line-209"><span class="sd">            ``None``.</span>
+</span><span id="line-210"><span class="sd">        licence: What ``ffmpeg -L`` says. :attr:`Licence.UNKNOWN` whenever the</span>
+</span><span id="line-211"><span class="sd">            output matched nothing known, the binary was absent, or the probe</span>
+</span><span id="line-212"><span class="sd">            failed — three different reasons, one honest answer.</span>
+</span><span id="line-213"><span class="sd">        filters: Every filter name ``ffmpeg -filters`` listed. Empty when the</span>
+</span><span id="line-214"><span class="sd">            probe failed, which is why :attr:`available` exists to tell "no</span>
+</span><span id="line-215"><span class="sd">            filters" apart from "did not look".</span>
+</span><span id="line-216"><span class="sd">        configuration: The raw ``configuration:`` line, kept for diagnostics</span>
+</span><span id="line-217"><span class="sd">            only. **Never** read it to decide a licence — it is editable by the</span>
+</span><span id="line-218"><span class="sd">            builder, which is the whole reason :attr:`licence` comes from</span>
+</span><span id="line-219"><span class="sd">            ``-L``.</span>
+</span><span id="line-220"><span class="sd">        notes: Human-readable reasons anything above is missing.</span>
+</span><span id="line-221"><span class="sd">    """</span>
+</span><span id="line-222">
+</span><span id="line-223">    <span class="n">path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="line-224">    <span class="n">version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="line-225">    <span class="n">licence</span><span class="p">:</span> <span class="n">Licence</span> <span class="o">=</span> <span class="n">Licence</span><span class="o">.</span><span class="n">UNKNOWN</span>
+</span><span id="line-226">    <span class="n">filters</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">()</span>
+</span><span id="line-227">    <span class="n">configuration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="line-228">    <span class="n">notes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
+</span><span id="line-229">
+</span><span id="line-230">    <span class="nd">@property</span>
+</span><span id="line-231">    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-232"><span class="w">        </span><span class="sd">"""Whether an ffmpeg binary was found and answered at all.</span>
+</span><span id="line-233">
+</span><span id="line-234"><span class="sd">        Distinct from "has no filters": a probe that could not run leaves</span>
+</span><span id="line-235"><span class="sd">        :attr:`filters` empty too, and a caller must be able to tell those</span>
+</span><span id="line-236"><span class="sd">        apart before concluding anything.</span>
+</span><span id="line-237"><span class="sd">        """</span>
+</span><span id="line-238">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">)</span>
+</span><span id="line-239">
+<div class="viewcode-block" id="FfmpegEnv.has_filter">
+<a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.FfmpegEnv.has_filter">[docs]</a>
+</span><span id="line-240">    <span class="k">def</span><span class="w"> </span><span class="nf">has_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="line-241"><span class="w">        </span><span class="sd">"""Whether ``name`` is in this build's filter table.</span>
+</span><span id="line-242">
+</span><span id="line-243"><span class="sd">        Always ``False`` when the probe did not run — check :attr:`available`</span>
+</span><span id="line-244"><span class="sd">        first if the difference matters to you.</span>
+</span><span id="line-245">
+</span><span id="line-246"><span class="sd">        Examples:</span>
+</span><span id="line-247"><span class="sd">            &gt;&gt;&gt; FfmpegEnv(filters=frozenset({'lut3d'})).has_filter('lut3d')</span>
+</span><span id="line-248"><span class="sd">            True</span>
+</span><span id="line-249"><span class="sd">            &gt;&gt;&gt; FfmpegEnv(filters=frozenset({'lut3d'})).has_filter('eq')</span>
+</span><span id="line-250"><span class="sd">            False</span>
+</span><span id="line-251"><span class="sd">        """</span>
+</span><span id="line-252">        <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filters</span></div>
+
+</span><span id="line-253">
+<div class="viewcode-block" id="FfmpegEnv.fingerprint">
+<a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.FfmpegEnv.fingerprint">[docs]</a>
+</span><span id="line-254">    <span class="k">def</span><span class="w"> </span><span class="nf">fingerprint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EnvFingerprint</span><span class="p">:</span>
+</span><span id="line-255"><span class="w">        </span><span class="sd">"""The comparable summary a compiled plan records.</span>
+</span><span id="line-256">
+</span><span id="line-257"><span class="sd">        Raises:</span>
+</span><span id="line-258"><span class="sd">            RuntimeError: The probe did not run. A fingerprint of an</span>
+</span><span id="line-259"><span class="sd">                environment nobody looked at would make two plans compiled</span>
+</span><span id="line-260"><span class="sd">                against unknown binaries compare equal, which is the false</span>
+</span><span id="line-261"><span class="sd">                direction.</span>
+</span><span id="line-262">
+</span><span id="line-263"><span class="sd">        Examples:</span>
+</span><span id="line-264"><span class="sd">            &gt;&gt;&gt; FfmpegEnv().fingerprint()</span>
+</span><span id="line-265"><span class="sd">            Traceback (most recent call last):</span>
+</span><span id="line-266"><span class="sd">            ...</span>
+</span><span id="line-267"><span class="sd">            RuntimeError: cannot fingerprint an ffmpeg that did not answer...</span>
+</span><span id="line-268"><span class="sd">        """</span>
+</span><span id="line-269">        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">available</span><span class="p">:</span>
+</span><span id="line-270">            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+</span><span id="line-271">                <span class="sa">f</span><span class="s2">"cannot fingerprint an ffmpeg that did not answer: "</span>
+</span><span id="line-272">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">notes</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="p">(</span><span class="s1">'no probe was run'</span><span class="p">,)</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="line-273">            <span class="p">)</span>
+</span><span id="line-274">        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span>
+</span><span id="line-275">            <span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span>
+</span><span id="line-276">        <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+</span><span id="line-277">        <span class="k">return</span> <span class="n">EnvFingerprint</span><span class="p">(</span>
+</span><span id="line-278">            <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-279">            <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">,</span>
+</span><span id="line-280">            <span class="n">licence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">licence</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+</span><span id="line-281">            <span class="n">filters_digest</span><span class="o">=</span><span class="n">digest</span><span class="p">,</span>
+</span><span id="line-282">        <span class="p">)</span></div>
+
+</span><span id="line-283">
+<div class="viewcode-block" id="FfmpegEnv.missing">
+<a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.FfmpegEnv.missing">[docs]</a>
+</span><span id="line-284">    <span class="k">def</span><span class="w"> </span><span class="nf">missing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+</span><span id="line-285"><span class="w">        </span><span class="sd">"""Which of ``names`` this build does not have, in the order given.</span>
+</span><span id="line-286">
+</span><span id="line-287"><span class="sd">        Examples:</span>
+</span><span id="line-288"><span class="sd">            &gt;&gt;&gt; env = FfmpegEnv(filters=frozenset({'lut3d', 'curves'}))</span>
+</span><span id="line-289"><span class="sd">            &gt;&gt;&gt; env.missing(['lut3d', 'eq', 'boxblur'])</span>
+</span><span id="line-290"><span class="sd">            ('eq', 'boxblur')</span>
+</span><span id="line-291"><span class="sd">        """</span>
+</span><span id="line-292">        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names</span> <span class="k">if</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">)</span></div>
+</div>
+
 </span><span id="line-293">
-</span><span id="line-294"><span class="k">def</span><span class="w"> </span><span class="nf">_ask</span><span class="p">(</span><span class="n">argv</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-295"><span class="w">    </span><span class="sd">"""Ask ffmpeg one question and return its combined output, or ``None``.</span>
-</span><span id="line-296">
-</span><span id="line-297"><span class="sd">    Goes through :func:`looks._run.run`, the package's single process</span>
-</span><span id="line-298"><span class="sd">    chokepoint, so these calls are covered by the ``-f null -`` invariant like</span>
-</span><span id="line-299"><span class="sd">    every other — they qualify under its environment-question clause, since</span>
-</span><span id="line-300"><span class="sd">    ``-L`` / ``-filters`` / ``-version`` open no input and write no output.</span>
-</span><span id="line-301">
-</span><span id="line-302"><span class="sd">    Never surfaces an environment failure as an exception: a missing binary, a</span>
-</span><span id="line-303"><span class="sd">    timeout or a permission error are facts about the machine that the caller</span>
-</span><span id="line-304"><span class="sd">    wants back as data. A probe that raises turns "I could not determine this"</span>
-</span><span id="line-305"><span class="sd">    into "your program stopped", which is the wrong trade for a diagnostic.</span>
-</span><span id="line-306"><span class="sd">    """</span>
-</span><span id="line-307">    <span class="n">result</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">argv</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-</span><span id="line-308">    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">result</span><span class="o">.</span><span class="n">timed_out</span><span class="p">:</span>
-</span><span id="line-309">        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="line-310">    <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span> <span class="o">+</span> <span class="n">result</span><span class="o">.</span><span class="n">stderr</span>
-</span><span id="line-311">
+</span><span id="line-294">
+</span><span id="line-295"><span class="k">def</span><span class="w"> </span><span class="nf">_ask</span><span class="p">(</span><span class="n">argv</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-296"><span class="w">    </span><span class="sd">"""Ask ffmpeg one question and return its combined output, or ``None``.</span>
+</span><span id="line-297">
+</span><span id="line-298"><span class="sd">    Goes through :func:`looks._run.run`, the package's single process</span>
+</span><span id="line-299"><span class="sd">    chokepoint, so these calls are covered by the ``-f null -`` invariant like</span>
+</span><span id="line-300"><span class="sd">    every other — they qualify under its environment-question clause, since</span>
+</span><span id="line-301"><span class="sd">    ``-L`` / ``-filters`` / ``-version`` open no input and write no output.</span>
+</span><span id="line-302">
+</span><span id="line-303"><span class="sd">    Never surfaces an environment failure as an exception: a missing binary, a</span>
+</span><span id="line-304"><span class="sd">    timeout or a permission error are facts about the machine that the caller</span>
+</span><span id="line-305"><span class="sd">    wants back as data. A probe that raises turns "I could not determine this"</span>
+</span><span id="line-306"><span class="sd">    into "your program stopped", which is the wrong trade for a diagnostic.</span>
+</span><span id="line-307"><span class="sd">    """</span>
+</span><span id="line-308">    <span class="n">result</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">argv</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+</span><span id="line-309">    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">result</span><span class="o">.</span><span class="n">timed_out</span><span class="p">:</span>
+</span><span id="line-310">        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="line-311">    <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span> <span class="o">+</span> <span class="n">result</span><span class="o">.</span><span class="n">stderr</span>
 </span><span id="line-312">
+</span><span id="line-313">
 <div class="viewcode-block" id="parse_licence">
 <a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.parse_licence">[docs]</a>
-</span><span id="line-313"><span class="k">def</span><span class="w"> </span><span class="nf">parse_licence</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Licence</span><span class="p">:</span>
-</span><span id="line-314"><span class="w">    </span><span class="sd">"""Classify ``ffmpeg -L`` output.</span>
-</span><span id="line-315">
-</span><span id="line-316"><span class="sd">    Most-restrictive-first, because the licence names are prefixes of one</span>
-</span><span id="line-317"><span class="sd">    another: a permissive-first scan matches "GNU General Public License" inside</span>
-</span><span id="line-318"><span class="sd">    the GPLv3 text and reports GPLv2. Anything unmatched is</span>
-</span><span id="line-319"><span class="sd">    :attr:`Licence.UNKNOWN` — never a default, never a guess.</span>
-</span><span id="line-320">
-</span><span id="line-321"><span class="sd">    Examples:</span>
-</span><span id="line-322"><span class="sd">        &gt;&gt;&gt; parse_licence("ffmpeg is free software; ... GNU General Public "</span>
-</span><span id="line-323"><span class="sd">        ...               "License as published by ... either version 3")</span>
-</span><span id="line-324"><span class="sd">        &lt;Licence.GPL3: 'gpl3'&gt;</span>
-</span><span id="line-325"><span class="sd">        &gt;&gt;&gt; parse_licence("... GNU Lesser General Public License ... version 2.1")</span>
-</span><span id="line-326"><span class="sd">        &lt;Licence.LGPL21: 'lgpl2.1'&gt;</span>
-</span><span id="line-327"><span class="sd">        &gt;&gt;&gt; parse_licence("this build is nonfree and unredistributable")</span>
-</span><span id="line-328"><span class="sd">        &lt;Licence.NONFREE: 'nonfree'&gt;</span>
-</span><span id="line-329"><span class="sd">        &gt;&gt;&gt; parse_licence("")</span>
-</span><span id="line-330"><span class="sd">        &lt;Licence.UNKNOWN: 'unknown'&gt;</span>
-</span><span id="line-331"><span class="sd">        &gt;&gt;&gt; parse_licence("Copyright (c) somebody, all rights reserved")</span>
-</span><span id="line-332"><span class="sd">        &lt;Licence.UNKNOWN: 'unknown'&gt;</span>
-</span><span id="line-333"><span class="sd">    """</span>
-</span><span id="line-334">    <span class="k">for</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">licence</span> <span class="ow">in</span> <span class="n">_LICENCE_PROBES</span><span class="p">:</span>
-</span><span id="line-335">        <span class="k">if</span> <span class="n">pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-</span><span id="line-336">            <span class="k">return</span> <span class="n">licence</span>
-</span><span id="line-337">    <span class="k">return</span> <span class="n">Licence</span><span class="o">.</span><span class="n">UNKNOWN</span></div>
+</span><span id="line-314"><span class="k">def</span><span class="w"> </span><span class="nf">parse_licence</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Licence</span><span class="p">:</span>
+</span><span id="line-315"><span class="w">    </span><span class="sd">"""Classify ``ffmpeg -L`` output.</span>
+</span><span id="line-316">
+</span><span id="line-317"><span class="sd">    Most-restrictive-first, because the licence names are prefixes of one</span>
+</span><span id="line-318"><span class="sd">    another: a permissive-first scan matches "GNU General Public License" inside</span>
+</span><span id="line-319"><span class="sd">    the GPLv3 text and reports GPLv2. Anything unmatched is</span>
+</span><span id="line-320"><span class="sd">    :attr:`Licence.UNKNOWN` — never a default, never a guess.</span>
+</span><span id="line-321">
+</span><span id="line-322"><span class="sd">    Examples:</span>
+</span><span id="line-323"><span class="sd">        &gt;&gt;&gt; parse_licence("ffmpeg is free software; ... GNU General Public "</span>
+</span><span id="line-324"><span class="sd">        ...               "License as published by ... either version 3")</span>
+</span><span id="line-325"><span class="sd">        &lt;Licence.GPL3: 'gpl3'&gt;</span>
+</span><span id="line-326"><span class="sd">        &gt;&gt;&gt; parse_licence("... GNU Lesser General Public License ... version 2.1")</span>
+</span><span id="line-327"><span class="sd">        &lt;Licence.LGPL21: 'lgpl2.1'&gt;</span>
+</span><span id="line-328"><span class="sd">        &gt;&gt;&gt; parse_licence("this build is nonfree and unredistributable")</span>
+</span><span id="line-329"><span class="sd">        &lt;Licence.NONFREE: 'nonfree'&gt;</span>
+</span><span id="line-330"><span class="sd">        &gt;&gt;&gt; parse_licence("")</span>
+</span><span id="line-331"><span class="sd">        &lt;Licence.UNKNOWN: 'unknown'&gt;</span>
+</span><span id="line-332"><span class="sd">        &gt;&gt;&gt; parse_licence("Copyright (c) somebody, all rights reserved")</span>
+</span><span id="line-333"><span class="sd">        &lt;Licence.UNKNOWN: 'unknown'&gt;</span>
+</span><span id="line-334"><span class="sd">    """</span>
+</span><span id="line-335">    <span class="k">for</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">licence</span> <span class="ow">in</span> <span class="n">_LICENCE_PROBES</span><span class="p">:</span>
+</span><span id="line-336">        <span class="k">if</span> <span class="n">pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+</span><span id="line-337">            <span class="k">return</span> <span class="n">licence</span>
+</span><span id="line-338">    <span class="k">return</span> <span class="n">Licence</span><span class="o">.</span><span class="n">UNKNOWN</span></div>
 
-</span><span id="line-338">
 </span><span id="line-339">
+</span><span id="line-340">
 <div class="viewcode-block" id="parse_filters">
 <a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.parse_filters">[docs]</a>
-</span><span id="line-340"><span class="k">def</span><span class="w"> </span><span class="nf">parse_filters</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-341"><span class="w">    </span><span class="sd">"""Extract filter names from ``ffmpeg -filters`` output.</span>
-</span><span id="line-342">
-</span><span id="line-343"><span class="sd">    The samples below are **verbatim** ffmpeg output, not hand-written — an</span>
-</span><span id="line-344"><span class="sd">    invented sample is a test of the regex against itself, which is how the</span>
-</span><span id="line-345"><span class="sd">    first version of this parser passed its doctests while returning zero</span>
-</span><span id="line-346"><span class="sd">    filters from the real binary.</span>
-</span><span id="line-347">
-</span><span id="line-348"><span class="sd">    Examples:</span>
-</span><span id="line-349"><span class="sd">        Two-character flags, as ffmpeg 8.1 emits them:</span>
-</span><span id="line-350">
-</span><span id="line-351"><span class="sd">        &gt;&gt;&gt; eight = '''Filters:</span>
-</span><span id="line-352"><span class="sd">        ...   T.. = Timeline support</span>
-</span><span id="line-353"><span class="sd">        ...   .S. = Slice threading</span>
-</span><span id="line-354"><span class="sd">        ...   ------</span>
-</span><span id="line-355"><span class="sd">        ...  TS aap               AA-&gt;A      Apply Affine Projection algorithm.</span>
-</span><span id="line-356"><span class="sd">        ...  .. abench            A-&gt;A       Benchmark part of a filtergraph.</span>
-</span><span id="line-357"><span class="sd">        ...  TS lut3d             V-&gt;V       Adjust colors using a 3D LUT.</span>
-</span><span id="line-358"><span class="sd">        ... '''</span>
-</span><span id="line-359"><span class="sd">        &gt;&gt;&gt; sorted(parse_filters(eight))</span>
-</span><span id="line-360"><span class="sd">        ['aap', 'abench', 'lut3d']</span>
-</span><span id="line-361">
-</span><span id="line-362"><span class="sd">        Three-character flags, as older builds emit them:</span>
-</span><span id="line-363">
-</span><span id="line-364"><span class="sd">        &gt;&gt;&gt; six = ' TSC lut3d            V-&gt;V       Adjust colors using a 3D LUT.'</span>
-</span><span id="line-365"><span class="sd">        &gt;&gt;&gt; sorted(parse_filters(six))</span>
-</span><span id="line-366"><span class="sd">        ['lut3d']</span>
-</span><span id="line-367">
-</span><span id="line-368"><span class="sd">        The legend lines are rejected because they carry no io signature:</span>
-</span><span id="line-369">
-</span><span id="line-370"><span class="sd">        &gt;&gt;&gt; parse_filters('  T.. = Timeline support')</span>
-</span><span id="line-371"><span class="sd">        frozenset()</span>
-</span><span id="line-372"><span class="sd">    """</span>
-</span><span id="line-373">    <span class="n">names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-</span><span id="line-374">    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
-</span><span id="line-375">        <span class="n">m</span> <span class="o">=</span> <span class="n">_FILTER_ROW</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-</span><span id="line-376">        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
-</span><span id="line-377">            <span class="n">names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">"name"</span><span class="p">))</span>
-</span><span id="line-378">    <span class="k">return</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">names</span><span class="p">)</span></div>
+</span><span id="line-341"><span class="k">def</span><span class="w"> </span><span class="nf">parse_filters</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-342"><span class="w">    </span><span class="sd">"""Extract filter names from ``ffmpeg -filters`` output.</span>
+</span><span id="line-343">
+</span><span id="line-344"><span class="sd">    The samples below are **verbatim** ffmpeg output, not hand-written — an</span>
+</span><span id="line-345"><span class="sd">    invented sample is a test of the regex against itself, which is how the</span>
+</span><span id="line-346"><span class="sd">    first version of this parser passed its doctests while returning zero</span>
+</span><span id="line-347"><span class="sd">    filters from the real binary.</span>
+</span><span id="line-348">
+</span><span id="line-349"><span class="sd">    Examples:</span>
+</span><span id="line-350"><span class="sd">        Two-character flags, as ffmpeg 8.1 emits them:</span>
+</span><span id="line-351">
+</span><span id="line-352"><span class="sd">        &gt;&gt;&gt; eight = '''Filters:</span>
+</span><span id="line-353"><span class="sd">        ...   T.. = Timeline support</span>
+</span><span id="line-354"><span class="sd">        ...   .S. = Slice threading</span>
+</span><span id="line-355"><span class="sd">        ...   ------</span>
+</span><span id="line-356"><span class="sd">        ...  TS aap               AA-&gt;A      Apply Affine Projection algorithm.</span>
+</span><span id="line-357"><span class="sd">        ...  .. abench            A-&gt;A       Benchmark part of a filtergraph.</span>
+</span><span id="line-358"><span class="sd">        ...  TS lut3d             V-&gt;V       Adjust colors using a 3D LUT.</span>
+</span><span id="line-359"><span class="sd">        ... '''</span>
+</span><span id="line-360"><span class="sd">        &gt;&gt;&gt; sorted(parse_filters(eight))</span>
+</span><span id="line-361"><span class="sd">        ['aap', 'abench', 'lut3d']</span>
+</span><span id="line-362">
+</span><span id="line-363"><span class="sd">        Three-character flags, as older builds emit them:</span>
+</span><span id="line-364">
+</span><span id="line-365"><span class="sd">        &gt;&gt;&gt; six = ' TSC lut3d            V-&gt;V       Adjust colors using a 3D LUT.'</span>
+</span><span id="line-366"><span class="sd">        &gt;&gt;&gt; sorted(parse_filters(six))</span>
+</span><span id="line-367"><span class="sd">        ['lut3d']</span>
+</span><span id="line-368">
+</span><span id="line-369"><span class="sd">        The legend lines are rejected because they carry no io signature:</span>
+</span><span id="line-370">
+</span><span id="line-371"><span class="sd">        &gt;&gt;&gt; parse_filters('  T.. = Timeline support')</span>
+</span><span id="line-372"><span class="sd">        frozenset()</span>
+</span><span id="line-373"><span class="sd">    """</span>
+</span><span id="line-374">    <span class="n">names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+</span><span id="line-375">    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+</span><span id="line-376">        <span class="n">m</span> <span class="o">=</span> <span class="n">_FILTER_ROW</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+</span><span id="line-377">        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+</span><span id="line-378">            <span class="n">names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">"name"</span><span class="p">))</span>
+</span><span id="line-379">    <span class="k">return</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">names</span><span class="p">)</span></div>
 
-</span><span id="line-379">
 </span><span id="line-380">
+</span><span id="line-381">
 <div class="viewcode-block" id="parse_configuration">
 <a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.parse_configuration">[docs]</a>
-</span><span id="line-381"><span class="k">def</span><span class="w"> </span><span class="nf">parse_configuration</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-382"><span class="w">    </span><span class="sd">"""Pull the ``configuration:`` line out of ``ffmpeg -version`` output.</span>
-</span><span id="line-383">
-</span><span id="line-384"><span class="sd">    Diagnostics only. See :attr:`FfmpegEnv.configuration` for why this must</span>
-</span><span id="line-385"><span class="sd">    never decide a licence.</span>
-</span><span id="line-386">
-</span><span id="line-387"><span class="sd">    Examples:</span>
-</span><span id="line-388"><span class="sd">        &gt;&gt;&gt; parse_configuration("ffmpeg version 8.1\\nconfiguration: --enable-gpl\\n")</span>
-</span><span id="line-389"><span class="sd">        '--enable-gpl'</span>
-</span><span id="line-390"><span class="sd">        &gt;&gt;&gt; parse_configuration("ffmpeg version 8.1\\n") is None</span>
-</span><span id="line-391"><span class="sd">        True</span>
-</span><span id="line-392"><span class="sd">    """</span>
-</span><span id="line-393">    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
-</span><span id="line-394">        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"configuration:"</span><span class="p">):</span>
-</span><span id="line-395">            <span class="k">return</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">"configuration:"</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-</span><span id="line-396">    <span class="k">return</span> <span class="kc">None</span></div>
+</span><span id="line-382"><span class="k">def</span><span class="w"> </span><span class="nf">parse_configuration</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-383"><span class="w">    </span><span class="sd">"""Pull the ``configuration:`` line out of ``ffmpeg -version`` output.</span>
+</span><span id="line-384">
+</span><span id="line-385"><span class="sd">    Diagnostics only. See :attr:`FfmpegEnv.configuration` for why this must</span>
+</span><span id="line-386"><span class="sd">    never decide a licence.</span>
+</span><span id="line-387">
+</span><span id="line-388"><span class="sd">    Examples:</span>
+</span><span id="line-389"><span class="sd">        &gt;&gt;&gt; parse_configuration("ffmpeg version 8.1\\nconfiguration: --enable-gpl\\n")</span>
+</span><span id="line-390"><span class="sd">        '--enable-gpl'</span>
+</span><span id="line-391"><span class="sd">        &gt;&gt;&gt; parse_configuration("ffmpeg version 8.1\\n") is None</span>
+</span><span id="line-392"><span class="sd">        True</span>
+</span><span id="line-393"><span class="sd">    """</span>
+</span><span id="line-394">    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+</span><span id="line-395">        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"configuration:"</span><span class="p">):</span>
+</span><span id="line-396">            <span class="k">return</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">"configuration:"</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</span><span id="line-397">    <span class="k">return</span> <span class="kc">None</span></div>
 
-</span><span id="line-397">
 </span><span id="line-398">
+</span><span id="line-399">
 <div class="viewcode-block" id="probe">
 <a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.probe">[docs]</a>
-</span><span id="line-399"><span class="k">def</span><span class="w"> </span><span class="nf">probe</span><span class="p">(</span>
-</span><span id="line-400">    <span class="n">ffmpeg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_FFMPEG</span><span class="p">,</span>
-</span><span id="line-401">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-402">    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DFLT_PROBE_TIMEOUT_S</span><span class="p">,</span>
-</span><span id="line-403"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FfmpegEnv</span><span class="p">:</span>
-</span><span id="line-404"><span class="w">    </span><span class="sd">"""Interrogate one ffmpeg binary. Three subprocess calls, no input, no output.</span>
-</span><span id="line-405">
-</span><span id="line-406"><span class="sd">    Returns a :class:`FfmpegEnv` in every case, including when ``ffmpeg`` is not</span>
-</span><span id="line-407"><span class="sd">    installed — the absence of a binary is a fact about the machine, and a</span>
-</span><span id="line-408"><span class="sd">    caller diagnosing it needs a value rather than an exception.</span>
-</span><span id="line-409">
-</span><span id="line-410"><span class="sd">    Args:</span>
-</span><span id="line-411"><span class="sd">        ffmpeg: Binary name (looked up on ``PATH``) or an explicit path.</span>
-</span><span id="line-412"><span class="sd">        timeout: Seconds allowed per probe call.</span>
-</span><span id="line-413">
-</span><span id="line-414"><span class="sd">    Examples:</span>
-</span><span id="line-415"><span class="sd">        &gt;&gt;&gt; env = probe('a-binary-that-does-not-exist')</span>
-</span><span id="line-416"><span class="sd">        &gt;&gt;&gt; env.available</span>
-</span><span id="line-417"><span class="sd">        False</span>
-</span><span id="line-418"><span class="sd">        &gt;&gt;&gt; env.licence</span>
-</span><span id="line-419"><span class="sd">        &lt;Licence.UNKNOWN: 'unknown'&gt;</span>
-</span><span id="line-420"><span class="sd">        &gt;&gt;&gt; env.notes[0]</span>
-</span><span id="line-421"><span class="sd">        "no 'a-binary-that-does-not-exist' on PATH"</span>
-</span><span id="line-422"><span class="sd">    """</span>
-</span><span id="line-423">    <span class="n">resolved</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">ffmpeg</span><span class="p">)</span>
-</span><span id="line-424">    <span class="k">if</span> <span class="n">resolved</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-425">        <span class="k">return</span> <span class="n">FfmpegEnv</span><span class="p">(</span><span class="n">notes</span><span class="o">=</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no </span><span class="si">{</span><span class="n">ffmpeg</span><span class="si">!r}</span><span class="s2"> on PATH"</span><span class="p">,))</span>
-</span><span id="line-426">
-</span><span id="line-427">    <span class="n">notes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-428">
-</span><span id="line-429">    <span class="n">licence_out</span> <span class="o">=</span> <span class="n">_ask</span><span class="p">([</span><span class="n">resolved</span><span class="p">,</span> <span class="s2">"-hide_banner"</span><span class="p">,</span> <span class="s2">"-L"</span><span class="p">],</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-</span><span id="line-430">    <span class="k">if</span> <span class="n">licence_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-431">        <span class="n">notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"`ffmpeg -L` did not run; licence is unknown"</span><span class="p">)</span>
-</span><span id="line-432">        <span class="n">licence</span> <span class="o">=</span> <span class="n">Licence</span><span class="o">.</span><span class="n">UNKNOWN</span>
-</span><span id="line-433">    <span class="k">else</span><span class="p">:</span>
-</span><span id="line-434">        <span class="n">licence</span> <span class="o">=</span> <span class="n">parse_licence</span><span class="p">(</span><span class="n">licence_out</span><span class="p">)</span>
-</span><span id="line-435">        <span class="k">if</span> <span class="n">licence</span> <span class="ow">is</span> <span class="n">Licence</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">:</span>
-</span><span id="line-436">            <span class="n">notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"`ffmpeg -L` output matched no known licence statement"</span><span class="p">)</span>
-</span><span id="line-437">
-</span><span id="line-438">    <span class="n">filters_out</span> <span class="o">=</span> <span class="n">_ask</span><span class="p">([</span><span class="n">resolved</span><span class="p">,</span> <span class="s2">"-hide_banner"</span><span class="p">,</span> <span class="s2">"-filters"</span><span class="p">],</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-</span><span id="line-439">    <span class="k">if</span> <span class="n">filters_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-440">        <span class="n">notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"`ffmpeg -filters` did not run; no filter is known to exist"</span><span class="p">)</span>
-</span><span id="line-441">        <span class="n">filters</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">()</span>
-</span><span id="line-442">    <span class="k">else</span><span class="p">:</span>
-</span><span id="line-443">        <span class="n">filters</span> <span class="o">=</span> <span class="n">parse_filters</span><span class="p">(</span><span class="n">filters_out</span><span class="p">)</span>
-</span><span id="line-444">        <span class="k">if</span> <span class="ow">not</span> <span class="n">filters</span><span class="p">:</span>
-</span><span id="line-445">            <span class="n">notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"`ffmpeg -filters` listed nothing"</span><span class="p">)</span>
-</span><span id="line-446">
-</span><span id="line-447">    <span class="n">version_out</span> <span class="o">=</span> <span class="n">_ask</span><span class="p">([</span><span class="n">resolved</span><span class="p">,</span> <span class="s2">"-hide_banner"</span><span class="p">,</span> <span class="s2">"-version"</span><span class="p">],</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-</span><span id="line-448">    <span class="n">version</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="line-449">    <span class="n">configuration</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="line-450">    <span class="k">if</span> <span class="n">version_out</span><span class="p">:</span>
-</span><span id="line-451">        <span class="n">first</span> <span class="o">=</span> <span class="n">version_out</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">version_out</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span> <span class="k">else</span> <span class="s2">""</span>
-</span><span id="line-452">        <span class="n">version</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">or</span> <span class="kc">None</span>
-</span><span id="line-453">        <span class="n">configuration</span> <span class="o">=</span> <span class="n">parse_configuration</span><span class="p">(</span><span class="n">version_out</span><span class="p">)</span>
-</span><span id="line-454">
-</span><span id="line-455">    <span class="k">return</span> <span class="n">FfmpegEnv</span><span class="p">(</span>
-</span><span id="line-456">        <span class="n">path</span><span class="o">=</span><span class="n">resolved</span><span class="p">,</span>
-</span><span id="line-457">        <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
-</span><span id="line-458">        <span class="n">licence</span><span class="o">=</span><span class="n">licence</span><span class="p">,</span>
-</span><span id="line-459">        <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">,</span>
-</span><span id="line-460">        <span class="n">configuration</span><span class="o">=</span><span class="n">configuration</span><span class="p">,</span>
-</span><span id="line-461">        <span class="n">notes</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">notes</span><span class="p">),</span>
-</span><span id="line-462">    <span class="p">)</span></div>
+</span><span id="line-400"><span class="k">def</span><span class="w"> </span><span class="nf">probe</span><span class="p">(</span>
+</span><span id="line-401">    <span class="n">ffmpeg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_FFMPEG</span><span class="p">,</span>
+</span><span id="line-402">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-403">    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DFLT_PROBE_TIMEOUT_S</span><span class="p">,</span>
+</span><span id="line-404"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FfmpegEnv</span><span class="p">:</span>
+</span><span id="line-405"><span class="w">    </span><span class="sd">"""Interrogate one ffmpeg binary. Three subprocess calls, no input, no output.</span>
+</span><span id="line-406">
+</span><span id="line-407"><span class="sd">    Returns a :class:`FfmpegEnv` in every case, including when ``ffmpeg`` is not</span>
+</span><span id="line-408"><span class="sd">    installed — the absence of a binary is a fact about the machine, and a</span>
+</span><span id="line-409"><span class="sd">    caller diagnosing it needs a value rather than an exception.</span>
+</span><span id="line-410">
+</span><span id="line-411"><span class="sd">    Args:</span>
+</span><span id="line-412"><span class="sd">        ffmpeg: Binary name (looked up on ``PATH``) or an explicit path.</span>
+</span><span id="line-413"><span class="sd">        timeout: Seconds allowed per probe call.</span>
+</span><span id="line-414">
+</span><span id="line-415"><span class="sd">    Examples:</span>
+</span><span id="line-416"><span class="sd">        &gt;&gt;&gt; env = probe('a-binary-that-does-not-exist')</span>
+</span><span id="line-417"><span class="sd">        &gt;&gt;&gt; env.available</span>
+</span><span id="line-418"><span class="sd">        False</span>
+</span><span id="line-419"><span class="sd">        &gt;&gt;&gt; env.licence</span>
+</span><span id="line-420"><span class="sd">        &lt;Licence.UNKNOWN: 'unknown'&gt;</span>
+</span><span id="line-421"><span class="sd">        &gt;&gt;&gt; env.notes[0]</span>
+</span><span id="line-422"><span class="sd">        "no 'a-binary-that-does-not-exist' on PATH"</span>
+</span><span id="line-423"><span class="sd">    """</span>
+</span><span id="line-424">    <span class="n">resolved</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">ffmpeg</span><span class="p">)</span>
+</span><span id="line-425">    <span class="k">if</span> <span class="n">resolved</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-426">        <span class="k">return</span> <span class="n">FfmpegEnv</span><span class="p">(</span><span class="n">notes</span><span class="o">=</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no </span><span class="si">{</span><span class="n">ffmpeg</span><span class="si">!r}</span><span class="s2"> on PATH"</span><span class="p">,))</span>
+</span><span id="line-427">
+</span><span id="line-428">    <span class="n">notes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-429">
+</span><span id="line-430">    <span class="n">licence_out</span> <span class="o">=</span> <span class="n">_ask</span><span class="p">([</span><span class="n">resolved</span><span class="p">,</span> <span class="s2">"-hide_banner"</span><span class="p">,</span> <span class="s2">"-L"</span><span class="p">],</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+</span><span id="line-431">    <span class="k">if</span> <span class="n">licence_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-432">        <span class="n">notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"`ffmpeg -L` did not run; licence is unknown"</span><span class="p">)</span>
+</span><span id="line-433">        <span class="n">licence</span> <span class="o">=</span> <span class="n">Licence</span><span class="o">.</span><span class="n">UNKNOWN</span>
+</span><span id="line-434">    <span class="k">else</span><span class="p">:</span>
+</span><span id="line-435">        <span class="n">licence</span> <span class="o">=</span> <span class="n">parse_licence</span><span class="p">(</span><span class="n">licence_out</span><span class="p">)</span>
+</span><span id="line-436">        <span class="k">if</span> <span class="n">licence</span> <span class="ow">is</span> <span class="n">Licence</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">:</span>
+</span><span id="line-437">            <span class="n">notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"`ffmpeg -L` output matched no known licence statement"</span><span class="p">)</span>
+</span><span id="line-438">
+</span><span id="line-439">    <span class="n">filters_out</span> <span class="o">=</span> <span class="n">_ask</span><span class="p">([</span><span class="n">resolved</span><span class="p">,</span> <span class="s2">"-hide_banner"</span><span class="p">,</span> <span class="s2">"-filters"</span><span class="p">],</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+</span><span id="line-440">    <span class="k">if</span> <span class="n">filters_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-441">        <span class="n">notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"`ffmpeg -filters` did not run; no filter is known to exist"</span><span class="p">)</span>
+</span><span id="line-442">        <span class="n">filters</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">()</span>
+</span><span id="line-443">    <span class="k">else</span><span class="p">:</span>
+</span><span id="line-444">        <span class="n">filters</span> <span class="o">=</span> <span class="n">parse_filters</span><span class="p">(</span><span class="n">filters_out</span><span class="p">)</span>
+</span><span id="line-445">        <span class="k">if</span> <span class="ow">not</span> <span class="n">filters</span><span class="p">:</span>
+</span><span id="line-446">            <span class="n">notes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"`ffmpeg -filters` listed nothing"</span><span class="p">)</span>
+</span><span id="line-447">
+</span><span id="line-448">    <span class="n">version_out</span> <span class="o">=</span> <span class="n">_ask</span><span class="p">([</span><span class="n">resolved</span><span class="p">,</span> <span class="s2">"-hide_banner"</span><span class="p">,</span> <span class="s2">"-version"</span><span class="p">],</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+</span><span id="line-449">    <span class="n">version</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="line-450">    <span class="n">configuration</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="line-451">    <span class="k">if</span> <span class="n">version_out</span><span class="p">:</span>
+</span><span id="line-452">        <span class="n">first</span> <span class="o">=</span> <span class="n">version_out</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">version_out</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span> <span class="k">else</span> <span class="s2">""</span>
+</span><span id="line-453">        <span class="n">version</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">or</span> <span class="kc">None</span>
+</span><span id="line-454">        <span class="n">configuration</span> <span class="o">=</span> <span class="n">parse_configuration</span><span class="p">(</span><span class="n">version_out</span><span class="p">)</span>
+</span><span id="line-455">
+</span><span id="line-456">    <span class="k">return</span> <span class="n">FfmpegEnv</span><span class="p">(</span>
+</span><span id="line-457">        <span class="n">path</span><span class="o">=</span><span class="n">resolved</span><span class="p">,</span>
+</span><span id="line-458">        <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
+</span><span id="line-459">        <span class="n">licence</span><span class="o">=</span><span class="n">licence</span><span class="p">,</span>
+</span><span id="line-460">        <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">,</span>
+</span><span id="line-461">        <span class="n">configuration</span><span class="o">=</span><span class="n">configuration</span><span class="p">,</span>
+</span><span id="line-462">        <span class="n">notes</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">notes</span><span class="p">),</span>
+</span><span id="line-463">    <span class="p">)</span></div>
 
-</span><span id="line-463">
 </span><span id="line-464">
+</span><span id="line-465">
 <div class="viewcode-block" id="gates">
 <a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.gates">[docs]</a>
-</span><span id="line-465"><span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-</span><span id="line-466"><span class="k">def</span><span class="w"> </span><span class="nf">gates</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
-</span><span id="line-467"><span class="w">    </span><span class="sd">"""The committed table of FFmpeg's own licence gates, extracted from source.</span>
-</span><span id="line-468">
-</span><span id="line-469"><span class="sd">    **A filter is GPL-gated two ways, and a grep finds only one of them.**</span>
-</span><span id="line-470"><span class="sd">    *Directly*, when its ``_filter_deps`` line contains the literal ``gpl``</span>
-</span><span id="line-471"><span class="sd">    (33 filters, ``eq`` among them). *Indirectly*, when its deps name an</span>
-</span><span id="line-472"><span class="sd">    external library that is itself in ``EXTERNAL_LIBRARY_GPL_LIST`` — enabling</span>
-</span><span id="line-473"><span class="sd">    the filter then forces ``--enable-gpl`` transitively, with no ``gpl`` token</span>
-</span><span id="line-474"><span class="sd">    anywhere on its own line. Five filters are in that second class:</span>
-</span><span id="line-475"><span class="sd">    ``frei0r``, ``frei0r_src``, ``rubberband``, ``vidstabdetect``,</span>
-</span><span id="line-476"><span class="sd">    ``vidstabtransform``.</span>
-</span><span id="line-477">
-</span><span id="line-478"><span class="sd">    Missing them is a **false permission**, which is the dangerous direction:</span>
-</span><span id="line-479"><span class="sd">    ``vidstabtransform`` is stabilisation, i.e. a perfectly plausible</span>
-</span><span id="line-480"><span class="sd">    normalisation effect for this package, and the naive extraction tiers it</span>
-</span><span id="line-481"><span class="sd">    permissive. The first version of this table did exactly that; it was caught</span>
-</span><span id="line-482"><span class="sd">    by an adversarial review rather than by any test, which is why the two</span>
-</span><span id="line-483"><span class="sd">    classes are now stored separately and asserted separately.</span>
-</span><span id="line-484">
-</span><span id="line-485"><span class="sd">    This is what FFmpeg's ``configure`` *declares*, not what the local binary</span>
-</span><span id="line-486"><span class="sd">    *has* — the two answer different questions, and both are needed. The table</span>
-</span><span id="line-487"><span class="sd">    says an effect written with ``eq`` could never run on a clean-room LGPL</span>
-</span><span id="line-488"><span class="sd">    build; :func:`probe` says whether the binary in front of you happens to have</span>
-</span><span id="line-489"><span class="sd">    it. Collapsing them makes every purely-LGPL Look unrunnable on every</span>
-</span><span id="line-490"><span class="sd">    Homebrew ffmpeg on earth, since those are all GPL builds.</span>
-</span><span id="line-491">
-</span><span id="line-492"><span class="sd">    Examples:</span>
-</span><span id="line-493"><span class="sd">        &gt;&gt;&gt; g = gates()</span>
-</span><span id="line-494"><span class="sd">        &gt;&gt;&gt; 'eq' in g['gpl_filters']</span>
-</span><span id="line-495"><span class="sd">        True</span>
-</span><span id="line-496"><span class="sd">        &gt;&gt;&gt; 'geq' in g['gpl_filters']      # relicensed in FFmpeg 4.3</span>
-</span><span id="line-497"><span class="sd">        False</span>
-</span><span id="line-498"><span class="sd">        &gt;&gt;&gt; 'lut3d' in g['gpl_filters']</span>
-</span><span id="line-499"><span class="sd">        False</span>
-</span><span id="line-500"><span class="sd">        &gt;&gt;&gt; 'libx264' in g['external_gpl']</span>
-</span><span id="line-501"><span class="sd">        True</span>
-</span><span id="line-502"><span class="sd">    """</span>
-</span><span id="line-503">    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">GATES_PATH</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span></div>
+</span><span id="line-466"><span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span><span id="line-467"><span class="k">def</span><span class="w"> </span><span class="nf">gates</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+</span><span id="line-468"><span class="w">    </span><span class="sd">"""The committed table of FFmpeg's own licence gates, extracted from source.</span>
+</span><span id="line-469">
+</span><span id="line-470"><span class="sd">    **A filter is GPL-gated two ways, and a grep finds only one of them.**</span>
+</span><span id="line-471"><span class="sd">    *Directly*, when its ``_filter_deps`` line contains the literal ``gpl``</span>
+</span><span id="line-472"><span class="sd">    (33 filters, ``eq`` among them). *Indirectly*, when its deps name an</span>
+</span><span id="line-473"><span class="sd">    external library that is itself in ``EXTERNAL_LIBRARY_GPL_LIST`` — enabling</span>
+</span><span id="line-474"><span class="sd">    the filter then forces ``--enable-gpl`` transitively, with no ``gpl`` token</span>
+</span><span id="line-475"><span class="sd">    anywhere on its own line. Five filters are in that second class:</span>
+</span><span id="line-476"><span class="sd">    ``frei0r``, ``frei0r_src``, ``rubberband``, ``vidstabdetect``,</span>
+</span><span id="line-477"><span class="sd">    ``vidstabtransform``.</span>
+</span><span id="line-478">
+</span><span id="line-479"><span class="sd">    Missing them is a **false permission**, which is the dangerous direction:</span>
+</span><span id="line-480"><span class="sd">    ``vidstabtransform`` is stabilisation, i.e. a perfectly plausible</span>
+</span><span id="line-481"><span class="sd">    normalisation effect for this package, and the naive extraction tiers it</span>
+</span><span id="line-482"><span class="sd">    permissive. The first version of this table did exactly that; it was caught</span>
+</span><span id="line-483"><span class="sd">    by an adversarial review rather than by any test, which is why the two</span>
+</span><span id="line-484"><span class="sd">    classes are now stored separately and asserted separately.</span>
+</span><span id="line-485">
+</span><span id="line-486"><span class="sd">    This is what FFmpeg's ``configure`` *declares*, not what the local binary</span>
+</span><span id="line-487"><span class="sd">    *has* — the two answer different questions, and both are needed. The table</span>
+</span><span id="line-488"><span class="sd">    says an effect written with ``eq`` could never run on a clean-room LGPL</span>
+</span><span id="line-489"><span class="sd">    build; :func:`probe` says whether the binary in front of you happens to have</span>
+</span><span id="line-490"><span class="sd">    it. Collapsing them makes every purely-LGPL Look unrunnable on every</span>
+</span><span id="line-491"><span class="sd">    Homebrew ffmpeg on earth, since those are all GPL builds.</span>
+</span><span id="line-492">
+</span><span id="line-493"><span class="sd">    Examples:</span>
+</span><span id="line-494"><span class="sd">        &gt;&gt;&gt; g = gates()</span>
+</span><span id="line-495"><span class="sd">        &gt;&gt;&gt; 'eq' in g['gpl_filters']</span>
+</span><span id="line-496"><span class="sd">        True</span>
+</span><span id="line-497"><span class="sd">        &gt;&gt;&gt; 'geq' in g['gpl_filters']      # relicensed in FFmpeg 4.3</span>
+</span><span id="line-498"><span class="sd">        False</span>
+</span><span id="line-499"><span class="sd">        &gt;&gt;&gt; 'lut3d' in g['gpl_filters']</span>
+</span><span id="line-500"><span class="sd">        False</span>
+</span><span id="line-501"><span class="sd">        &gt;&gt;&gt; 'libx264' in g['external_gpl']</span>
+</span><span id="line-502"><span class="sd">        True</span>
+</span><span id="line-503"><span class="sd">    """</span>
+</span><span id="line-504">    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">GATES_PATH</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span></div>
 
-</span><span id="line-504">
 </span><span id="line-505">
+</span><span id="line-506">
 <div class="viewcode-block" id="UnknownFilter">
 <a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.UnknownFilter">[docs]</a>
-</span><span id="line-506"><span class="k">class</span><span class="w"> </span><span class="nc">UnknownFilter</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
-</span><span id="line-507"><span class="w">    </span><span class="sd">"""A filter name that is not in any known universe.</span>
-</span><span id="line-508">
-</span><span id="line-509"><span class="sd">    Raised rather than ignored, because :func:`needs_gpl` is an</span>
-</span><span id="line-510"><span class="sd">    **allowlist-by-absence**: a name it does not recognise carries no gate, so</span>
-</span><span id="line-511"><span class="sd">    silently returning "not GPL" for a typo, a wrong case, a filter from a newer</span>
-</span><span id="line-512"><span class="sd">    ffmpeg, or one an extraction never enumerated is a *computed* false</span>
-</span><span id="line-513"><span class="sd">    permission — at exactly the point the licence tier enters. That is the one</span>
-</span><span id="line-514"><span class="sd">    direction this package may never fail in.</span>
-</span><span id="line-515"><span class="sd">    """</span></div>
+</span><span id="line-507"><span class="k">class</span><span class="w"> </span><span class="nc">UnknownFilter</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+</span><span id="line-508"><span class="w">    </span><span class="sd">"""A filter name that is not in any known universe.</span>
+</span><span id="line-509">
+</span><span id="line-510"><span class="sd">    Raised rather than ignored, because :func:`needs_gpl` is an</span>
+</span><span id="line-511"><span class="sd">    **allowlist-by-absence**: a name it does not recognise carries no gate, so</span>
+</span><span id="line-512"><span class="sd">    silently returning "not GPL" for a typo, a wrong case, a filter from a newer</span>
+</span><span id="line-513"><span class="sd">    ffmpeg, or one an extraction never enumerated is a *computed* false</span>
+</span><span id="line-514"><span class="sd">    permission — at exactly the point the licence tier enters. That is the one</span>
+</span><span id="line-515"><span class="sd">    direction this package may never fail in.</span>
+</span><span id="line-516"><span class="sd">    """</span></div>
 
-</span><span id="line-516">
 </span><span id="line-517">
+</span><span id="line-518">
 <div class="viewcode-block" id="known_filters">
 <a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.known_filters">[docs]</a>
-</span><span id="line-518"><span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-</span><span id="line-519"><span class="k">def</span><span class="w"> </span><span class="nf">known_filters</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-520"><span class="w">    </span><span class="sd">"""Every filter name FFmpeg n8.1 declares — the universe :func:`needs_gpl` checks against.</span>
-</span><span id="line-521">
-</span><span id="line-522"><span class="sd">    Extracted from ``libavfilter/allfilters.c``, which declares one ``extern``</span>
-</span><span id="line-523"><span class="sd">    per filter regardless of build flags, so it covers filters the local binary</span>
-</span><span id="line-524"><span class="sd">    does not have. That is the right universe: a name absent from *this* build</span>
-</span><span id="line-525"><span class="sd">    is still a real filter with a real gate, and refusing it would be a false</span>
-</span><span id="line-526"><span class="sd">    alarm, while a name absent from *FFmpeg* is a typo and must raise.</span>
-</span><span id="line-527">
-</span><span id="line-528"><span class="sd">    Examples:</span>
-</span><span id="line-529"><span class="sd">        &gt;&gt;&gt; u = known_filters()</span>
-</span><span id="line-530"><span class="sd">        &gt;&gt;&gt; {'eq', 'lut3d', 'vidstabtransform', 'geq'} &lt;= u</span>
-</span><span id="line-531"><span class="sd">        True</span>
-</span><span id="line-532"><span class="sd">        &gt;&gt;&gt; 'nosuchfilter' in u</span>
-</span><span id="line-533"><span class="sd">        False</span>
-</span><span id="line-534"><span class="sd">        &gt;&gt;&gt; len(u) &gt; 500</span>
-</span><span id="line-535"><span class="sd">        True</span>
-</span><span id="line-536"><span class="sd">    """</span>
-</span><span id="line-537">    <span class="k">return</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">gates</span><span class="p">()[</span><span class="s2">"all_filters"</span><span class="p">])</span>  <span class="c1"># type: ignore[arg-type]</span></div>
+</span><span id="line-519"><span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span><span id="line-520"><span class="k">def</span><span class="w"> </span><span class="nf">known_filters</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-521"><span class="w">    </span><span class="sd">"""Every filter name FFmpeg n8.1 declares — the universe :func:`needs_gpl` checks against.</span>
+</span><span id="line-522">
+</span><span id="line-523"><span class="sd">    Extracted from ``libavfilter/allfilters.c``, which declares one ``extern``</span>
+</span><span id="line-524"><span class="sd">    per filter regardless of build flags, so it covers filters the local binary</span>
+</span><span id="line-525"><span class="sd">    does not have. That is the right universe: a name absent from *this* build</span>
+</span><span id="line-526"><span class="sd">    is still a real filter with a real gate, and refusing it would be a false</span>
+</span><span id="line-527"><span class="sd">    alarm, while a name absent from *FFmpeg* is a typo and must raise.</span>
+</span><span id="line-528">
+</span><span id="line-529"><span class="sd">    Examples:</span>
+</span><span id="line-530"><span class="sd">        &gt;&gt;&gt; u = known_filters()</span>
+</span><span id="line-531"><span class="sd">        &gt;&gt;&gt; {'eq', 'lut3d', 'vidstabtransform', 'geq'} &lt;= u</span>
+</span><span id="line-532"><span class="sd">        True</span>
+</span><span id="line-533"><span class="sd">        &gt;&gt;&gt; 'nosuchfilter' in u</span>
+</span><span id="line-534"><span class="sd">        False</span>
+</span><span id="line-535"><span class="sd">        &gt;&gt;&gt; len(u) &gt; 500</span>
+</span><span id="line-536"><span class="sd">        True</span>
+</span><span id="line-537"><span class="sd">    """</span>
+</span><span id="line-538">    <span class="k">return</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">gates</span><span class="p">()[</span><span class="s2">"all_filters"</span><span class="p">])</span>  <span class="c1"># type: ignore[arg-type]</span></div>
 
-</span><span id="line-538">
 </span><span id="line-539">
+</span><span id="line-540">
 <div class="viewcode-block" id="gpl_only_filters">
 <a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.gpl_only_filters">[docs]</a>
-</span><span id="line-540"><span class="k">def</span><span class="w"> </span><span class="nf">gpl_only_filters</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="line-541"><span class="w">    </span><span class="sd">"""Filter names FFmpeg gates behind ``--enable-gpl``.</span>
-</span><span id="line-542">
-</span><span id="line-543"><span class="sd">    Examples:</span>
-</span><span id="line-544"><span class="sd">        &gt;&gt;&gt; f = gpl_only_filters()</span>
-</span><span id="line-545"><span class="sd">        &gt;&gt;&gt; {'eq', 'boxblur', 'cropdetect'} &lt;= f</span>
-</span><span id="line-546"><span class="sd">        True</span>
-</span><span id="line-547"><span class="sd">        &gt;&gt;&gt; f &amp; {'lut3d', 'curves', 'colorlevels', 'geq'}</span>
-</span><span id="line-548"><span class="sd">        frozenset()</span>
-</span><span id="line-549"><span class="sd">    """</span>
-</span><span id="line-550">    <span class="k">return</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">gates</span><span class="p">()[</span><span class="s2">"gpl_filters"</span><span class="p">])</span>  <span class="c1"># type: ignore[arg-type]</span></div>
+</span><span id="line-541"><span class="k">def</span><span class="w"> </span><span class="nf">gpl_only_filters</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="line-542"><span class="w">    </span><span class="sd">"""Filter names FFmpeg gates behind ``--enable-gpl``.</span>
+</span><span id="line-543">
+</span><span id="line-544"><span class="sd">    Examples:</span>
+</span><span id="line-545"><span class="sd">        &gt;&gt;&gt; f = gpl_only_filters()</span>
+</span><span id="line-546"><span class="sd">        &gt;&gt;&gt; {'eq', 'boxblur', 'cropdetect'} &lt;= f</span>
+</span><span id="line-547"><span class="sd">        True</span>
+</span><span id="line-548"><span class="sd">        &gt;&gt;&gt; f &amp; {'lut3d', 'curves', 'colorlevels', 'geq'}</span>
+</span><span id="line-549"><span class="sd">        frozenset()</span>
+</span><span id="line-550"><span class="sd">    """</span>
+</span><span id="line-551">    <span class="k">return</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">gates</span><span class="p">()[</span><span class="s2">"gpl_filters"</span><span class="p">])</span>  <span class="c1"># type: ignore[arg-type]</span></div>
 
-</span><span id="line-551">
 </span><span id="line-552">
+</span><span id="line-553">
 <div class="viewcode-block" id="needs_gpl">
 <a class="viewcode-back" href="../../_autosummary/looks.environment.html#looks.needs_gpl">[docs]</a>
-</span><span id="line-553"><span class="k">def</span><span class="w"> </span><span class="nf">needs_gpl</span><span class="p">(</span>
-</span><span id="line-554">    <span class="n">filters</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">known</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="line-555"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-</span><span id="line-556"><span class="w">    </span><span class="sd">"""Which of ``filters`` exist only in a GPL build, in the order given.</span>
-</span><span id="line-557">
-</span><span id="line-558"><span class="sd">    The point of the package in one function: a chain that reaches for the</span>
-</span><span id="line-559"><span class="sd">    obvious grade filter is not portable to an LGPL build, and nothing in the</span>
-</span><span id="line-560"><span class="sd">    ffmpeg CLI will tell you, because the binary you are holding runs it fine.</span>
-</span><span id="line-561">
-</span><span id="line-562"><span class="sd">    **Every name is validated first, and an unrecognised one raises.** This</span>
-</span><span id="line-563"><span class="sd">    function is an allowlist-by-absence — a name carrying no gate is reported</span>
-</span><span id="line-564"><span class="sd">    GPL-free — so without the check a typo, a wrong case, or a filter from a</span>
-</span><span id="line-565"><span class="sd">    newer ffmpeg is a *computed false permission*. That is not a hypothetical:</span>
-</span><span id="line-566"><span class="sd">    before the check, ``needs_gpl(['nosuchfilter'])`` and ``needs_gpl(['EQ'])``</span>
-</span><span id="line-567"><span class="sd">    both returned ``()``.</span>
-</span><span id="line-568">
-</span><span id="line-569"><span class="sd">    Args:</span>
-</span><span id="line-570"><span class="sd">        filters: Filter names, in the order they appear in a chain.</span>
-</span><span id="line-571"><span class="sd">        known: The universe to validate against. Pass</span>
-</span><span id="line-572"><span class="sd">            :attr:`FfmpegEnv.filters` to also catch a name this build does not</span>
-</span><span id="line-573"><span class="sd">            have; the default is :func:`known_filters`, every filter FFmpeg</span>
-</span><span id="line-574"><span class="sd">            n8.1 declares.</span>
-</span><span id="line-575">
-</span><span id="line-576"><span class="sd">    Raises:</span>
-</span><span id="line-577"><span class="sd">        UnknownFilter: A name is not in ``known``.</span>
-</span><span id="line-578">
-</span><span id="line-579"><span class="sd">    Examples:</span>
-</span><span id="line-580"><span class="sd">        &gt;&gt;&gt; needs_gpl(['scale', 'eq', 'lut3d', 'boxblur'])</span>
-</span><span id="line-581"><span class="sd">        ('eq', 'boxblur')</span>
-</span><span id="line-582"><span class="sd">        &gt;&gt;&gt; needs_gpl(['curves', 'colorlevels', 'lut3d'])</span>
-</span><span id="line-583"><span class="sd">        ()</span>
-</span><span id="line-584">
-</span><span id="line-585"><span class="sd">        A name that is not a filter raises rather than reporting GPL-free:</span>
-</span><span id="line-586">
-</span><span id="line-587"><span class="sd">        &gt;&gt;&gt; needs_gpl(['nosuchfilter'])</span>
-</span><span id="line-588"><span class="sd">        Traceback (most recent call last):</span>
-</span><span id="line-589"><span class="sd">        ...</span>
-</span><span id="line-590"><span class="sd">        looks.environment.UnknownFilter: not known ffmpeg filters: ['nosuchfilter']...</span>
-</span><span id="line-591">
-</span><span id="line-592"><span class="sd">        Case matters, because it matters to ffmpeg:</span>
-</span><span id="line-593">
-</span><span id="line-594"><span class="sd">        &gt;&gt;&gt; needs_gpl(['EQ'])</span>
-</span><span id="line-595"><span class="sd">        Traceback (most recent call last):</span>
-</span><span id="line-596"><span class="sd">        ...</span>
-</span><span id="line-597"><span class="sd">        looks.environment.UnknownFilter: not known ffmpeg filters: ['EQ']...</span>
-</span><span id="line-598"><span class="sd">    """</span>
-</span><span id="line-599">    <span class="n">universe</span> <span class="o">=</span> <span class="n">known_filters</span><span class="p">()</span> <span class="k">if</span> <span class="n">known</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">known</span>
-</span><span id="line-600">    <span class="n">unknown</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filters</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">universe</span><span class="p">]</span>
-</span><span id="line-601">    <span class="k">if</span> <span class="n">unknown</span><span class="p">:</span>
-</span><span id="line-602">        <span class="k">raise</span> <span class="n">UnknownFilter</span><span class="p">(</span>
-</span><span id="line-603">            <span class="sa">f</span><span class="s2">"not known ffmpeg filters: </span><span class="si">{</span><span class="n">unknown</span><span class="si">}</span><span class="s2">. This function reports a name "</span>
-</span><span id="line-604">            <span class="sa">f</span><span class="s2">"it does not recognise as GPL-free, so an unrecognised name is a "</span>
-</span><span id="line-605">            <span class="sa">f</span><span class="s2">"false permission rather than a missing answer — hence the "</span>
-</span><span id="line-606">            <span class="sa">f</span><span class="s2">"refusal. If the name is real and newer than the committed table, "</span>
-</span><span id="line-607">            <span class="sa">f</span><span class="s2">"pass known=env.filters from a probe of the binary you will run."</span>
-</span><span id="line-608">        <span class="p">)</span>
-</span><span id="line-609">    <span class="n">gpl</span> <span class="o">=</span> <span class="n">gpl_only_filters</span><span class="p">()</span>
-</span><span id="line-610">    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filters</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">gpl</span><span class="p">)</span></div>
+</span><span id="line-554"><span class="k">def</span><span class="w"> </span><span class="nf">needs_gpl</span><span class="p">(</span>
+</span><span id="line-555">    <span class="n">filters</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">known</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="line-556"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+</span><span id="line-557"><span class="w">    </span><span class="sd">"""Which of ``filters`` exist only in a GPL build, in the order given.</span>
+</span><span id="line-558">
+</span><span id="line-559"><span class="sd">    The point of the package in one function: a chain that reaches for the</span>
+</span><span id="line-560"><span class="sd">    obvious grade filter is not portable to an LGPL build, and nothing in the</span>
+</span><span id="line-561"><span class="sd">    ffmpeg CLI will tell you, because the binary you are holding runs it fine.</span>
+</span><span id="line-562">
+</span><span id="line-563"><span class="sd">    **Every name is validated first, and an unrecognised one raises.** This</span>
+</span><span id="line-564"><span class="sd">    function is an allowlist-by-absence — a name carrying no gate is reported</span>
+</span><span id="line-565"><span class="sd">    GPL-free — so without the check a typo, a wrong case, or a filter from a</span>
+</span><span id="line-566"><span class="sd">    newer ffmpeg is a *computed false permission*. That is not a hypothetical:</span>
+</span><span id="line-567"><span class="sd">    before the check, ``needs_gpl(['nosuchfilter'])`` and ``needs_gpl(['EQ'])``</span>
+</span><span id="line-568"><span class="sd">    both returned ``()``.</span>
+</span><span id="line-569">
+</span><span id="line-570"><span class="sd">    Args:</span>
+</span><span id="line-571"><span class="sd">        filters: Filter names, in the order they appear in a chain.</span>
+</span><span id="line-572"><span class="sd">        known: The universe to validate against. Pass</span>
+</span><span id="line-573"><span class="sd">            :attr:`FfmpegEnv.filters` to also catch a name this build does not</span>
+</span><span id="line-574"><span class="sd">            have; the default is :func:`known_filters`, every filter FFmpeg</span>
+</span><span id="line-575"><span class="sd">            n8.1 declares.</span>
+</span><span id="line-576">
+</span><span id="line-577"><span class="sd">    Raises:</span>
+</span><span id="line-578"><span class="sd">        UnknownFilter: A name is not in ``known``.</span>
+</span><span id="line-579">
+</span><span id="line-580"><span class="sd">    Examples:</span>
+</span><span id="line-581"><span class="sd">        &gt;&gt;&gt; needs_gpl(['scale', 'eq', 'lut3d', 'boxblur'])</span>
+</span><span id="line-582"><span class="sd">        ('eq', 'boxblur')</span>
+</span><span id="line-583"><span class="sd">        &gt;&gt;&gt; needs_gpl(['curves', 'colorlevels', 'lut3d'])</span>
+</span><span id="line-584"><span class="sd">        ()</span>
+</span><span id="line-585">
+</span><span id="line-586"><span class="sd">        A name that is not a filter raises rather than reporting GPL-free:</span>
+</span><span id="line-587">
+</span><span id="line-588"><span class="sd">        &gt;&gt;&gt; needs_gpl(['nosuchfilter'])</span>
+</span><span id="line-589"><span class="sd">        Traceback (most recent call last):</span>
+</span><span id="line-590"><span class="sd">        ...</span>
+</span><span id="line-591"><span class="sd">        looks.environment.UnknownFilter: not known ffmpeg filters: ['nosuchfilter']...</span>
+</span><span id="line-592">
+</span><span id="line-593"><span class="sd">        Case matters, because it matters to ffmpeg:</span>
+</span><span id="line-594">
+</span><span id="line-595"><span class="sd">        &gt;&gt;&gt; needs_gpl(['EQ'])</span>
+</span><span id="line-596"><span class="sd">        Traceback (most recent call last):</span>
+</span><span id="line-597"><span class="sd">        ...</span>
+</span><span id="line-598"><span class="sd">        looks.environment.UnknownFilter: not known ffmpeg filters: ['EQ']...</span>
+</span><span id="line-599"><span class="sd">    """</span>
+</span><span id="line-600">    <span class="n">universe</span> <span class="o">=</span> <span class="n">known_filters</span><span class="p">()</span> <span class="k">if</span> <span class="n">known</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">known</span>
+</span><span id="line-601">    <span class="n">unknown</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filters</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">universe</span><span class="p">]</span>
+</span><span id="line-602">    <span class="k">if</span> <span class="n">unknown</span><span class="p">:</span>
+</span><span id="line-603">        <span class="k">raise</span> <span class="n">UnknownFilter</span><span class="p">(</span>
+</span><span id="line-604">            <span class="sa">f</span><span class="s2">"not known ffmpeg filters: </span><span class="si">{</span><span class="n">unknown</span><span class="si">}</span><span class="s2">. This function reports a name "</span>
+</span><span id="line-605">            <span class="sa">f</span><span class="s2">"it does not recognise as GPL-free, so an unrecognised name is a "</span>
+</span><span id="line-606">            <span class="sa">f</span><span class="s2">"false permission rather than a missing answer — hence the "</span>
+</span><span id="line-607">            <span class="sa">f</span><span class="s2">"refusal. If the name is real and newer than the committed table, "</span>
+</span><span id="line-608">            <span class="sa">f</span><span class="s2">"pass known=env.filters from a probe of the binary you will run."</span>
+</span><span id="line-609">        <span class="p">)</span>
+</span><span id="line-610">    <span class="n">gpl</span> <span class="o">=</span> <span class="n">gpl_only_filters</span><span class="p">()</span>
+</span><span id="line-611">    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filters</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">gpl</span><span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>

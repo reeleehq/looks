@@ -113,6 +113,10 @@ the two packages apart — `burns` owns *authored* geometry over time,
 Size(width=1439, height=1080)
 ```
 
+#### *property* size *: [Size](#looks.geometry.Size)*
+
+The dimensions as a [`Size`](#looks.geometry.Size).
+
 ### looks.geometry.DFLT_BACKDROP_BLUR_SIGMA *= 15.0*
 
 Backdrop defaults, transcribed from `mixing.resize_to_dimensions`’s
@@ -212,7 +216,7 @@ preset name; they resolve to a `Size` at the boundary.
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
-A pixel size. `aspect` is width/height, never the other way round.
+A pixel size. [`aspect`](#looks.geometry.Size.aspect) is width/height, never the other way round.
 
 ### Examples
 
@@ -224,6 +228,10 @@ Traceback (most recent call last):
 ...
 looks.geometry.GeometryError: a Size must be positive, got 0x10
 ```
+
+#### *property* aspect *: [float](https://docs.python.org/3/builtins/functions.html#float)*
+
+Width divided by height.
 
 ### *class* looks.geometry.Solid(rgb=(0, 0, 0))
 

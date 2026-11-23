@@ -277,6 +277,11 @@ the two packages apart — <code class="docutils literal notranslate"><span clas
 </div>
 <dl class="field-list simple">
 </dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="looks.geometry.Box.size">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#looks.geometry.Size" title="looks.geometry.Size"><span class="pre">Size</span></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.Box.size" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.Box.size'">¶</a></dt>
+<dd><p>The dimensions as a <a class="reference internal" href="#looks.geometry.Size" title="looks.geometry.Size"><code class="xref py py-class docutils literal notranslate"><span class="pre">Size</span></code></a>.</p>
+</dd></dl>
 </dd></dl>
 <dl class="py data">
 <dt class="sig sig-object py" id="looks.geometry.DFLT_BACKDROP_BLUR_SIGMA">
@@ -374,7 +379,7 @@ preset name; they resolve to a <code class="code docutils literal notranslate"><
 <dt class="sig sig-object py" id="looks.geometry.Size">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.geometry.</span></span><span class="sig-name descname"><span class="pre">Size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/geometry.html#Size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.Size" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.Size'">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
-<p>A pixel size. <code class="xref py py-attr docutils literal notranslate"><span class="pre">aspect</span></code> is width/height, never the other way round.</p>
+<p>A pixel size. <a class="reference internal" href="#looks.geometry.Size.aspect" title="looks.geometry.Size.aspect"><code class="xref py py-attr docutils literal notranslate"><span class="pre">aspect</span></code></a> is width/height, never the other way round.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Size</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">)</span><span class="o">.</span><span class="n">aspect</span>
 </span><span id="line-2"><span class="go">1.7777777777777777</span>
@@ -386,6 +391,11 @@ preset name; they resolve to a <code class="code docutils literal notranslate"><
 </div>
 <dl class="field-list simple">
 </dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="looks.geometry.Size.aspect">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">aspect</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.geometry.Size.aspect" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.geometry.Size.aspect'">¶</a></dt>
+<dd><p>Width divided by height.</p>
+</dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="looks.geometry.Solid">
@@ -578,7 +588,10 @@ of its own.</p>
 <ul>
 <li><a :data-current="activeSection === '#looks.geometry.Backdrop'" class="reference internal" href="#looks.geometry.Backdrop"><code class="docutils literal notranslate"><span class="pre">Backdrop</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.geometry.Blurred'" class="reference internal" href="#looks.geometry.Blurred"><code class="docutils literal notranslate"><span class="pre">Blurred</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.geometry.Box'" class="reference internal" href="#looks.geometry.Box"><code class="docutils literal notranslate"><span class="pre">Box</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.Box'" class="reference internal" href="#looks.geometry.Box"><code class="docutils literal notranslate"><span class="pre">Box</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.geometry.Box.size'" class="reference internal" href="#looks.geometry.Box.size"><code class="docutils literal notranslate"><span class="pre">Box.size</span></code></a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#looks.geometry.DFLT_BACKDROP_BLUR_SIGMA'" class="reference internal" href="#looks.geometry.DFLT_BACKDROP_BLUR_SIGMA"><code class="docutils literal notranslate"><span class="pre">DFLT_BACKDROP_BLUR_SIGMA</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.geometry.DFLT_ROUNDING'" class="reference internal" href="#looks.geometry.DFLT_ROUNDING"><code class="docutils literal notranslate"><span class="pre">DFLT_ROUNDING</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.geometry.GeometryError'" class="reference internal" href="#looks.geometry.GeometryError"><code class="docutils literal notranslate"><span class="pre">GeometryError</span></code></a></li>
@@ -588,7 +601,10 @@ of its own.</p>
 </li>
 <li><a :data-current="activeSection === '#looks.geometry.Reframe'" class="reference internal" href="#looks.geometry.Reframe"><code class="docutils literal notranslate"><span class="pre">Reframe</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.geometry.SOCIAL_SIZES'" class="reference internal" href="#looks.geometry.SOCIAL_SIZES"><code class="docutils literal notranslate"><span class="pre">SOCIAL_SIZES</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.geometry.Size'" class="reference internal" href="#looks.geometry.Size"><code class="docutils literal notranslate"><span class="pre">Size</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.geometry.Size'" class="reference internal" href="#looks.geometry.Size"><code class="docutils literal notranslate"><span class="pre">Size</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.geometry.Size.aspect'" class="reference internal" href="#looks.geometry.Size.aspect"><code class="docutils literal notranslate"><span class="pre">Size.aspect</span></code></a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#looks.geometry.Solid'" class="reference internal" href="#looks.geometry.Solid"><code class="docutils literal notranslate"><span class="pre">Solid</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.geometry.center_box'" class="reference internal" href="#looks.geometry.center_box"><code class="docutils literal notranslate"><span class="pre">center_box()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.geometry.ffmpeg_chain'" class="reference internal" href="#looks.geometry.ffmpeg_chain"><code class="docutils literal notranslate"><span class="pre">ffmpeg_chain()</span></code></a></li>

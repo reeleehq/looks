@@ -1,4 +1,4 @@
-> built 2026-11-22 14:11 UTC from 95ac5da (main) · looks 0.0.39. Details: build_info.json
+> built 2026-11-23 00:32 UTC from 4211593 (main) · looks 0.0.39. Details: build_info.json
 
 # index.html.md
 
@@ -273,6 +273,13 @@ what a person reads and the second is what the solver minimised.
 Clips the trim left outside the window. Empty under `full_range`.
 Named rather than counted, because *which* clip could not be fixed is
 the interesting half of the answer.
+
+#### to_dict()
+
+The spread as a JSON-serialisable dict (`looks.spread/v1`).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### looks.across.Statistic
 
@@ -1200,6 +1207,13 @@ SHA-256 over the sorted filter names.
 ...                     licence='gpl3', filters_digest='abc')
 True
 ```
+
+#### *classmethod* from_dict(d)
+
+Rebuild a fingerprint from [`to_dict()`](_autosummary/looks.environment.html.md#looks.environment.EnvFingerprint.to_dict) output.
+
+* **Return type:**
+  [`EnvFingerprint`](_autosummary/looks.environment.html.md#looks.environment.EnvFingerprint)
 
 #### to_dict()
 
@@ -2332,6 +2346,10 @@ Why, when something could not be measured.
 * **Type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
+#### *property* can_flicker *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[bool](https://docs.python.org/3/builtins/functions.html#bool)]*
+
+Whether the chain can flicker; `None` while the dependency is undetermined.
+
 ### looks.frame_dependency.FLICKER_FREE *= frozenset({Dependency.INDEPENDENT})*
 
 The classes that cannot produce flicker.
@@ -2554,6 +2572,10 @@ the two packages apart — `burns` owns *authored* geometry over time,
 Size(width=1439, height=1080)
 ```
 
+#### *property* size *: [Size](_autosummary/looks.geometry.html.md#looks.geometry.Size)*
+
+The dimensions as a [`Size`](_autosummary/looks.geometry.html.md#looks.geometry.Size).
+
 ### looks.geometry.DFLT_BACKDROP_BLUR_SIGMA *= 15.0*
 
 Backdrop defaults, transcribed from `mixing.resize_to_dimensions`’s
@@ -2653,7 +2675,7 @@ preset name; they resolve to a `Size` at the boundary.
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
-A pixel size. `aspect` is width/height, never the other way round.
+A pixel size. [`aspect`](_autosummary/looks.geometry.html.md#looks.geometry.Size.aspect) is width/height, never the other way round.
 
 ### Examples
 
@@ -2665,6 +2687,10 @@ Traceback (most recent call last):
 ...
 looks.geometry.GeometryError: a Size must be positive, got 0x10
 ```
+
+#### *property* aspect *: [float](https://docs.python.org/3/builtins/functions.html#float)*
+
+Width divided by height.
 
 ### *class* looks.geometry.Solid(rgb=(0, 0, 0))
 
@@ -3205,6 +3231,10 @@ the two packages apart — `burns` owns *authored* geometry over time,
 Size(width=1439, height=1080)
 ```
 
+#### *property* size *: [Size](_autosummary/looks.geometry.html.md#looks.geometry.Size)*
+
+The dimensions as a [`Size`](_autosummary/looks.html.md#looks.Size).
+
 ### *exception* looks.CacheError
 
 Bases: [`LutError`](_autosummary/looks.lut.html.md#looks.lut.LutError)
@@ -3567,6 +3597,10 @@ Why, when something could not be measured.
 * **Type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
+#### *property* can_flicker *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[bool](https://docs.python.org/3/builtins/functions.html#bool)]*
+
+Whether the chain can flicker; `None` while the dependency is undetermined.
+
 ### *class* looks.Effect(, name, params=FrozenMap(), at=None, impl=None, backend=None, metadata=FrozenMap())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
@@ -3776,6 +3810,13 @@ from its `requires_filters`, so rule 22 never reads `None` for
 one: leaving it out is not a way past the refusal. (Changing a
 declared `rgb_only` changes `vf`’s pixels; bump `impl_version`.)
 
+#### tags(key)
+
+The tags of the entry registered under `key`.
+
+* **Return type:**
+  [`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)
+
 #### with_defaults(effect, params)
 
 `params` with this registry’s declared defaults filled in.
@@ -3925,6 +3966,13 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 A run of ffmpeg steps with no frame operation in it: one `-vf`.
 
+#### to_dict()
+
+The stage as a JSON-serialisable dict.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
 ### *class* looks.FrameSegment(op, decode, encode, pix_fmt, width, height, rate, params=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
@@ -3940,6 +3988,13 @@ How many bytes one frame occupies on the pipe.
 
 rawvideo has no header, so a consumer that guesses this reads a sheared
 picture rather than an error.
+
+#### to_dict()
+
+The stage as a JSON-serialisable dict.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### *exception* looks.GeometryError
 
@@ -4084,7 +4139,7 @@ whose expressions reference `in_time`. Distinct from
 
 \*\*Tri-state, and `None` is not `False`.\*\* The same rule as
 `Step.cpu_seconds` and
-[`can_flicker`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.DependencyReport.can_flicker):
+[`can_flicker`](_autosummary/looks.frame_dependency.html.md#id0):
 “we were not told” and “it does not” are different claims, and only
 one of them is a guarantee a caller may act on. An implementation
 registered without declaring this reads as **unknown**, never as
@@ -4378,6 +4433,13 @@ The whole arrangement, as data.
 `boundaries` is the number of raw-frame crossings, which is the number
 that costs — each one is a full decode and re-encode. It is reported after
 folding, because counting runs before folding overstates it.
+
+#### to_dict()
+
+The whole pipe as a JSON-serialisable dict (`looks.pipe/v1`).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### *class* looks.Placement(source, target, scale, crop=None, offset=None, rounding='exact_floor')
 
@@ -4754,6 +4816,13 @@ a different picture from the one stored.
 * **Return type:**
   [`Ripple`](_autosummary/looks.transition.html.md#looks.transition.Ripple)
 
+#### to_dict()
+
+The transition as a JSON-serialisable dict.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
 ### *exception* looks.SchemaError
 
 Bases: [`SpecError`](_autosummary/looks.spec.html.md#looks.spec.SpecError)
@@ -4764,7 +4833,7 @@ A serialised document this build cannot read.
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
-A pixel size. `aspect` is width/height, never the other way round.
+A pixel size. [`aspect`](_autosummary/looks.html.md#looks.Size.aspect) is width/height, never the other way round.
 
 ### Examples
 
@@ -4776,6 +4845,10 @@ Traceback (most recent call last):
 ...
 looks.geometry.GeometryError: a Size must be positive, got 0x10
 ```
+
+#### *property* aspect *: [float](https://docs.python.org/3/builtins/functions.html#float)*
+
+Width divided by height.
 
 ### *class* looks.Solid(rgb=(0, 0, 0))
 
@@ -4848,6 +4921,13 @@ what a person reads and the second is what the solver minimised.
 Clips the trim left outside the window. Empty under `full_range`.
 Named rather than counted, because *which* clip could not be fixed is
 the interesting half of the answer.
+
+#### to_dict()
+
+The spread as a JSON-serialisable dict (`looks.spread/v1`).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### *exception* looks.StageOrderWarning
 
@@ -5109,6 +5189,20 @@ True
 * **Return type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Effect`](_autosummary/looks.spec.html.md#looks.spec.Effect)]
 
+#### *classmethod* from_dict(d)
+
+Rebuild a transition from [`to_dict()`](_autosummary/looks.html.md#looks.Transition.to_dict) output; `TransitionError` for another kind.
+
+* **Return type:**
+  [`Transition`](_autosummary/looks.transition.html.md#looks.transition.Transition)
+
+#### to_dict()
+
+The transition as a JSON-serialisable dict.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
 ### *exception* looks.TransitionError
 
 Bases: [`SpecError`](_autosummary/looks.spec.html.md#looks.spec.SpecError)
@@ -5176,6 +5270,13 @@ The whole frame is the identity window:
 >>> Window.full()
 Window(x=0.0, y=0.0, w=1.0, h=1.0)
 ```
+
+#### *classmethod* full()
+
+The window covering the whole frame.
+
+* **Return type:**
+  [`Window`](_autosummary/looks.motion.html.md#looks.motion.Window)
 
 ### *class* looks.WindowLike(\*args, \*\*kwargs)
 
@@ -8855,6 +8956,13 @@ The whole frame is the identity window:
 Window(x=0.0, y=0.0, w=1.0, h=1.0)
 ```
 
+#### *classmethod* full()
+
+The window covering the whole frame.
+
+* **Return type:**
+  [`Window`](_autosummary/looks.motion.html.md#looks.motion.Window)
+
 ### *class* looks.motion.WindowLike(\*args, \*\*kwargs)
 
 Bases: [`Protocol`](https://docs.python.org/3/library/typing.html#typing.Protocol)
@@ -9224,7 +9332,7 @@ looks.params.ParamError: grain: unknown parameter 'strenght'; it takes ['seed', 
 | [`curve`](_autosummary/looks.params.html.md#looks.params.curve)(name)                                      | At least two `(x, y)` points in 0..1 with x strictly increasing.                 |
 | [`flag`](_autosummary/looks.params.html.md#looks.params.flag)(name[, default])                            | A bool, not truthiness: `"false"` would otherwise be true.                       |
 | [`real`](_autosummary/looks.params.html.md#looks.params.real)(name[, default, low, high, low_open, ...])  | A finite number, optionally bounded.                                             |
-| `text`(name[, default])                                                                           |                                                                                  |
+| [`text`](_autosummary/looks.params.html.md#looks.params.text)(name[, default])                            | A free-text parameter: must be a string.                                         |
 | [`vector`](_autosummary/looks.params.html.md#looks.params.vector)(name, length[, default, low, high, ...])  | `length` finite numbers, each optionally bounded.                                |
 | [`whole`](_autosummary/looks.params.html.md#looks.params.whole)(name[, default, low, high])                | A whole number (`8.0` is fine, `7.9` and `True` are not).                        |
 | [`with_defaults`](_autosummary/looks.params.html.md#looks.params.with_defaults)(effect, params, \*[, schemas])     | The parameters with every declared default filled in; the input is untouched.    |
@@ -9363,7 +9471,7 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 One named parameter: how to recognise a valid value, and what omitted means.
 
 `accepts` is the strategy; the constructors below ([`real()`](_autosummary/looks.params.html.md#looks.params.real),
-[`whole()`](_autosummary/looks.params.html.md#looks.params.whole), [`flag()`](_autosummary/looks.params.html.md#looks.params.flag), `text()`, [`vector()`](_autosummary/looks.params.html.md#looks.params.vector), [`curve()`](_autosummary/looks.params.html.md#looks.params.curve),
+[`whole()`](_autosummary/looks.params.html.md#looks.params.whole), [`flag()`](_autosummary/looks.params.html.md#looks.params.flag), [`text()`](_autosummary/looks.params.html.md#looks.params.text), [`vector()`](_autosummary/looks.params.html.md#looks.params.vector), [`curve()`](_autosummary/looks.params.html.md#looks.params.curve),
 [`anything()`](_autosummary/looks.params.html.md#looks.params.anything)) cover every kind the registered effects need.
 
 #### fits_format(pix_fmt)
@@ -9456,6 +9564,10 @@ A bool, not truthiness: `"false"` would otherwise be true.
 ### looks.params.real(name, default=<object object>, \*, low=None, high=None, low_open=False, emitted=False)
 
 A finite number, optionally bounded. `emitted` bounds it as written.
+
+### looks.params.text(name, default=<object object>)
+
+A free-text parameter: must be a string.
 
 ### looks.params.vector(name, length, default=<object object>, \*, low=None, high=None, low_open=False)
 
@@ -9571,6 +9683,13 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 A run of ffmpeg steps with no frame operation in it: one `-vf`.
 
+#### to_dict()
+
+The stage as a JSON-serialisable dict.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
 ### *class* looks.pipe.FrameSegment(op, decode, encode, pix_fmt, width, height, rate, params=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
@@ -9586,6 +9705,13 @@ How many bytes one frame occupies on the pipe.
 
 rawvideo has no header, so a consumer that guesses this reads a sheared
 picture rather than an error.
+
+#### to_dict()
+
+The stage as a JSON-serialisable dict.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### looks.pipe.PIPE_BYTES_PER_PIXEL *= {'abgr': 4, 'argb': 4, 'bgr24': 3, 'bgra': 4, 'gray': 1, 'rgb24': 3, 'rgba': 4}*
 
@@ -9610,6 +9736,13 @@ The whole arrangement, as data.
 `boundaries` is the number of raw-frame crossings, which is the number
 that costs — each one is a full decode and re-encode. It is reported after
 folding, because counting runs before folding overstates it.
+
+#### to_dict()
+
+The whole pipe as a JSON-serialisable dict (`looks.pipe/v1`).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### looks.pipe.describe(arranged)
 
@@ -9939,6 +10072,13 @@ An ffmpeg implementation’s undeclared `rgb_only` is settled here
 from its `requires_filters`, so rule 22 never reads `None` for
 one: leaving it out is not a way past the refusal. (Changing a
 declared `rgb_only` changes `vf`’s pixels; bump `impl_version`.)
+
+#### tags(key)
+
+The tags of the entry registered under `key`.
+
+* **Return type:**
+  [`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)
 
 #### with_defaults(effect, params)
 
@@ -10315,7 +10455,7 @@ whose expressions reference `in_time`. Distinct from
 
 \*\*Tri-state, and `None` is not `False`.\*\* The same rule as
 `Step.cpu_seconds` and
-[`can_flicker`](_autosummary/looks.frame_dependency.html.md#looks.frame_dependency.DependencyReport.can_flicker):
+[`can_flicker`](_autosummary/looks.frame_dependency.html.md#id0):
 “we were not told” and “it does not” are different claims, and only
 one of them is a guarantee a caller may act on. An implementation
 registered without declaring this reads as **unknown**, never as
@@ -11315,6 +11455,13 @@ a different picture from the one stored.
 * **Return type:**
   [`Ripple`](_autosummary/looks.transition.html.md#looks.transition.Ripple)
 
+#### to_dict()
+
+The transition as a JSON-serialisable dict.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
 ### looks.transition.TRANSITION_CURVES *= frozenset({'circleclose', 'circleopen', 'dissolve', 'fade', 'fadeblack', 'fadewhite', 'slidedown', 'slideleft', 'slideright', 'slideup', 'smoothleft', 'smoothright', 'wipedown', 'wipeleft', 'wiperight', 'wipeup'})*
 
 a curated subset of ffmpeg’s 58, chosen
@@ -11397,6 +11544,20 @@ True
 
 * **Return type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Effect`](_autosummary/looks.spec.html.md#looks.spec.Effect)]
+
+#### *classmethod* from_dict(d)
+
+Rebuild a transition from [`to_dict()`](_autosummary/looks.transition.html.md#looks.transition.Transition.to_dict) output; `TransitionError` for another kind.
+
+* **Return type:**
+  [`Transition`](_autosummary/looks.transition.html.md#looks.transition.Transition)
+
+#### to_dict()
+
+The transition as a JSON-serialisable dict.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### *exception* looks.transition.TransitionError
 
@@ -11558,7 +11719,7 @@ frames...
 
 # About this build
 
-This documentation was built on **2026-11-22 14:11 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/95ac5dafcdb943493ee1977316bce0c8c283685a"><code>95ac5da</code></a> on branch <code>main</code>, for **looks 0.0.39** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-23 00:32 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/42115938d025e24a0ed1b06bbb1e1bbd935cce8a"><code>4211593</code></a> on branch <code>main</code>, for **looks 0.0.39** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -11567,9 +11728,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                       |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/reeleehq/looks/commit/95ac5dafcdb943493ee1977316bce0c8c283685a"><code>95ac5dafcdb943493ee1977316bce0c8c283685a</code></a> |
+| Commit              | <a href="https://github.com/reeleehq/looks/commit/42115938d025e24a0ed1b06bbb1e1bbd935cce8a"><code>42115938d025e24a0ed1b06bbb1e1bbd935cce8a</code></a> |
 | Branch              | <code>main</code>                                                                                                                                     |
-| Tags at this commit | <code>0.0.39</code>                                                                                                                                   |
+| Tags at this commit | none                                                                                                                                                  |
 | Working tree        | clean                                                                                                                                                 |
 | Remote              | <code>https://github.com/reeleehq/looks</code>                                                                                                        |
 
@@ -11578,9 +11739,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>reeleehq/looks</code>                                                                |
-| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/45031160244">45031160244</a>       |
+| Run          | <a href="https://github.com/reeleehq/looks/actions/runs/45088856916">45088856916</a>       |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>969a944496d62640c60f00202121149b62e7c86b</code> (in the history of the built commit) |
+| Event commit | <code>42115938d025e24a0ed1b06bbb1e1bbd935cce8a</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -11611,7 +11772,7 @@ Latest release: <a href="https://pypi.org/project/looks/0.0.39/">0.0.39</a>, the
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout 95ac5dafcdb943493ee1977316bce0c8c283685a
+git checkout 42115938d025e24a0ed1b06bbb1e1bbd935cce8a
 pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

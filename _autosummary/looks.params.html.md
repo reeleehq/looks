@@ -74,7 +74,7 @@ looks.params.ParamError: grain: unknown parameter 'strenght'; it takes ['seed', 
 | [`curve`](#looks.params.curve)(name)                                      | At least two `(x, y)` points in 0..1 with x strictly increasing.                 |
 | [`flag`](#looks.params.flag)(name[, default])                            | A bool, not truthiness: `"false"` would otherwise be true.                       |
 | [`real`](#looks.params.real)(name[, default, low, high, low_open, ...])  | A finite number, optionally bounded.                                             |
-| `text`(name[, default])                                                                           |                                                                                  |
+| [`text`](#looks.params.text)(name[, default])                            | A free-text parameter: must be a string.                                         |
 | [`vector`](#looks.params.vector)(name, length[, default, low, high, ...])  | `length` finite numbers, each optionally bounded.                                |
 | [`whole`](#looks.params.whole)(name[, default, low, high])                | A whole number (`8.0` is fine, `7.9` and `True` are not).                        |
 | [`with_defaults`](#looks.params.with_defaults)(effect, params, \*[, schemas])     | The parameters with every declared default filled in; the input is untouched.    |
@@ -213,7 +213,7 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 One named parameter: how to recognise a valid value, and what omitted means.
 
 `accepts` is the strategy; the constructors below ([`real()`](#looks.params.real),
-[`whole()`](#looks.params.whole), [`flag()`](#looks.params.flag), `text()`, [`vector()`](#looks.params.vector), [`curve()`](#looks.params.curve),
+[`whole()`](#looks.params.whole), [`flag()`](#looks.params.flag), [`text()`](#looks.params.text), [`vector()`](#looks.params.vector), [`curve()`](#looks.params.curve),
 [`anything()`](#looks.params.anything)) cover every kind the registered effects need.
 
 #### fits_format(pix_fmt)
@@ -306,6 +306,10 @@ A bool, not truthiness: `"false"` would otherwise be true.
 ### looks.params.real(name, default=<object object>, \*, low=None, high=None, low_open=False, emitted=False)
 
 A finite number, optionally bounded. `emitted` bounds it as written.
+
+### looks.params.text(name, default=<object object>)
+
+A free-text parameter: must be a string.
 
 ### looks.params.vector(name, length, default=<object object>, \*, low=None, high=None, low_open=False)
 

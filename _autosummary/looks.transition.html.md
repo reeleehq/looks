@@ -204,6 +204,13 @@ a different picture from the one stored.
 * **Return type:**
   [`Ripple`](#looks.transition.Ripple)
 
+#### to_dict()
+
+The transition as a JSON-serialisable dict.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
 ### looks.transition.TRANSITION_CURVES *= frozenset({'circleclose', 'circleopen', 'dissolve', 'fade', 'fadeblack', 'fadewhite', 'slidedown', 'slideleft', 'slideright', 'slideup', 'smoothleft', 'smoothright', 'wipedown', 'wipeleft', 'wiperight', 'wipeup'})*
 
 a curated subset of ffmpeg’s 58, chosen
@@ -286,6 +293,20 @@ True
 
 * **Return type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Effect`](looks.spec.html.md#looks.spec.Effect)]
+
+#### *classmethod* from_dict(d)
+
+Rebuild a transition from [`to_dict()`](#looks.transition.Transition.to_dict) output; `TransitionError` for another kind.
+
+* **Return type:**
+  [`Transition`](#looks.transition.Transition)
+
+#### to_dict()
+
+The transition as a JSON-serialisable dict.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### *exception* looks.transition.TransitionError
 

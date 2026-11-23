@@ -758,6 +758,11 @@ the two packages apart — <code class="docutils literal notranslate"><span clas
 </div>
 <dl class="field-list simple">
 </dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="looks.Box.size">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="looks.geometry.html#looks.geometry.Size" title="looks.geometry.Size"><span class="pre">Size</span></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.Box.size" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.Box.size'">¶</a></dt>
+<dd><p>The dimensions as a <a class="reference internal" href="#looks.Size" title="looks.Size"><code class="xref py py-class docutils literal notranslate"><span class="pre">Size</span></code></a>.</p>
+</dd></dl>
 </dd></dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="looks.CacheError">
@@ -1184,6 +1189,11 @@ guarantee.</p>
 </dd>
 </dl>
 </dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="id0">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">can_flicker</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">Optional</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">bool</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">]</span></span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#id0" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id0'">¶</a></dt>
+<dd><p>Whether the chain can flicker; <code class="docutils literal notranslate"><span class="pre">None</span></code> while the dependency is undetermined.</p>
+</dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="looks.Effect">
@@ -1426,6 +1436,16 @@ one: leaving it out is not a way past the refusal. (Changing a
 declared <code class="docutils literal notranslate"><span class="pre">rgb_only</span></code> changes <code class="docutils literal notranslate"><span class="pre">vf</span></code>’s pixels; bump <code class="docutils literal notranslate"><span class="pre">impl_version</span></code>.)</p>
 </dd></dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="looks.EffectRegistry.tags">
+<span class="sig-name descname"><span class="pre">tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/registry.html#EffectRegistry.tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.EffectRegistry.tags" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.EffectRegistry.tags'">¶</a></dt>
+<dd><p>The tags of the entry registered under <code class="docutils literal notranslate"><span class="pre">key</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">frozenset</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="looks.EffectRegistry.with_defaults">
 <span class="sig-name descname"><span class="pre">with_defaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">effect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/registry.html#EffectRegistry.with_defaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.EffectRegistry.with_defaults" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.EffectRegistry.with_defaults'">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">params</span></code> with this registry’s declared defaults filled in.</p>
@@ -1601,6 +1621,16 @@ and AnimeGANv2’s terms have no identifier at all.</p>
 <p>A run of ffmpeg steps with no frame operation in it: one <code class="code docutils literal notranslate"><span class="pre">-vf</span></code>.</p>
 <dl class="field-list simple">
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.FilterSegment.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/pipe.html#FilterSegment.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.FilterSegment.to_dict" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.FilterSegment.to_dict'">¶</a></dt>
+<dd><p>The stage as a JSON-serialisable dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="looks.FrameSegment">
@@ -1617,6 +1647,16 @@ settings and destination to <code class="xref py py-attr docutils literal notran
 <dd><p>How many bytes one frame occupies on the pipe.</p>
 <p>rawvideo has no header, so a consumer that guesses this reads a sheared
 picture rather than an error.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.FrameSegment.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/pipe.html#FrameSegment.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.FrameSegment.to_dict" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.FrameSegment.to_dict'">¶</a></dt>
+<dd><p>The stage as a JSON-serialisable dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 <dl class="py exception">
@@ -1798,7 +1838,7 @@ whose expressions reference <code class="docutils literal notranslate"><span cla
 <code class="docutils literal notranslate"><span class="pre">enable='between(t,...)'</span></code>.</p>
 <p>**Tri-state, and <code class="docutils literal notranslate"><span class="pre">None</span></code> is not <code class="docutils literal notranslate"><span class="pre">False</span></code>.** The same rule as
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">Step.cpu_seconds</span></code> and
-<a class="reference internal" href="looks.frame_dependency.html#looks.frame_dependency.DependencyReport.can_flicker" title="looks.frame_dependency.DependencyReport.can_flicker"><code class="xref py py-attr docutils literal notranslate"><span class="pre">can_flicker</span></code></a>:
+<a class="reference internal" href="looks.frame_dependency.html#id0" title="looks.frame_dependency.DependencyReport.can_flicker"><code class="xref py py-attr docutils literal notranslate"><span class="pre">can_flicker</span></code></a>:
 “we were not told” and “it does not” are different claims, and only
 one of them is a guarantee a caller may act on. An implementation
 registered without declaring this reads as <strong>unknown</strong>, never as
@@ -2102,6 +2142,16 @@ that costs — each one is a full decode and re-encode. It is reported after
 folding, because counting runs before folding overstates it.</p>
 <dl class="field-list simple">
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.PipePlan.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/pipe.html#PipePlan.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.PipePlan.to_dict" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.PipePlan.to_dict'">¶</a></dt>
+<dd><p>The whole pipe as a JSON-serialisable dict (<code class="docutils literal notranslate"><span class="pre">looks.pipe/v1</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="looks.Placement">
@@ -2484,6 +2534,16 @@ a different picture from the one stored.</p>
 </dd>
 </dl>
 </dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.Ripple.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/transition.html#Ripple.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.Ripple.to_dict" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.Ripple.to_dict'">¶</a></dt>
+<dd><p>The transition as a JSON-serialisable dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
 </dd></dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="looks.SchemaError">
@@ -2495,7 +2555,7 @@ a different picture from the one stored.</p>
 <dt class="sig sig-object py" id="looks.Size">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">looks.</span></span><span class="sig-name descname"><span class="pre">Size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/geometry.html#Size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.Size" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.Size'">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
-<p>A pixel size. <code class="xref py py-attr docutils literal notranslate"><span class="pre">aspect</span></code> is width/height, never the other way round.</p>
+<p>A pixel size. <a class="reference internal" href="#looks.Size.aspect" title="looks.Size.aspect"><code class="xref py py-attr docutils literal notranslate"><span class="pre">aspect</span></code></a> is width/height, never the other way round.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Size</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">)</span><span class="o">.</span><span class="n">aspect</span>
 </span><span id="line-2"><span class="go">1.7777777777777777</span>
@@ -2507,6 +2567,11 @@ a different picture from the one stored.</p>
 </div>
 <dl class="field-list simple">
 </dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="looks.Size.aspect">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">aspect</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.Size.aspect" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.Size.aspect'">¶</a></dt>
+<dd><p>Width divided by height.</p>
+</dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="looks.Solid">
@@ -2581,6 +2646,16 @@ what a person reads and the second is what the solver minimised.</p>
 <dd><p>Clips the trim left outside the window. Empty under <code class="docutils literal notranslate"><span class="pre">full_range</span></code>.
 Named rather than counted, because <em>which</em> clip could not be fixed is
 the interesting half of the answer.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.Spread.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/across.html#Spread.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.Spread.to_dict" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.Spread.to_dict'">¶</a></dt>
+<dd><p>The spread as a JSON-serialisable dict (<code class="docutils literal notranslate"><span class="pre">looks.spread/v1</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 <dl class="py exception">
@@ -2858,6 +2933,26 @@ without an <code class="docutils literal notranslate"><span class="pre">isinstan
 </dd>
 </dl>
 </dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.Transition.from_dict">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/transition.html#Transition.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.Transition.from_dict" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.Transition.from_dict'">¶</a></dt>
+<dd><p>Rebuild a transition from <a class="reference internal" href="#looks.Transition.to_dict" title="looks.Transition.to_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_dict()</span></code></a> output; <code class="docutils literal notranslate"><span class="pre">TransitionError</span></code> for another kind.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="looks.transition.html#looks.transition.Transition" title="looks.transition.Transition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transition</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.Transition.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/transition.html#Transition.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.Transition.to_dict" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.Transition.to_dict'">¶</a></dt>
+<dd><p>The transition as a JSON-serialisable dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
 </dd></dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="looks.TransitionError">
@@ -2921,6 +3016,16 @@ separate opt-in, supply evidence.</p>
 </div>
 <dl class="field-list simple">
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="looks.Window.full">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">full</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/looks/motion.html#Window.full"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#looks.Window.full" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#looks.Window.full'">¶</a></dt>
+<dd><p>The window covering the whole frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="looks.motion.html#looks.motion.Window" title="looks.motion.Window"><code class="xref py py-class docutils literal notranslate"><span class="pre">Window</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="looks.WindowLike">
@@ -4954,7 +5059,10 @@ count check — the obvious check — passes in both cases.</p></li>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#looks.Blurred'" class="reference internal" href="#looks.Blurred"><code class="docutils literal notranslate"><span class="pre">Blurred</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.Box'" class="reference internal" href="#looks.Box"><code class="docutils literal notranslate"><span class="pre">Box</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.Box'" class="reference internal" href="#looks.Box"><code class="docutils literal notranslate"><span class="pre">Box</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.Box.size'" class="reference internal" href="#looks.Box.size"><code class="docutils literal notranslate"><span class="pre">Box.size</span></code></a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#looks.CacheError'" class="reference internal" href="#looks.CacheError"><code class="docutils literal notranslate"><span class="pre">CacheError</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.Candidate'" class="reference internal" href="#looks.Candidate"><code class="docutils literal notranslate"><span class="pre">Candidate</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.Choice'" class="reference internal" href="#looks.Choice"><code class="docutils literal notranslate"><span class="pre">Choice</span></code></a></li>
@@ -4996,6 +5104,7 @@ count check — the obvious check — passes in both cases.</p></li>
 <li><a :data-current="activeSection === '#looks.DependencyReport.determinism_delta'" class="reference internal" href="#looks.DependencyReport.determinism_delta"><code class="docutils literal notranslate"><span class="pre">DependencyReport.determinism_delta</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.DependencyReport.can_flicker'" class="reference internal" href="#looks.DependencyReport.can_flicker"><code class="docutils literal notranslate"><span class="pre">DependencyReport.can_flicker</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.DependencyReport.note'" class="reference internal" href="#looks.DependencyReport.note"><code class="docutils literal notranslate"><span class="pre">DependencyReport.note</span></code></a></li>
+<li><a :data-current="activeSection === '#id0'" class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">DependencyReport.can_flicker</span></code></a></li>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#looks.Effect'" class="reference internal" href="#looks.Effect"><code class="docutils literal notranslate"><span class="pre">Effect</span></code></a><ul>
@@ -5015,6 +5124,7 @@ count check — the obvious check — passes in both cases.</p></li>
 <li><a :data-current="activeSection === '#looks.EffectRegistry.implementations'" class="reference internal" href="#looks.EffectRegistry.implementations"><code class="docutils literal notranslate"><span class="pre">EffectRegistry.implementations()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.EffectRegistry.keeps_depth'" class="reference internal" href="#looks.EffectRegistry.keeps_depth"><code class="docutils literal notranslate"><span class="pre">EffectRegistry.keeps_depth()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.EffectRegistry.register'" class="reference internal" href="#looks.EffectRegistry.register"><code class="docutils literal notranslate"><span class="pre">EffectRegistry.register()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.EffectRegistry.tags'" class="reference internal" href="#looks.EffectRegistry.tags"><code class="docutils literal notranslate"><span class="pre">EffectRegistry.tags()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.EffectRegistry.with_defaults'" class="reference internal" href="#looks.EffectRegistry.with_defaults"><code class="docutils literal notranslate"><span class="pre">EffectRegistry.with_defaults()</span></code></a></li>
 </ul>
 </li>
@@ -5033,9 +5143,13 @@ count check — the obvious check — passes in both cases.</p></li>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#looks.FieldOfUse'" class="reference internal" href="#looks.FieldOfUse"><code class="docutils literal notranslate"><span class="pre">FieldOfUse</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.FilterSegment'" class="reference internal" href="#looks.FilterSegment"><code class="docutils literal notranslate"><span class="pre">FilterSegment</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.FilterSegment'" class="reference internal" href="#looks.FilterSegment"><code class="docutils literal notranslate"><span class="pre">FilterSegment</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.FilterSegment.to_dict'" class="reference internal" href="#looks.FilterSegment.to_dict"><code class="docutils literal notranslate"><span class="pre">FilterSegment.to_dict()</span></code></a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#looks.FrameSegment'" class="reference internal" href="#looks.FrameSegment"><code class="docutils literal notranslate"><span class="pre">FrameSegment</span></code></a><ul>
 <li><a :data-current="activeSection === '#looks.FrameSegment.frame_bytes'" class="reference internal" href="#looks.FrameSegment.frame_bytes"><code class="docutils literal notranslate"><span class="pre">FrameSegment.frame_bytes</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.FrameSegment.to_dict'" class="reference internal" href="#looks.FrameSegment.to_dict"><code class="docutils literal notranslate"><span class="pre">FrameSegment.to_dict()</span></code></a></li>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#looks.GeometryError'" class="reference internal" href="#looks.GeometryError"><code class="docutils literal notranslate"><span class="pre">GeometryError</span></code></a></li>
@@ -5090,7 +5204,10 @@ count check — the obvious check — passes in both cases.</p></li>
 <li><a :data-current="activeSection === '#looks.MeasurementError'" class="reference internal" href="#looks.MeasurementError"><code class="docutils literal notranslate"><span class="pre">MeasurementError</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.MotionError'" class="reference internal" href="#looks.MotionError"><code class="docutils literal notranslate"><span class="pre">MotionError</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.PipeError'" class="reference internal" href="#looks.PipeError"><code class="docutils literal notranslate"><span class="pre">PipeError</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.PipePlan'" class="reference internal" href="#looks.PipePlan"><code class="docutils literal notranslate"><span class="pre">PipePlan</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.PipePlan'" class="reference internal" href="#looks.PipePlan"><code class="docutils literal notranslate"><span class="pre">PipePlan</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.PipePlan.to_dict'" class="reference internal" href="#looks.PipePlan.to_dict"><code class="docutils literal notranslate"><span class="pre">PipePlan.to_dict()</span></code></a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#looks.Placement'" class="reference internal" href="#looks.Placement"><code class="docutils literal notranslate"><span class="pre">Placement</span></code></a><ul>
 <li><a :data-current="activeSection === '#looks.Placement.resamples'" class="reference internal" href="#looks.Placement.resamples"><code class="docutils literal notranslate"><span class="pre">Placement.resamples</span></code></a></li>
 </ul>
@@ -5123,10 +5240,14 @@ count check — the obvious check — passes in both cases.</p></li>
 <li><a :data-current="activeSection === '#looks.Ripple.dissolve'" class="reference internal" href="#looks.Ripple.dissolve"><code class="docutils literal notranslate"><span class="pre">Ripple.dissolve</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.Ripple.effect'" class="reference internal" href="#looks.Ripple.effect"><code class="docutils literal notranslate"><span class="pre">Ripple.effect()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.Ripple.from_dict'" class="reference internal" href="#looks.Ripple.from_dict"><code class="docutils literal notranslate"><span class="pre">Ripple.from_dict()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.Ripple.to_dict'" class="reference internal" href="#looks.Ripple.to_dict"><code class="docutils literal notranslate"><span class="pre">Ripple.to_dict()</span></code></a></li>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#looks.SchemaError'" class="reference internal" href="#looks.SchemaError"><code class="docutils literal notranslate"><span class="pre">SchemaError</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.Size'" class="reference internal" href="#looks.Size"><code class="docutils literal notranslate"><span class="pre">Size</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.Size'" class="reference internal" href="#looks.Size"><code class="docutils literal notranslate"><span class="pre">Size</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.Size.aspect'" class="reference internal" href="#looks.Size.aspect"><code class="docutils literal notranslate"><span class="pre">Size.aspect</span></code></a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#looks.Solid'" class="reference internal" href="#looks.Solid"><code class="docutils literal notranslate"><span class="pre">Solid</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.Span'" class="reference internal" href="#looks.Span"><code class="docutils literal notranslate"><span class="pre">Span</span></code></a><ul>
 <li><a :data-current="activeSection === '#looks.Span.duration'" class="reference internal" href="#looks.Span.duration"><code class="docutils literal notranslate"><span class="pre">Span.duration</span></code></a></li>
@@ -5137,6 +5258,7 @@ count check — the obvious check — passes in both cases.</p></li>
 <li><a :data-current="activeSection === '#looks.SpecError'" class="reference internal" href="#looks.SpecError"><code class="docutils literal notranslate"><span class="pre">SpecError</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.Spread'" class="reference internal" href="#looks.Spread"><code class="docutils literal notranslate"><span class="pre">Spread</span></code></a><ul>
 <li><a :data-current="activeSection === '#looks.Spread.outside'" class="reference internal" href="#looks.Spread.outside"><code class="docutils literal notranslate"><span class="pre">Spread.outside</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.Spread.to_dict'" class="reference internal" href="#looks.Spread.to_dict"><code class="docutils literal notranslate"><span class="pre">Spread.to_dict()</span></code></a></li>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#looks.StageOrderWarning'" class="reference internal" href="#looks.StageOrderWarning"><code class="docutils literal notranslate"><span class="pre">StageOrderWarning</span></code></a></li>
@@ -5159,6 +5281,8 @@ count check — the obvious check — passes in both cases.</p></li>
 <li><a :data-current="activeSection === '#looks.Transition'" class="reference internal" href="#looks.Transition"><code class="docutils literal notranslate"><span class="pre">Transition</span></code></a><ul>
 <li><a :data-current="activeSection === '#looks.Transition.dissolve'" class="reference internal" href="#looks.Transition.dissolve"><code class="docutils literal notranslate"><span class="pre">Transition.dissolve</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.Transition.effect'" class="reference internal" href="#looks.Transition.effect"><code class="docutils literal notranslate"><span class="pre">Transition.effect()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.Transition.from_dict'" class="reference internal" href="#looks.Transition.from_dict"><code class="docutils literal notranslate"><span class="pre">Transition.from_dict()</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.Transition.to_dict'" class="reference internal" href="#looks.Transition.to_dict"><code class="docutils literal notranslate"><span class="pre">Transition.to_dict()</span></code></a></li>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#looks.TransitionError'" class="reference internal" href="#looks.TransitionError"><code class="docutils literal notranslate"><span class="pre">TransitionError</span></code></a></li>
@@ -5166,7 +5290,10 @@ count check — the obvious check — passes in both cases.</p></li>
 <li><a :data-current="activeSection === '#looks.UnknownImpl'" class="reference internal" href="#looks.UnknownImpl"><code class="docutils literal notranslate"><span class="pre">UnknownImpl</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.UnresolvedParameter'" class="reference internal" href="#looks.UnresolvedParameter"><code class="docutils literal notranslate"><span class="pre">UnresolvedParameter</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.Verdict'" class="reference internal" href="#looks.Verdict"><code class="docutils literal notranslate"><span class="pre">Verdict</span></code></a></li>
-<li><a :data-current="activeSection === '#looks.Window'" class="reference internal" href="#looks.Window"><code class="docutils literal notranslate"><span class="pre">Window</span></code></a></li>
+<li><a :data-current="activeSection === '#looks.Window'" class="reference internal" href="#looks.Window"><code class="docutils literal notranslate"><span class="pre">Window</span></code></a><ul>
+<li><a :data-current="activeSection === '#looks.Window.full'" class="reference internal" href="#looks.Window.full"><code class="docutils literal notranslate"><span class="pre">Window.full()</span></code></a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#looks.WindowLike'" class="reference internal" href="#looks.WindowLike"><code class="docutils literal notranslate"><span class="pre">WindowLike</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.assert_flicker_free'" class="reference internal" href="#looks.assert_flicker_free"><code class="docutils literal notranslate"><span class="pre">assert_flicker_free()</span></code></a></li>
 <li><a :data-current="activeSection === '#looks.assess'" class="reference internal" href="#looks.assess"><code class="docutils literal notranslate"><span class="pre">assess()</span></code></a></li>

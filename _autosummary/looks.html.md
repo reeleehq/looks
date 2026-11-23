@@ -336,6 +336,10 @@ the two packages apart — `burns` owns *authored* geometry over time,
 Size(width=1439, height=1080)
 ```
 
+#### *property* size *: [Size](looks.geometry.html.md#looks.geometry.Size)*
+
+The dimensions as a [`Size`](#looks.Size).
+
 ### *exception* looks.CacheError
 
 Bases: [`LutError`](looks.lut.html.md#looks.lut.LutError)
@@ -698,6 +702,10 @@ Why, when something could not be measured.
 * **Type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
+#### *property* can_flicker *: [Optional](https://docs.python.org/3/library/typing.html#typing.Optional)[[bool](https://docs.python.org/3/builtins/functions.html#bool)]*
+
+Whether the chain can flicker; `None` while the dependency is undetermined.
+
 ### *class* looks.Effect(, name, params=FrozenMap(), at=None, impl=None, backend=None, metadata=FrozenMap())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
@@ -907,6 +915,13 @@ from its `requires_filters`, so rule 22 never reads `None` for
 one: leaving it out is not a way past the refusal. (Changing a
 declared `rgb_only` changes `vf`’s pixels; bump `impl_version`.)
 
+#### tags(key)
+
+The tags of the entry registered under `key`.
+
+* **Return type:**
+  [`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)
+
 #### with_defaults(effect, params)
 
 `params` with this registry’s declared defaults filled in.
@@ -1056,6 +1071,13 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 A run of ffmpeg steps with no frame operation in it: one `-vf`.
 
+#### to_dict()
+
+The stage as a JSON-serialisable dict.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
 ### *class* looks.FrameSegment(op, decode, encode, pix_fmt, width, height, rate, params=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
@@ -1071,6 +1093,13 @@ How many bytes one frame occupies on the pipe.
 
 rawvideo has no header, so a consumer that guesses this reads a sheared
 picture rather than an error.
+
+#### to_dict()
+
+The stage as a JSON-serialisable dict.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### *exception* looks.GeometryError
 
@@ -1215,7 +1244,7 @@ whose expressions reference `in_time`. Distinct from
 
 \*\*Tri-state, and `None` is not `False`.\*\* The same rule as
 `Step.cpu_seconds` and
-[`can_flicker`](looks.frame_dependency.html.md#looks.frame_dependency.DependencyReport.can_flicker):
+[`can_flicker`](looks.frame_dependency.html.md#id0):
 “we were not told” and “it does not” are different claims, and only
 one of them is a guarantee a caller may act on. An implementation
 registered without declaring this reads as **unknown**, never as
@@ -1509,6 +1538,13 @@ The whole arrangement, as data.
 `boundaries` is the number of raw-frame crossings, which is the number
 that costs — each one is a full decode and re-encode. It is reported after
 folding, because counting runs before folding overstates it.
+
+#### to_dict()
+
+The whole pipe as a JSON-serialisable dict (`looks.pipe/v1`).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### *class* looks.Placement(source, target, scale, crop=None, offset=None, rounding='exact_floor')
 
@@ -1885,6 +1921,13 @@ a different picture from the one stored.
 * **Return type:**
   [`Ripple`](looks.transition.html.md#looks.transition.Ripple)
 
+#### to_dict()
+
+The transition as a JSON-serialisable dict.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
 ### *exception* looks.SchemaError
 
 Bases: [`SpecError`](looks.spec.html.md#looks.spec.SpecError)
@@ -1895,7 +1938,7 @@ A serialised document this build cannot read.
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
-A pixel size. `aspect` is width/height, never the other way round.
+A pixel size. [`aspect`](#looks.Size.aspect) is width/height, never the other way round.
 
 ### Examples
 
@@ -1907,6 +1950,10 @@ Traceback (most recent call last):
 ...
 looks.geometry.GeometryError: a Size must be positive, got 0x10
 ```
+
+#### *property* aspect *: [float](https://docs.python.org/3/builtins/functions.html#float)*
+
+Width divided by height.
 
 ### *class* looks.Solid(rgb=(0, 0, 0))
 
@@ -1979,6 +2026,13 @@ what a person reads and the second is what the solver minimised.
 Clips the trim left outside the window. Empty under `full_range`.
 Named rather than counted, because *which* clip could not be fixed is
 the interesting half of the answer.
+
+#### to_dict()
+
+The spread as a JSON-serialisable dict (`looks.spread/v1`).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### *exception* looks.StageOrderWarning
 
@@ -2240,6 +2294,20 @@ True
 * **Return type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Effect`](looks.spec.html.md#looks.spec.Effect)]
 
+#### *classmethod* from_dict(d)
+
+Rebuild a transition from [`to_dict()`](#looks.Transition.to_dict) output; `TransitionError` for another kind.
+
+* **Return type:**
+  [`Transition`](looks.transition.html.md#looks.transition.Transition)
+
+#### to_dict()
+
+The transition as a JSON-serialisable dict.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
 ### *exception* looks.TransitionError
 
 Bases: [`SpecError`](looks.spec.html.md#looks.spec.SpecError)
@@ -2307,6 +2375,13 @@ The whole frame is the identity window:
 >>> Window.full()
 Window(x=0.0, y=0.0, w=1.0, h=1.0)
 ```
+
+#### *classmethod* full()
+
+The window covering the whole frame.
+
+* **Return type:**
+  [`Window`](looks.motion.html.md#looks.motion.Window)
 
 ### *class* looks.WindowLike(\*args, \*\*kwargs)
 

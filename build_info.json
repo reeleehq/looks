@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-22T14:11:53Z",
+  "built_at": "2026-11-23T00:32:54Z",
   "package": {
     "name": "looks",
     "version": "0.0.39",
@@ -9,26 +9,24 @@
   },
   "git": {
     "available": true,
-    "commit": "95ac5dafcdb943493ee1977316bce0c8c283685a",
-    "short_commit": "95ac5da",
+    "commit": "42115938d025e24a0ed1b06bbb1e1bbd935cce8a",
+    "short_commit": "4211593",
     "branch": "main",
-    "tags": [
-      "0.0.39"
-    ],
+    "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/reeleehq/looks",
-    "commit_url": "https://github.com/reeleehq/looks/commit/95ac5dafcdb943493ee1977316bce0c8c283685a",
+    "commit_url": "https://github.com/reeleehq/looks/commit/42115938d025e24a0ed1b06bbb1e1bbd935cce8a",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "reeleehq/looks",
-    "sha": "969a944496d62640c60f00202121149b62e7c86b",
+    "sha": "42115938d025e24a0ed1b06bbb1e1bbd935cce8a",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "45031160244",
-    "run_url": "https://github.com/reeleehq/looks/actions/runs/45031160244",
+    "run_id": "45088856916",
+    "run_url": "https://github.com/reeleehq/looks/actions/runs/45088856916",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -58,7 +56,7 @@
   },
   "site": {
     "modules_documented": 18,
-    "objects_documented": 670
+    "objects_documented": 694
   },
   "pypi": {
     "checked": true,
@@ -66,7 +64,7 @@
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/reeleehq/looks && cd looks\ngit checkout 95ac5dafcdb943493ee1977316bce0c8c283685a\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/reeleehq/looks && cd looks\ngit checkout 42115938d025e24a0ed1b06bbb1e1bbd935cce8a\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

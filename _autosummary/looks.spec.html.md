@@ -302,7 +302,7 @@ whose expressions reference `in_time`. Distinct from
 
 \*\*Tri-state, and `None` is not `False`.\*\* The same rule as
 `Step.cpu_seconds` and
-[`can_flicker`](looks.frame_dependency.html.md#looks.frame_dependency.DependencyReport.can_flicker):
+[`can_flicker`](looks.frame_dependency.html.md#id0):
 “we were not told” and “it does not” are different claims, and only
 one of them is a guarantee a caller may act on. An implementation
 registered without declaring this reads as **unknown**, never as

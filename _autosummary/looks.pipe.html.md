@@ -94,6 +94,13 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 A run of ffmpeg steps with no frame operation in it: one `-vf`.
 
+#### to_dict()
+
+The stage as a JSON-serialisable dict.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
 ### *class* looks.pipe.FrameSegment(op, decode, encode, pix_fmt, width, height, rate, params=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
@@ -109,6 +116,13 @@ How many bytes one frame occupies on the pipe.
 
 rawvideo has no header, so a consumer that guesses this reads a sheared
 picture rather than an error.
+
+#### to_dict()
+
+The stage as a JSON-serialisable dict.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### looks.pipe.PIPE_BYTES_PER_PIXEL *= {'abgr': 4, 'argb': 4, 'bgr24': 3, 'bgra': 4, 'gray': 1, 'rgb24': 3, 'rgba': 4}*
 
@@ -133,6 +147,13 @@ The whole arrangement, as data.
 `boundaries` is the number of raw-frame crossings, which is the number
 that costs — each one is a full decode and re-encode. It is reported after
 folding, because counting runs before folding overstates it.
+
+#### to_dict()
+
+The whole pipe as a JSON-serialisable dict (`looks.pipe/v1`).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 ### looks.pipe.describe(arranged)
 
