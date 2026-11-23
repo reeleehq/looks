@@ -2,6 +2,12 @@
 
 Named video effects that compile to a backend command, each carrying a **licence tier** — so you can demand commercial-safe-only and get a **refusal** rather than a surprise.
 
+```bash
+pip install looks
+```
+
+Zero dependencies: ffmpeg is shelled out to, never linked.
+
 ```python
 from looks.environment import needs_gpl
 
@@ -9,8 +15,6 @@ needs_gpl(["scale", "eq", "lut3d"])  # -> ('eq',)
 ```
 
 `eq` is the obvious brightness/contrast/gamma filter. It exists **only in a GPL build of ffmpeg**. Nothing in the ffmpeg CLI will tell you, because the binary on your machine runs it fine — and the LGPL-clean way to do the same thing (`curves`, `colorlevels`, `exposure`) is one substitution away. That gap is what this package is for.
-
-`pip install looks` — **zero dependencies.** ffmpeg is shelled out to, never linked.
 
 ## What it does today
 
