@@ -1,32 +1,34 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-23T00:32:54Z",
+  "built_at": "2026-11-23T02:44:12Z",
   "package": {
     "name": "looks",
-    "version": "0.0.39",
+    "version": "0.0.40",
     "display_name": "looks",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "42115938d025e24a0ed1b06bbb1e1bbd935cce8a",
-    "short_commit": "4211593",
+    "commit": "ed31a76da2c642a452dc6930051b054aa3d715ef",
+    "short_commit": "ed31a76",
     "branch": "main",
-    "tags": [],
+    "tags": [
+      "0.0.40"
+    ],
     "dirty": false,
     "remote_url": "https://github.com/reeleehq/looks",
-    "commit_url": "https://github.com/reeleehq/looks/commit/42115938d025e24a0ed1b06bbb1e1bbd935cce8a",
+    "commit_url": "https://github.com/reeleehq/looks/commit/ed31a76da2c642a452dc6930051b054aa3d715ef",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "reeleehq/looks",
-    "sha": "42115938d025e24a0ed1b06bbb1e1bbd935cce8a",
+    "sha": "6fed2e01f00a44cf88f77a79e0877f2668218055",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "45088856916",
-    "run_url": "https://github.com/reeleehq/looks/actions/runs/45088856916",
+    "run_id": "45101482162",
+    "run_url": "https://github.com/reeleehq/looks/actions/runs/45101482162",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -60,11 +62,11 @@
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.39",
+    "latest": "0.0.40",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/reeleehq/looks && cd looks\ngit checkout 42115938d025e24a0ed1b06bbb1e1bbd935cce8a\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/reeleehq/looks && cd looks\ngit checkout ed31a76da2c642a452dc6930051b054aa3d715ef\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

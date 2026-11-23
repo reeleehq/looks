@@ -5,7 +5,7 @@ orphan: true
 
 # About this build
 
-This documentation was built on **2026-11-23 00:32 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/42115938d025e24a0ed1b06bbb1e1bbd935cce8a"><code>4211593</code></a> on branch <code>main</code>, for **looks 0.0.39** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-23 02:44 UTC** from commit <a href="https://github.com/reeleehq/looks/commit/ed31a76da2c642a452dc6930051b054aa3d715ef"><code>ed31a76</code></a> on branch <code>main</code>, for **looks 0.0.40** (from <code>pyproject.toml</code>).
 
 :::{note}
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -15,9 +15,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 | | |
 |---|---|
-| Commit | <a href="https://github.com/reeleehq/looks/commit/42115938d025e24a0ed1b06bbb1e1bbd935cce8a"><code>42115938d025e24a0ed1b06bbb1e1bbd935cce8a</code></a> |
+| Commit | <a href="https://github.com/reeleehq/looks/commit/ed31a76da2c642a452dc6930051b054aa3d715ef"><code>ed31a76da2c642a452dc6930051b054aa3d715ef</code></a> |
 | Branch | <code>main</code> |
-| Tags at this commit | none |
+| Tags at this commit | <code>0.0.40</code> |
 | Working tree | clean |
 | Remote | <code>https://github.com/reeleehq/looks</code> |
 
@@ -26,9 +26,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 | | |
 |---|---|
 | Repository | <code>reeleehq/looks</code> |
-| Run | <a href="https://github.com/reeleehq/looks/actions/runs/45088856916">45088856916</a> |
+| Run | <a href="https://github.com/reeleehq/looks/actions/runs/45101482162">45101482162</a> |
 | Ref | <code>refs/heads/main</code> |
-| Event commit | <code>42115938d025e24a0ed1b06bbb1e1bbd935cce8a</code> (in the history of the built commit) |
+| Event commit | <code>6fed2e01f00a44cf88f77a79e0877f2668218055</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -53,13 +53,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/looks/0.0.39/">0.0.39</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/looks/0.0.40/">0.0.40</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/reeleehq/looks && cd looks
-git checkout 42115938d025e24a0ed1b06bbb1e1bbd935cce8a
+git checkout ed31a76da2c642a452dc6930051b054aa3d715ef
 pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
