@@ -108,6 +108,7 @@ class Size:
 
     @property
     def aspect(self) -> float:
+        """Width divided by height."""
         return self.width / self.height
 
 
@@ -133,6 +134,7 @@ class Box:
 
     @property
     def size(self) -> Size:
+        """The dimensions as a :class:`Size`."""
         return Size(self.width, self.height)
 
 

@@ -141,6 +141,7 @@ class Spread:
         return iter(self.choices)
 
     def to_dict(self) -> dict:
+        """The spread as a JSON-serialisable dict (``looks.spread/v1``)."""
         return {
             "schema": "looks.spread/v1",
             "statistic": self.statistic,

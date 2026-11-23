@@ -200,10 +200,12 @@ class Transition:
         return None
 
     def to_dict(self) -> dict:
+        """The transition as a JSON-serialisable dict."""
         return {"duration_s": self.duration_s, "curve": self.curve}
 
     @classmethod
     def from_dict(cls, d: Mapping) -> "Transition":
+        """Rebuild a transition from :meth:`to_dict` output; ``TransitionError`` for another kind."""
         kind = d.get("kind", XFADE_KIND)
         if kind != XFADE_KIND:
             raise TransitionError(
@@ -328,6 +330,7 @@ class Ripple:
         )
 
     def to_dict(self) -> dict:
+        """The transition as a JSON-serialisable dict."""
         return {
             "kind": RIPPLE_KIND,
             "duration_s": self.duration_s,

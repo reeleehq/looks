@@ -125,6 +125,7 @@ class FrameSegment:
         return self.width * self.height * PIPE_BYTES_PER_PIXEL[self.pix_fmt]
 
     def to_dict(self) -> dict:
+        """The stage as a JSON-serialisable dict."""
         return {
             "kind": "frame",
             "op": self.op,
@@ -145,6 +146,7 @@ class FilterSegment:
     vf: str
 
     def to_dict(self) -> dict:
+        """The stage as a JSON-serialisable dict."""
         return {"kind": "filter", "vf": self.vf}
 
 
@@ -168,6 +170,7 @@ class PipePlan:
         return iter(self.segments)
 
     def to_dict(self) -> dict:
+        """The whole pipe as a JSON-serialisable dict (``looks.pipe/v1``)."""
         return {
             "schema": "looks.pipe/v1",
             "source": self.source,

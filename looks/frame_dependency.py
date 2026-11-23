@@ -238,6 +238,7 @@ class DependencyReport:
 
     @property
     def can_flicker(self) -> Optional[bool]:
+        """Whether the chain can flicker; ``None`` while the dependency is undetermined."""
         if self.dependency is Dependency.UNDETERMINED:
             return None
         return self.dependency not in FLICKER_FREE

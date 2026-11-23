@@ -143,6 +143,7 @@ class Window:
 
     @classmethod
     def full(cls) -> "Window":
+        """The window covering the whole frame."""
         return cls(0.0, 0.0, 1.0, 1.0)
 
 
