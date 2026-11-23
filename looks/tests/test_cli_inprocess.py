@@ -132,7 +132,6 @@ def test_main_dispatches_in_process(capsys):
     assert "none of these needs a GPL build" in capsys.readouterr().out
 
 
-@pytest.mark.xfail(strict=True, reason="looks#71: a non-numeric time escapes as a ValueError traceback")
 def test_motion_non_numeric_time_is_a_clean_refusal():
     with pytest.raises(SystemExit, match="cannot read .* as a keyframe"):
         cli.motion(["x:0,0,1,1"])

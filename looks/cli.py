@@ -138,6 +138,7 @@ def motion(
     def parse(text: str) -> Keyframe:
         try:
             when, window = text.split(":", 1)
+            t = float(when)
             x, y, w, h = (float(v) for v in window.split(","))
         except ValueError:
             raise SystemExit(
@@ -145,7 +146,7 @@ def motion(
                 "a time in seconds, then a normalised top-left window, e.g. "
                 "0:0,0,1,1"
             ) from None
-        return Keyframe(float(when), Window(x, y, w, h))
+        return Keyframe(t, Window(x, y, w, h))
 
     size = None
     if output is not None:
