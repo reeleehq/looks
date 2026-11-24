@@ -286,6 +286,33 @@ class TestTheyAgreeOnCOLOUR:
         worst = max(abs(a - b) for a, b in zip(mine, gpl))
         assert worst <= 8, f"amount={amount}: {worst}/255 apart on limited range"
 
+    _GAP = pytest.mark.xfail(
+        strict=True,
+        reason="looks#65: eq range-converts a full-range clip; up to 25/255 from lutyuv",
+    )
+
+    @pytest.mark.parametrize(
+        "amount",
+        (0.5, 1.0, pytest.param(1.5, marks=_GAP), pytest.param(2.0, marks=_GAP),
+         pytest.param(3.0, marks=_GAP), pytest.param(10.0, marks=_GAP)),
+    )  # fmt: skip
+    def test_on_a_full_range_clip(self, amount, env):
+        """A full-range COLOUR source (``yuvj444p``), the case looks#65 is about.
+
+        Measured on 9.0.1 (2026-11-24): within 3/255 up to amount 1.0, then 19 at
+        1.5 and 25-26 from 2.0, while a limited-format source stays within 6. ``eq``
+        alone (``contrast=1``) already moves a full-range colour frame by 3. The
+        earlier "agrees on 7.0+" was measured on a grey ramp, which hides it, as
+        it hid the per-channel bug above. So the rule 29b gap is on current builds
+        too: these rows are strict xfails that turn green, and fail the suite as
+        a reminder, the day selection refuses ``eq`` for a full-range clip."""
+        _ffmpeg_or_skip()
+        full = "format=yuvj444p,"
+        mine = rendered(full + ours(amount, env))
+        gpl = rendered(full + f"eq=contrast={amount}")
+        worst = max(abs(a - b) for a, b in zip(mine, gpl))
+        assert worst <= 8, f"amount={amount}: {worst}/255 apart on a full-range clip"
+
     def test_all_three_channels_are_compared(self):
         """The guard on the guard. `transfer` reads `stdout[i*3]` — the RED
         byte — so a fragment that leaves red alone and destroys green and blue
