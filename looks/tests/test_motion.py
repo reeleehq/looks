@@ -339,6 +339,16 @@ class TestTheRefusalsAboutThePathItself:
         with pytest.raises(MotionError, match="not a\n?\\s*number|not a number"):
             compile_motion([Keyframe(0, Window(float("nan"), 0, 0.5, 0.5))])
 
+    @pytest.mark.parametrize("bad", [float("nan"), float("inf"), float("-inf")])
+    def test_a_non_finite_keyframe_time_is_refused(self, bad):
+        w = Window(0, 0, 0.5, 0.5)
+        with pytest.raises(MotionError, match="not a finite time"):
+            compile_motion([Keyframe(0, w), Keyframe(bad, w)])
+
+    def test_a_nan_first_keyframe_time_is_refused(self):
+        with pytest.raises(MotionError, match="not a finite time"):
+            compile_motion([Keyframe(float("nan"), Window(0, 0, 0.5, 0.5))])
+
 
 class TestTheStructuralWindow:
     """`looks` must never import `burns`, so it accepts burns' shape instead."""

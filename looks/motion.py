@@ -64,6 +64,7 @@ remember them:
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Optional, Protocol, Sequence, runtime_checkable
 
@@ -204,6 +205,11 @@ def _check(keyframes: Sequence[Keyframe]) -> tuple[Keyframe, ...]:
                 f"{_num(k.window.x + k.window.w)}, y+h="
                 f"{_num(k.window.y + k.window.h)}. ffmpeg would clamp this to "
                 "a different framing than the one authored, silently."
+            )
+        if not math.isfinite(k.t):
+            raise MotionError(
+                f"keyframe {i} is at t={k.t!r}, which is not a finite time. "
+                "A keyframe needs a real moment, not NaN or infinity."
             )
         if last is not None and k.t <= last:
             raise MotionError(
